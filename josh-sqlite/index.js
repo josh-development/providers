@@ -6,6 +6,7 @@ const {
   set: _set,
   isNil,
   isArray,
+  isFunction,
   toPath,
 } = require('lodash');
 
@@ -189,6 +190,7 @@ module.exports = class JoshProvider {
         return [value, currKey];
       }
     }
+    return null;
   }
 
   async findByValue(value, path) {
@@ -200,6 +202,7 @@ module.exports = class JoshProvider {
         return [val, currKey];
       }
     }
+    return null;
   }
 
   async filterByFunction(fn, path) {
@@ -213,8 +216,8 @@ module.exports = class JoshProvider {
     return returnArray;
   }
 
-  async filterByValue(fn, path) {
-    return this.getAll().map(([, value]) => (path ? _get(val, path) : val) === value);
+  async filterByValue(value, path) {
+    return this.getAll().filter(([, val]) => (path ? _get(val, path) : val) === value);
   }
 
   close() {
