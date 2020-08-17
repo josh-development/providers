@@ -47,6 +47,11 @@ module.exports = class JoshProvider {
       this.db.pragma('synchronous = 1');
       if (this.wal) this.db.pragma('journal_mode = wal');
     }
+    this.db.prepare(`CREATE TABLE IF NOT EXISTS 'internal::autonum' (josh TEXT PRIMARY KEY, lastnum INTEGER)`).run();
+    const row = this.db.prepare("SELECT lastnum FROM 'internal::autonum' WHERE josh = ?").get(this.name);
+    if (!row) {
+      this.db.prepare("INSERT INTO 'internal::autonum' (josh, lastnum) VALUES (?, ?)").run(this.name, 0);
+    }
   }
 
   /**
@@ -222,6 +227,13 @@ module.exports = class JoshProvider {
 
   close() {
     return this.db.close();
+  }
+
+  async autonum() {
+    let { lastnum } = this.db.prepare("SELECT lastnum FROM 'internal::autonum' WHERE josh = ?").get(this.name);
+    lastnum++;
+    this.db.prepare("INSERT OR REPLACE INTO 'internal::autonum' (josh, lastnum) VALUES (?, ?)").run(this.name, lastnum);
+    return lastnum;
   }
 
   keyCheck(key) {
