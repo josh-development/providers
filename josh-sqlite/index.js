@@ -288,4 +288,23 @@ module.exports = class JoshProvider {
     }
   }
 
+  async setMany(data, overwrite) {
+    if (isNil(data) || data.constructor.name !== 'Array') {
+      throw new Error('Provided data was not an array of [key, value] pairs.');
+    }
+    const insert = this.db.prepare(`INSERT OR REPLACE INTO ${this.name} (key, value) VALUES (?, ?);`);
+    const existingKeys = await this.keys();
+
+    const insertMany = this.db.transaction((rows) => {
+      for (const row of rows) insert.run(row);
+    });
+
+    insertMany(data.keys.reduce((acc, { key, value }) => {
+      if (overwrite && !existingKeys.includes(key)) {
+        acc.push([key, JSON.stringify(value)]);
+      }
+      return acc;
+    }, []));
+  }
+
 };
