@@ -299,7 +299,7 @@ module.exports = class JoshProvider {
       for (const row of rows) insert.run(row);
     });
 
-    insertMany(data.keys.reduce((acc, { key, value }) => {
+    insertMany(data.reduce((acc, [key, value]) => {
       if (overwrite && !existingKeys.includes(key)) {
         acc.push([key, JSON.stringify(value)]);
       }
