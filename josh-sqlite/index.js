@@ -229,11 +229,11 @@ module.exports = class JoshProvider {
     return this.db.close();
   }
 
-  async autonum() {
+  async autoId() {
     let { lastnum } = this.db.prepare("SELECT lastnum FROM 'internal::autonum' WHERE josh = ?").get(this.name);
     lastnum++;
     this.db.prepare("INSERT OR REPLACE INTO 'internal::autonum' (josh, lastnum) VALUES (?, ?)").run(this.name, lastnum);
-    return lastnum;
+    return lastnum.toString();
   }
 
   keyCheck(key) {
