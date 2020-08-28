@@ -8,6 +8,7 @@ const {
   isArray,
   isFunction,
   toPath,
+  cloneDeep,
 } = require('lodash');
 
 // Native imports
@@ -16,6 +17,8 @@ const fs = require('fs');
 
 // Custom error codes with stack support.
 const Err = require('./error.js');
+
+const { getPaths } = require("./utils.js");
 
 module.exports = class JoshProvider {
 
@@ -43,7 +46,7 @@ module.exports = class JoshProvider {
   async init() {
     const table = this.db.prepare("SELECT count(*) FROM sqlite_master WHERE type='table' AND name = ?;").get(this.name);
     if (!table['count(*)']) {
-      this.db.prepare(`CREATE TABLE ${this.name} (key text PRIMARY KEY, value text)`).run();
+      this.db.prepare(`CREATE TABLE '${this.name}' (key text, path text, value text)`).run();
       this.db.pragma('synchronous = 1');
       if (this.wal) this.db.pragma('journal_mode = wal');
     }
@@ -52,51 +55,46 @@ module.exports = class JoshProvider {
     if (!row) {
       this.db.prepare("INSERT INTO 'internal::autonum' (josh, lastnum) VALUES (?, ?)").run(this.name, 0);
     }
+
+    this.deleteStmt = this.db.prepare(`DELETE FROM '${this.name}' WHERE key=@key AND path=@path;`);
+    this.insertStmt = this.db.prepare(`INSERT INTO '${this.name}' (key, path, value) VALUES (@key, @path, @value);`);
+
+    this.runMany = this.db.transaction((transactions) => {
+      for(const [statement, row] of transactions) statement.run(row);
+    });
   }
 
-  /**
-   * Force fetch one or more key values from the database. If the database has changed, that new value is used.
-   * @param {string|number} key A single key or array of keys to force fetch from the database.
-   * @param {string} path The path to a value within an object or array value.
-   * @return {Josh|*} The Josh, including the new fetched values, or the value in case the function argument is a single key.
-   */
-  get(key, path = []) {
-    const row = this.db.prepare(`SELECT * FROM ${this.name} WHERE key = ?;`).get(key);
-    const data = isNil(row) ? null : this.parseData(row.value);
-    if (!data) return null;
-    if (path.length) return _get(data, path);
-    return data;
+  get(key, path) {
+    const query = this.db.prepare(`SELECT * FROM '${this.name}' WHERE key = ?${path ? ' AND path = ?' : " AND path='::NULL::'"};`);
+    const row = path ? query.get(key, path) : query.get(key);
+    return row ? JSON.parse(row.value) : undefined;
   }
 
   getAll() {
-    const stmt = this.db.prepare(`SELECT * from ${this.name}`);
+    const stmt = this.db.prepare(`SELECT * from '${this.name}' WHERE path='::NULL::';`);
     return stmt.all().map(row => [row.key, JSON.parse(row.value)]);
   }
 
   getMany(keys) {
-    return this.db.prepare(`SELECT * FROM ${this.name} WHERE key IN (${'?, '.repeat(keys.length).slice(0, -2)})`)
+    return this.db.prepare(`SELECT * FROM '${this.name}' WHERE key IN (${'?, '.repeat(keys.length).slice(0, -2)}) AND path='::NULL::';`)
       .all(keys)
       .map(row => [row.key, JSON.parse(row.value)]);
   }
 
   async random(count = 1) {
-    const data = await (await this.db.prepare(`SELECT * FROM '${this.name}' ORDER BY RANDOM() LIMIT ${count};`)).all();
+    const data = await (await this.db.prepare(`SELECT * FROM '${this.name}' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${count};`)).all();
     return count > 1 ? data : data[0];
   }
 
   async randomKey(count = 1) {
-    const data = await (await this.db.prepare(`SELECT rowid FROM '${this.name}' ORDER BY RANDOM() LIMIT ${count};`)).all();
+    const data = await (await this.db.prepare(`SELECT rowid FROM '${this.name}' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${count};`)).all();
     return count > 1 ? data.map(row => row.key) : data[0].key;
   }
 
-  async has(key, path = []) {
-    if (path.length) {
-      const data = this.get(key);
-      if (!data) return false;
-      return !isNil(_get(data, path));
-    }
-    const data = await (await this.db.prepare(`SELECT count(*) FROM '${this.name}' WHERE key = ?;`)).get(key);
-    return data['count(*)'] === 1;
+  async has(key, path) {
+    const query = this.db.prepare(`SELECT count(*) FROM '${this.name}' WHERE key = ?${path ? ' AND path = ?' : "AND path='::NULL::'"};`);
+    const row = path ? query.get(key, path) : query.get(key);
+    return row['count(*)'] === 1;
   }
 
   /**
@@ -104,12 +102,12 @@ module.exports = class JoshProvider {
    * @return {array<string>} Array of all indexes (keys) in the Josh, cached or not.
    */
   async keys() {
-    const rows = await (await this.db.prepare(`SELECT key FROM '${this.name}';`)).all();
+    const rows = await (await this.db.prepare(`SELECT key FROM '${this.name}' WHERE path='::NULL::';`)).all();
     return rows.map(row => row.key);
   }
 
   async values() {
-    const rows = await (await this.db.prepare(`SELECT value FROM '${this.name}';`)).all();
+    const rows = await (await this.db.prepare(`SELECT value FROM '${this.name}' WHERE path='::NULL::';`)).all();
     return rows.map(row => this.parseData(row.value));
   }
 
@@ -118,42 +116,36 @@ module.exports = class JoshProvider {
    * @return {integer} The number of rows in the database.
    */
   async count() {
-    const data = await (await this.db.prepare(`SELECT count(*) FROM '${this.name}';`)).get();
+    const data = await (await this.db.prepare(`SELECT count(*) FROM '${this.name}' WHERE path='::NULL::';`)).get();
     return data['count(*)'];
   }
 
   async set(key, path, val) {
     key = this.keyCheck(key);
-    let data = await this.get(key);
-    if (path.length) {
-      if (isNil(data)) data = {};
-      _set(data, path, val);
-    } else {
-      data = val;
-    }
-    await this.db.prepare(`INSERT OR REPLACE INTO ${this.name} (key, value) VALUES (?, ?);`).run(key, JSON.stringify(data));
+    const executions = await this.compareData(key, val, path);
+    console.log(executions);
+    this.runMany(executions);
     return this;
   }
 
   async delete(key, path) {
-    if (path.length > 0) {
-      const data = this.get(key);
-      path = toPath(path);
-      const last = path.pop();
-      const propValue = path.length ? _get(data, path) : data;
-      if (isArray(propValue)) {
-        propValue.splice(last, 1);
-      } else {
-        delete propValue[last];
-      }
-      this.set(key, path, propValue);
-    } else {
-      await this.db.prepare(`DELETE FROM ${this.name} WHERE key = ?`).run(key);
+    console.log(`Delete ${path} from ${key}`);
+    if(!path || path.length === 0) {
+      await this.db.prepare(`DELETE FROM '${this.name}' WHERE key = ?`).run(key);
+      return this;
     }
+    const propValue = this.get(key, path);
+    if (isArray(propValue)) {
+      propValue.splice(last, 1);
+    } else {
+      delete propValue[last];
+    }
+    await this.set(key, path, propValue);
+    return this;
   }
 
   async clear() {
-    this.db.exec(`DELETE FROM ${this.name}`);
+    this.db.exec(`DELETE FROM '${this.name}'`);
   }
 
   async push(key, path, value, allowDupes) {
@@ -198,16 +190,10 @@ module.exports = class JoshProvider {
     return null;
   }
 
-  async findByValue(value, path) {
-    const keys = await this.keys();
-    while (keys.length > 0) {
-      const currKey = keys.shift();
-      const val = this.get(currKey);
-      if ((path ? _get(val, path) : val) === value) {
-        return [val, currKey];
-      }
-    }
-    return null;
+  async findByValue(path, value) {
+    const query = this.db.prepare(`SELECT key, value FROM '${this.name}' WHERE value = ?${path ? ' AND path = ?' : " AND path = '::NULL::'"} LIMIT 1;`);
+    const results = path ? query.get(JSON.stringify(value), path) : query.get(JSON.stringify(value));
+    return results ? await this.get(results.key) : null;
   }
 
   async filterByFunction(fn, path) {
@@ -221,8 +207,14 @@ module.exports = class JoshProvider {
     return returnArray;
   }
 
-  async filterByValue(value, path) {
-    return this.getAll().filter(([, val]) => (path ? _get(val, path) : val) === value);
+  async filterByValue(path, value) {
+    const query = this.db.prepare(`SELECT key, value FROM '${this.name}' WHERE value = ?${path ? ' AND path = ?' : " AND path = '::NULL::'"}`);
+    const rows = path ? query.all(JSON.stringify(value), path) : query.all(JSON.stringify(value));
+    if(rows.length === 0) {
+      return [];
+    }
+    const promises = rows.map(async result => [await this.get(result.key), result.key]);
+    return Promise.all(promises);
   }
 
   close() {
@@ -269,6 +261,7 @@ module.exports = class JoshProvider {
    * @param {string} path Optional. The dotProp path to the property in JOSH.
    */
   // Herefore I indicate that I do understand part of this would be easily resolved with TypeScript but I don't do TS... yet.
+  // TODO: OPTIMIZE FOR LESS QUERIES. A LOT less queries. wow this is bad.
   async check(key, type, path = null) {
     if (!await this.has(key)) throw new Err(`The key "${key}" does not exist in JOSH "${this.name}"`, 'JoshPathError');
     if (!type) return;
@@ -288,23 +281,45 @@ module.exports = class JoshProvider {
     }
   }
 
+  // TODO: Check if I can figure out how to get actual NULL values instead of ::NULL::.
+  async compareData (key, newValue, path) {
+    const executions = [];
+    const currentData = await this.has(key) ? await this.get(key) : '::NULL::';
+    const currentPaths = getPaths(currentData);
+    const paths = path ? getPaths(_set(cloneDeep(currentData), path, newValue)) : getPaths(newValue);
+
+    console.log(currentPaths, paths);
+
+    for(const [path, value] of Object.entries(currentPaths)) {
+      if(isNil(paths[path]) || paths[path] !== value) {
+        executions.push([this.deleteStmt, { key, path }]);
+        if(!isNil(paths[path])) executions.push([this.insertStmt, { key, path, value: paths[path] }])
+      }
+      delete paths[path];
+    }
+    for(const [path, value] of Object.entries(paths)) {
+      executions.push([this.insertStmt, { key, path, value }])
+    }
+    return executions;
+  }
+
+  // TODO: Figure out how to make this similar to GET, 
   async setMany(data, overwrite) {
     if (isNil(data) || data.constructor.name !== 'Array') {
       throw new Error('Provided data was not an array of [key, value] pairs.');
     }
-    const insert = this.db.prepare(`INSERT OR REPLACE INTO ${this.name} (key, value) VALUES (?, ?);`);
     const existingKeys = await this.keys();
 
-    const insertMany = this.db.transaction((rows) => {
-      for (const row of rows) insert.run(row);
+    const promises = data
+      .filter(([key]) => overwrite || !existingKeys.includes(key))
+      .map(([key, value]) => this.compareData(key, value));
+    
+    Promise.all(promises).then(data => {
+      console.log(data);
     });
 
-    insertMany(data.reduce((acc, [key, value]) => {
-      if (overwrite && !existingKeys.includes(key)) {
-        acc.push([key, JSON.stringify(value)]);
-      }
-      return acc;
-    }, []));
+    // console.log(executions);
+    //this.insertMany(executions);
   }
 
 };
