@@ -7,7 +7,7 @@ const {
   isNil,
   isArray,
   isFunction,
-  toPath,
+  flatten,
   cloneDeep,
 } = require('lodash');
 
@@ -123,13 +123,11 @@ module.exports = class JoshProvider {
   async set(key, path, val) {
     key = this.keyCheck(key);
     const executions = await this.compareData(key, val, path);
-    console.log(executions);
     this.runMany(executions);
     return this;
   }
 
   async delete(key, path) {
-    console.log(`Delete ${path} from ${key}`);
     if(!path || path.length === 0) {
       await this.db.prepare(`DELETE FROM '${this.name}' WHERE key = ?`).run(key);
       return this;
@@ -288,8 +286,6 @@ module.exports = class JoshProvider {
     const currentPaths = getPaths(currentData);
     const paths = path ? getPaths(_set(cloneDeep(currentData), path, newValue)) : getPaths(newValue);
 
-    console.log(currentPaths, paths);
-
     for(const [path, value] of Object.entries(currentPaths)) {
       if(isNil(paths[path]) || paths[path] !== value) {
         executions.push([this.deleteStmt, { key, path }]);
@@ -310,16 +306,13 @@ module.exports = class JoshProvider {
     }
     const existingKeys = await this.keys();
 
-    const promises = data
+    const promises = flatten(data
       .filter(([key]) => overwrite || !existingKeys.includes(key))
-      .map(([key, value]) => this.compareData(key, value));
+      .map(([key, value]) => this.compareData(key, value)));
     
     Promise.all(promises).then(data => {
-      console.log(data);
+      this.runMany(flatten(data));
     });
-
-    // console.log(executions);
-    //this.insertMany(executions);
   }
 
 };
