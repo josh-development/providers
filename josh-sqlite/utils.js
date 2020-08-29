@@ -1,7 +1,7 @@
 const { isArray, isObject } = require("lodash");
 
 const getDelimitedPath = (base, key, valueIsArray) => valueIsArray 
-  ? base ? `${base}["${key}"]` : key
+  ? base ? `${base}[${key}]` : key
   : base ? `${base}.${key}` : key;
 
 const getPaths = (data, acc = {}, basePath = null) => {

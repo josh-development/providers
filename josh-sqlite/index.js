@@ -23,19 +23,26 @@ const { getPaths } = require("./utils.js");
 module.exports = class JoshProvider {
 
   constructor(options) {
-    if (!options.name) throw new Error('Must provide options.name');
+    if(options.inMemory) {
+      // This is there for testing purposes, really. 
+      // But hey, if you want an in-memory database, knock yourself out, kiddo!
+      this.db = new Database(':memory:');
+      this.name = ':memory:';
+    } else {
+      if (!options.name) throw new Error('Must provide options.name');
+      this.dataDir = resolve(process.cwd(), options.dataDir || 'data');
 
-    this.dataDir = resolve(process.cwd(), options.dataDir || 'data');
-
-    if (!options.dataDir) {
-      if (!fs.existsSync('./data')) {
-        fs.mkdirSync('./data');
+      if (!options.dataDir) {
+        if (!fs.existsSync('./data')) {
+          fs.mkdirSync('./data');
+        }
       }
+  
+      this.name = options.name;
+      this.validateName();
+      this.db = new Database(`${this.dataDir}${sep}josh.sqlite`);
     }
 
-    this.name = options.name;
-    this.validateName();
-    this.db = new Database(`${this.dataDir}${sep}josh.sqlite`);
   }
 
   /**
@@ -43,7 +50,7 @@ module.exports = class JoshProvider {
    * @param {Map} Josh In order to set data to the Josh, one must be provided.
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
-  async init() {
+  init() {
     const table = this.db.prepare("SELECT count(*) FROM sqlite_master WHERE type='table' AND name = ?;").get(this.name);
     if (!table['count(*)']) {
       this.db.prepare(`CREATE TABLE '${this.name}' (key text, path text, value text)`).run();
@@ -62,6 +69,7 @@ module.exports = class JoshProvider {
     this.runMany = this.db.transaction((transactions) => {
       for(const [statement, row] of transactions) statement.run(row);
     });
+    this.isInitialized = true;
   }
 
   get(key, path) {
@@ -79,6 +87,10 @@ module.exports = class JoshProvider {
     return this.db.prepare(`SELECT * FROM '${this.name}' WHERE key IN (${'?, '.repeat(keys.length).slice(0, -2)}) AND path='::NULL::';`)
       .all(keys)
       .map(row => [row.key, JSON.parse(row.value)]);
+  }
+
+  query(params) {
+    return false;
   }
 
   async random(count = 1) {
