@@ -9,6 +9,7 @@ const {
   isFunction,
   flatten,
   cloneDeep,
+  unset,
 } = require('lodash');
 
 // Native imports
@@ -18,7 +19,7 @@ const fs = require('fs');
 // Custom error codes with stack support.
 const Err = require('./error.js');
 
-const { getPaths } = require("./utils.js");
+const { getPaths, sanitize } = require("./utils.js");
 
 module.exports = class JoshProvider {
 
@@ -50,7 +51,7 @@ module.exports = class JoshProvider {
    * @param {Map} Josh In order to set data to the Josh, one must be provided.
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
-  init() {
+  async init() {
     const table = this.db.prepare("SELECT count(*) FROM sqlite_master WHERE type='table' AND name = ?;").get(this.name);
     if (!table['count(*)']) {
       this.db.prepare(`CREATE TABLE '${this.name}' (key text, path text, value text)`).run();
@@ -86,24 +87,23 @@ module.exports = class JoshProvider {
   getMany(keys) {
     return this.db.prepare(`SELECT * FROM '${this.name}' WHERE key IN (${'?, '.repeat(keys.length).slice(0, -2)}) AND path='::NULL::';`)
       .all(keys)
-      .map(row => [row.key, JSON.parse(row.value)]);
+      .reduce((acc, row) => {
+        acc[row.key] = JSON.parse(row.value);
+        return acc;
+      }, {});
   }
 
-  query(params) {
-    return false;
-  }
-
-  async random(count = 1) {
-    const data = await (await this.db.prepare(`SELECT * FROM '${this.name}' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${count};`)).all();
+  random(count = 1) {
+    const data = this.db.prepare(`SELECT * FROM '${this.name}' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${Number(count)};`).all();
     return count > 1 ? data : data[0];
   }
 
-  async randomKey(count = 1) {
-    const data = await (await this.db.prepare(`SELECT rowid FROM '${this.name}' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${count};`)).all();
+  randomKey(count = 1) {
+    const data = this.db.prepare(`SELECT rowid FROM '${this.name}' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${Number(count)};`).all();
     return count > 1 ? data.map(row => row.key) : data[0].key;
   }
 
-  async has(key, path) {
+  has(key, path) {
     const query = this.db.prepare(`SELECT count(*) FROM '${this.name}' WHERE key = ?${path ? ' AND path = ?' : "AND path='::NULL::'"};`);
     const row = path ? query.get(key, path) : query.get(key);
     return row['count(*)'] === 1;
@@ -113,13 +113,13 @@ module.exports = class JoshProvider {
    * Retrieves all the indexes (keys) in the database for this Josh, even if they aren't fetched.
    * @return {array<string>} Array of all indexes (keys) in the Josh, cached or not.
    */
-  async keys() {
-    const rows = await (await this.db.prepare(`SELECT key FROM '${this.name}' WHERE path='::NULL::';`)).all();
+  keys() {
+    const rows = this.db.prepare(`SELECT key FROM '${this.name}' WHERE path='::NULL::';`).all();
     return rows.map(row => row.key);
   }
 
-  async values() {
-    const rows = await (await this.db.prepare(`SELECT value FROM '${this.name}' WHERE path='::NULL::';`)).all();
+  values() {
+    const rows = this.db.prepare(`SELECT value FROM '${this.name}' WHERE path='::NULL::';`).all();
     return rows.map(row => this.parseData(row.value));
   }
 
@@ -127,48 +127,47 @@ module.exports = class JoshProvider {
    * Retrieves the number of rows in the database for this Josh, even if they aren't fetched.
    * @return {integer} The number of rows in the database.
    */
-  async count() {
-    const data = await (await this.db.prepare(`SELECT count(*) FROM '${this.name}' WHERE path='::NULL::';`)).get();
+  count() {
+    const data = this.db.prepare(`SELECT count(*) FROM '${this.name}' WHERE path='::NULL::';`).get();
     return data['count(*)'];
   }
 
-  async set(key, path, val) {
+  set(key, path, val) {
     key = this.keyCheck(key);
-    const executions = await this.compareData(key, val, path);
+    const executions = this.compareData(key, val, path);
     this.runMany(executions);
     return this;
   }
 
-  async delete(key, path) {
+  delete(key, path) {
+    this.check(key, 'Object');
     if(!path || path.length === 0) {
-      await this.db.prepare(`DELETE FROM '${this.name}' WHERE key = ?`).run(key);
+      this.db.prepare(`DELETE FROM '${this.name}' WHERE key = ?`).run(key);
       return this;
     }
-    const propValue = this.get(key, path);
-    if (isArray(propValue)) {
-      propValue.splice(last, 1);
-    } else {
-      delete propValue[last];
-    }
-    await this.set(key, path, propValue);
+    const value = this.get(key);
+    unset(value, path);
+    this.set(key, null, value);
     return this;
   }
 
-  async clear() {
+  clear() {
     this.db.exec(`DELETE FROM '${this.name}'`);
+    return this;
   }
 
-  async push(key, path, value, allowDupes) {
-    await this.check(key, 'Array', path);
-    const data = await this.get(key, path);
+  push(key, path, value, allowDupes) {
+    this.check(key, 'Array', path);
+    const data = this.get(key, path);
     if (!allowDupes && data.indexOf(value) > -1) return;
     data.push(value);
     this.set(key, path, data);
+    return this;
   }
 
-  async remove(key, path, val) {
-    await this.check(key, ['Array', 'Object'], path);
-    const data = await this.get(key, path);
+  remove(key, path, val) {
+    this.check(key, 'Array', path);
+    const data = this.get(key, path);
     const criteria = isFunction(val) ? val : value => val === value;
     const index = data.findIndex(criteria);
     if (index > -1) {
@@ -178,18 +177,20 @@ module.exports = class JoshProvider {
     return this;
   }
 
-  async inc(key, path) {
-    await this.check(key, ['Number'], path);
-    this.set(key, path, await this.get(key, path) + 1);
+  inc(key, path) {
+    this.check(key, ['Number'], path);
+    this.set(key, path, this.get(key, path) + 1);
+    return this;
   }
 
-  async dec(key, path) {
-    await this.check(key, ['Number'], path);
-    this.set(key, path, await this.get(key, path) - 1);
+  dec(key, path) {
+    this.check(key, ['Number'], path);
+    this.set(key, path, this.get(key, path) - 1);
+    return this;
   }
 
   async findByFunction(fn, path) {
-    const keys = await this.keys();
+    const keys = this.keys();
     while (keys.length > 0) {
       const currKey = keys.shift();
       const value = this.get(currKey);
@@ -200,38 +201,40 @@ module.exports = class JoshProvider {
     return null;
   }
 
-  async findByValue(path, value) {
+  findByValue(path, value) {
     const query = this.db.prepare(`SELECT key, value FROM '${this.name}' WHERE value = ?${path ? ' AND path = ?' : " AND path = '::NULL::'"} LIMIT 1;`);
     const results = path ? query.get(JSON.stringify(value), path) : query.get(JSON.stringify(value));
-    return results ? await this.get(results.key) : null;
+    return results ? {[results.key]: this.get(results.key)} : null;
   }
 
   async filterByFunction(fn, path) {
-    const all = await this.getAll();
-    const returnArray = [];
+    const all = this.getAll();
+    const returnObject = {};
     for (const [key, value] of all) {
       if (await fn(path ? _get(value, path) : value, key)) {
-        returnArray.push([key, value]);
+        returnObject[key] = value;
       }
     }
-    return returnArray;
+    return returnObject;
   }
 
-  async filterByValue(path, value) {
+  filterByValue(path, value) {
     const query = this.db.prepare(`SELECT key, value FROM '${this.name}' WHERE value = ?${path ? ' AND path = ?' : " AND path = '::NULL::'"}`);
     const rows = path ? query.all(JSON.stringify(value), path) : query.all(JSON.stringify(value));
     if(rows.length === 0) {
       return [];
     }
-    const promises = rows.map(async result => [await this.get(result.key), result.key]);
-    return Promise.all(promises);
+    return rows.reduce((acc, row) => {
+      acc[row.key] = this.get(row.key);
+      return acc;
+    }, {})
   }
 
   close() {
     return this.db.close();
   }
 
-  async autoId() {
+  autoId() {
     let { lastnum } = this.db.prepare("SELECT lastnum FROM 'internal::autonum' WHERE josh = ?").get(this.name);
     lastnum++;
     this.db.prepare("INSERT OR REPLACE INTO 'internal::autonum' (josh, lastnum) VALUES (?, ?)").run(this.name, lastnum);
@@ -272,13 +275,13 @@ module.exports = class JoshProvider {
    */
   // Herefore I indicate that I do understand part of this would be easily resolved with TypeScript but I don't do TS... yet.
   // TODO: OPTIMIZE FOR LESS QUERIES. A LOT less queries. wow this is bad.
-  async check(key, type, path = null) {
-    if (!await this.has(key)) throw new Err(`The key "${key}" does not exist in JOSH "${this.name}"`, 'JoshPathError');
+  check(key, type, path = null) {
+    if (!this.has(key)) throw new Err(`The key "${key}" does not exist in JOSH "${this.name}"`, 'JoshPathError');
     if (!type) return;
     if (!isArray(type)) type = [type];
     if (!isNil(path)) {
-      await this.check(key, 'Object');
-      const data = await this.get(key);
+      this.check(key, 'Object');
+      const data = this.get(key);
       if (isNil(_get(data, path))) {
         throw new Err(`The property "${path}" in key "${key}" does not exist. Please set() it or ensure() it."`, 'JoshPathError');
       }
@@ -286,15 +289,15 @@ module.exports = class JoshProvider {
         throw new Err(`The property "${path}" in key "${key}" is not of type "${type.join('" or "')}" in JOSH "${this.name}" 
 (key was of type "${_get(data, path).constructor.name}")`, 'JoshTypeError');
       }
-    } else if (!type.includes((await this.get(key)).constructor.name)) {
+    } else if (!type.includes(this.get(key)).constructor.name) {
       throw new Err(`The key "${key}" is not of type "${type.join('" or "')}" in JOSH "${this.name}" (key was of type "${this.get(key).constructor.name}")`, 'JoshTypeError');
     }
   }
 
   // TODO: Check if I can figure out how to get actual NULL values instead of ::NULL::.
-  async compareData (key, newValue, path) {
+  compareData (key, newValue, path) {
     const executions = [];
-    const currentData = await this.has(key) ? await this.get(key) : '::NULL::';
+    const currentData = this.has(key) ? this.get(key) : '::NULL::';
     const currentPaths = getPaths(currentData);
     const paths = path ? getPaths(_set(cloneDeep(currentData), path, newValue)) : getPaths(newValue);
 
@@ -312,19 +315,16 @@ module.exports = class JoshProvider {
   }
 
   // TODO: Figure out how to make this similar to GET, 
-  async setMany(data, overwrite) {
+  setMany(data, overwrite) {
     if (isNil(data) || data.constructor.name !== 'Array') {
       throw new Error('Provided data was not an array of [key, value] pairs.');
     }
-    const existingKeys = await this.keys();
+    const existingKeys = this.keys();
 
-    const promises = flatten(data
+    this.runMany(flatten(data
       .filter(([key]) => overwrite || !existingKeys.includes(key))
-      .map(([key, value]) => this.compareData(key, value)));
-    
-    Promise.all(promises).then(data => {
-      this.runMany(flatten(data));
-    });
+      .map(([key, value]) => this.compareData(key, value))));
+    return this;
   }
 
 };
