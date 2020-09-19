@@ -6,11 +6,15 @@ const {
   set: _set,
   isNil,
   isArray,
+  isObject,
   isFunction,
   flatten,
   cloneDeep,
   unset,
 } = require('lodash');
+
+const serialize = require('serialize-javascript');
+const onChange = require('on-change');
 
 // Native imports
 const { resolve, sep } = require('path');
@@ -19,8 +23,6 @@ const fs = require('fs');
 // Custom error codes with stack support.
 const Err = require('./error.js');
 
-const { getPaths, sanitize } = require("./utils.js");
-
 module.exports = class JoshProvider {
 
   constructor(options) {
@@ -28,7 +30,7 @@ module.exports = class JoshProvider {
       // This is there for testing purposes, really. 
       // But hey, if you want an in-memory database, knock yourself out, kiddo!
       this.db = new Database(':memory:');
-      this.name = ':memory:';
+      this.name = 'InMemoryJosh';
     } else {
       if (!options.name) throw new Error('Must provide options.name');
       this.dataDir = resolve(process.cwd(), options.dataDir || 'data');
@@ -76,19 +78,19 @@ module.exports = class JoshProvider {
   get(key, path) {
     const query = this.db.prepare(`SELECT * FROM '${this.name}' WHERE key = ?${path ? ' AND path = ?' : " AND path='::NULL::'"};`);
     const row = path ? query.get(key, path) : query.get(key);
-    return row ? JSON.parse(row.value) : undefined;
+    return row ? eval('(' + row.value + ')') : undefined;
   }
 
   getAll() {
-    const stmt = this.db.prepare(`SELECT * from '${this.name}' WHERE path='::NULL::';`);
-    return stmt.all().map(row => [row.key, JSON.parse(row.value)]);
+    const stmt = this.db.prepare(`SELECT * FROM '${this.name}' WHERE path='::NULL::';`);
+    return stmt.all().map(row => [row.key, eval('(' + row.value + ')')]);
   }
 
   getMany(keys) {
     return this.db.prepare(`SELECT * FROM '${this.name}' WHERE key IN (${'?, '.repeat(keys.length).slice(0, -2)}) AND path='::NULL::';`)
       .all(keys)
       .reduce((acc, row) => {
-        acc[row.key] = JSON.parse(row.value);
+        acc[row.key] = eval('(' + row.value + ')');
         return acc;
       }, {});
   }
@@ -189,6 +191,49 @@ module.exports = class JoshProvider {
     return this;
   }
 
+  math(key, path, operation, operand) {
+    const base = this.get(key, path);
+    let result = null;
+    if (base == undefined || operation == undefined || operand == undefined) throw new Err('Math Operation requires base and operation', 'JoshTypeError');
+    switch (operation) {
+      case 'add' :
+      case 'addition' :
+      case '+' :
+        result = base + operand;
+        break;
+      case 'sub' :
+      case 'subtract' :
+      case '-' :
+        result = base - operand;
+        break;
+      case 'mult' :
+      case 'multiply' :
+      case '*' :
+        result = base * operand;
+        break;
+      case 'div' :
+      case 'divide' :
+      case '/' :
+        result = base / operand;
+        break;
+      case 'exp' :
+      case 'exponent' :
+      case '^' :
+        result = Math.pow(base, operand);
+        break;
+      case 'mod' :
+      case 'modulo' :
+      case '%' :
+        result = base % operand;
+        break;
+      case 'rand' :
+      case 'random' :
+        result = Math.floor(Math.random() * Math.floor(operand));
+        break;
+    }
+    return this.set(key, path, result);
+  }
+
   async findByFunction(fn, path) {
     const keys = this.keys();
     while (keys.length > 0) {
@@ -203,7 +248,7 @@ module.exports = class JoshProvider {
 
   findByValue(path, value) {
     const query = this.db.prepare(`SELECT key, value FROM '${this.name}' WHERE value = ?${path ? ' AND path = ?' : " AND path = '::NULL::'"} LIMIT 1;`);
-    const results = path ? query.get(JSON.stringify(value), path) : query.get(JSON.stringify(value));
+    const results = path ? query.get(this.serializeData(value), path) : query.get(this.serializeData(value));
     return results ? {[results.key]: this.get(results.key)} : null;
   }
 
@@ -220,18 +265,79 @@ module.exports = class JoshProvider {
 
   filterByValue(path, value) {
     const query = this.db.prepare(`SELECT key, value FROM '${this.name}' WHERE value = ?${path ? ' AND path = ?' : " AND path = '::NULL::'"}`);
-    const rows = path ? query.all(JSON.stringify(value), path) : query.all(JSON.stringify(value));
-    if(rows.length === 0) {
-      return [];
-    }
+    const rows = path ? query.all(this.serializeData(value), path) : query.all(this.serializeData(value));
     return rows.reduce((acc, row) => {
       acc[row.key] = this.get(row.key);
       return acc;
-    }, {})
+    }, {});
   }
+
+  mapByValue(path) {
+    const rows = this.db.prepare(`SELECT key, value FROM '${this.name}' WHERE path = ?`).all(path);
+    return rows.reduce((acc, row) => [...acc ,eval('(' + row.value + ')')], []);
+  }
+
+  async mapByFunction(fn) {
+    const all = this.getAll();
+    const promises = all.map(([key, value]) => fn(value, key));
+    return Promise.all(promises);
+  }
+
+  includes(key, val, path = null) {
+    const data = this.get(key, path);
+    const criteria = isFunction(val) ? val : value => val === value;
+    const index = data.findIndex(criteria);
+    return index > -1;
+  }
+
+  someByPath(path, value) {
+    const row = this.db.prepare(`SELECT key FROM '${this.name}' WHERE path = ? AND value = ? LIMIT 1`).get(path, value);
+    return row && row.key;
+  }
+
+  someByFunction(fn) {
+    const rows = this.db.prepare(`SELECT key, value FROM '${this.name} WHERE path = '::NULL::';'`);
+    return rows.map(row => [row.key, eval('(' + row.value + ')')]).some(fn);
+  }
+
+  everyByPath(path, value) {
+    const row = this.db.prepare(`SELECT key FROM '${this.name}' WHERE path = ? AND value = ? LIMIT 1`).all(path, value);
+    return row.length === this.count();
+  }
+
+  async everyByFunction(fn) {
+    const all = this.getAll();
+    const answerCount = [];
+    for (const [key, value] of all) {
+      if (await fn(path ? _get(value, path) : value, key)) {
+        answerCount++;
+      } else {
+        break;
+      }
+    }
+    return answerCount === all.length;
+  }
+
+  // reduce(fn(accumulator, current))
 
   close() {
     return this.db.close();
+  }
+
+  destroy() {
+    this.clear();
+    const transaction = this.db.transaction((run) => {
+      for (const stmt of run) {
+        this.db.prepare(stmt).run();
+      }
+    });
+
+    transaction([
+      `DROP TABLE IF EXISTS '${this.name}';`,
+      `DROP TABLE IF EXISTS 'internal::changes::${this.name}';`,
+      `DELETE FROM 'internal::autonum' WHERE josh = '${this.name}';`
+    ]);
+    return null;
   }
 
   autoId() {
@@ -259,7 +365,7 @@ module.exports = class JoshProvider {
 
   parseData(data) {
     try {
-      return JSON.parse(data);
+      return eval('(' + data + ')');
     } catch (err) {
       console.log('Error parsing data : ', err);
       return null;
@@ -298,8 +404,8 @@ module.exports = class JoshProvider {
   compareData (key, newValue, path) {
     const executions = [];
     const currentData = this.has(key) ? this.get(key) : '::NULL::';
-    const currentPaths = getPaths(currentData);
-    const paths = path ? getPaths(_set(cloneDeep(currentData), path, newValue)) : getPaths(newValue);
+    const currentPaths = this.getPaths(currentData);
+    const paths = path ? this.getPaths(_set(cloneDeep(currentData), path, newValue)) : this.getPaths(newValue);
 
     for(const [path, value] of Object.entries(currentPaths)) {
       if(isNil(paths[path]) || paths[path] !== value) {
@@ -325,6 +431,39 @@ module.exports = class JoshProvider {
       .filter(([key]) => overwrite || !existingKeys.includes(key))
       .map(([key, value]) => this.compareData(key, value))));
     return this;
+  }
+
+
+  getDelimitedPath (base, key, valueIsArray) {
+    return valueIsArray 
+      ? base ? `${base}[${key}]` : key
+      : base ? `${base}.${key}` : key;
+  }
+
+  serializeData (data) {
+    let serialized;
+    try {
+      serialized = serialize(onChange.target(data));
+    } catch(e) {
+      serialized = serialize(data);
+    }
+    return serialized;
+  }
+
+  getPaths (data, acc = {}, basePath = null) {
+    if(data === '::NULL::') return {};
+    if(!isObject(data)) {
+      acc[basePath || '::NULL::'] = this.serializeData(data);
+      return acc;
+    }
+    const source = isArray(data) ? data.map((d, i) => [i, d]) : Object.entries(data);
+    const returnPaths = source.reduce((paths, [key, value]) => {
+      const path = this.getDelimitedPath(basePath, key, !isArray(value));
+      if(isObject(value)) this.getPaths(value, paths, path);
+      paths[path.toString()] = this.serializeData(value);
+      return paths;
+    }, acc || {});
+    return basePath ? returnPaths : ({...returnPaths, '::NULL::': this.serializeData(data)});
   }
 
 };
