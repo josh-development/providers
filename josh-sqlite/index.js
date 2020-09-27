@@ -53,7 +53,7 @@ module.exports = class JoshProvider {
   init() {
     const table = this.db.prepare("SELECT count(*) FROM sqlite_master WHERE type='table' AND name = ?;").get(this.name);
     if (!table['count(*)']) {
-      this.db.prepare(`CREATE TABLE '${this.name}' (key text, path text, value text)`).run();
+      this.db.prepare(`CREATE TABLE '${this.name}' (key text, path text, value text, PRIMARY KEY('key','path'))`).run();
       this.db.pragma('synchronous = 1');
       if (this.wal) this.db.pragma('journal_mode = wal');
     }
