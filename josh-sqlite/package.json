@@ -1,6 +1,6 @@
 {
   "name": "@josh-providers/sqlite",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "SQLite Provider for JOSH",
   "main": "index.js",
   "scripts": {
