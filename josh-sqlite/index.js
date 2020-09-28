@@ -69,6 +69,8 @@ module.exports = class JoshProvider {
     this.deleteStmt = this.db.prepare(`DELETE FROM '${this.name}' WHERE key=@key AND path=@path;`);
     this.insertStmt = this.db.prepare(`INSERT INTO '${this.name}' (key, path, value) VALUES (@key, @path, @value);`);
 
+    this.getPaginatedStmt = this.db.prepare(`SELECT ROWID, * FROM '${this.name}' WHERE rowid > @lastRowId AND path = '::NULL::' ORDER BY rowid LIMIT @limit;`);
+
     this.runMany = this.db.transaction((transactions) => {
       for(const [statement, row] of transactions) statement.run(row);
     });
@@ -235,13 +237,18 @@ module.exports = class JoshProvider {
   }
 
   async findByFunction(fn, path) {
-    const keys = this.keys();
-    while (keys.length > 0) {
-      const currKey = keys.shift();
-      const value = this.get(currKey);
-      if (await fn(path ? _get(value, path) : value, currKey)) {
-        return [value, currKey];
+    let lastRowId = 0;
+    let finished = false;
+    while (!finished) {
+      const rows = this.getPaginatedStmt.all({ lastRowId, limit: 10 });
+      for (const { key, value } of rows) {
+        if (await fn(path ? _get(this.parseData(value), path) : this.parseData(value), key)) {
+          finished = true;
+          return { key, value };
+        }
       }
+      lastRowId = rows.length > 0 ? rows[rows.length -1].rowid : null;
+      if(rows.length < 10) finished = true;
     }
     return null;
   }
@@ -253,12 +260,18 @@ module.exports = class JoshProvider {
   }
 
   async filterByFunction(fn, path) {
-    const all = this.getAll();
+    let lastRowId = 0;
+    let finished = false;
     const returnObject = {};
-    for (const [key, value] of all) {
-      if (await fn(path ? _get(value, path) : value, key)) {
-        returnObject[key] = value;
+    while (!finished) {
+      const rows = this.getPaginatedStmt.all({ lastRowId, limit: 100 });
+      for (const { key, value } of rows) {
+        if (await fn(path ? _get(this.parseData(value), path) : this.parseData(value), key)) {
+          returnObject[key] = value;
+        }
       }
+      lastRowId = rows.length > 0 ? rows[rows.length -1].rowid : null;
+      if(rows.length < 100) finished = true;
     }
     return returnObject;
   }

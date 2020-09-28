@@ -4,7 +4,6 @@ const provider = new Provider({ inMemory: true });
 
 test('Database instance is valid', () => {
     expect(provider).not.toBe(null);
-    expect(provider.constructor.name).toBe('JoshProvider');
     expect(provider.name).toBe('InMemoryJosh');
 });
 
@@ -31,7 +30,7 @@ test('Database can be written to with all supported values', () => {
 test('Database returns expected statistical properties', async() => {
     expect(provider.count()).toBe(7);
     // order is weird because jest can't compare arrays in an unordered fashion.
-    expect(provider.keys()).toEqual(['object', 'array', 'string', 'boolean', 'complexobject', 'null', 'number']);
+    expect(provider.keys().sort()).toEqual(['array', 'boolean', 'complexobject', 'null', 'number', 'object', 'string']);
     expect(provider.values()).toEqual([
         { a: 1, b: 2, c: 3, d: 4},
         [1, 2, 3, 4, 5],
@@ -74,14 +73,14 @@ test('Database can act on many rows at a time', async () => {
     expect(provider.getMany(['number', 'boolean'])).toEqual({ 'number': 42, 'boolean': false });
     expect(provider.setMany([['new1', 'new1'], ['new2', 'new2']])).toEqual(provider);
     expect(provider.count()).toBe(9);
-    expect(provider.keys()).toEqual(['string', 'boolean', 'complexobject', 'null', 'number', 'object', 'array', 'new1', 'new2']);
+    expect(provider.keys().sort()).toEqual(['string', 'boolean', 'complexobject', 'null', 'number', 'object', 'array', 'new1', 'new2'].sort());
 });
 
 test('Database can delete values and data at paths', () => {
     // Delete
     provider.delete('new2');
     expect(provider.count()).toBe(8);
-    expect(provider.keys()).toEqual(['string', 'boolean', 'complexobject', 'null', 'number', 'object', 'array', 'new1']);
+    expect(provider.keys().sort()).toEqual(['string', 'boolean', 'complexobject', 'null', 'number', 'object', 'array', 'new1'].sort());
 
     // Objects
     provider.delete('object', 'a');
@@ -102,7 +101,7 @@ test('Database supports math operations', () => {
     expect(provider.get('number')).toBe(42);
 })
 
-test('Database can loop, filter, find', () => {
+test('Database can loop, filter, find', async () => {
     expect(provider.filterByValue('b', 2)).toEqual({
         object: { b: 2, c: 3, d: 4, e: 5 },
         complexobject: {
@@ -115,10 +114,16 @@ test('Database can loop, filter, find', () => {
     expect(provider.findByValue('c', 3)).toEqual({
         object: { b: 2, c: 3, d: 4, e: 5 }
     });
+    // add a bunch of rows for function filter/find
+    for(let i = 0; i < 200; i++) {
+        provider.set(`object${i}`, null, { count: Number(i) });
+    }
+    expect(Object.keys(await provider.filterByFunction(v => v && v.count >= 100)).length).toBe(100);s
+    expect((await provider.findByFunction(v => v && v.count === 101)).key).toBe('object101');
     // test: <query> (upcoming)
 });
 
-test('Database can be purged and destroyed', () => {
+test('Database can be purged and destroyed', async () => {
     provider.clear();
     expect(provider.count()).toBe(0);
 
