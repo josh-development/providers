@@ -78,8 +78,7 @@ class JoshProvider {
   }
 
   inc(key, path) {
-    this.set(key, path, this.get(key, path) + 1);
-    return this;
+    return this.set(key, path, this.get(key, path) + 1);
   }
 
   keyArray() {
