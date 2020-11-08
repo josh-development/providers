@@ -26,8 +26,8 @@ const Err = require('./error.js');
 module.exports = class JoshProvider {
 
   constructor(options) {
-    if(options.inMemory) {
-      // This is there for testing purposes, really. 
+    if (options.inMemory) {
+      // This is there for testing purposes, really.
       // But hey, if you want an in-memory database, knock yourself out, kiddo!
       this.db = new Database(':memory:');
       this.name = 'InMemoryJosh';
@@ -40,12 +40,11 @@ module.exports = class JoshProvider {
           fs.mkdirSync('./data');
         }
       }
-  
+
       this.name = options.name;
       this.validateName();
       this.db = new Database(`${this.dataDir}${sep}josh.sqlite`);
     }
-
   }
 
   /**
@@ -72,7 +71,7 @@ module.exports = class JoshProvider {
     this.getPaginatedStmt = this.db.prepare(`SELECT ROWID, * FROM '${this.name}' WHERE rowid > @lastRowId AND path = '::NULL::' ORDER BY rowid LIMIT @limit;`);
 
     this.runMany = this.db.transaction((transactions) => {
-      for(const [statement, row] of transactions) statement.run(row);
+      for (const [statement, transactionRow] of transactions) statement.run(transactionRow);
     });
     this.isInitialized = true;
   }
@@ -80,19 +79,19 @@ module.exports = class JoshProvider {
   get(key, path) {
     const query = this.db.prepare(`SELECT * FROM '${this.name}' WHERE key = ?${path ? ' AND path = ?' : " AND path='::NULL::'"};`);
     const row = path ? query.get(key, path) : query.get(key);
-    return row ? eval('(' + row.value + ')') : undefined;
+    return row ? eval(`(${row.value})`) : undefined;
   }
 
   getAll() {
     const stmt = this.db.prepare(`SELECT * FROM '${this.name}' WHERE path='::NULL::';`);
-    return stmt.all().map(row => [row.key, eval('(' + row.value + ')')]);
+    return stmt.all().map(row => [row.key, eval(`(${row.value})`)]);
   }
 
   getMany(keys) {
     return this.db.prepare(`SELECT * FROM '${this.name}' WHERE key IN (${'?, '.repeat(keys.length).slice(0, -2)}) AND path='::NULL::';`)
       .all(keys)
       .reduce((acc, row) => {
-        acc[row.key] = eval('(' + row.value + ')');
+        acc[row.key] = eval(`(${row.value})`);
         return acc;
       }, {});
   }
@@ -145,7 +144,7 @@ module.exports = class JoshProvider {
 
   delete(key, path) {
     this.check(key, 'Object');
-    if(!path || path.length === 0) {
+    if (!path || path.length === 0) {
       this.db.prepare(`DELETE FROM '${this.name}' WHERE key = ?`).run(key);
       return this;
     }
@@ -166,7 +165,7 @@ module.exports = class JoshProvider {
     if (!allowDupes && data.indexOf(value) > -1) return;
     data.push(value);
     this.set(key, path, data);
-    return this;
+    // return this;
   }
 
   remove(key, path, val) {
@@ -198,40 +197,40 @@ module.exports = class JoshProvider {
     let result = null;
     if (base == undefined || operation == undefined || operand == undefined) throw new Err('Math Operation requires base and operation', 'JoshTypeError');
     switch (operation) {
-      case 'add' :
-      case 'addition' :
-      case '+' :
-        result = base + operand;
-        break;
-      case 'sub' :
-      case 'subtract' :
-      case '-' :
-        result = base - operand;
-        break;
-      case 'mult' :
-      case 'multiply' :
-      case '*' :
-        result = base * operand;
-        break;
-      case 'div' :
-      case 'divide' :
-      case '/' :
-        result = base / operand;
-        break;
-      case 'exp' :
-      case 'exponent' :
-      case '^' :
-        result = Math.pow(base, operand);
-        break;
-      case 'mod' :
-      case 'modulo' :
-      case '%' :
-        result = base % operand;
-        break;
-      case 'rand' :
-      case 'random' :
-        result = Math.floor(Math.random() * Math.floor(operand));
-        break;
+    case 'add' :
+    case 'addition' :
+    case '+' :
+      result = base + operand;
+      break;
+    case 'sub' :
+    case 'subtract' :
+    case '-' :
+      result = base - operand;
+      break;
+    case 'mult' :
+    case 'multiply' :
+    case '*' :
+      result = base * operand;
+      break;
+    case 'div' :
+    case 'divide' :
+    case '/' :
+      result = base / operand;
+      break;
+    case 'exp' :
+    case 'exponent' :
+    case '^' :
+      result = Math.pow(base, operand);
+      break;
+    case 'mod' :
+    case 'modulo' :
+    case '%' :
+      result = base % operand;
+      break;
+    case 'rand' :
+    case 'random' :
+      result = Math.floor(Math.random() * Math.floor(operand));
+      break;
     }
     return this.set(key, path, result);
   }
@@ -247,8 +246,8 @@ module.exports = class JoshProvider {
           return { key, value };
         }
       }
-      lastRowId = rows.length > 0 ? rows[rows.length -1].rowid : null;
-      if(rows.length < 10) finished = true;
+      lastRowId = rows.length > 0 ? rows[rows.length - 1].rowid : null;
+      if (rows.length < 10) finished = true;
     }
     return null;
   }
@@ -256,7 +255,7 @@ module.exports = class JoshProvider {
   findByValue(path, value) {
     const query = this.db.prepare(`SELECT key, value FROM '${this.name}' WHERE value = ?${path ? ' AND path = ?' : " AND path = '::NULL::'"} LIMIT 1;`);
     const results = path ? query.get(this.serializeData(value), path) : query.get(this.serializeData(value));
-    return results ? {[results.key]: this.get(results.key)} : null;
+    return results ? { [results.key]: this.get(results.key) } : null;
   }
 
   async filterByFunction(fn, path) {
@@ -270,8 +269,8 @@ module.exports = class JoshProvider {
           returnObject[key] = value;
         }
       }
-      lastRowId = rows.length > 0 ? rows[rows.length -1].rowid : null;
-      if(rows.length < 100) finished = true;
+      lastRowId = rows.length > 0 ? rows[rows.length - 1].rowid : null;
+      if (rows.length < 100) finished = true;
     }
     return returnObject;
   }
@@ -287,7 +286,7 @@ module.exports = class JoshProvider {
 
   mapByValue(path) {
     const rows = this.db.prepare(`SELECT key, value FROM '${this.name}' WHERE path = ?`).all(path);
-    return rows.reduce((acc, row) => [...acc ,eval('(' + row.value + ')')], []);
+    return rows.reduce((acc, row) => [...acc, eval(`(${row.value})`)], []);
   }
 
   async mapByFunction(fn) {
@@ -310,7 +309,7 @@ module.exports = class JoshProvider {
 
   someByFunction(fn) {
     const rows = this.db.prepare(`SELECT key, value FROM '${this.name} WHERE path = '::NULL::';'`);
-    return rows.map(row => [row.key, eval('(' + row.value + ')')]).some(fn);
+    return rows.map(row => [row.key, eval(`(${row.value})`)]).some(fn);
   }
 
   everyByPath(path, value) {
@@ -318,18 +317,18 @@ module.exports = class JoshProvider {
     return row.length === this.count();
   }
 
-  async everyByFunction(fn) {
-    const all = this.getAll();
-    const answerCount = [];
-    for (const [key, value] of all) {
-      if (await fn(path ? _get(value, path) : value, key)) {
-        answerCount++;
-      } else {
-        break;
-      }
-    }
-    return answerCount === all.length;
-  }
+  // async everyByFunction(fn) {
+  //   const all = this.getAll();
+  //   const answerCount = [];
+  //   for (const [key, value] of all) {
+  //     if (await fn(path ? _get(value, path) : value, key)) {
+  //       answerCount++;
+  //     } else {
+  //       break;
+  //     }
+  //   }
+  //   return answerCount === all.length;
+  // }
 
   // reduce(fn(accumulator, current))
 
@@ -348,7 +347,7 @@ module.exports = class JoshProvider {
     transaction([
       `DROP TABLE IF EXISTS '${this.name}';`,
       `DROP TABLE IF EXISTS 'internal::changes::${this.name}';`,
-      `DELETE FROM 'internal::autonum' WHERE josh = '${this.name}';`
+      `DELETE FROM 'internal::autonum' WHERE josh = '${this.name}';`,
     ]);
     return null;
   }
@@ -378,7 +377,7 @@ module.exports = class JoshProvider {
 
   parseData(data) {
     try {
-      return eval('(' + data + ')');
+      return eval(`(${data})`);
     } catch (err) {
       console.log('Error parsing data : ', err);
       return null;
@@ -414,26 +413,26 @@ module.exports = class JoshProvider {
   }
 
   // TODO: Check if I can figure out how to get actual NULL values instead of ::NULL::.
-  compareData (key, newValue, path) {
+  compareData(key, newValue, path) {
     const executions = [];
     const currentData = this.has(key) ? this.get(key) : '::NULL::';
     const currentPaths = this.getPaths(currentData);
     const paths = path ? this.getPaths(_set(cloneDeep(currentData), path, newValue)) : this.getPaths(newValue);
 
-    for(const [path, value] of Object.entries(currentPaths)) {
-      if(isNil(paths[path]) || paths[path] !== value) {
-        executions.push([this.deleteStmt, { key, path }]);
-        if(!isNil(paths[path])) executions.push([this.insertStmt, { key, path, value: paths[path] }])
+    for (const [currentPath, value] of Object.entries(currentPaths)) {
+      if (isNil(paths[currentPath]) || paths[currentPath] !== value) {
+        executions.push([this.deleteStmt, { key, path: currentPath }]);
+        if (!isNil(paths[currentPath])) executions.push([this.insertStmt, { key, path: currentPath, value: paths[currentPath] }]);
       }
-      delete paths[path];
+      delete paths[currentPath];
     }
-    for(const [path, value] of Object.entries(paths)) {
-      executions.push([this.insertStmt, { key, path, value }])
+    for (const [currentPath, value] of Object.entries(paths)) {
+      executions.push([this.insertStmt, { key, path: currentPath, value }]);
     }
     return executions;
   }
 
-  // TODO: Figure out how to make this similar to GET, 
+  // TODO: Figure out how to make this similar to GET,
   setMany(data, overwrite) {
     if (isNil(data) || data.constructor.name !== 'Array') {
       throw new Error('Provided data was not an array of [key, value] pairs.');
@@ -447,36 +446,36 @@ module.exports = class JoshProvider {
   }
 
 
-  getDelimitedPath (base, key, valueIsArray) {
-    return valueIsArray 
-      ? base ? `${base}[${key}]` : key
-      : base ? `${base}.${key}` : key;
+  getDelimitedPath(base, key, valueIsArray) {
+    return valueIsArray ?
+      base ? `${base}[${key}]` : key :
+      base ? `${base}.${key}` : key;
   }
 
-  serializeData (data) {
+  serializeData(data) {
     let serialized;
     try {
       serialized = serialize(onChange.target(data));
-    } catch(e) {
+    } catch (err) {
       serialized = serialize(data);
     }
     return serialized;
   }
 
-  getPaths (data, acc = {}, basePath = null) {
-    if(data === '::NULL::') return {};
-    if(!isObject(data)) {
+  getPaths(data, acc = {}, basePath = null) {
+    if (data === '::NULL::') return {};
+    if (!isObject(data)) {
       acc[basePath || '::NULL::'] = this.serializeData(data);
       return acc;
     }
-    const source = isArray(data) ? data.map((d, i) => [i, d]) : Object.entries(data);
+    const source = isArray(data) ? data.map((da, i) => [i, da]) : Object.entries(data);
     const returnPaths = source.reduce((paths, [key, value]) => {
       const path = this.getDelimitedPath(basePath, key, !isArray(value));
-      if(isObject(value)) this.getPaths(value, paths, path);
+      if (isObject(value)) this.getPaths(value, paths, path);
       paths[path.toString()] = this.serializeData(value);
       return paths;
     }, acc || {});
-    return basePath ? returnPaths : ({...returnPaths, '::NULL::': this.serializeData(data)});
+    return basePath ? returnPaths : { ...returnPaths, '::NULL::': this.serializeData(data) };
   }
 
 };

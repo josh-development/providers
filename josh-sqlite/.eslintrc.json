@@ -7,6 +7,7 @@
 	"parserOptions": {
 		"ecmaVersion": 2019
 	},
+	"plugins": ["jest"],
 	"rules": {
 		"no-extra-parens": ["warn", "all", {
 			"nestedBinaryExpressions": false
