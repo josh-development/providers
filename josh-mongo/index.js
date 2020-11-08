@@ -77,8 +77,8 @@ class JoshProvider {
     });
   }
 
-  inc(key, path) {
-    return this.set(key, path, this.get(key, path) + 1);
+  inc(key) {
+    return this.set(key, this.get(key) + 1);
   }
 
   keyArray() {
@@ -124,7 +124,7 @@ class JoshProvider {
     // Do not delete this internal method.
     this.name = this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
   }
-    /*
+  /*
    * INTERNAL method to verify the type of a key or property
    * Will THROW AN ERROR on wrong type, to simplify code.
    * @param {string|number} key Required. The key of the element to check
@@ -133,24 +133,24 @@ class JoshProvider {
    */
   // Herefore I indicate that I do understand part of this would be easily resolved with TypeScript but I don't do TS... yet.
   // TODO: OPTIMIZE FOR LESS QUERIES. A LOT less queries. wow this is bad.
-  check(key, type, path = null) {
-    if (!this.has(key)) throw new Err(`The key "${key}" does not exist in JOSH "${this.name}"`, 'JoshPathError');
-    if (!type) return;
-    if (!isArray(type)) type = [type];
-    if (!isNil(path)) {
-      this.check(key, 'Object');
-      const data = this.get(key);
-      if (isNil(_get(data, path))) {
-        throw new Err(`The property "${path}" in key "${key}" does not exist. Please set() it or ensure() it."`, 'JoshPathError');
-      }
-      if (!type.includes(_get(data, path).constructor.name)) {
-        throw new Err(`The property "${path}" in key "${key}" is not of type "${type.join('" or "')}" in JOSH "${this.name}" 
-(key was of type "${_get(data, path).constructor.name}")`, 'JoshTypeError');
-      }
-    } else if (!type.includes(this.get(key)).constructor.name) {
-      throw new Err(`The key "${key}" is not of type "${type.join('" or "')}" in JOSH "${this.name}" (key was of type "${this.get(key).constructor.name}")`, 'JoshTypeError');
-    }
-  }
+  //   check(key, type, path = null) {
+  //     if (!this.has(key)) throw new Err(`The key "${key}" does not exist in JOSH "${this.name}"`, 'JoshPathError');
+  //     if (!type) return;
+  //     if (!isArray(type)) type = [type];
+  //     if (!isNil(path)) {
+  //       this.check(key, 'Object');
+  //       const data = this.get(key);
+  //       if (isNil(_get(data, path))) {
+  //         throw new Err(`The property "${path}" in key "${key}" does not exist. Please set() it or ensure() it."`, 'JoshPathError');
+  //       }
+  //       if (!type.includes(_get(data, path).constructor.name)) {
+  //         throw new Err(`The property "${path}" in key "${key}" is not of type "${type.join('" or "')}" in JOSH "${this.name}"
+  // (key was of type "${_get(data, path).constructor.name}")`, 'JoshTypeError');
+  //       }
+  //     } else if (!type.includes(this.get(key)).constructor.name) {
+  //       throw new Err(`The key "${key}" is not of type "${type.join('" or "')}" in JOSH "${this.name}" (key was of type "${this.get(key).constructor.name}")`, 'JoshTypeError');
+  //     }
+  //   }
   keyCheck(key) {
     return !_.isNil(key) && key[0] !== '$';
   }
