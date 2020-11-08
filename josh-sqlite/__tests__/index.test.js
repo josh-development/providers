@@ -118,7 +118,7 @@ test('Database can loop, filter, find', async () => {
     for(let i = 0; i < 200; i++) {
         provider.set(`object${i}`, null, { count: Number(i) });
     }
-    expect(Object.keys(await provider.filterByFunction(v => v && v.count >= 100)).length).toBe(100);s
+    expect(Object.keys(await provider.filterByFunction(v => v && v.count >= 100)).length).toBe(100);
     expect((await provider.findByFunction(v => v && v.count === 101)).key).toBe('object101');
     // test: <query> (upcoming)
 });

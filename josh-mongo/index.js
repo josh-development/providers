@@ -1,14 +1,15 @@
 const {
-  MongoClient
+  MongoClient,
 } = require('mongodb');
 
-const _ = require('lodash');
+// const _ = require('lodash'); Unused
+
+const Err = require('./error');
 
 class JoshProvider {
 
   constructor(options) {
-
-    if (!options.name) throw new Error('Must provide options.name');
+    if (!options.name) throw new Err('Must provide options.name', 'JoshTypeError');
     this.name = options.name;
     this.validateName();
     this.auth =
@@ -29,25 +30,38 @@ class JoshProvider {
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
   async init() {
-    console.log('Initializing MongoDB');
-    this.client = await MongoClient.connect(this.url, { useNewUrlParser: true ,  useUnifiedTopology: true });
-    console.log(this.client);
+    // console.log('Initializing MongoDB', this.url);
+    this.client = await MongoClient.connect(this.url, { useNewUrlParser: true, useUnifiedTopology: true });
+    // console.log(this.client);
     this.db = this.client.db(this.dbName).collection(this.name);
-    console.log(this.db);
+    // console.log(this.db);
     return true;
   }
 
+  /**
+   * Get settings
+   * @returns {Object} Returns an object containing all settings
+   */
   get settings() {
     return {
-      name: this.dbName
+      name: this.dbName,
     };
   }
 
   /**
+   * Check is database is initialized and connected
+   * @returns {boolean} Returns true if connected successfully
+   */
+  get isInitialized() {
+    return this.client.isConnected();
+  }
+
+  /**
    * Shuts down the underlying database.
+   * @returns {Promise} Promise resolves when finished closing
    */
   close() {
-    this.client.close();
+    return this.client.close();
   }
 
   /**
@@ -55,60 +69,281 @@ class JoshProvider {
    * @param {(string|number)} key Required. The key of the element to add to the josh object.
    * @param {*} val Required. The value of the element to add to the josh object.
    * This value MUST be stringifiable as JSON.
+   * @example
+   * ```
+   * await JoshProvider.set("josh", { hello: "world" })
+   * ```
    */
-  set(key, val) {
-    if (!key || !['String', 'Number'].includes(key.constructor.name)) {
+  async set(key, val) {
+    this.check([
+      [key, ['String', 'Number']],
+    ]);
+    if (!key) {
       throw new Error('Keys should be strings or numbers.');
     }
-    this.db.update({
-      _id: key
-    }, {
+    await this.db.findOneAndUpdate({
       _id: key,
-      value: val
     }, {
-      upsert: true
+      $set: { value: val },
+    }, {
+      upsert: true,
     });
+    return this;
   }
 
+  /**
+   * Set many keys and values
+   * @param {Array} arr This is a key value array to be set in the database
+   * @example
+   * ```
+   * await JoshProvider.setMany([ ["hello", "world"], ["josh": true] ])
+   * ```
+   */
+  async setMany(arr) {
+    this.check([
+      [arr, ['Array']],
+    ]);
+    for (const [key, val] of arr) {
+      await this.set(key, val);
+    }
+    return this;
+  }
+
+  /**
+   * Fetch the value of a key in the database
+   * @param {(string|number)} key The document key to fetch
+   * @returns {Promise} Resolves to the value
+   * @example
+   * ```
+   * await JoshProvider.get("josh")
+   * ```
+   */
   get(key) {
-    console.log(`Retrieving ${key}'s data`);
-    return this.db.findOne({
-      _id: key
+    this.check([
+      [key, ['String', 'Number']],
+    ]);
+    return new Promise((res, rej) => {
+      this.db.findOne({
+        _id: key,
+      }).then(doc => res(doc.value)).catch(rej);
     });
   }
 
-  keyArray() {
-    return new Promise( (resolve, reject) => {
-      this.db.find({}).toArray((err, docs) => {
-        if(err) reject(err);
-        resolve(docs);
+  /**
+   * Fetch multiple keys from the database
+   * @param {string[]} arr Multiple keys to fetch from the database
+   * @returns {Object} Returns object with each key mapped to its value
+   * @example
+   * ```
+   * await JoshProvider.getMany([ "josh", 123 ])
+   * ```
+   */
+  async getMany(arr) {
+    this.check([
+      [arr, ['Array']],
+    ]);
+    const finalDocs = {};
+    const docs = await this.db.find({ _id: { $in: arr } }).toArray();
+    for (const doc of docs) {
+      finalDocs[doc._id] = doc.value;
+    }
+    return finalDocs;
+  }
+
+  /**
+   * Count the documents in the database
+   * @param {Object} query This filters the documents counted
+   * @returns {Promise}
+   * @example
+   * ```
+   * await JoshProvider.count()
+   * ```
+   */
+  count(query = {}) {
+    this.check();
+    return this.db.countDocuments(query);
+  }
+
+  /**
+   * Increment the value of a document by 1
+   * @param {(string|number)} key The document key to increment
+   * @example
+   * ```
+   * await JoshProvider.inc("joshes")
+   * ```
+   */
+  async inc(key) {
+    this.check();
+    return this.set(key, await this.get(key) + 1);
+  }
+
+  /**
+   * Decrement the value of a document by 1
+   * @param {(string|number)} key The document key to decrement
+   * @example
+   * ```
+   * await JoshProvider.dec("joshes")
+   * ```
+   */
+  async dec(key) {
+    this.check();
+    return this.set(key, await this.get(key) - 1);
+  }
+
+  /**
+   * Perform mathmatical operations on the value of a document
+   * @param {(string|number)} key The document key to transform
+   * @param {string} operation Valid operations are add, subtract, multiply, divide, exponent, modulo and random
+   * @param {number} operand The number to transform the value with
+   * @example
+   * ```
+   * await JoshProvider.math('number', 'multiply', 2)
+   * await JoshProvider.math('number', '/', 2) // divide
+   * await JoshProvider.math('number', 'exp', 2) // exponent
+   * ```
+   */
+  async math(key, operation, operand) {
+    this.check([
+      [key, ['String', 'Number']],
+      [operation, ['String']],
+      [operand, ['Number']],
+    ]);
+    const base = await this.get(key);
+    let result = null;
+    if (!base || !operation || !operand) throw new Err('Math operation requires base, operation and operand', 'JoshTypeError');
+    switch (operation) {
+    case 'add' :
+    case 'addition' :
+    case '+' :
+      result = base + operand;
+      break;
+    case 'sub' :
+    case 'subtract' :
+    case '-' :
+      result = base - operand;
+      break;
+    case 'mult' :
+    case 'multiply' :
+    case '*' :
+      result = base * operand;
+      break;
+    case 'div' :
+    case 'divide' :
+    case '/' :
+      result = base / operand;
+      break;
+    case 'exp' :
+    case 'exponent' :
+    case '^' :
+      result = Math.pow(base, operand);
+      break;
+    case 'mod' :
+    case 'modulo' :
+    case '%' :
+      result = base % operand;
+      break;
+    case 'rand' :
+    case 'random' :
+      result = Math.floor(Math.random() * Math.floor(operand));
+      break;
+    default:
+      throw new Err('Please provide a valid operand', 'JoshTypeError');
+    }
+    if (result) {
+      await this.set(key, result);
+    }
+    return this;
+  }
+
+  /**
+   * Fetch all keys within a query
+   * @param {Object} query Query to filter the keys by
+   * @returns {Array}
+   * @example
+   * ```
+   * await JoshProvider.keys()
+   * ```
+   */
+  keys(query = {}) {
+    this.check([
+      [query, ['Object']],
+    ]);
+    return new Promise((resolve, reject) => {
+      this.db.find(query).toArray((err, docs) => {
+        if (err) reject(err);
+        resolve(docs.map(doc => doc._id));
       });
     });
   }
 
-  delete(key) {
-    return this.db.remove({
-      _id: key
-    }, {
-      single: true
+  /**
+   * Fetch all values in the database
+   * @param {Object} query Query to filter the values by
+   * @returns {Array}
+   * @example
+   * ```
+   * await JoshProvider.values()
+   * ```
+   */
+  values(query = {}) {
+    this.check([
+      [query, ['Object']],
+    ]);
+    return new Promise((resolve, reject) => {
+      this.db.find(query).toArray((err, docs) => {
+        if (err) reject(err);
+        resolve(docs.map(doc => doc.value));
+      });
     });
   }
 
-  deleteAll() {
-    return this.db.deleteMany({});
+  /**
+   * Delete a document from the database
+   * @param {(string|value)} key The document key to delete
+   * @example
+   * ```
+   * await JoshProvider.delete("josh");
+   * ```
+   */
+  async delete(key) {
+    this.check([
+      [key, ['String', 'Number']],
+    ]);
+    await this.db.deleteOne({
+      _id: key,
+    });
+    return this;
   }
 
-  hasAsync(key) {
-    return this.db.find({
-      _id: key
-    }).limit(1);
+  /**
+   * Delete multiple documents from the database
+   * @param {Array} arr Multiple keys to be deleted
+   * @example
+   * ```
+   * await JoshProvider.deleteMany(["josh", "mongo", "number", 12])
+   * ```
+   */
+  async deleteMany(arr) {
+    this.check([
+      [arr, ['Array']],
+    ]);
+    const query = {
+      $in: arr,
+    };
+    await this.db.deleteMany({ _id: query });
+    return this;
   }
 
   /**
    * Deletes all entries in the database.
    * @return {Promise<*>} Promise returned by the database after deletion
+   * @example
+   * ```
+   * await JoshProvider.bulkDelete()
+   * ```
    */
   bulkDelete() {
+    this.check();
     return this.db.drop();
   }
 
@@ -120,9 +355,21 @@ class JoshProvider {
     // Do not delete this internal method.
     this.name = this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
   }
-  
-  keyCheck(key) {
-    return !_.isNil(key) && key[0] !== '$';
+
+  /**
+   * Internal method used to check validity of the database and input
+   * @param {Array} input Input to type check
+   * @private
+   */
+  check(input = []) {
+    if (!this.isInitialized) {
+      throw new Err('Connection to database not open');
+    }
+    for (const [key, expected] of input) {
+      if (!expected.includes(key.constructor.name)) {
+        throw new Err(`Input of ${key.constructor.name} was invalid, the supported data types are: ${expected.join(', ')}`);
+      }
+    }
   }
 
 }

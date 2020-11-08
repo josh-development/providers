@@ -69,7 +69,7 @@ module.exports = class JoshProvider {
     this.getPaginatedStmt = this.db.prepare(`SELECT ROWID, * FROM '${this.name}' WHERE rowid > @lastRowId AND path = '::NULL::' ORDER BY rowid LIMIT @limit;`);
 
     this.runMany = this.db.transaction((transactions) => {
-      for (const [statement, rowValue] of transactions) statement.run(rowValue);
+      for (const [statement, transactionRow] of transactions) statement.run(transactionRow);
     });
     this.isInitialized = true;
   }
@@ -163,7 +163,7 @@ module.exports = class JoshProvider {
     if (!allowDupes && data.indexOf(value) > -1) return this;
     data.push(value);
     this.set(key, path, data);
-    return this;
+    // return this;
   }
 
   remove(key, path, val) {
@@ -180,8 +180,7 @@ module.exports = class JoshProvider {
 
   inc(key, path) {
     this.check(key, ['Number'], path);
-    this.set(key, path, this.get(key, path) + 1);
-    return this;
+    return this.set(key, path, this.get(key, path) + 1);
   }
 
   dec(key, path) {
@@ -193,42 +192,42 @@ module.exports = class JoshProvider {
   math(key, path, operation, operand) {
     const base = this.get(key, path);
     let result = null;
-    if (base == undefined || operation == undefined || operand == undefined) throw new Err('Math Operation requires base and operation', 'JoshTypeError');
+    if (base == undefined || operation == undefined || operand == undefined) throw new Err('Math operation requires base, operation and operand', 'JoshTypeError');
     switch (operation) {
-      case 'add' :
-      case 'addition' :
-      case '+' :
-        result = base + operand;
-        break;
-      case 'sub' :
-      case 'subtract' :
-      case '-' :
-        result = base - operand;
-        break;
-      case 'mult' :
-      case 'multiply' :
-      case '*' :
-        result = base * operand;
-        break;
-      case 'div' :
-      case 'divide' :
-      case '/' :
-        result = base / operand;
-        break;
-      case 'exp' :
-      case 'exponent' :
-      case '^' :
-        result = Math.pow(base, operand);
-        break;
-      case 'mod' :
-      case 'modulo' :
-      case '%' :
-        result = base % operand;
-        break;
-      case 'rand' :
-      case 'random' :
-        result = Math.floor(Math.random() * Math.floor(operand));
-        break;
+    case 'add' :
+    case 'addition' :
+    case '+' :
+      result = base + operand;
+      break;
+    case 'sub' :
+    case 'subtract' :
+    case '-' :
+      result = base - operand;
+      break;
+    case 'mult' :
+    case 'multiply' :
+    case '*' :
+      result = base * operand;
+      break;
+    case 'div' :
+    case 'divide' :
+    case '/' :
+      result = base / operand;
+      break;
+    case 'exp' :
+    case 'exponent' :
+    case '^' :
+      result = Math.pow(base, operand);
+      break;
+    case 'mod' :
+    case 'modulo' :
+    case '%' :
+      result = base % operand;
+      break;
+    case 'rand' :
+    case 'random' :
+      result = Math.floor(Math.random() * Math.floor(operand));
+      break;
     }
     return this.set(key, path, result);
   }
@@ -427,28 +426,15 @@ module.exports = class JoshProvider {
 
     for (const [currentPath, value] of Object.entries(currentPaths)) {
       if (isNil(paths[currentPath]) || paths[currentPath] !== value) {
-        executions.push([this.deleteStmt, { key, currentPath }]);
-        if (!isNil(paths[currentPath])) executions.push([this.insertStmt, { key, currentPath, value: paths[currentPath] }]);
+        executions.push([this.deleteStmt, { key, path: currentPath }]);
+        if (!isNil(paths[currentPath])) executions.push([this.insertStmt, { key, path: currentPath, value: paths[currentPath] }]);
       }
-      delete paths[path];
+      delete paths[currentPath];
     }
     for (const [currentPath, value] of Object.entries(paths)) {
-      executions.push([this.insertStmt, { key, currentPath, value }]);
+      executions.push([this.insertStmt, { key, path: currentPath, value }]);
     }
     return executions;
-  }
-
-  // TODO: Figure out how to make this similar to GET, 
-  setMany(data, overwrite) {
-    if (isNil(data) || data.constructor.name !== 'Array') {
-      throw new Error('Provided data was not an array of [key, value] pairs.');
-    }
-    const existingKeys = this.keys();
-
-    this.runMany(flatten(data
-      .filter(([key]) => overwrite || !existingKeys.includes(key))
-      .map(([key, value]) => this.compareData(key, value))));
-    return this;
   }
 
 };
