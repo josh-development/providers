@@ -12,7 +12,7 @@ test('Database can be initialized', async () => {
   await provider.init();
 });
 
-test("Database can be closed", () => {
+test('Database can be closed', () => {
   provider.close()
 })
 
