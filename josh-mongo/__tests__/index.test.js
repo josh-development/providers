@@ -1,44 +1,45 @@
 
 const Provider = require('../index.js');
 
-const provider = new Provider({ name: 'InMemoryJosh' });
+const provider = new Provider({ name: 'josh' });
 
 test('Database instance is valid', () => {
   expect(provider).not.toBe(null);
-  expect(provider.name).toBe('inmemoryjosh');
+  expect(provider.name).toBe('josh');
 });
 
 test('Database can be initialized', async () => {
   await provider.init();
+  expect(provider.isInitialized).toBe(true);
+});
+
+test('Database can be written to with all supported values', async () => {
+  expect(await provider.set('object', { a: 1, b: 2, c: 3, d: 4 })).toEqual(
+    provider
+  );
+  expect(await provider.set('array', [1, 2, 3, 4, 5])).toEqual(provider);
+  expect(await provider.set('number', 42)).toEqual(provider);
+  expect(await provider.set('string', 'This is a string')).toEqual(provider);
+  expect(await provider.set('boolean', false)).toEqual(provider);
+  expect(
+    await provider.set('complexobject', {
+      a: 1,
+      b: 2,
+      c: [1, 2, 3, 4, { a: [1, 2, 3, 4] }],
+      d: { 1: 'one', 2: 'two' },
+    })
+  ).toEqual(provider);
+  expect(await provider.set('null', null)).toEqual(provider);
+
+  await provider.inc('number');
+  expect(await provider.get('number')).toBe(43);
+  await provider.dec('number');
+  expect(await provider.get('number')).toBe(42);
 });
 
 test('Database can be closed', () => {
   provider.close()
 })
-
-// test('Database can be written to with all supported values', () => {
-//   expect(provider.set('object', { a: 1, b: 2, c: 3, d: 4 })).toEqual(
-//     provider
-//   );
-//   expect(provider.set('array', [1, 2, 3, 4, 5])).toEqual(provider);
-//   expect(provider.set('number', 42)).toEqual(provider);
-//   expect(provider.set('string', 'This is a string')).toEqual(provider);
-//   expect(provider.set('boolean', false)).toEqual(provider);
-//   expect(
-//     provider.set('complexobject', {
-//       a: 1,
-//       b: 2,
-//       c: [1, 2, 3, 4, { a: [1, 2, 3, 4] }],
-//       d: { 1: 'one', 2: 'two' },
-//     })
-//   ).toEqual(provider);
-//   expect(provider.set('null', null)).toEqual(provider);
-
-//   provider.inc('number');
-//   expect(provider.get('number')).toBe(43);
-//   provider.dec('number');
-//   expect(provider.get('number')).toBe(42);
-// });
 
 // test('Database returns expected statistical properties', async () => {
 //   expect(provider.count()).toBe(7);
@@ -198,6 +199,6 @@ test('Database can be closed', () => {
 //   provider.destroy();
 //   // THIS NEEDS TO BE ADJUSTED FOR EACH PROVIDER
 //   expect(() => provider.count()).toThrowError(
-//     new Error('no such table: InMemoryJosh')
+//     new Error('no such table: josh')
 //   );
 // });

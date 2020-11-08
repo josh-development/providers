@@ -28,11 +28,12 @@ class JoshProvider {
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
   async init() {
-    console.log('Initializing MongoDB');
+    console.log('Initializing MongoDB', this.url);
     this.client = await MongoClient.connect(this.url, { useNewUrlParser: true, useUnifiedTopology: true });
     // console.log(this.client);
     this.db = this.client.db(this.dbName).collection(this.name);
     // console.log(this.db);
+    this.isInitialized = (this.client.isConnected())
     return true;
   }
 
@@ -55,15 +56,14 @@ class JoshProvider {
    * @param {*} val Required. The value of the element to add to the josh object.
    * This value MUST be stringifiable as JSON.
    */
-  set(key, val) {
+  async set(key, val) {
     if (!key || !['String', 'Number'].includes(key.constructor.name)) {
       throw new Error('Keys should be strings or numbers.');
     }
-    this.db.update({
+    await this.db.findOneAndUpdate({
       _id: key,
     }, {
-      _id: key,
-      value: val,
+      $set: { value: val },
     }, {
       upsert: true,
     });
@@ -72,13 +72,19 @@ class JoshProvider {
 
   get(key) {
     console.log(`Retrieving ${key}'s data`);
-    return this.db.findOne({
-      _id: key,
-    });
+    return new Promise((res, rej) => {
+      this.db.findOne({
+        _id: key,
+      }).then(doc => res(doc.value)).catch(rej);
+    })
   }
 
-  inc(key) {
-    return this.set(key, this.get(key) + 1);
+  async inc(key) {
+    return this.set(key, await this.get(key) + 1);
+  }
+
+  async dec(key) {
+    return this.set(key, await this.get(key) - 1);
   }
 
   keyArray() {
