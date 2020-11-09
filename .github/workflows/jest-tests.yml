@@ -31,7 +31,10 @@ jobs:
         path: node_modules
         # An explicit key for restoring and saving the cache
         key: ${{ matrix.node-version }}
-        
+    - name: Start MongoDB
+      uses: supercharge/mongodb-github-action@1.3.0
+      with:
+        mongodb-version: ${{ matrix.mongodb-version }}
     - run: npm i -g yarn
     - run: cd josh-sqlite; yarn; yarn test;
     - run: cd josh-mongo; yarn; yarn test
