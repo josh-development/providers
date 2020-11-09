@@ -73,12 +73,27 @@ class JoshProvider {
     return this;
   }
 
+  async setMany(arr) {
+    for (let doc of arr) {
+      await this.set(doc[0], doc[1]);
+    }
+    return this;
+  }
+
   get(key) {
     return new Promise((res, rej) => {
       this.db.findOne({
         _id: key,
       }).then(doc => res(doc.value)).catch(rej);
     })
+  }
+
+  async getMany(arr) {
+    const doc = {};
+    for(let i = 0; i < arr.length; i++) {
+      doc[arr[i]] = await this.get(arr[i]);
+    }
+    return doc;
   }
 
   count(query = {}) {
@@ -91,6 +106,48 @@ class JoshProvider {
 
   async dec(key) {
     return this.set(key, await this.get(key) - 1);
+  }
+
+  math() {
+    /*
+    // TODO:
+        switch (operation) {
+    case 'add' :
+    case 'addition' :
+    case '+' :
+      result = base + operand;
+      break;
+    case 'sub' :
+    case 'subtract' :
+    case '-' :
+      result = base - operand;
+      break;
+    case 'mult' :
+    case 'multiply' :
+    case '*' :
+      result = base * operand;
+      break;
+    case 'div' :
+    case 'divide' :
+    case '/' :
+      result = base / operand;
+      break;
+    case 'exp' :
+    case 'exponent' :
+    case '^' :
+      result = Math.pow(base, operand);
+      break;
+    case 'mod' :
+    case 'modulo' :
+    case '%' :
+      result = base % operand;
+      break;
+    case 'rand' :
+    case 'random' :
+      result = Math.floor(Math.random() * Math.floor(operand));
+      break;
+    }
+    */
   }
 
   keys(query = {}) {

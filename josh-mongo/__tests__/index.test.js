@@ -80,6 +80,33 @@ test('Database returns expected statistical properties', async () => {
   ]);
 });
 
+test('Database can act on many rows at a time', async () => {
+  expect(await provider.getMany(['number', 'boolean'])).toEqual({
+    number: 42,
+    boolean: false,
+  });
+  expect(
+    await provider.setMany([
+      ['new1', 'new1'],
+      ['new2', 'new2'],
+    ])
+  ).toEqual(provider);
+  expect(await provider.count()).toBe(9);
+  expect((await provider.keys()).sort()).toEqual(
+    [
+      'string',
+      'boolean',
+      'complexobject',
+      'null',
+      'number',
+      'object',
+      'array',
+      'new1',
+      'new2',
+    ].sort()
+  );
+});
+
 test('Database can be deleted', async () => {
   await provider.bulkDelete()
 })
@@ -88,32 +115,6 @@ test('Database can be closed', () => {
   provider.close()
 })
 
-// test('Database can act on many rows at a time', async () => {
-//   expect(provider.getMany(['number', 'boolean'])).toEqual({
-//     number: 42,
-//     boolean: false,
-//   });
-//   expect(
-//     provider.setMany([
-//       ['new1', 'new1'],
-//       ['new2', 'new2'],
-//     ])
-//   ).toEqual(provider);
-//   expect(provider.count()).toBe(9);
-//   expect(provider.keys().sort()).toEqual(
-//     [
-//       'string',
-//       'boolean',
-//       'complexobject',
-//       'null',
-//       'number',
-//       'object',
-//       'array',
-//       'new1',
-//       'new2',
-//     ].sort()
-//   );
-// });
 
 // test('Database can delete values and data at paths', () => {
 //   // Delete
