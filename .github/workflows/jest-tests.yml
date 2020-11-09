@@ -33,5 +33,5 @@ jobs:
         key: ${{ matrix.node-version }}
         
     - run: npm i -g yarn
-    - run: cd josh-sqlite; yarn ci; yarn test;
-    - run: cd ..; cd josh-mongo; yarn ci; yarn test
+    - run: cd josh-sqlite; yarn; yarn test;
+    - run: cd ..; cd josh-mongo; yarn; yarn test
