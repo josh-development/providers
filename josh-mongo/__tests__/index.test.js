@@ -37,69 +37,56 @@ test('Database can be written to with all supported values', async () => {
   expect(await provider.get('number')).toBe(42);
 });
 
+test('Database can retrieve data points as expected', async () => {
+  expect(await provider.get('object')).toEqual({ a: 1, b: 2, c: 3, d: 4 });
+  expect(await provider.get('array')).toEqual([1, 2, 3, 4, 5]);
+  expect(await provider.get('number')).toEqual(42);
+  expect(await provider.get('string')).toBe('This is a string');
+  expect(await provider.get('boolean')).toBe(false);
+  expect(await provider.get('complexobject')).toEqual({
+    a: 1,
+    b: 2,
+    c: [1, 2, 3, 4, { a: [1, 2, 3, 4] }],
+    d: { 1: 'one', 2: 'two' },
+  });
+  expect(await provider.get('null')).toBeNull();
+});
+
+test('Database returns expected statistical properties', async () => {
+  expect(await provider.count()).toBe(7);
+  // order is weird because jest can't compare arrays in an unordered fashion.
+  expect((await provider.keys()).sort()).toEqual([
+    'array',
+    'boolean',
+    'complexobject',
+    'null',
+    'number',
+    'object',
+    'string',
+  ]);
+  expect((await provider.values()).sort()).toEqual([
+    [1, 2, 3, 4, 5],
+    42,
+    'This is a string',
+    { a: 1, b: 2, c: 3, d: 4 },
+    {
+      a: 1,
+      b: 2,
+      c: [1, 2, 3, 4, { a: [1, 2, 3, 4] }],
+      d: { 1: 'one', 2: 'two' },
+    },
+    false,
+    null, 
+  ]);
+});
+
+test('Database can be closed', async () => {
+  await provider.bulkDelete()
+})
+
 test('Database can be closed', () => {
   provider.close()
 })
-
-// test('Database returns expected statistical properties', async () => {
-//   expect(provider.count()).toBe(7);
-//   // order is weird because jest can't compare arrays in an unordered fashion.
-//   expect(provider.keys().sort()).toEqual([
-//     'array',
-//     'boolean',
-//     'complexobject',
-//     'null',
-//     'number',
-//     'object',
-//     'string',
-//   ]);
-//   expect(provider.values()).toEqual([
-//     { a: 1, b: 2, c: 3, d: 4 },
-//     [1, 2, 3, 4, 5],
-//     'This is a string',
-//     false,
-//     {
-//       a: 1,
-//       b: 2,
-//       c: [1, 2, 3, 4, { a: [1, 2, 3, 4] }],
-//       d: { 1: 'one', 2: 'two' },
-//     },
-//     null,
-//     42,
-//   ]);
-//   expect(provider.autoId()).toBe('1');
-//   expect(provider.autoId()).toBe('2');
-// });
-
-// test('Database can retrieve data points as expected', async () => {
-//   expect(provider.get('object')).toEqual({ a: 1, b: 2, c: 3, d: 4 });
-//   expect(provider.get('array')).toEqual([1, 2, 3, 4, 5]);
-//   expect(provider.get('number')).toEqual(42);
-//   expect(provider.get('string')).toBe('This is a string');
-//   expect(provider.get('boolean')).toBe(false);
-//   expect(provider.get('complexobject')).toEqual({
-//     a: 1,
-//     b: 2,
-//     c: [1, 2, 3, 4, { a: [1, 2, 3, 4] }],
-//     d: { 1: 'one', 2: 'two' },
-//   });
-//   expect(provider.get('null')).toBeNull();
-//   expect(provider.has('object', 'a')).toBe(true);
-// });
-
-// test('Database can read and write in paths', () => {
-//   expect(provider.get('object', 'a')).toBe(1);
-//   expect(provider.get('array', '0')).toBe(1);
-//   expect(provider.get('complexobject', 'c[4].a[1]')).toBe(2);
-
-//   provider.set('object', 'e', 5);
-//   expect(provider.get('object', 'e')).toBe(5);
-//   provider.set('array', '5', 6);
-//   expect(provider.get('array', '5')).toBe(6);
-
-//   provider.push('array', 7);
-//   expect(provider.get('array', '6')).toBe(7);
-// });
 
 // test('Database can act on many rows at a time', async () => {
 //   expect(provider.getMany(['number', 'boolean'])).toEqual({

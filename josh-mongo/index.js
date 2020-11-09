@@ -79,6 +79,10 @@ class JoshProvider {
     })
   }
 
+  count(query = {}) {
+    return this.db.countDocuments(query);
+  }
+
   async inc(key) {
     return this.set(key, await this.get(key) + 1);
   }
@@ -87,11 +91,20 @@ class JoshProvider {
     return this.set(key, await this.get(key) - 1);
   }
 
-  keyArray() {
+  keys(query = {}) {
     return new Promise((resolve, reject) => {
-      this.db.find({}).toArray((err, docs) => {
+      this.db.find(query).toArray((err, docs) => {
         if (err) reject(err);
-        resolve(docs);
+        resolve(docs.map(x => x._id));
+      });
+    });
+  }
+
+  values(query = {}) {
+    return new Promise((resolve, reject) => {
+      this.db.find(query).toArray((err, docs) => {
+        if (err) reject(err);
+        resolve(docs.map(x => x.value));
       });
     });
   }
