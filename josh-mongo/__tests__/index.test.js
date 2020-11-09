@@ -80,7 +80,7 @@ test('Database returns expected statistical properties', async () => {
   ]);
 });
 
-test('Database can be closed', async () => {
+test('Database can be deleted', async () => {
   await provider.bulkDelete()
 })
 

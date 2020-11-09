@@ -33,7 +33,6 @@ class JoshProvider {
     // console.log(this.client);
     this.db = this.client.db(this.dbName).collection(this.name);
     // console.log(this.db);
-    this.isInitialized = (this.client.isConnected())
     return true;
   }
 
@@ -41,6 +40,10 @@ class JoshProvider {
     return {
       name: this.dbName,
     };
+  }
+
+  get isInitialized() {
+    return this.client.isConnected()
   }
 
   /**
@@ -71,7 +74,6 @@ class JoshProvider {
   }
 
   get(key) {
-    console.log(`Retrieving ${key}'s data`);
     return new Promise((res, rej) => {
       this.db.findOne({
         _id: key,
