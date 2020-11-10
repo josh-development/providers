@@ -4,6 +4,7 @@ const {
 
 const _ = require('lodash');
 
+const Err = require("./error");
 class JoshProvider {
 
   constructor(options) {
@@ -74,8 +75,8 @@ class JoshProvider {
   }
 
   async setMany(arr) {
-    for (let doc of arr) {
-      await this.set(doc[0], doc[1]);
+    for (let [key, val] of arr) {
+      await this.set(key, val);
     }
     return this;
   }
@@ -108,10 +109,11 @@ class JoshProvider {
     return this.set(key, await this.get(key) - 1);
   }
 
-  math() {
-    /*
-    // TODO:
-        switch (operation) {
+  async math(key, operation, operand) {
+    const base = await this.get(key);
+    let result = null;
+    if (!base || !operation || !operand) throw new Err('Math operation requires base, operation and operand', 'JoshTypeError');
+    switch (operation) {
     case 'add' :
     case 'addition' :
     case '+' :
@@ -146,8 +148,14 @@ class JoshProvider {
     case 'random' :
       result = Math.floor(Math.random() * Math.floor(operand));
       break;
+    default:
+      throw new Err("Please provide a valid operand", "JoshTypeError") 
+      break;
     }
-    */
+    if(result) {
+      await this.set(key, result);
+    }
+    return this;
   }
 
   keys(query = {}) {
@@ -168,16 +176,19 @@ class JoshProvider {
     });
   }
 
-  delete(key) {
-    return this.db.remove({
+  async delete(key) {
+    await this.db.deleteOne({
       _id: key,
-    }, {
-      single: true,
     });
+    return this;
   }
 
-  deleteAll() {
-    return this.db.deleteMany({});
+  async deleteMany(arr) {
+    const query = {
+      $in: arr
+    };
+    await this.db.deleteMany({ _id: query });
+    return this;
   }
 
   hasAsync(key) {

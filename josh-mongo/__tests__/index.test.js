@@ -107,6 +107,42 @@ test('Database can act on many rows at a time', async () => {
   );
 });
 
+test('Database supports math operations', async () => {
+  await provider.math('number', 'multiply', 2);
+  expect(await provider.get('number')).toBe(84);
+  await provider.math('number', 'divide', 4);
+  expect(await provider.get('number')).toBe(21);
+  await provider.math('number', 'add', 21);
+  expect(await provider.get('number')).toBe(42);
+});
+
+
+test('Database can delete values and data at paths', async () => {
+  // Delete
+  await provider.delete('new2');
+  expect(await provider.count()).toBe(8);
+  expect((await provider.keys()).sort()).toEqual(
+    [
+      'string',
+      'boolean',
+      'complexobject',
+      'null',
+      'number',
+      'object',
+      'array',
+      'new1',
+    ].sort()
+  );
+
+  await provider.setMany([
+    ["del1", "del1"],
+    ["del2", "del2"]
+  ])
+  expect(await provider.count()).toBe(10);
+  await provider.deleteMany(["del1", "del2"])
+  expect(await provider.count()).toBe(8);
+});
+
 test('Database can be deleted', async () => {
   await provider.bulkDelete()
 })
@@ -116,41 +152,7 @@ test('Database can be closed', () => {
 })
 
 
-// test('Database can delete values and data at paths', () => {
-//   // Delete
-//   provider.delete('new2');
-//   expect(provider.count()).toBe(8);
-//   expect(provider.keys().sort()).toEqual(
-//     [
-//       'string',
-//       'boolean',
-//       'complexobject',
-//       'null',
-//       'number',
-//       'object',
-//       'array',
-//       'new1',
-//     ].sort()
-//   );
 
-//   // Objects
-//   provider.delete('object', 'a');
-//   expect(provider.count()).toBe(8);
-//   expect(provider.get('object')).toEqual({ b: 2, c: 3, d: 4, e: 5 });
-
-//   // Arrays
-//   provider.remove('array', 4);
-//   expect(provider.get('array')).toEqual([1, 2, 3, 5, 6, 7]);
-// });
-
-// test('Database supports math operations', () => {
-//   provider.math('number', 'multiply', 2);
-//   expect(provider.get('number')).toBe(84);
-//   provider.math('number', 'divide', 4);
-//   expect(provider.get('number')).toBe(21);
-//   provider.math('number', 'add', 21);
-//   expect(provider.get('number')).toBe(42);
-// });
 
 // test('Database can loop, filter, find', async () => {
 //   expect(provider.filterByValue('b', 2)).toEqual({

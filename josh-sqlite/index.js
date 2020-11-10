@@ -194,7 +194,7 @@ module.exports = class JoshProvider {
   math(key, path, operation, operand) {
     const base = this.get(key, path);
     let result = null;
-    if (base == undefined || operation == undefined || operand == undefined) throw new Err('Math Operation requires base and operation', 'JoshTypeError');
+    if (base == undefined || operation == undefined || operand == undefined) throw new Err('Math operation requires base, operation and operand', 'JoshTypeError');
     switch (operation) {
     case 'add' :
     case 'addition' :
