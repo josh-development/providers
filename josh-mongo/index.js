@@ -29,7 +29,7 @@ class JoshProvider {
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
   async init() {
-    console.log('Initializing MongoDB', this.url);
+    // console.log('Initializing MongoDB', this.url);
     this.client = await MongoClient.connect(this.url, { useNewUrlParser: true, useUnifiedTopology: true });
     // console.log(this.client);
     this.db = this.client.db(this.dbName).collection(this.name);
@@ -37,21 +37,30 @@ class JoshProvider {
     return true;
   }
 
+  /**
+   * Get settings
+   * @returns {object} Returns an object containing all settings
+   */
   get settings() {
     return {
       name: this.dbName,
     };
   }
 
+  /**
+   * Check is database is initialized and connected
+   * @returns {Boolean} Returns true if connected successfully
+   */
   get isInitialized() {
     return this.client.isConnected()
   }
 
   /**
    * Shuts down the underlying database.
+   * @returns {Promise} Promise resolves when finished closing
    */
   close() {
-    this.client.close();
+    return this.client.close();
   }
 
   /**
@@ -59,9 +68,16 @@ class JoshProvider {
    * @param {(string|number)} key Required. The key of the element to add to the josh object.
    * @param {*} val Required. The value of the element to add to the josh object.
    * This value MUST be stringifiable as JSON.
+   * @example
+   * ```
+   * await JoshProvider.set("josh", { hello: "world" })
+   * ```
    */
   async set(key, val) {
-    if (!key || !['String', 'Number'].includes(key.constructor.name)) {
+    this.check([ 
+      [key, ["String"]],
+    ])
+    if (!key) {
       throw new Error('Keys should be strings or numbers.');
     }
     await this.db.findOneAndUpdate({
@@ -74,6 +90,14 @@ class JoshProvider {
     return this;
   }
 
+  /**
+   * Set many keys and values
+   * @param {Array} arr
+   * @example
+   * ```
+   * await JoshProvider.setMany([ ["hello", "world"], ["josh": true] ])
+   * ``` 
+   */
   async setMany(arr) {
     for (let [key, val] of arr) {
       await this.set(key, val);
@@ -81,6 +105,15 @@ class JoshProvider {
     return this;
   }
 
+  /**
+   * Fetch the value of a key in the database
+   * @param {(string|number)} key 
+   * @returns {Promise} Resolves to the value
+   * @example
+   * ```
+   * await JoshProvider.get("josh")
+   * ```
+   */
   get(key) {
     return new Promise((res, rej) => {
       this.db.findOne({
@@ -89,26 +122,72 @@ class JoshProvider {
     })
   }
 
+  /**
+   * Fetch multiple keys from the database
+   * @param {Array} arr 
+   * @returns {object} Returns object with each key mapped to its value
+   * @example
+   * ```
+   * await JoshProvider.getMany([ "josh", 123 ])
+   * ```
+   */
   async getMany(arr) {
     const doc = {};
-    for(let i = 0; i < arr.length; i++) {
-      doc[arr[i]] = await this.get(arr[i]);
+    for(let key of arr) {
+      doc[key] = await this.get(key);
     }
     return doc;
   }
 
+  /**
+   * Count the documents in the database
+   * @param {object} query This filters the documents counted 
+   * @returns {Promise}
+   * @example
+   * ```
+   * await JoshProvider.count()
+   * ```
+   */
   count(query = {}) {
     return this.db.countDocuments(query);
   }
 
+  /**
+   * Increment the value of a document by 1
+   * @param {(string|number)} key 
+   * @example
+   * ```
+   * await JoshProvider.inc("joshes")
+   * ```
+   */
   async inc(key) {
     return this.set(key, await this.get(key) + 1);
   }
 
+  /**
+   * Decrement the value of a document by 1
+   * @param {(string|number)} key
+   * @example
+   * ```
+   * await JoshProvider.dec("joshes")
+   * ``` 
+   */
   async dec(key) {
     return this.set(key, await this.get(key) - 1);
   }
 
+  /**
+   * Perform mathmatical operations on the value of a document
+   * @param {(string|number)} key 
+   * @param {string} operation Valid operations are add, subtract, multiply, divide, exponent, modulo and random
+   * @param {number} operand
+   * @example
+   * ```
+   * await JoshProvider.math('number', 'multiply', 2)
+   * await JoshProvider.math('number', '/', 2) // divide
+   * await JoshProvider.math('number', 'exp', 2) // exponent
+   * ```
+   */
   async math(key, operation, operand) {
     const base = await this.get(key);
     let result = null;
@@ -158,6 +237,15 @@ class JoshProvider {
     return this;
   }
 
+  /**
+   * Fetch all keys within a query
+   * @param {object} query 
+   * @returns {Array}
+   * @example
+   * ```
+   * await JoshProvider.keys()
+   * ```
+   */
   keys(query = {}) {
     return new Promise((resolve, reject) => {
       this.db.find(query).toArray((err, docs) => {
@@ -167,6 +255,15 @@ class JoshProvider {
     });
   }
 
+  /**
+   * Fetch all values in the database
+   * @param {object} query 
+   * @returns {Array}
+   * @example
+   * ```
+   * await JoshProvider.values()
+   * ```
+   */
   values(query = {}) {
     return new Promise((resolve, reject) => {
       this.db.find(query).toArray((err, docs) => {
@@ -213,35 +310,19 @@ class JoshProvider {
     // Do not delete this internal method.
     this.name = this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
   }
-  /*
-   * INTERNAL method to verify the type of a key or property
-   * Will THROW AN ERROR on wrong type, to simplify code.
-   * @param {string|number} key Required. The key of the element to check
-   * @param {string} type Required. The javascript constructor to check
-   * @param {string} path Optional. The dotProp path to the property in JOSH.
-   */
-  // Herefore I indicate that I do understand part of this would be easily resolved with TypeScript but I don't do TS... yet.
-  // TODO: OPTIMIZE FOR LESS QUERIES. A LOT less queries. wow this is bad.
-  //   check(key, type, path = null) {
-  //     if (!this.has(key)) throw new Err(`The key "${key}" does not exist in JOSH "${this.name}"`, 'JoshPathError');
-  //     if (!type) return;
-  //     if (!isArray(type)) type = [type];
-  //     if (!isNil(path)) {
-  //       this.check(key, 'Object');
-  //       const data = this.get(key);
-  //       if (isNil(_get(data, path))) {
-  //         throw new Err(`The property "${path}" in key "${key}" does not exist. Please set() it or ensure() it."`, 'JoshPathError');
-  //       }
-  //       if (!type.includes(_get(data, path).constructor.name)) {
-  //         throw new Err(`The property "${path}" in key "${key}" is not of type "${type.join('" or "')}" in JOSH "${this.name}"
-  // (key was of type "${_get(data, path).constructor.name}")`, 'JoshTypeError');
-  //       }
-  //     } else if (!type.includes(this.get(key)).constructor.name) {
-  //       throw new Err(`The key "${key}" is not of type "${type.join('" or "')}" in JOSH "${this.name}" (key was of type "${this.get(key).constructor.name}")`, 'JoshTypeError');
-  //     }
-  //   }
+
   keyCheck(key) {
     return !_.isNil(key) && key[0] !== '$';
+  }
+  check(input) {
+    if(!this.isInitialized) {
+      throw new Err("Connection to database not open")
+    }
+    for (let [key, expected] of input) {
+     if(!expected.includes(key.constructor.name)) {
+       throw new Err("Input was invalid, the supported data types are: " + expected.join(", "))
+     }
+    }
   }
 
 }

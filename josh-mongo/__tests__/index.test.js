@@ -145,13 +145,16 @@ test('Database can delete values and data at paths', async () => {
 
 test('Database can be deleted', async () => {
   await provider.bulkDelete()
+  expect(await provider.count()).toBe(0)
 })
 
-test('Database can be closed', () => {
-  provider.close()
+test('Database can be closed', async () => {
+  await provider.close()
 })
 
-
+test('Database can\'t be used after close', async () => {
+  await expect(provider.set("test", "test")).rejects.toThrowError("Connection to database not open")
+})
 
 
 // test('Database can loop, filter, find', async () => {
@@ -180,15 +183,4 @@ test('Database can be closed', () => {
 //     'object101'
 //   );
 //   // test: <query> (upcoming)
-// });
-
-// test('Database can be purged and destroyed', async () => {
-//   provider.clear();
-//   expect(provider.count()).toBe(0);
-
-//   provider.destroy();
-//   // THIS NEEDS TO BE ADJUSTED FOR EACH PROVIDER
-//   expect(() => provider.count()).toThrowError(
-//     new Error('no such table: josh')
-//   );
 // });
