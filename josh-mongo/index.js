@@ -8,7 +8,7 @@ const Err = require("./error");
 class JoshProvider {
 
   constructor(options) {
-    if (!options.name) throw new Error('Must provide options.name');
+    if (!options.name) throw new Err('Must provide options.name', "JoshTypeError");
     this.name = options.name;
     this.validateName();
     this.auth =
@@ -75,7 +75,7 @@ class JoshProvider {
    */
   async set(key, val) {
     this.check([ 
-      [key, ["String"]],
+      [key, ["String", "Number"]]
     ])
     if (!key) {
       throw new Error('Keys should be strings or numbers.');
@@ -99,6 +99,9 @@ class JoshProvider {
    * ``` 
    */
   async setMany(arr) {
+    this.check([ 
+      [arr, ["Array"]]
+    ])
     for (let [key, val] of arr) {
       await this.set(key, val);
     }
@@ -115,6 +118,9 @@ class JoshProvider {
    * ```
    */
   get(key) {
+    this.check([ 
+      [key, ["String", "Number"]]
+    ])
     return new Promise((res, rej) => {
       this.db.findOne({
         _id: key,
@@ -124,7 +130,7 @@ class JoshProvider {
 
   /**
    * Fetch multiple keys from the database
-   * @param {Array} arr 
+   * @param {string[]} arr 
    * @returns {object} Returns object with each key mapped to its value
    * @example
    * ```
@@ -132,6 +138,9 @@ class JoshProvider {
    * ```
    */
   async getMany(arr) {
+    this.check([ 
+      [arr, ["Array"]]
+    ])
     const doc = {};
     for(let key of arr) {
       doc[key] = await this.get(key);
@@ -149,6 +158,7 @@ class JoshProvider {
    * ```
    */
   count(query = {}) {
+    this.check();
     return this.db.countDocuments(query);
   }
 
@@ -161,6 +171,7 @@ class JoshProvider {
    * ```
    */
   async inc(key) {
+    this.check();
     return this.set(key, await this.get(key) + 1);
   }
 
@@ -173,6 +184,7 @@ class JoshProvider {
    * ``` 
    */
   async dec(key) {
+    this.check();
     return this.set(key, await this.get(key) - 1);
   }
 
@@ -189,6 +201,11 @@ class JoshProvider {
    * ```
    */
   async math(key, operation, operand) {
+    this.check([ 
+      [key, ["String", "Number"]],
+      [operation, ["String"]],
+      [operand, ["Number"]]
+    ])
     const base = await this.get(key);
     let result = null;
     if (!base || !operation || !operand) throw new Err('Math operation requires base, operation and operand', 'JoshTypeError');
@@ -247,6 +264,9 @@ class JoshProvider {
    * ```
    */
   keys(query = {}) {
+    this.check([
+      [query, ["Object"]]
+    ])
     return new Promise((resolve, reject) => {
       this.db.find(query).toArray((err, docs) => {
         if (err) reject(err);
@@ -265,6 +285,9 @@ class JoshProvider {
    * ```
    */
   values(query = {}) {
+    this.check([
+      [query, ["Object"]]
+    ])
     return new Promise((resolve, reject) => {
       this.db.find(query).toArray((err, docs) => {
         if (err) reject(err);
@@ -273,14 +296,36 @@ class JoshProvider {
     });
   }
 
+  /**
+   * Delete a document from the database
+   * @param {string} key 
+   * @example
+   * ```
+   * await JoshProvider.delete("josh");
+   * ```
+   */
   async delete(key) {
+    this.check([
+      [key, ["String", "Number"]]
+    ])
     await this.db.deleteOne({
       _id: key,
     });
     return this;
   }
 
+  /**
+   * Delete multiple documents from the database
+   * @param {Array} arr 
+   * @example
+   * ```
+   * await JoshProvider.deleteMany(["josh", "mongo", "number", 12])
+   * ```
+   */
   async deleteMany(arr) {
+    this.check([
+      [arr, ["Array"]]
+    ])
     const query = {
       $in: arr
     };
@@ -288,17 +333,16 @@ class JoshProvider {
     return this;
   }
 
-  hasAsync(key) {
-    return this.db.find({
-      _id: key,
-    }).limit(1);
-  }
-
   /**
    * Deletes all entries in the database.
    * @return {Promise<*>} Promise returned by the database after deletion
+   * @example
+   * ```
+   * await JoshProvider.bulkDelete()
+   * ```
    */
   bulkDelete() {
+    this.check();
     return this.db.drop();
   }
 
@@ -311,16 +355,17 @@ class JoshProvider {
     this.name = this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
   }
 
-  keyCheck(key) {
-    return !_.isNil(key) && key[0] !== '$';
-  }
-  check(input) {
+  /**
+   * Internal method used to check validity of the database and input
+   * @private
+   */
+  check(input = []) {
     if(!this.isInitialized) {
       throw new Err("Connection to database not open")
     }
     for (let [key, expected] of input) {
      if(!expected.includes(key.constructor.name)) {
-       throw new Err("Input was invalid, the supported data types are: " + expected.join(", "))
+       throw new Err("Input of " + key.constructor.name + " was invalid, the supported data types are: " + expected.join(", "))
      }
     }
   }
