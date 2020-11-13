@@ -346,7 +346,18 @@ class JoshProvider {
     this.check();
     return this.db.drop();
   }
-
+  /**
+   * Check for key in database
+   * @param {(string|number)} key The document key to check
+   * @return {boolean} True if key is found in database
+   * @example
+   * ```
+   * await JoshProvider.has("number")
+   * ```
+   */
+  async has(key) {
+    return await this.get(key) != null;
+  }
   /**
    * Internal method used to validate persistent josh names (valid Windows filenames)
    * @private
