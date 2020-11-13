@@ -1,4 +1,3 @@
-
 const Provider = require('../index.js');
 
 const provider = new Provider({ name: 'josh' });
@@ -11,11 +10,12 @@ test('Database instance is valid', () => {
 test('Database can be initialized', async () => {
   await provider.init();
   expect(provider.isInitialized).toBe(true);
+  expect(await provider.count()).toBe(0);
 });
 
 test('Database can be written to with all supported values', async () => {
   expect(await provider.set('object', { a: 1, b: 2, c: 3, d: 4 })).toEqual(
-    provider
+    provider,
   );
   expect(await provider.set('array', [1, 2, 3, 4, 5])).toEqual(provider);
   expect(await provider.set('number', 42)).toEqual(provider);
@@ -27,7 +27,7 @@ test('Database can be written to with all supported values', async () => {
       b: 2,
       c: [1, 2, 3, 4, { a: [1, 2, 3, 4] }],
       d: { 1: 'one', 2: 'two' },
-    })
+    }),
   ).toEqual(provider);
   expect(await provider.set('null', null)).toEqual(provider);
 
@@ -76,7 +76,7 @@ test('Database returns expected statistical properties', async () => {
       d: { 1: 'one', 2: 'two' },
     },
     false,
-    null, 
+    null,
   ]);
 });
 
@@ -89,7 +89,7 @@ test('Database can act on many rows at a time', async () => {
     await provider.setMany([
       ['new1', 'new1'],
       ['new2', 'new2'],
-    ])
+    ]),
   ).toEqual(provider);
   expect(await provider.count()).toBe(9);
   expect((await provider.keys()).sort()).toEqual(
@@ -103,7 +103,7 @@ test('Database can act on many rows at a time', async () => {
       'array',
       'new1',
       'new2',
-    ].sort()
+    ].sort(),
   );
 });
 
@@ -131,30 +131,30 @@ test('Database can delete values and data at paths', async () => {
       'object',
       'array',
       'new1',
-    ].sort()
+    ].sort(),
   );
 
   await provider.setMany([
-    ["del1", "del1"],
-    ["del2", "del2"]
-  ])
+    ['del1', 'del1'],
+    ['del2', 'del2'],
+  ]);
   expect(await provider.count()).toBe(10);
-  await provider.deleteMany(["del1", "del2"])
+  await provider.deleteMany(['del1', 'del2']);
   expect(await provider.count()).toBe(8);
 });
 
 test('Database can be deleted', async () => {
-  await provider.bulkDelete()
-  expect(await provider.count()).toBe(0)
-})
+  await provider.bulkDelete();
+  expect(await provider.count()).toBe(0);
+});
 
 test('Database can be closed', async () => {
-  await provider.close()
-})
+  await provider.close();
+});
 
 test('Database can\'t be used after close', async () => {
-  await expect(provider.set("test", "test")).rejects.toThrowError("Connection to database not open")
-})
+  await expect(provider.set('test', 'test')).rejects.toThrowError('Connection to database not open');
+});
 
 
 // test('Database can loop, filter, find', async () => {
