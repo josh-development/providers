@@ -1,5 +1,5 @@
 {
-  "name": "josh-mongo",
+  "name": "@josh-providers/mongo",
   "version": "0.0.1",
   "description": "MongoDB Provider for JOSH",
   "repository": {
