@@ -9,14 +9,14 @@ const Err = require('./error');
 class JoshProvider {
 
   constructor(options) {
-    if (!options.name) throw new Err('Must provide options.name', 'JoshTypeError');
-    this.name = options.name;
+    if (!options.collection) throw new Err('Must provide options.collection', 'JoshTypeError');
+    this.collection = options.collection;
     this.validateName();
     this.auth =
       options.user && options.password ?
         `${options.user}:${options.password}@` :
         '';
-    this.dbName = options.dbName || 'test';
+    this.dbName = options.dbName || 'josh';
     this.port = options.port || 27017;
     this.host = options.host || 'localhost';
     this.url =
@@ -32,7 +32,7 @@ class JoshProvider {
   async init() {
     this.client = await MongoClient.connect(this.url, { useNewUrlParser: true, useUnifiedTopology: true })
       .catch(err => console.error(err));
-    this.db = this.client.db(this.dbName).collection(this.name);
+    this.db = this.client.db(this.dbName).collection(this.collection);
     return true;
   }
 
@@ -363,7 +363,7 @@ class JoshProvider {
    */
   validateName() {
     // Do not delete this internal method.
-    this.name = this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    this.collection = this.collection.replace(/[^a-z0-9]/gi, '_').toLowerCase();
   }
 
   /**
