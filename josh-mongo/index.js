@@ -30,11 +30,9 @@ class JoshProvider {
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
   async init() {
-    // console.log('Initializing MongoDB', this.url);
-    this.client = await MongoClient.connect(this.url, { useNewUrlParser: true, useUnifiedTopology: true });
-    // console.log(this.client);
+    this.client = await MongoClient.connect(this.url, { useNewUrlParser: true, useUnifiedTopology: true })
+      .catch(err => console.error(err));
     this.db = this.client.db(this.dbName).collection(this.name);
-    // console.log(this.db);
     return true;
   }
 
@@ -342,9 +340,10 @@ class JoshProvider {
    * await JoshProvider.bulkDelete()
    * ```
    */
-  bulkDelete() {
+  async bulkDelete() {
     this.check();
-    return this.db.drop();
+    await this.db.deleteMany({});
+    return this;
   }
   /**
    * Check for key in database
