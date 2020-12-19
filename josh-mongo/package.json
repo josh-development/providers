@@ -1,6 +1,6 @@
 {
   "name": "@josh-providers/mongo",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "MongoDB Provider for JOSH",
   "scripts": {
     "test": "jest",

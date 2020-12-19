@@ -18,7 +18,7 @@ NOTES:
 - This testing WILL DELETE THE ENTIRE COLLECTION CONTENT, so do NOT connect this to a live collection OMG what's wrong with you!
 */
 
-if(!config || !config.name) {
+if(!config || !config.collection) {
   console.error("No configuration detected, please create config-mongo.json");
   process.exit(1);
 };
@@ -31,7 +31,7 @@ afterAll(() => {
 
 test('Database instance is valid', () => {
   expect(provider).not.toBe(null);
-  expect(provider.name).toBe('josh');
+  expect(provider.collection).toBe('josh');
 });
 
 test('Database can be initialized', async () => {
@@ -42,22 +42,23 @@ test('Database can be initialized', async () => {
 });
 
 test('Database can be written to with all supported values', async () => {
-  expect(await provider.set('object', { a: 1, b: 2, c: 3, d: 4 })).toEqual(
+  expect(await provider.set('object', null, { a: 1, b: 2, c: 3, d: 4 })).toEqual(
     provider,
   );
-  expect(await provider.set('array', [1, 2, 3, 4, 5])).toEqual(provider);
-  expect(await provider.set('number', 42)).toEqual(provider);
-  expect(await provider.set('string', 'This is a string')).toEqual(provider);
-  expect(await provider.set('boolean', false)).toEqual(provider);
+  expect(await provider.set('array', null, [1, 2, 3, 4, 5])).toEqual(provider);
+  // Fix: "Cannot create field '43' in element { value: 42 }" ????
+  expect(await provider.set('number', null, 42)).toEqual(provider);
+  expect(await provider.set('string', null, 'This is a string')).toEqual(provider);
+  expect(await provider.set('boolean', null, false)).toEqual(provider);
   expect(
-    await provider.set('complexobject', {
+    await provider.set('complexobject', null, {
       a: 1,
       b: 2,
       c: [1, 2, 3, 4, { a: [1, 2, 3, 4] }],
       d: { 1: 'one', 2: 'two' },
     }),
   ).toEqual(provider);
-  expect(await provider.set('null', null)).toEqual(provider);
+  expect(await provider.set('null', null,  null)).toEqual(provider);
 
   await provider.inc('number');
   expect(await provider.get('number')).toBe(43);
@@ -83,6 +84,7 @@ test('Database can retrieve data points as expected', async () => {
 test('Database returns expected statistical properties', async () => {
   expect(await provider.count()).toBe(7);
   // order is weird because jest can't compare arrays in an unordered fashion.
+  // TODO: keys() now gets the _id list, should get key prop from all documents.
   expect((await provider.keys()).sort()).toEqual([
     'array',
     'boolean',
@@ -109,6 +111,7 @@ test('Database returns expected statistical properties', async () => {
 });
 
 test('Database can act on many rows at a time', async () => {
+  // TODO: fix returns empty object
   expect(await provider.getMany(['number', 'boolean'])).toEqual({
     number: 42,
     boolean: false,
@@ -136,6 +139,7 @@ test('Database can act on many rows at a time', async () => {
 });
 
 test('Database supports math operations', async () => {
+  // Fix: math don't work at all
   await provider.math('number', 'multiply', 2);
   expect(await provider.get('number')).toBe(84);
   await provider.math('number', 'divide', 4);
@@ -146,7 +150,7 @@ test('Database supports math operations', async () => {
 
 
 test('Database can delete values and data at paths', async () => {
-  // Delete
+  // Fix: expected 8 received 7? Probs because math don't work.
   await provider.delete('new2');
   expect(await provider.count()).toBe(8);
   expect((await provider.keys()).sort()).toEqual(
@@ -171,10 +175,10 @@ test('Database can delete values and data at paths', async () => {
   expect(await provider.count()).toBe(8);
 });
 
-test('Database can be deleted', async () => {
-  await provider.bulkDelete();
-  expect(await provider.count()).toBe(0);
-});
+// test('Database can be deleted', async () => {
+//   await provider.bulkDelete();
+//   expect(await provider.count()).toBe(0);
+// });
 
 test('Database can be closed', async () => {
   await provider.close();

@@ -1,8 +1,11 @@
 const {
   MongoClient,
+  ObjectId
 } = require('mongodb');
 
-// const _ = require('lodash'); Unused
+const {
+  get: _get
+} = require('lodash');
 
 const Err = require('./error');
 
@@ -72,7 +75,7 @@ class JoshProvider {
    * await JoshProvider.set("josh", { hello: "world" })
    * ```
    */
-  async set(key, val) {
+  async set(key, path, val) {
     this.check([
       [key, ['String', 'Number']],
     ]);
@@ -80,9 +83,9 @@ class JoshProvider {
       throw new Error('Keys should be strings or numbers.');
     }
     await this.db.findOneAndUpdate({
-      _id: key,
+      key: { $eq: key},
     }, {
-      $set: { value: val },
+      $set: { key, [`${path ? `value.${path}` : 'value'}`]: val },
     }, {
       upsert: true,
     });
@@ -116,15 +119,15 @@ class JoshProvider {
    * await JoshProvider.get("josh")
    * ```
    */
-  get(key) {
+  async get(key, path) {
     this.check([
       [key, ['String', 'Number']],
     ]);
-    return new Promise((res, rej) => {
-      this.db.findOne({
-        _id: key,
-      }).then(doc => res(doc.value)).catch(rej);
+    const data = await this.db.findOne({
+      key: { $eq: key},
     });
+    if(!path) return data && data.value;
+    return _get(data, path);
   }
 
   /**
