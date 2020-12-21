@@ -1,24 +1,25 @@
-const {
-  MongoClient,
-} = require('mongodb');
+const { MongoClient, ObjectId } = require("mongodb");
 
-// const _ = require('lodash'); Unused
+const { get: _get } = require("lodash");
 
-const Err = require('./error');
+const Err = require("./error");
 
 class JoshProvider {
-
   constructor(options) {
-    if (!options.name) throw new Err('Must provide options.name', 'JoshTypeError');
+    if (!options.name)
+      throw new Err("Must provide options.name", "JoshTypeError");
     this.name = options.name;
+    if (!options.collection)
+      throw new Err("Must provide options.collection", "JoshTypeError");
+    this.collection = options.collection;
     this.validateName();
     this.auth =
-      options.user && options.password ?
-        `${options.user}:${options.password}@` :
-        '';
-    this.dbName = options.dbName || 'test';
+      options.user && options.password
+        ? `${options.user}:${options.password}@`
+        : "";
+    this.dbName = options.dbName || "josh";
     this.port = options.port || 27017;
-    this.host = options.host || 'localhost';
+    this.host = options.host || "localhost";
     this.url =
       options.url ||
       `mongodb://${this.auth}${this.host}:${this.port}/${this.dbName}`;
@@ -30,11 +31,11 @@ class JoshProvider {
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
   async init() {
-    // console.log('Initializing MongoDB', this.url);
-    this.client = await MongoClient.connect(this.url, { useNewUrlParser: true, useUnifiedTopology: true });
-    // console.log(this.client);
-    this.db = this.client.db(this.dbName).collection(this.name);
-    // console.log(this.db);
+    this.client = await MongoClient.connect(this.url, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }).catch((err) => console.error(err));
+    this.db = this.client.db(this.dbName).collection(this.collection);
     return true;
   }
 
@@ -74,20 +75,22 @@ class JoshProvider {
    * await JoshProvider.set("josh", { hello: "world" })
    * ```
    */
-  async set(key, val) {
-    this.check([
-      [key, ['String', 'Number']],
-    ]);
+  async set(key, path, val) {
+    this.check([[key, ["String", "Number"]]]);
     if (!key) {
-      throw new Error('Keys should be strings or numbers.');
+      throw new Error("Keys should be strings or numbers.");
     }
-    await this.db.findOneAndUpdate({
-      _id: key,
-    }, {
-      $set: { value: val },
-    }, {
-      upsert: true,
-    });
+    await this.db.findOneAndUpdate(
+      {
+        key: { $eq: key },
+      },
+      {
+        $set: { key, [`${path ? `value.${path}` : "value"}`]: val },
+      },
+      {
+        upsert: true,
+      }
+    );
     return this;
   }
 
@@ -100,9 +103,7 @@ class JoshProvider {
    * ```
    */
   async setMany(arr) {
-    this.check([
-      [arr, ['Array']],
-    ]);
+    this.check([[arr, ["Array"]]]);
     for (const [key, val] of arr) {
       await this.set(key, val);
     }
@@ -118,15 +119,13 @@ class JoshProvider {
    * await JoshProvider.get("josh")
    * ```
    */
-  get(key) {
-    this.check([
-      [key, ['String', 'Number']],
-    ]);
-    return new Promise((res, rej) => {
-      this.db.findOne({
-        _id: key,
-      }).then(doc => res(doc.value)).catch(rej);
+  async get(key, path) {
+    this.check([[key, ["String", "Number"]]]);
+    const data = await this.db.findOne({
+      key: { $eq: key },
     });
+    if (!path) return data && data.value;
+    return _get(data, path);
   }
 
   /**
@@ -139,13 +138,11 @@ class JoshProvider {
    * ```
    */
   async getMany(arr) {
-    this.check([
-      [arr, ['Array']],
-    ]);
+    this.check([[arr, ["Array"]]]);
     const finalDocs = {};
-    const docs = await this.db.find({ _id: { $in: arr } }).toArray();
+    const docs = await this.db.find({ key: { $in: arr } }).toArray();
     for (const doc of docs) {
-      finalDocs[doc._id] = doc.value;
+      finalDocs[doc.key] = doc.value;
     }
     return finalDocs;
   }
@@ -174,7 +171,21 @@ class JoshProvider {
    */
   async inc(key) {
     this.check();
-    return this.set(key, await this.get(key) + 1);
+    return this.set(key, null, (await this.get(key)) + 1);
+  }
+
+  /**
+   * Count the documents in the database
+   * @param {Object} query This filters the documents counted
+   * @returns {Promise}
+   * @example
+   * ```
+   * await JoshProvider.count()
+   * ```
+   */
+  count(query = {}) {
+    this.check();
+    return this.db.countDocuments(query);
   }
 
   /**
@@ -187,7 +198,7 @@ class JoshProvider {
    */
   async dec(key) {
     this.check();
-    return this.set(key, await this.get(key) - 1);
+    return this.set(key, null, (await this.get(key)) - 1);
   }
 
   /**
@@ -204,53 +215,57 @@ class JoshProvider {
    */
   async math(key, operation, operand) {
     this.check([
-      [key, ['String', 'Number']],
-      [operation, ['String']],
-      [operand, ['Number']],
+      [key, ["String", "Number"]],
+      [operation, ["String"]],
+      [operand, ["Number"]],
     ]);
     const base = await this.get(key);
     let result = null;
-    if (!base || !operation || !operand) throw new Err('Math operation requires base, operation and operand', 'JoshTypeError');
+    if (!base || !operation || !operand)
+      throw new Err(
+        "Math operation requires base, operation and operand",
+        "JoshTypeError"
+      );
     switch (operation) {
-    case 'add' :
-    case 'addition' :
-    case '+' :
-      result = base + operand;
-      break;
-    case 'sub' :
-    case 'subtract' :
-    case '-' :
-      result = base - operand;
-      break;
-    case 'mult' :
-    case 'multiply' :
-    case '*' :
-      result = base * operand;
-      break;
-    case 'div' :
-    case 'divide' :
-    case '/' :
-      result = base / operand;
-      break;
-    case 'exp' :
-    case 'exponent' :
-    case '^' :
-      result = Math.pow(base, operand);
-      break;
-    case 'mod' :
-    case 'modulo' :
-    case '%' :
-      result = base % operand;
-      break;
-    case 'rand' :
-    case 'random' :
-      result = Math.floor(Math.random() * Math.floor(operand));
-      break;
-    default:
-      throw new Err('Please provide a valid operand', 'JoshTypeError');
+      case "add":
+      case "addition":
+      case "+":
+        result = base + operand;
+        break;
+      case "sub":
+      case "subtract":
+      case "-":
+        result = base - operand;
+        break;
+      case "mult":
+      case "multiply":
+      case "*":
+        result = base * operand;
+        break;
+      case "div":
+      case "divide":
+      case "/":
+        result = base / operand;
+        break;
+      case "exp":
+      case "exponent":
+      case "^":
+        result = Math.pow(base, operand);
+        break;
+      case "mod":
+      case "modulo":
+      case "%":
+        result = base % operand;
+        break;
+      case "rand":
+      case "random":
+        result = Math.floor(Math.random() * Math.floor(operand));
+        break;
+      default:
+        throw new Err("Please provide a valid operand", "JoshTypeError");
     }
     if (result) {
-      await this.set(key, result);
+      await this.set(key, null, result);
     }
     return this;
   }
@@ -265,13 +280,11 @@ class JoshProvider {
    * ```
    */
   keys(query = {}) {
-    this.check([
-      [query, ['Object']],
-    ]);
+    this.check([[query, ["Object"]]]);
     return new Promise((resolve, reject) => {
       this.db.find(query).toArray((err, docs) => {
         if (err) reject(err);
-        resolve(docs.map(doc => doc._id));
+        resolve(docs.map((doc) => doc.key));
       });
     });
   }
@@ -286,13 +299,11 @@ class JoshProvider {
    * ```
    */
   values(query = {}) {
-    this.check([
-      [query, ['Object']],
-    ]);
+    this.check([[query, ["Object"]]]);
     return new Promise((resolve, reject) => {
       this.db.find(query).toArray((err, docs) => {
         if (err) reject(err);
-        resolve(docs.map(doc => doc.value));
+        resolve(docs.map((doc) => doc.value));
       });
     });
   }
@@ -306,11 +317,9 @@ class JoshProvider {
    * ```
    */
   async delete(key) {
-    this.check([
-      [key, ['String', 'Number']],
-    ]);
+    this.check([[key, ["String", "Number"]]]);
     await this.db.deleteOne({
-      _id: key,
+      key: key,
     });
     return this;
   }
@@ -324,13 +333,11 @@ class JoshProvider {
    * ```
    */
   async deleteMany(arr) {
-    this.check([
-      [arr, ['Array']],
-    ]);
+    this.check([[arr, ["Array"]]]);
     const query = {
       $in: arr,
     };
-    await this.db.deleteMany({ _id: query });
+    await this.db.deleteMany({ key: query });
     return this;
   }
 
@@ -342,9 +349,10 @@ class JoshProvider {
    * await JoshProvider.bulkDelete()
    * ```
    */
-  bulkDelete() {
+  async bulkDelete() {
     this.check();
-    return this.db.drop();
+    await this.db.deleteMany({});
+    return this;
   }
   /**
    * Check for key in database
@@ -356,7 +364,7 @@ class JoshProvider {
    * ```
    */
   async has(key) {
-    return await this.get(key) != null;
+    return (await this.get(key)) != null;
   }
   /**
    * Internal method used to validate persistent josh names (valid Windows filenames)
@@ -364,7 +372,7 @@ class JoshProvider {
    */
   validateName() {
     // Do not delete this internal method.
-    this.name = this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    this.collection = this.collection.replace(/[^a-z0-9]/gi, "_").toLowerCase();
   }
 
   /**
@@ -374,15 +382,18 @@ class JoshProvider {
    */
   check(input = []) {
     if (!this.isInitialized) {
-      throw new Err('Connection to database not open');
+      throw new Err("Connection to database not open");
     }
     for (const [key, expected] of input) {
       if (!expected.includes(key.constructor.name)) {
-        throw new Err(`Input of ${key.constructor.name} was invalid, the supported data types are: ${expected.join(', ')}`);
+        throw new Err(
+          `Input of ${
+            key.constructor.name
+          } was invalid, the supported data types are: ${expected.join(", ")}`
+        );
       }
     }
   }
-
 }
 
 module.exports = JoshProvider;
