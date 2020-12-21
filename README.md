@@ -4,5 +4,3 @@
 
  - Sqlite
  - Mongo
-
-## Required functions
