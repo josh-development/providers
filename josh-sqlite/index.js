@@ -1,4 +1,4 @@
-const Database = require("better-sqlite3");
+const Database = require('better-sqlite3');
 
 // Lodash should probably be a core lib but hey, it's useful!
 const {
@@ -10,31 +10,38 @@ const {
   flatten,
   cloneDeep,
   unset,
-} = require("lodash");
+} = require('lodash');
 
 // Native imports
-const { resolve, sep } = require("path");
-const fs = require("fs");
+const { resolve, sep } = require('path');
+const fs = require('fs');
 
 // Custom error codes with stack support.
-const Err = require("./error.js");
+const Err = require('./error.js');
 // , buildQuery
-const { getPaths, serializeData } = require("./utils.js");
+const {
+  getPaths,
+  serializeData,
+  serialize,
+  isObject,
+  onChange,
+} = require('./utils.js');
 
 module.exports = class JoshProvider {
+
   constructor(options) {
     if (options.inMemory) {
       // This is there for testing purposes, really.
       // But hey, if you want an in-memory database, knock yourself out, kiddo!
-      this.db = new Database(":memory:");
-      this.name = "InMemoryJosh";
+      this.db = new Database(':memory:');
+      this.name = 'InMemoryJosh';
     } else {
-      if (!options.name) throw new Error("Must provide options.name");
-      this.dataDir = resolve(process.cwd(), options.dataDir || "data");
+      if (!options.name) throw new Error('Must provide options.name');
+      this.dataDir = resolve(process.cwd(), options.dataDir || 'data');
 
       if (!options.dataDir) {
-        if (!fs.existsSync("./data")) {
-          fs.mkdirSync("./data");
+        if (!fs.existsSync('./data')) {
+          fs.mkdirSync('./data');
         }
       }
 
@@ -52,21 +59,21 @@ module.exports = class JoshProvider {
   async init() {
     const table = this.db
       .prepare(
-        "SELECT count(*) FROM sqlite_master WHERE type='table' AND name = ?;"
+        "SELECT count(*) FROM sqlite_master WHERE type='table' AND name = ?;",
       )
       .get(this.name);
-    if (!table["count(*)"]) {
+    if (!table['count(*)']) {
       this.db
         .prepare(
-          `CREATE TABLE '${this.name}' (key text, path text, value text, PRIMARY KEY('key','path'))`
+          `CREATE TABLE '${this.name}' (key text, path text, value text, PRIMARY KEY('key','path'))`,
         )
         .run();
-      this.db.pragma("synchronous = 1");
-      if (this.wal) this.db.pragma("journal_mode = wal");
+      this.db.pragma('synchronous = 1');
+      if (this.wal) this.db.pragma('journal_mode = wal');
     }
     this.db
       .prepare(
-        `CREATE TABLE IF NOT EXISTS 'internal::autonum' (josh TEXT PRIMARY KEY, lastnum INTEGER)`
+        `CREATE TABLE IF NOT EXISTS 'internal::autonum' (josh TEXT PRIMARY KEY, lastnum INTEGER)`,
       )
       .run();
     const row = this.db
@@ -75,25 +82,26 @@ module.exports = class JoshProvider {
     if (!row) {
       this.db
         .prepare(
-          "INSERT INTO 'internal::autonum' (josh, lastnum) VALUES (?, ?)"
+          "INSERT INTO 'internal::autonum' (josh, lastnum) VALUES (?, ?)",
         )
         .run(this.name, 0);
     }
 
     this.deleteStmt = this.db.prepare(
-      `DELETE FROM '${this.name}' WHERE key=@key AND path=@path;`
+      `DELETE FROM '${this.name}' WHERE key=@key AND path=@path;`,
     );
     this.insertStmt = this.db.prepare(
-      `INSERT INTO '${this.name}' (key, path, value) VALUES (@key, @path, @value);`
+      `INSERT INTO '${this.name}' (key, path, value) VALUES (@key, @path, @value);`,
     );
 
     this.getPaginatedStmt = this.db.prepare(
-      `SELECT ROWID, * FROM '${this.name}' WHERE rowid > @lastRowId AND path = '::NULL::' ORDER BY rowid LIMIT @limit;`
+      `SELECT ROWID, * FROM '${this.name}' WHERE rowid > @lastRowId AND path = '::NULL::' ORDER BY rowid LIMIT @limit;`,
     );
 
     this.runMany = this.db.transaction((transactions) => {
-      for (const [statement, transactionRow] of transactions)
+      for (const [statement, transactionRow] of transactions) {
         statement.run(transactionRow);
+      }
     });
     this.isInitialized = true;
   }
@@ -101,8 +109,8 @@ module.exports = class JoshProvider {
   get(key, path) {
     const query = this.db.prepare(
       `SELECT * FROM '${this.name}' WHERE key = ?${
-        path ? " AND path = ?" : " AND path='::NULL::'"
-      };`
+        path ? ' AND path = ?' : " AND path='::NULL::'"
+      };`,
     );
     const row = path ? query.get(key, path) : query.get(key);
     return row ? eval(`(${row.value})`) : undefined;
@@ -110,7 +118,7 @@ module.exports = class JoshProvider {
 
   getAll() {
     const stmt = this.db.prepare(
-      `SELECT * FROM '${this.name}' WHERE path='::NULL::';`
+      `SELECT * FROM '${this.name}' WHERE path='::NULL::';`,
     );
     return stmt.all().map((row) => [row.key, eval(`(${row.value})`)]);
   }
@@ -118,9 +126,9 @@ module.exports = class JoshProvider {
   getMany(keys) {
     return this.db
       .prepare(
-        `SELECT * FROM '${this.name}' WHERE key IN (${"?, "
+        `SELECT * FROM '${this.name}' WHERE key IN (${'?, '
           .repeat(keys.length)
-          .slice(0, -2)}) AND path='::NULL::';`
+          .slice(0, -2)}) AND path='::NULL::';`,
       )
       .all(keys)
       .reduce((acc, row) => {
@@ -134,7 +142,7 @@ module.exports = class JoshProvider {
       .prepare(
         `SELECT * FROM '${
           this.name
-        }' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${Number(count)};`
+        }' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${Number(count)};`,
       )
       .all();
     return count > 1 ? data : data[0];
@@ -145,7 +153,7 @@ module.exports = class JoshProvider {
       .prepare(
         `SELECT rowid FROM '${
           this.name
-        }' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${Number(count)};`
+        }' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${Number(count)};`,
       )
       .all();
     return count > 1 ? data.map((row) => row.key) : data[0].key;
@@ -154,11 +162,11 @@ module.exports = class JoshProvider {
   has(key, path) {
     const query = this.db.prepare(
       `SELECT count(*) FROM '${this.name}' WHERE key = ?${
-        path ? " AND path = ?" : "AND path='::NULL::'"
-      };`
+        path ? ' AND path = ?' : "AND path='::NULL::'"
+      };`,
     );
     const row = path ? query.get(key, path) : query.get(key);
-    return row["count(*)"] === 1;
+    return row['count(*)'] === 1;
   }
 
   /**
@@ -187,7 +195,7 @@ module.exports = class JoshProvider {
     const data = this.db
       .prepare(`SELECT count(*) FROM '${this.name}' WHERE path='::NULL::';`)
       .get();
-    return data["count(*)"];
+    return data['count(*)'];
   }
 
   set(key, path, val) {
@@ -198,7 +206,7 @@ module.exports = class JoshProvider {
   }
 
   delete(key, path) {
-    this.check(key, "Object");
+    this.check(key, 'Object');
     if (!path || path.length === 0) {
       this.db.prepare(`DELETE FROM '${this.name}' WHERE key = ?`).run(key);
       return this;
@@ -215,16 +223,16 @@ module.exports = class JoshProvider {
   }
 
   push(key, path, value, allowDupes) {
-    this.check(key, "Array", path);
+    this.check(key, 'Array', path);
     const data = this.get(key, path);
     if (!allowDupes && data.indexOf(value) > -1) return this;
     data.push(value);
     this.set(key, path, data);
-    // return this;
+    return this;
   }
 
   remove(key, path, val) {
-    this.check(key, "Array", path);
+    this.check(key, 'Array', path);
     const data = this.get(key, path);
     const criteria = isFunction(val) ? val : (value) => val === value;
     const index = data.findIndex(criteria);
@@ -236,12 +244,12 @@ module.exports = class JoshProvider {
   }
 
   inc(key, path) {
-    this.check(key, ["Number"], path);
+    this.check(key, ['Number'], path);
     return this.set(key, path, this.get(key, path) + 1);
   }
 
   dec(key, path) {
-    this.check(key, ["Number"], path);
+    this.check(key, ['Number'], path);
     this.set(key, path, this.get(key, path) - 1);
     return this;
   }
@@ -249,44 +257,45 @@ module.exports = class JoshProvider {
   math(key, path, operation, operand) {
     const base = this.get(key, path);
     let result = null;
-    if (base == undefined || operation == undefined || operand == undefined)
+    if (base == undefined || operation == undefined || operand == undefined) {
       throw new Err(
-        "Math operation requires base, operation and operand",
-        "JoshTypeError"
+        'Math operation requires base, operation and operand',
+        'JoshTypeError',
       );
+    }
     switch (operation) {
-      case "add":
-      case "addition":
-      case "+":
+      case 'add':
+      case 'addition':
+      case '+':
         result = base + operand;
         break;
-      case "sub":
-      case "subtract":
-      case "-":
+      case 'sub':
+      case 'subtract':
+      case '-':
         result = base - operand;
         break;
-      case "mult":
-      case "multiply":
-      case "*":
+      case 'mult':
+      case 'multiply':
+      case '*':
         result = base * operand;
         break;
-      case "div":
-      case "divide":
-      case "/":
+      case 'div':
+      case 'divide':
+      case '/':
         result = base / operand;
         break;
-      case "exp":
-      case "exponent":
-      case "^":
+      case 'exp':
+      case 'exponent':
+      case '^':
         result = Math.pow(base, operand);
         break;
-      case "mod":
-      case "modulo":
-      case "%":
+      case 'mod':
+      case 'modulo':
+      case '%':
         result = base % operand;
         break;
-      case "rand":
-      case "random":
+      case 'rand':
+      case 'random':
         result = Math.floor(Math.random() * Math.floor(operand));
         break;
     }
@@ -302,7 +311,7 @@ module.exports = class JoshProvider {
         if (
           await fn(
             path ? _get(this.parseData(value), path) : this.parseData(value),
-            key
+            key,
           )
         ) {
           finished = true;
@@ -318,12 +327,12 @@ module.exports = class JoshProvider {
   findByValue(path, value) {
     const query = this.db.prepare(
       `SELECT key, value FROM '${this.name}' WHERE value = ?${
-        path ? " AND path = ?" : " AND path = '::NULL::'"
-      } LIMIT 1;`
+        path ? ' AND path = ?' : " AND path = '::NULL::'"
+      } LIMIT 1;`,
     );
-    const results = path
-      ? query.get(serializeData(value), path)
-      : query.get(serializeData(value));
+    const results = path ?
+      query.get(serializeData(value), path) :
+      query.get(serializeData(value));
     return results ? { [results.key]: this.get(results.key) } : null;
   }
 
@@ -337,7 +346,7 @@ module.exports = class JoshProvider {
         if (
           await fn(
             path ? _get(this.parseData(value), path) : this.parseData(value),
-            key
+            key,
           )
         ) {
           returnObject[key] = value;
@@ -352,12 +361,12 @@ module.exports = class JoshProvider {
   filterByValue(path, value) {
     const query = this.db.prepare(
       `SELECT key, value FROM '${this.name}' WHERE value = ?${
-        path ? " AND path = ?" : " AND path = '::NULL::'"
-      }`
+        path ? ' AND path = ?' : " AND path = '::NULL::'"
+      }`,
     );
-    const rows = path
-      ? query.all(serializeData(value), path)
-      : query.all(serializeData(value));
+    const rows = path ?
+      query.all(serializeData(value), path) :
+      query.all(serializeData(value));
     return rows.reduce((acc, row) => {
       acc[row.key] = this.get(row.key);
       return acc;
@@ -387,7 +396,7 @@ module.exports = class JoshProvider {
   someByPath(path, value) {
     const row = this.db
       .prepare(
-        `SELECT key FROM '${this.name}' WHERE path = ? AND value = ? LIMIT 1`
+        `SELECT key FROM '${this.name}' WHERE path = ? AND value = ? LIMIT 1`,
       )
       .get(path, value);
     return row && row.key;
@@ -395,7 +404,7 @@ module.exports = class JoshProvider {
 
   someByFunction(fn) {
     const rows = this.db.prepare(
-      `SELECT key, value FROM '${this.name} WHERE path = '::NULL::';'`
+      `SELECT key, value FROM '${this.name} WHERE path = '::NULL::';'`,
     );
     return rows.map((row) => [row.key, eval(`(${row.value})`)]).some(fn);
   }
@@ -403,7 +412,7 @@ module.exports = class JoshProvider {
   everyByPath(path, value) {
     const row = this.db
       .prepare(
-        `SELECT key FROM '${this.name}' WHERE path = ? AND value = ? LIMIT 1`
+        `SELECT key FROM '${this.name}' WHERE path = ? AND value = ? LIMIT 1`,
       )
       .all(path, value);
     return row.length === this.count();
@@ -451,7 +460,7 @@ module.exports = class JoshProvider {
     lastnum++;
     this.db
       .prepare(
-        "INSERT OR REPLACE INTO 'internal::autonum' (josh, lastnum) VALUES (?, ?)"
+        "INSERT OR REPLACE INTO 'internal::autonum' (josh, lastnum) VALUES (?, ?)",
       )
       .run(this.name, lastnum);
     return lastnum.toString();
@@ -466,8 +475,8 @@ module.exports = class JoshProvider {
   /* INTERNAL METHODS */
 
   keyCheck(key) {
-    if (isNil(key) || !["String", "Number"].includes(key.constructor.name)) {
-      throw new Error("josh-sqlite require keys to be strings or numbers.");
+    if (isNil(key) || !['String', 'Number'].includes(key.constructor.name)) {
+      throw new Error('josh-sqlite require keys to be strings or numbers.');
     }
     return key.toString();
   }
@@ -478,14 +487,14 @@ module.exports = class JoshProvider {
    */
   validateName() {
     // Do not delete this internal method.
-    this.name = this.name.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+    this.name = this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
   }
 
   parseData(data) {
     try {
       return eval(`(${data})`);
     } catch (err) {
-      console.log("Error parsing data : ", err);
+      console.log('Error parsing data : ', err);
       return null;
     }
   }
@@ -500,29 +509,30 @@ module.exports = class JoshProvider {
   // Herefore I indicate that I do understand part of this would be easily resolved with TypeScript but I don't do TS... yet.
   // TODO: OPTIMIZE FOR LESS QUERIES. A LOT less queries. wow this is bad.
   check(key, type, path = null) {
-    if (!this.has(key))
+    if (!this.has(key)) {
       throw new Err(
         `The key "${key}" does not exist in JOSH "${this.name}"`,
-        "JoshPathError"
+        'JoshPathError',
       );
+    }
     if (!type) return;
     if (!isArray(type)) type = [type];
     if (!isNil(path)) {
-      this.check(key, "Object");
+      this.check(key, 'Object');
       const data = this.get(key);
       if (isNil(_get(data, path))) {
         throw new Err(
           `The property "${path}" in key "${key}" does not exist. Please set() it or ensure() it."`,
-          "JoshPathError"
+          'JoshPathError',
         );
       }
       if (!type.includes(_get(data, path).constructor.name)) {
         throw new Err(
           `The property "${path}" in key "${key}" is not of type "${type.join(
-            '" or "'
+            '" or "',
           )}" in JOSH "${this.name}" 
 (key was of type "${_get(data, path).constructor.name}")`,
-          "JoshTypeError"
+          'JoshTypeError',
         );
       }
     } else if (!type.includes(this.get(key)).constructor.name) {
@@ -530,7 +540,7 @@ module.exports = class JoshProvider {
         `The key "${key}" is not of type "${type.join('" or "')}" in JOSH "${
           this.name
         }" (key was of type "${this.get(key).constructor.name}")`,
-        "JoshTypeError"
+        'JoshTypeError',
       );
     }
   }
@@ -538,20 +548,21 @@ module.exports = class JoshProvider {
   // TODO: Check if I can figure out how to get actual NULL values instead of ::NULL::.
   compareData(key, newValue, path) {
     const executions = [];
-    const currentData = this.has(key) ? this.get(key) : "::NULL::";
+    const currentData = this.has(key) ? this.get(key) : '::NULL::';
     const currentPaths = getPaths(currentData);
-    const paths = path
-      ? getPaths(_set(cloneDeep(currentData), path, newValue))
-      : getPaths(newValue);
+    const paths = path ?
+      getPaths(_set(cloneDeep(currentData), path, newValue)) :
+      getPaths(newValue);
 
     for (const [currentPath, value] of Object.entries(currentPaths)) {
       if (isNil(paths[currentPath]) || paths[currentPath] !== value) {
         executions.push([this.deleteStmt, { key, path: currentPath }]);
-        if (!isNil(paths[currentPath]))
+        if (!isNil(paths[currentPath])) {
           executions.push([
             this.insertStmt,
             { key, path: currentPath, value: paths[currentPath] },
           ]);
+        }
       }
       delete paths[currentPath];
     }
@@ -563,8 +574,8 @@ module.exports = class JoshProvider {
 
   // TODO: Figure out how to make this similar to GET,
   setMany(data, overwrite) {
-    if (isNil(data) || data.constructor.name !== "Array") {
-      throw new Error("Provided data was not an array of [key, value] pairs.");
+    if (isNil(data) || data.constructor.name !== 'Array') {
+      throw new Error('Provided data was not an array of [key, value] pairs.');
     }
     const existingKeys = this.keys();
 
@@ -572,20 +583,20 @@ module.exports = class JoshProvider {
       flatten(
         data
           .filter(([key]) => overwrite || !existingKeys.includes(key))
-          .map(([key, value]) => this.compareData(key, value))
-      )
+          .map(([key, value]) => this.compareData(key, value)),
+      ),
     );
     return this;
   }
 
   getDelimitedPath(base, key, valueIsArray) {
-    return valueIsArray
-      ? base
-        ? `${base}[${key}]`
-        : key
-      : base
-      ? `${base}.${key}`
-      : key;
+    return valueIsArray ?
+      base ?
+        `${base}[${key}]` :
+        key :
+      base ?
+        `${base}.${key}` :
+        key;
   }
 
   serializeData(data) {
@@ -599,22 +610,23 @@ module.exports = class JoshProvider {
   }
 
   getPaths(data, acc = {}, basePath = null) {
-    if (data === "::NULL::") return {};
+    if (data === '::NULL::') return {};
     if (!isObject(data)) {
-      acc[basePath || "::NULL::"] = this.serializeData(data);
+      acc[basePath || '::NULL::'] = this.serializeData(data);
       return acc;
     }
-    const source = isArray(data)
-      ? data.map((da, i) => [i, da])
-      : Object.entries(data);
+    const source = isArray(data) ?
+      data.map((da, i) => [i, da]) :
+      Object.entries(data);
     const returnPaths = source.reduce((paths, [key, value]) => {
       const path = this.getDelimitedPath(basePath, key, !isArray(value));
       if (isObject(value)) this.getPaths(value, paths, path);
       paths[path.toString()] = this.serializeData(value);
       return paths;
     }, acc || {});
-    return basePath
-      ? returnPaths
-      : { ...returnPaths, "::NULL::": this.serializeData(data) };
+    return basePath ?
+      returnPaths :
+      { ...returnPaths, '::NULL::': this.serializeData(data) };
   }
+
 };
