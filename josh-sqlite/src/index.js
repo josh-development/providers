@@ -264,40 +264,40 @@ module.exports = class JoshProvider {
       );
     }
     switch (operation) {
-      case 'add':
-      case 'addition':
-      case '+':
-        result = base + operand;
-        break;
-      case 'sub':
-      case 'subtract':
-      case '-':
-        result = base - operand;
-        break;
-      case 'mult':
-      case 'multiply':
-      case '*':
-        result = base * operand;
-        break;
-      case 'div':
-      case 'divide':
-      case '/':
-        result = base / operand;
-        break;
-      case 'exp':
-      case 'exponent':
-      case '^':
-        result = Math.pow(base, operand);
-        break;
-      case 'mod':
-      case 'modulo':
-      case '%':
-        result = base % operand;
-        break;
-      case 'rand':
-      case 'random':
-        result = Math.floor(Math.random() * Math.floor(operand));
-        break;
+    case 'add':
+    case 'addition':
+    case '+':
+      result = base + operand;
+      break;
+    case 'sub':
+    case 'subtract':
+    case '-':
+      result = base - operand;
+      break;
+    case 'mult':
+    case 'multiply':
+    case '*':
+      result = base * operand;
+      break;
+    case 'div':
+    case 'divide':
+    case '/':
+      result = base / operand;
+      break;
+    case 'exp':
+    case 'exponent':
+    case '^':
+      result = Math.pow(base, operand);
+      break;
+    case 'mod':
+    case 'modulo':
+    case '%':
+      result = base % operand;
+      break;
+    case 'rand':
+    case 'random':
+      result = Math.floor(Math.random() * Math.floor(operand));
+      break;
     }
     return this.set(key, path, result);
   }
