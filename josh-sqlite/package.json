@@ -2,10 +2,10 @@
   "name": "@josh-providers/sqlite",
   "version": "1.0.17",
   "description": "SQLite Provider for JOSH",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "jest",
-    "lint": "eslint *.js --fix"
+    "lint": "eslint src/*.js --fix"
   },
   "keywords": [],
   "repository": {
@@ -26,13 +26,7 @@
   },
   "devDependencies": {
     "eslint": "6.8.0",
-    "eslint-config-airbnb-base": "^14.2.0",
-    "eslint-config-standard": "^14.1.1",
-    "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jest": "^24.1.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
     "jest": "^26.2.2"
   }
 }

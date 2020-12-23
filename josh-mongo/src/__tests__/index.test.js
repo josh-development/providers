@@ -6,8 +6,8 @@ const config = require('./config-mongo.json');
   "url": "mongodb+srv://<username>:<password>@cluster0.0zbvd.mongodb.net/<dbName>?retryWrites=true&w=majority"
 }
 
-NOTES: 
-- The above refers to using Mongo Atlas for testing. Make sure to use the full URL that results from going to: 
+NOTES:
+- The above refers to using Mongo Atlas for testing. Make sure to use the full URL that results from going to:
   - Your Cluster
   - Command Line Tools
   - Connect Instructions
@@ -18,16 +18,14 @@ NOTES:
 - This testing WILL DELETE THE ENTIRE COLLECTION CONTENT, so do NOT connect this to a live collection OMG what's wrong with you!
 */
 
-if(!config || !config.collection) {
-  console.error("No configuration detected, please create config-mongo.json");
+if (!config || !config.collection) {
+  console.error('No configuration detected, please create config-mongo.json');
   process.exit(1);
-};
+}
 
 const provider = new Provider(config);
 
-afterAll(() => {
-  return provider.close();
-});
+afterAll(() => provider.close());
 
 test('Database instance is valid', () => {
   expect(provider).not.toBe(null);
@@ -42,13 +40,14 @@ test('Database can be initialized', async () => {
 });
 
 test('Database can be written to with all supported values', async () => {
-  expect(await provider.set('object', null, { a: 1, b: 2, c: 3, d: 4 })).toEqual(
+  expect(
+    await provider.set('object', null, { a: 1, b: 2, c: 3, d: 4 }),
+  ).toEqual(provider);
+  expect(await provider.set('array', null, [1, 2, 3, 4, 5])).toEqual(provider);
+  expect(await provider.set('number', null, 42)).toEqual(provider);
+  expect(await provider.set('string', null, 'This is a string')).toEqual(
     provider,
   );
-  expect(await provider.set('array', null, [1, 2, 3, 4, 5])).toEqual(provider);
-  // Fix: "Cannot create field '43' in element { value: 42 }" ????
-  expect(await provider.set('number', null, 42)).toEqual(provider);
-  expect(await provider.set('string', null, 'This is a string')).toEqual(provider);
   expect(await provider.set('boolean', null, false)).toEqual(provider);
   expect(
     await provider.set('complexobject', null, {
@@ -58,7 +57,7 @@ test('Database can be written to with all supported values', async () => {
       d: { 1: 'one', 2: 'two' },
     }),
   ).toEqual(provider);
-  expect(await provider.set('null', null,  null)).toEqual(provider);
+  expect(await provider.set('null', null, null)).toEqual(provider);
 
   await provider.inc('number');
   expect(await provider.get('number')).toBe(43);
@@ -83,8 +82,6 @@ test('Database can retrieve data points as expected', async () => {
 
 test('Database returns expected statistical properties', async () => {
   expect(await provider.count()).toBe(7);
-  // order is weird because jest can't compare arrays in an unordered fashion.
-  // TODO: keys() now gets the _id list, should get key prop from all documents.
   expect((await provider.keys()).sort()).toEqual([
     'array',
     'boolean',
@@ -111,7 +108,6 @@ test('Database returns expected statistical properties', async () => {
 });
 
 test('Database can act on many rows at a time', async () => {
-  // TODO: fix returns empty object
   expect(await provider.getMany(['number', 'boolean'])).toEqual({
     number: 42,
     boolean: false,
@@ -139,7 +135,6 @@ test('Database can act on many rows at a time', async () => {
 });
 
 test('Database supports math operations', async () => {
-  // Fix: math don't work at all
   await provider.math('number', 'multiply', 2);
   expect(await provider.get('number')).toBe(84);
   await provider.math('number', 'divide', 4);
@@ -148,9 +143,7 @@ test('Database supports math operations', async () => {
   expect(await provider.get('number')).toBe(42);
 });
 
-
 test('Database can delete values and data at paths', async () => {
-  // Fix: expected 8 received 7? Probs because math don't work.
   await provider.delete('new2');
   expect(await provider.count()).toBe(8);
   expect((await provider.keys()).sort()).toEqual(
@@ -184,10 +177,11 @@ test('Database can be closed', async () => {
   await provider.close();
 });
 
-test('Database can\'t be used after close', async () => {
-  await expect(provider.set('test', 'test')).rejects.toThrowError('Connection to database not open');
+test("Database can't be used after close", async () => {
+  await expect(provider.set('test', null, 'test')).rejects.toThrowError(
+    'Connection to database not open',
+  );
 });
-
 
 // test('Database can loop, filter, find', async () => {
 //   expect(provider.filterByValue('b', 2)).toEqual({

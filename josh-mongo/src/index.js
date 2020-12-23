@@ -1,18 +1,19 @@
-const {
-  MongoClient,
-  ObjectId
-} = require('mongodb');
+const { MongoClient } = require('mongodb');
 
-const {
-  get: _get
-} = require('lodash');
+const { get: _get } = require('lodash');
 
 const Err = require('./error');
 
 class JoshProvider {
 
   constructor(options) {
-    if (!options.collection) throw new Err('Must provide options.collection', 'JoshTypeError');
+    if (!options.name) {
+      throw new Err('Must provide options.name', 'JoshTypeError');
+    }
+    this.name = options.name;
+    if (!options.collection) {
+      throw new Err('Must provide options.collection', 'JoshTypeError');
+    }
     this.collection = options.collection;
     this.validateName();
     this.auth =
@@ -33,8 +34,10 @@ class JoshProvider {
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
   async init() {
-    this.client = await MongoClient.connect(this.url, { useNewUrlParser: true, useUnifiedTopology: true })
-      .catch(err => console.error(err));
+    this.client = await MongoClient.connect(this.url, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }).catch((err) => console.error(err));
     this.db = this.client.db(this.dbName).collection(this.collection);
     return true;
   }
@@ -68,6 +71,7 @@ class JoshProvider {
   /**
    * Set a value to the josh.
    * @param {(string|number)} key Required. The key of the element to add to the josh object.
+   * @param {(string|null)} path Required but null is allowed. The path to add the value to the document
    * @param {*} val Required. The value of the element to add to the josh object.
    * This value MUST be stringifiable as JSON.
    * @example
@@ -76,19 +80,21 @@ class JoshProvider {
    * ```
    */
   async set(key, path, val) {
-    this.check([
-      [key, ['String', 'Number']],
-    ]);
+    this.check([[key, ['String', 'Number']]]);
     if (!key) {
       throw new Error('Keys should be strings or numbers.');
     }
-    await this.db.findOneAndUpdate({
-      key: { $eq: key},
-    }, {
-      $set: { key, [`${path ? `value.${path}` : 'value'}`]: val },
-    }, {
-      upsert: true,
-    });
+    await this.db.findOneAndUpdate(
+      {
+        key: { $eq: key },
+      },
+      {
+        $set: { key, [`${path ? `value.${path}` : 'value'}`]: val },
+      },
+      {
+        upsert: true,
+      },
+    );
     return this;
   }
 
@@ -101,9 +107,7 @@ class JoshProvider {
    * ```
    */
   async setMany(arr) {
-    this.check([
-      [arr, ['Array']],
-    ]);
+    this.check([[arr, ['Array']]]);
     for (const [key, val] of arr) {
       await this.set(key, val);
     }
@@ -113,6 +117,7 @@ class JoshProvider {
   /**
    * Fetch the value of a key in the database
    * @param {(string|number)} key The document key to fetch
+   * @param {(string|null)} path The path in the document to get
    * @returns {Promise} Resolves to the value
    * @example
    * ```
@@ -120,13 +125,11 @@ class JoshProvider {
    * ```
    */
   async get(key, path) {
-    this.check([
-      [key, ['String', 'Number']],
-    ]);
+    this.check([[key, ['String', 'Number']]]);
     const data = await this.db.findOne({
-      key: { $eq: key},
+      key: { $eq: key },
     });
-    if(!path) return data && data.value;
+    if (!path) return data && data.value;
     return _get(data, path);
   }
 
@@ -140,15 +143,26 @@ class JoshProvider {
    * ```
    */
   async getMany(arr) {
-    this.check([
-      [arr, ['Array']],
-    ]);
+    this.check([[arr, ['Array']]]);
     const finalDocs = {};
-    const docs = await this.db.find({ _id: { $in: arr } }).toArray();
+    const docs = await this.db.find({ key: { $in: arr } }).toArray();
     for (const doc of docs) {
-      finalDocs[doc._id] = doc.value;
+      finalDocs[doc.key] = doc.value;
     }
     return finalDocs;
+  }
+
+  /**
+   * Increment the value of a document by 1
+   * @param {(string|number)} key The document key to increment
+   * @example
+   * ```
+   * await JoshProvider.inc("joshes")
+   * ```
+   */
+  async inc(key) {
+    this.check();
+    return this.set(key, null, await this.get(key) + 1);
   }
 
   /**
@@ -166,19 +180,6 @@ class JoshProvider {
   }
 
   /**
-   * Increment the value of a document by 1
-   * @param {(string|number)} key The document key to increment
-   * @example
-   * ```
-   * await JoshProvider.inc("joshes")
-   * ```
-   */
-  async inc(key) {
-    this.check();
-    return this.set(key, await this.get(key) + 1);
-  }
-
-  /**
    * Decrement the value of a document by 1
    * @param {(string|number)} key The document key to decrement
    * @example
@@ -188,7 +189,7 @@ class JoshProvider {
    */
   async dec(key) {
     this.check();
-    return this.set(key, await this.get(key) - 1);
+    return this.set(key, null, await this.get(key) - 1);
   }
 
   /**
@@ -211,47 +212,52 @@ class JoshProvider {
     ]);
     const base = await this.get(key);
     let result = null;
-    if (!base || !operation || !operand) throw new Err('Math operation requires base, operation and operand', 'JoshTypeError');
+    if (!base || !operation || !operand) {
+      throw new Err(
+        'Math operation requires base, operation and operand',
+        'JoshTypeError',
+      );
+    }
     switch (operation) {
-    case 'add' :
-    case 'addition' :
-    case '+' :
+    case 'add':
+    case 'addition':
+    case '+':
       result = base + operand;
       break;
-    case 'sub' :
-    case 'subtract' :
-    case '-' :
+    case 'sub':
+    case 'subtract':
+    case '-':
       result = base - operand;
       break;
-    case 'mult' :
-    case 'multiply' :
-    case '*' :
+    case 'mult':
+    case 'multiply':
+    case '*':
       result = base * operand;
       break;
-    case 'div' :
-    case 'divide' :
-    case '/' :
+    case 'div':
+    case 'divide':
+    case '/':
       result = base / operand;
       break;
-    case 'exp' :
-    case 'exponent' :
-    case '^' :
+    case 'exp':
+    case 'exponent':
+    case '^':
       result = Math.pow(base, operand);
       break;
-    case 'mod' :
-    case 'modulo' :
-    case '%' :
+    case 'mod':
+    case 'modulo':
+    case '%':
       result = base % operand;
       break;
-    case 'rand' :
-    case 'random' :
+    case 'rand':
+    case 'random':
       result = Math.floor(Math.random() * Math.floor(operand));
       break;
     default:
       throw new Err('Please provide a valid operand', 'JoshTypeError');
     }
     if (result) {
-      await this.set(key, result);
+      await this.set(key, null, result);
     }
     return this;
   }
@@ -266,13 +272,11 @@ class JoshProvider {
    * ```
    */
   keys(query = {}) {
-    this.check([
-      [query, ['Object']],
-    ]);
+    this.check([[query, ['Object']]]);
     return new Promise((resolve, reject) => {
       this.db.find(query).toArray((err, docs) => {
         if (err) reject(err);
-        resolve(docs.map(doc => doc._id));
+        resolve(docs.map((doc) => doc.key));
       });
     });
   }
@@ -287,13 +291,11 @@ class JoshProvider {
    * ```
    */
   values(query = {}) {
-    this.check([
-      [query, ['Object']],
-    ]);
+    this.check([[query, ['Object']]]);
     return new Promise((resolve, reject) => {
       this.db.find(query).toArray((err, docs) => {
         if (err) reject(err);
-        resolve(docs.map(doc => doc.value));
+        resolve(docs.map((doc) => doc.value));
       });
     });
   }
@@ -307,11 +309,9 @@ class JoshProvider {
    * ```
    */
   async delete(key) {
-    this.check([
-      [key, ['String', 'Number']],
-    ]);
+    this.check([[key, ['String', 'Number']]]);
     await this.db.deleteOne({
-      _id: key,
+      key: key,
     });
     return this;
   }
@@ -325,13 +325,11 @@ class JoshProvider {
    * ```
    */
   async deleteMany(arr) {
-    this.check([
-      [arr, ['Array']],
-    ]);
+    this.check([[arr, ['Array']]]);
     const query = {
       $in: arr,
     };
-    await this.db.deleteMany({ _id: query });
+    await this.db.deleteMany({ key: query });
     return this;
   }
 
@@ -380,7 +378,11 @@ class JoshProvider {
     }
     for (const [key, expected] of input) {
       if (!expected.includes(key.constructor.name)) {
-        throw new Err(`Input of ${key.constructor.name} was invalid, the supported data types are: ${expected.join(', ')}`);
+        throw new Err(
+          `Input of ${
+            key.constructor.name
+          } was invalid, the supported data types are: ${expected.join(', ')}`,
+        );
       }
     }
   }
