@@ -135,11 +135,11 @@ test('Database can act on many rows at a time', async () => {
 });
 
 test('Database supports math operations', async () => {
-  await provider.math('number', 'multiply', 2);
+  await provider.math('number', null, 'multiply', 2);
   expect(await provider.get('number')).toBe(84);
-  await provider.math('number', 'divide', 4);
+  await provider.math('number', null, 'divide', 4);
   expect(await provider.get('number')).toBe(21);
-  await provider.math('number', 'add', 21);
+  await provider.math('number', null, 'add', 21);
   expect(await provider.get('number')).toBe(42);
 });
 

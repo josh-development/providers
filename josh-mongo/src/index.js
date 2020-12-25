@@ -5,7 +5,6 @@ const { get: _get } = require('lodash');
 const Err = require('./error');
 
 class JoshProvider {
-
   constructor(options) {
     if (!options.name) {
       throw new Err('Must provide options.name', 'JoshTypeError');
@@ -39,7 +38,7 @@ class JoshProvider {
       useUnifiedTopology: true,
     }).catch((err) => console.error(err));
     this.db = this.client.db(this.dbName).collection(this.collection);
-    return true;
+    return this.isInitialized;
   }
 
   /**
@@ -100,16 +99,16 @@ class JoshProvider {
 
   /**
    * Set many keys and values
-   * @param {Array} arr This is a key value array to be set in the database
+   * @param {Array} arr This is a [key, value, path] array to be set in the database
    * @example
    * ```
-   * await JoshProvider.setMany([ ["hello", "world"], ["josh": true] ])
+   * await JoshProvider.setMany([ ["hello", "world"], ["josh": true], ["foo", true, "alive"] ])
    * ```
    */
   async setMany(arr) {
     this.check([[arr, ['Array']]]);
-    for (const [key, val] of arr) {
-      await this.set(key, val);
+    for (const [key, val, path = null] of arr) {
+      await this.set(key, path, val);
     }
     return this;
   }
@@ -155,14 +154,15 @@ class JoshProvider {
   /**
    * Increment the value of a document by 1
    * @param {(string|number)} key The document key to increment
+   * @param {string} path The path in document to increment
    * @example
    * ```
    * await JoshProvider.inc("joshes")
    * ```
    */
-  async inc(key) {
+  async inc(key, path = null) {
     this.check();
-    return this.set(key, null, await this.get(key) + 1);
+    return this.set(key, path, await this.get(key, path) + 1);
   }
 
   /**
@@ -182,19 +182,21 @@ class JoshProvider {
   /**
    * Decrement the value of a document by 1
    * @param {(string|number)} key The document key to decrement
+   * @param {string} path The path in the document to decrement
    * @example
    * ```
    * await JoshProvider.dec("joshes")
    * ```
    */
-  async dec(key) {
+  async dec(key, path = null) {
     this.check();
-    return this.set(key, null, await this.get(key) - 1);
+    return this.set(key, path, await this.get(key, path) - 1);
   }
 
   /**
    * Perform mathmatical operations on the value of a document
    * @param {(string|number)} key The document key to transform
+   * @param {string} path The path in document to transform
    * @param {string} operation Valid operations are add, subtract, multiply, divide, exponent, modulo and random
    * @param {number} operand The number to transform the value with
    * @example
@@ -204,13 +206,13 @@ class JoshProvider {
    * await JoshProvider.math('number', 'exp', 2) // exponent
    * ```
    */
-  async math(key, operation, operand) {
+  async math(key, path = null, operation, operand) {
     this.check([
       [key, ['String', 'Number']],
       [operation, ['String']],
       [operand, ['Number']],
     ]);
-    const base = await this.get(key);
+    const base = await this.get(key, path);
     let result = null;
     if (!base || !operation || !operand) {
       throw new Err(
@@ -257,7 +259,7 @@ class JoshProvider {
       throw new Err('Please provide a valid operand', 'JoshTypeError');
     }
     if (result) {
-      await this.set(key, null, result);
+      await this.set(key, path, result);
     }
     return this;
   }
@@ -349,14 +351,15 @@ class JoshProvider {
   /**
    * Check for key in database
    * @param {(string|number)} key The document key to check
+   * @param {string} path The path in document to check
    * @return {boolean} True if key is found in database
    * @example
    * ```
    * await JoshProvider.has("number")
    * ```
    */
-  async has(key) {
-    return await this.get(key) != null;
+  async has(key, path = null) {
+    return await this.get(key, path) != null;
   }
   /**
    * Internal method used to validate persistent josh names (valid Windows filenames)
@@ -386,7 +389,6 @@ class JoshProvider {
       }
     }
   }
-
 }
 
 module.exports = JoshProvider;
