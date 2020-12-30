@@ -356,7 +356,7 @@ class JoshProvider {
       }
     }
   }
-  async filterByValue(value, path = null) {
+  async filterByValue(path, value) {
     await this.check();
     const docs = await this.getAll();
     const finalDoc = [];

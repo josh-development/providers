@@ -168,7 +168,7 @@ test("Database can delete values and data at paths", async () => {
 });
 
 test("Database can loop, filter, find", async () => {
-  expect(await provider.filterByValue(2, "b")).toEqual([
+  expect(await provider.filterByValue("b", 2)).toEqual([
     ["object", { a: 1, b: 2, c: 3, d: 4 }],
     [
       "complexobject",
