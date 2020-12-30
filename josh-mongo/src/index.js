@@ -1,27 +1,27 @@
-const { MongoClient } = require('mongodb');
+const { MongoClient } = require("mongodb");
 
-const { get: _get } = require('lodash');
+const { get: _get } = require("lodash");
 
-const Err = require('./error');
+const Err = require("./error");
 
 class JoshProvider {
   constructor(options) {
     if (!options.name) {
-      throw new Err('Must provide options.name', 'JoshTypeError');
+      throw new Err("Must provide options.name", "JoshTypeError");
     }
     this.name = options.name;
     if (!options.collection) {
-      throw new Err('Must provide options.collection', 'JoshTypeError');
+      throw new Err("Must provide options.collection", "JoshTypeError");
     }
     this.collection = options.collection;
     this.validateName();
     this.auth =
-      options.user && options.password ?
-        `${options.user}:${options.password}@` :
-        '';
-    this.dbName = options.dbName || 'josh';
+      options.user && options.password
+        ? `${options.user}:${options.password}@`
+        : "";
+    this.dbName = options.dbName || "josh";
     this.port = options.port || 27017;
-    this.host = options.host || 'localhost';
+    this.host = options.host || "localhost";
     this.url =
       options.url ||
       `mongodb://${this.auth}${this.host}:${this.port}/${this.dbName}`;
@@ -66,6 +66,14 @@ class JoshProvider {
   close() {
     return this.client.close();
   }
+  /**
+   * Clears and shuts down the underlying database.
+   * @returns {Promise} Promise resolves when finished closing
+   */
+  destroy() {
+    this.clear();
+    return this.close();
+  }
 
   /**
    * Set a value to the josh.
@@ -79,20 +87,20 @@ class JoshProvider {
    * ```
    */
   async set(key, path, val) {
-    this.check([[key, ['String', 'Number']]]);
+    this.check([[key, ["String", "Number"]]]);
     if (!key) {
-      throw new Error('Keys should be strings or numbers.');
+      throw new Error("Keys should be strings or numbers.");
     }
     await this.db.findOneAndUpdate(
       {
         key: { $eq: key },
       },
       {
-        $set: { key, [`${path ? `value.${path}` : 'value'}`]: val },
+        $set: { key, [`${path ? `value.${path}` : "value"}`]: val },
       },
       {
         upsert: true,
-      },
+      }
     );
     return this;
   }
@@ -106,7 +114,7 @@ class JoshProvider {
    * ```
    */
   async setMany(arr) {
-    this.check([[arr, ['Array']]]);
+    this.check([[arr, ["Array"]]]);
     for (const [key, val, path = null] of arr) {
       await this.set(key, path, val);
     }
@@ -124,7 +132,7 @@ class JoshProvider {
    * ```
    */
   async get(key, path) {
-    this.check([[key, ['String', 'Number']]]);
+    this.check([[key, ["String", "Number"]]]);
     const data = await this.db.findOne({
       key: { $eq: key },
     });
@@ -142,7 +150,7 @@ class JoshProvider {
    * ```
    */
   async getMany(arr) {
-    this.check([[arr, ['Array']]]);
+    this.check([[arr, ["Array"]]]);
     const finalDocs = {};
     const docs = await this.db.find({ key: { $in: arr } }).toArray();
     for (const doc of docs) {
@@ -162,7 +170,7 @@ class JoshProvider {
    */
   async inc(key, path = null) {
     this.check();
-    return this.set(key, path, await this.get(key, path) + 1);
+    return this.set(key, path, (await this.get(key, path)) + 1);
   }
 
   /**
@@ -190,7 +198,7 @@ class JoshProvider {
    */
   async dec(key, path = null) {
     this.check();
-    return this.set(key, path, await this.get(key, path) - 1);
+    return this.set(key, path, (await this.get(key, path)) - 1);
   }
 
   /**
@@ -208,55 +216,55 @@ class JoshProvider {
    */
   async math(key, path = null, operation, operand) {
     this.check([
-      [key, ['String', 'Number']],
-      [operation, ['String']],
-      [operand, ['Number']],
+      [key, ["String", "Number"]],
+      [operation, ["String"]],
+      [operand, ["Number"]],
     ]);
     const base = await this.get(key, path);
     let result = null;
     if (!base || !operation || !operand) {
       throw new Err(
-        'Math operation requires base, operation and operand',
-        'JoshTypeError',
+        "Math operation requires base, operation and operand",
+        "JoshTypeError"
       );
     }
     switch (operation) {
-    case 'add':
-    case 'addition':
-    case '+':
-      result = base + operand;
-      break;
-    case 'sub':
-    case 'subtract':
-    case '-':
-      result = base - operand;
-      break;
-    case 'mult':
-    case 'multiply':
-    case '*':
-      result = base * operand;
-      break;
-    case 'div':
-    case 'divide':
-    case '/':
-      result = base / operand;
-      break;
-    case 'exp':
-    case 'exponent':
-    case '^':
-      result = Math.pow(base, operand);
-      break;
-    case 'mod':
-    case 'modulo':
-    case '%':
-      result = base % operand;
-      break;
-    case 'rand':
-    case 'random':
-      result = Math.floor(Math.random() * Math.floor(operand));
-      break;
-    default:
-      throw new Err('Please provide a valid operand', 'JoshTypeError');
+      case "add":
+      case "addition":
+      case "+":
+        result = base + operand;
+        break;
+      case "sub":
+      case "subtract":
+      case "-":
+        result = base - operand;
+        break;
+      case "mult":
+      case "multiply":
+      case "*":
+        result = base * operand;
+        break;
+      case "div":
+      case "divide":
+      case "/":
+        result = base / operand;
+        break;
+      case "exp":
+      case "exponent":
+      case "^":
+        result = Math.pow(base, operand);
+        break;
+      case "mod":
+      case "modulo":
+      case "%":
+        result = base % operand;
+        break;
+      case "rand":
+      case "random":
+        result = Math.floor(Math.random() * Math.floor(operand));
+        break;
+      default:
+        throw new Err("Please provide a valid operand", "JoshTypeError");
     }
     if (result) {
       await this.set(key, path, result);
@@ -274,7 +282,7 @@ class JoshProvider {
    * ```
    */
   keys(query = {}) {
-    this.check([[query, ['Object']]]);
+    this.check([[query, ["Object"]]]);
     return new Promise((resolve, reject) => {
       this.db.find(query).toArray((err, docs) => {
         if (err) reject(err);
@@ -293,7 +301,7 @@ class JoshProvider {
    * ```
    */
   values(query = {}) {
-    this.check([[query, ['Object']]]);
+    this.check([[query, ["Object"]]]);
     return new Promise((resolve, reject) => {
       this.db.find(query).toArray((err, docs) => {
         if (err) reject(err);
@@ -311,7 +319,7 @@ class JoshProvider {
    * ```
    */
   async delete(key) {
-    this.check([[key, ['String', 'Number']]]);
+    this.check([[key, ["String", "Number"]]]);
     await this.db.deleteOne({
       key: key,
     });
@@ -327,7 +335,7 @@ class JoshProvider {
    * ```
    */
   async deleteMany(arr) {
-    this.check([[arr, ['Array']]]);
+    this.check([[arr, ["Array"]]]);
     const query = {
       $in: arr,
     };
@@ -335,7 +343,7 @@ class JoshProvider {
     return this;
   }
   async findByValue(path, value) {
-    this.check([[value, ['String', 'Number']]]);
+    this.check([[value, ["String", "Number"]]]);
     const docs = await this.db.find({}).toArray();
     const finalDoc = {};
     for (const doc of docs) {
@@ -346,7 +354,7 @@ class JoshProvider {
     }
   }
   async findByFunction(fn) {
-    this.check([[fn, ['Function']]]);
+    this.check([[fn, ["Function"]]]);
     const docs = await this.db.find({}).toArray();
     for (const doc of docs) {
       if (fn(doc.value)) {
@@ -355,7 +363,7 @@ class JoshProvider {
     }
   }
   async filterByValue(path, value) {
-    this.check([[value, ['String', 'Number']]]);
+    this.check([[value, ["String", "Number"]]]);
     const docs = await this.db.find({}).toArray();
     const finalDoc = {};
     for (const doc of docs) {
@@ -366,7 +374,7 @@ class JoshProvider {
     return finalDoc;
   }
   async filterByFunction(fn) {
-    this.check([[fn, ['Function']]]);
+    this.check([[fn, ["Function"]]]);
     const docs = await this.db.find({}).toArray();
     const finalDoc = {};
     for (const doc of docs) {
@@ -381,10 +389,10 @@ class JoshProvider {
    * @return {Promise<*>} Promise returned by the database after deletion
    * @example
    * ```
-   * await JoshProvider.bulkDelete()
+   * await JoshProvider.clear()
    * ```
    */
-  async bulkDelete() {
+  async clear() {
     this.check();
     await this.db.deleteMany({});
     return this;
@@ -400,7 +408,7 @@ class JoshProvider {
    * ```
    */
   async has(key, path = null) {
-    return await this.get(key, path) != null;
+    return (await this.get(key, path)) != null;
   }
   /**
    * Internal method used to validate persistent josh names (valid Windows filenames)
@@ -408,7 +416,7 @@ class JoshProvider {
    */
   validateName() {
     // Do not delete this internal method.
-    this.collection = this.collection.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    this.collection = this.collection.replace(/[^a-z0-9]/gi, "_").toLowerCase();
   }
 
   /**
@@ -418,14 +426,14 @@ class JoshProvider {
    */
   check(input = []) {
     if (!this.isInitialized) {
-      throw new Err('Connection to database not open');
+      throw new Err("Connection to database not open");
     }
     for (const [key, expected] of input) {
       if (!expected.includes(key.constructor.name)) {
         throw new Err(
           `Input of ${
             key.constructor.name
-          } was invalid, the supported data types are: ${expected.join(', ')}`,
+          } was invalid, the supported data types are: ${expected.join(", ")}`
         );
       }
     }
