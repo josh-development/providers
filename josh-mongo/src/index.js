@@ -334,7 +334,48 @@ class JoshProvider {
     await this.db.deleteMany({ key: query });
     return this;
   }
-
+  async findByValue(path, value) {
+    this.check([[value, ['String', 'Number']]]);
+    const docs = await this.db.find({}).toArray();
+    const finalDoc = {};
+    for (const doc of docs) {
+      if (_get(doc.value, path) == value) {
+        finalDoc[doc.key] = doc.value;
+        return finalDoc;
+      }
+    }
+  }
+  async findByFunction(fn) {
+    this.check([[fn, ['Function']]]);
+    const docs = await this.db.find({}).toArray();
+    for (const doc of docs) {
+      if (fn(doc.value)) {
+        return doc;
+      }
+    }
+  }
+  async filterByValue(path, value) {
+    this.check([[value, ['String', 'Number']]]);
+    const docs = await this.db.find({}).toArray();
+    const finalDoc = {};
+    for (const doc of docs) {
+      if (_get(doc.value, path) == value) {
+        finalDoc[doc.key] = doc.value;
+      }
+    }
+    return finalDoc;
+  }
+  async filterByFunction(fn) {
+    this.check([[fn, ['Function']]]);
+    const docs = await this.db.find({}).toArray();
+    const finalDoc = {};
+    for (const doc of docs) {
+      if (fn(doc.value)) {
+        finalDoc[doc.key] = doc.value;
+      }
+    }
+    return finalDoc;
+  }
   /**
    * Deletes all entries in the database.
    * @return {Promise<*>} Promise returned by the database after deletion
