@@ -34,8 +34,7 @@ test("Database instance is valid", () => {
 
 test("Database can be initialized", async () => {
   await provider.init();
-  expect(provider.isInitialized).toBe(true);
-  await provider.bulkDelete();
+  await provider.clear();
   expect(await provider.count()).toBe(0);
 });
 
@@ -200,7 +199,7 @@ test("Database can loop, filter, find", async () => {
 });
 
 test("Database can be deleted", async () => {
-  await provider.bulkDelete();
+  await provider.clear();
   expect(await provider.count()).toBe(0);
 });
 

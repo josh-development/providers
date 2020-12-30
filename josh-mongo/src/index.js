@@ -1,6 +1,6 @@
 const { MongoClient } = require("mongodb");
 
-const { get: _get } = require("lodash");
+const { get: _get, unset, isFunction } = require("lodash");
 
 const Err = require("./error");
 
@@ -38,24 +38,6 @@ class JoshProvider {
       useUnifiedTopology: true,
     }).catch((err) => console.error(err));
     this.db = this.client.db(this.dbName).collection(this.collection);
-    return this.isInitialized;
-  }
-
-  /**
-   * Get settings
-   * @returns {Object} Returns an object containing all settings
-   */
-  get settings() {
-    return {
-      name: this.dbName,
-    };
-  }
-
-  /**
-   * Check is database is initialized and connected
-   * @returns {boolean} Returns true if connected successfully
-   */
-  get isInitialized() {
     return this.client.isConnected();
   }
 
@@ -87,7 +69,6 @@ class JoshProvider {
    * ```
    */
   async set(key, path, val) {
-    this.check([[key, ["String", "Number"]]]);
     if (!key) {
       throw new Error("Keys should be strings or numbers.");
     }
@@ -114,7 +95,6 @@ class JoshProvider {
    * ```
    */
   async setMany(arr) {
-    this.check([[arr, ["Array"]]]);
     for (const [key, val, path = null] of arr) {
       await this.set(key, path, val);
     }
@@ -132,7 +112,6 @@ class JoshProvider {
    * ```
    */
   async get(key, path) {
-    this.check([[key, ["String", "Number"]]]);
     const data = await this.db.findOne({
       key: { $eq: key },
     });
@@ -140,6 +119,12 @@ class JoshProvider {
     return _get(data, path);
   }
 
+  async getAll() {
+    return await this.db
+      .find({})
+      .toArray()
+      .map((doc) => [doc.key, doc.value]);
+  }
   /**
    * Fetch multiple keys from the database
    * @param {string[]} arr Multiple keys to fetch from the database
@@ -150,7 +135,6 @@ class JoshProvider {
    * ```
    */
   async getMany(arr) {
-    this.check([[arr, ["Array"]]]);
     const finalDocs = {};
     const docs = await this.db.find({ key: { $in: arr } }).toArray();
     for (const doc of docs) {
@@ -169,7 +153,6 @@ class JoshProvider {
    * ```
    */
   async inc(key, path = null) {
-    this.check();
     return this.set(key, path, (await this.get(key, path)) + 1);
   }
 
@@ -183,7 +166,6 @@ class JoshProvider {
    * ```
    */
   count(query = {}) {
-    this.check();
     return this.db.countDocuments(query);
   }
 
@@ -197,7 +179,6 @@ class JoshProvider {
    * ```
    */
   async dec(key, path = null) {
-    this.check();
     return this.set(key, path, (await this.get(key, path)) - 1);
   }
 
@@ -215,11 +196,6 @@ class JoshProvider {
    * ```
    */
   async math(key, path = null, operation, operand) {
-    this.check([
-      [key, ["String", "Number"]],
-      [operation, ["String"]],
-      [operand, ["Number"]],
-    ]);
     const base = await this.get(key, path);
     let result = null;
     if (!base || !operation || !operand) {
@@ -272,6 +248,15 @@ class JoshProvider {
     return this;
   }
 
+  async random(count = 1) {
+    const docs = this.db.aggregate([{ $sample: { size: count } }]);
+    return count > 1 ? docs : docs[0];
+  }
+
+  async randomKey(count = 1) {
+    const docs = await this.random(count);
+    return count > 1 ? docs.map((doc) => doc.key) : docs.key;
+  }
   /**
    * Fetch all keys within a query
    * @param {Object} query Query to filter the keys by
@@ -282,7 +267,6 @@ class JoshProvider {
    * ```
    */
   keys(query = {}) {
-    this.check([[query, ["Object"]]]);
     return new Promise((resolve, reject) => {
       this.db.find(query).toArray((err, docs) => {
         if (err) reject(err);
@@ -301,7 +285,6 @@ class JoshProvider {
    * ```
    */
   values(query = {}) {
-    this.check([[query, ["Object"]]]);
     return new Promise((resolve, reject) => {
       this.db.find(query).toArray((err, docs) => {
         if (err) reject(err);
@@ -318,11 +301,18 @@ class JoshProvider {
    * await JoshProvider.delete("josh");
    * ```
    */
-  async delete(key) {
-    this.check([[key, ["String", "Number"]]]);
-    await this.db.deleteOne({
-      key: key,
-    });
+  async delete(key, path) {
+    if (!path || path.length === 0) {
+      await this.db.deleteOne({
+        key: key,
+      });
+      return this;
+    } else {
+      const value = await this.get(key);
+      unset(value, path);
+      await this.set(key, null, value);
+      return this;
+    }
     return this;
   }
 
@@ -335,7 +325,6 @@ class JoshProvider {
    * ```
    */
   async deleteMany(arr) {
-    this.check([[arr, ["Array"]]]);
     const query = {
       $in: arr,
     };
@@ -343,7 +332,6 @@ class JoshProvider {
     return this;
   }
   async findByValue(path, value) {
-    this.check([[value, ["String", "Number"]]]);
     const docs = await this.db.find({}).toArray();
     const finalDoc = {};
     for (const doc of docs) {
@@ -354,7 +342,6 @@ class JoshProvider {
     }
   }
   async findByFunction(fn) {
-    this.check([[fn, ["Function"]]]);
     const docs = await this.db.find({}).toArray();
     for (const doc of docs) {
       if (fn(doc.value)) {
@@ -363,7 +350,6 @@ class JoshProvider {
     }
   }
   async filterByValue(path, value) {
-    this.check([[value, ["String", "Number"]]]);
     const docs = await this.db.find({}).toArray();
     const finalDoc = {};
     for (const doc of docs) {
@@ -374,7 +360,6 @@ class JoshProvider {
     return finalDoc;
   }
   async filterByFunction(fn) {
-    this.check([[fn, ["Function"]]]);
     const docs = await this.db.find({}).toArray();
     const finalDoc = {};
     for (const doc of docs) {
@@ -383,6 +368,62 @@ class JoshProvider {
       }
     }
     return finalDoc;
+  }
+  async push(key, path, value, allowDupes) {
+    const data = await this.get(key, path);
+    if (!allowDupes && data.indexOf(value) > -1) return this;
+    data.push(value);
+    this.set(key, path, data);
+    return this;
+  }
+  async remove(key, path, val) {
+    const data = await this.get(key, path);
+    const criteria = isFunction(val) ? val : (value) => val === value;
+    const index = data.findIndex(criteria);
+    if (index > -1) {
+      data.splice(index, 1);
+      await this.set(key, path, data);
+    }
+    return this;
+  }
+  async mapByFunction(fn) {
+    const all = this.getAll();
+    all.map(([key, value]) => fn(value, key));
+    return Promise.all(promises);
+  }
+  includes(key, val, path = null) {
+    const data = await this.get(key, path);
+    const criteria = isFunction(val) ? val : (value) => val === value;
+    const index = data.findIndex(criteria);
+    return index > -1;
+  }
+
+  someByPath(path, value) {
+    const doc = await this.findByValue(path, value);
+    return doc && doc.key;
+  }
+
+  someByFunction(fn) {
+    const docs = await this.getAll()
+    return docs.map(([key,value]) => [key, value]).some(fn);
+  }
+
+  everyByPath(path, value) {
+    const docs = await this.getAll().filter(doc => _get(doc.value, path) == value)
+    return docs.length === await this.count();
+  }
+
+  async everyByFunction(fn) {
+    const all = await this.getAll();
+    let answerCount = 0;
+    for (const [key, value] of all) {
+      if (await fn(value, key)) {
+        answerCount++;
+      } else {
+        break;
+      }
+    }
+    return answerCount === all.length;
   }
   /**
    * Deletes all entries in the database.
@@ -393,7 +434,6 @@ class JoshProvider {
    * ```
    */
   async clear() {
-    this.check();
     await this.db.deleteMany({});
     return this;
   }
@@ -420,12 +460,13 @@ class JoshProvider {
   }
 
   /**
-   * Internal method used to check validity of the database and input
+   * Internal method used to check validity of the database and value of doc to change
    * @param {Array} input Input to type check
    * @private
    */
+  // TODO: fix this to not check params but key,value,path
   check(input = []) {
-    if (!this.isInitialized) {
+    if (!this.client.isConnected()) {
       throw new Err("Connection to database not open");
     }
     for (const [key, expected] of input) {
