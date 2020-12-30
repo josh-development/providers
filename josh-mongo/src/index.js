@@ -90,14 +90,18 @@ class JoshProvider {
   /**
    * Set many keys and values
    * @param {Array} arr This is a [key, value, path] array to be set in the database
+   * @param {boolean} overwrite Whether or not to overwrite existing values or ignore
    * @example
    * ```
    * await JoshProvider.setMany([ ["hello", "world"], ["josh": true], ["foo", true, "alive"] ])
    * ```
    */
-  async setMany(arr) {
+  async setMany(arr, overwrite) {
     for (const [key, val, path = null] of arr) {
-      await this.set(key, path, val);
+      const found = this.get(key, path);
+      if (!found || (found && overwrite)) {
+        await this.set(key, path, val);
+      }
     }
     return this;
   }
@@ -121,10 +125,8 @@ class JoshProvider {
   }
 
   async getAll() {
-    return await this.db
-      .find({})
-      .toArray()
-      .map((doc) => [doc.key, doc.value]);
+    const docs = await this.db.find({}).toArray();
+    return docs.map((doc) => [doc.key, doc.value]);
   }
   /**
    * Fetch multiple keys from the database
@@ -136,12 +138,8 @@ class JoshProvider {
    * ```
    */
   async getMany(arr) {
-    const finalDocs = {};
     const docs = await this.db.find({ key: { $in: arr } }).toArray();
-    for (const doc of docs) {
-      finalDocs[doc.key] = doc.value;
-    }
-    return finalDocs;
+    return docs.map((doc) => [doc.key, doc.value]);
   }
 
   /**
@@ -250,13 +248,15 @@ class JoshProvider {
   }
 
   async random(count = 1) {
-    const docs = this.db.aggregate([{ $sample: { size: count } }]);
-    return count > 1 ? docs : docs[0];
+    const docs = await this.db
+      .aggregate([{ $sample: { size: count } }])
+      .toArray();
+    return docs.map((doc) => [doc.key, doc.value]);
   }
 
   async randomKey(count = 1) {
     const docs = await this.random(count);
-    return count > 1 ? docs.map((doc) => doc.key) : docs.key;
+    return docs.map((doc) => doc[0]);
   }
   /**
    * Fetch all keys within a query
@@ -345,26 +345,26 @@ class JoshProvider {
     const docs = await this.db.find({}).toArray();
     for (const doc of docs) {
       if (fn(doc.value)) {
-        return doc;
+        return [doc.key, doc.value];
       }
     }
   }
-  async filterByValue(path, value) {
-    const docs = await this.db.find({}).toArray();
-    const finalDoc = {};
-    for (const doc of docs) {
-      if (_get(doc.value, path) == value) {
-        finalDoc[doc.key] = doc.value;
+  async filterByValue(value, path = null) {
+    const docs = await this.getAll();
+    const finalDoc = [];
+    for (const [key, val] of docs) {
+      if ((path && _get(val, path) == value) || val == value) {
+        finalDoc.push([key, val]);
       }
     }
     return finalDoc;
   }
   async filterByFunction(fn) {
-    const docs = await this.db.find({}).toArray();
-    const finalDoc = {};
-    for (const doc of docs) {
-      if (fn(doc.value)) {
-        finalDoc[doc.key] = doc.value;
+    const docs = await this.getAll();
+    const finalDoc = [];
+    for (const [key, value] of docs) {
+      if (fn(value)) {
+        finalDoc.push([key, value]);
       }
     }
     return finalDoc;
@@ -387,30 +387,34 @@ class JoshProvider {
     return this;
   }
   async mapByFunction(fn) {
-    let all = this.getAll();
-    all = all.map(([key, value]) => fn(value, key));
-    return Promise.all(all);
+    let all = await this.getAll();
+    all = all.map(([key, value]) => fn(key, value));
+    return all;
   }
-  async includes(key, val, path = null) {
+  async includes(key, path = null, val) {
     const data = await this.get(key, path);
+    if (!data) return;
     const criteria = isFunction(val) ? val : (value) => val === value;
     const index = data.findIndex(criteria);
     return index > -1;
   }
 
-  async someByPath(path, value) {
-    const doc = await this.findByValue(path, value);
-    return doc && doc.key;
+  async someByValue(value, path) {
+    const docs = await this.getAll();
+    return docs.some((doc) =>
+      path ? _get(doc[1], path) == value : doc[1] == value,
+    );
   }
 
   async someByFunction(fn) {
     const docs = await this.getAll();
-    return docs.map(([key, value]) => [key, value]).some(fn);
+    return docs.some(fn);
   }
 
-  async everyByPath(path, value) {
-    const docs = await this.getAll().filter(
-      (doc) => _get(doc.value, path) == value,
+  async everyByValue(value, path) {
+    let docs = await this.getAll();
+    docs = docs.filter((doc) =>
+      path ? _get(doc[1], path) == value : doc[1] == value,
     );
     return docs.length === await this.count();
   }

@@ -10,3 +10,4 @@ data/
 out/
 # config-mongo.json
 yarn.lock
+test.js
