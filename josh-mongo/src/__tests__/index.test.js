@@ -107,10 +107,10 @@ test("Database returns expected statistical properties", async () => {
 });
 
 test("Database can act on many rows at a time", async () => {
-  expect(await provider.getMany(["number", "boolean"])).toEqual({
-    number: 42,
-    boolean: false,
-  });
+  expect(await provider.getMany(["number", "boolean"])).toEqual([
+    ["number", 42],
+    ["boolean", false],
+  ]);
   expect(
     await provider.setMany([
       ["new1", "new1"],
@@ -168,15 +168,18 @@ test("Database can delete values and data at paths", async () => {
 });
 
 test("Database can loop, filter, find", async () => {
-  expect(await provider.filterByValue("b", 2)).toEqual({
-    object: { a: 1, b: 2, c: 3, d: 4 },
-    complexobject: {
-      a: 1,
-      b: 2,
-      c: [1, 2, 3, 4, { a: [1, 2, 3, 4] }],
-      d: { 1: "one", 2: "two" },
-    },
-  });
+  expect(await provider.filterByValue(2, "b")).toEqual([
+    ["object", { a: 1, b: 2, c: 3, d: 4 }],
+    [
+      "complexobject",
+      {
+        a: 1,
+        b: 2,
+        c: [1, 2, 3, 4, { a: [1, 2, 3, 4] }],
+        d: { 1: "one", 2: "two" },
+      },
+    ],
+  ]);
   expect(await provider.findByValue("c", 3)).toEqual({
     object: {
       a: 1,
@@ -193,7 +196,7 @@ test("Database can loop, filter, find", async () => {
     Object.keys(await provider.filterByFunction((v) => v && v.count >= 100))
       .length
   ).toBe(100);
-  expect((await provider.findByFunction((v) => v && v.count === 101)).key).toBe(
+  expect((await provider.findByFunction((v) => v && v.count === 101))[0]).toBe(
     "object101"
   );
 });
