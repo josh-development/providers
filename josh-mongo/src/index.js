@@ -341,7 +341,7 @@ class JoshProvider {
     const docs = await this.db.find({}).toArray();
     const finalDoc = {};
     for (const doc of docs) {
-      if (_get(doc.value, path) == value) {
+      if (!value ? _get(doc.value, path) : value == _get(doc.value, path)) {
         finalDoc[doc.key] = doc.value;
         return finalDoc;
       }
