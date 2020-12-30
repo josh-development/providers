@@ -361,7 +361,7 @@ class JoshProvider {
     const docs = await this.getAll();
     const finalDoc = [];
     for (const [key, val] of docs) {
-      if ((path && _get(val, path) == value) || val == value) {
+      if (!value ? _get(val, path) : value == _get(val, path)) {
         finalDoc.push([key, val]);
       }
     }
