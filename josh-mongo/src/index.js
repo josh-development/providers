@@ -1,27 +1,27 @@
-const { MongoClient, ObjectId } = require("mongodb");
+const { MongoClient, ObjectId } = require('mongodb');
 
-const { get: _get, unset, isFunction } = require("lodash");
+const { get: _get, unset, isFunction } = require('lodash');
 
-const Err = require("./error");
+const Err = require('./error');
 
 class JoshProvider {
   constructor(options) {
     if (!options.name) {
-      throw new Err("Must provide options.name", "JoshTypeError");
+      throw new Err('Must provide options.name', 'JoshTypeError');
     }
     this.name = options.name;
     if (!options.collection) {
-      throw new Err("Must provide options.collection", "JoshTypeError");
+      throw new Err('Must provide options.collection', 'JoshTypeError');
     }
     this.collection = options.collection;
     this.validateName();
     this.auth =
-      options.user && options.password
-        ? `${options.user}:${options.password}@`
-        : "";
-    this.dbName = options.dbName || "josh";
+      options.user && options.password ?
+        `${options.user}:${options.password}@` :
+        '';
+    this.dbName = options.dbName || 'josh';
     this.port = options.port || 27017;
-    this.host = options.host || "localhost";
+    this.host = options.host || 'localhost';
     this.url =
       options.url ||
       `mongodb://${this.auth}${this.host}:${this.port}/${this.dbName}`;
@@ -71,18 +71,18 @@ class JoshProvider {
   async set(key, path, val) {
     await this.check();
     if (!key) {
-      throw new Error("Keys should be strings or numbers.");
+      throw new Error('Keys should be strings or numbers.');
     }
     await this.db.findOneAndUpdate(
       {
         key: { $eq: key },
       },
       {
-        $set: { key, [`${path ? `value.${path}` : "value"}`]: val },
+        $set: { key, [`${path ? `value.${path}` : 'value'}`]: val },
       },
       {
         upsert: true,
-      }
+      },
     );
     return this;
   }
@@ -123,7 +123,7 @@ class JoshProvider {
       key: { $eq: key },
     });
     if (!path) return data && data.value;
-    return _get(data, path);
+    return _get(data.value, path);
   }
 
   async getAll() {
@@ -156,8 +156,8 @@ class JoshProvider {
    * ```
    */
   async inc(key, path = null) {
-    await this.check(key, ["Number"], path);
-    return this.set(key, path, (await this.get(key, path)) + 1);
+    await this.check(key, ['Number'], path);
+    return this.set(key, path, await this.get(key, path) + 1);
   }
 
   /**
@@ -183,8 +183,8 @@ class JoshProvider {
    * ```
    */
   async dec(key, path = null) {
-    await this.check(key, ["Number"], path);
-    return this.set(key, path, (await this.get(key, path)) - 1);
+    await this.check(key, ['Number'], path);
+    return this.set(key, path, await this.get(key, path) - 1);
   }
 
   /**
@@ -201,52 +201,52 @@ class JoshProvider {
    * ```
    */
   async math(key, path = null, operation, operand) {
-    await this.check(key, ["Number"], path);
+    await this.check(key, ['Number'], path);
     const base = await this.get(key, path);
     let result = null;
     if (!base || !operation || !operand) {
       throw new Err(
-        "Math operation requires base, operation and operand parameters",
-        "JoshTypeError"
+        'Math operation requires base, operation and operand parameters',
+        'JoshTypeError',
       );
     }
     switch (operation) {
-      case "add":
-      case "addition":
-      case "+":
-        result = base + operand;
-        break;
-      case "sub":
-      case "subtract":
-      case "-":
-        result = base - operand;
-        break;
-      case "mult":
-      case "multiply":
-      case "*":
-        result = base * operand;
-        break;
-      case "div":
-      case "divide":
-      case "/":
-        result = base / operand;
-        break;
-      case "exp":
-      case "exponent":
-      case "^":
-        result = Math.pow(base, operand);
-        break;
-      case "mod":
-      case "modulo":
-      case "%":
-        result = base % operand;
-        break;
-      case "rand":
-      case "random":
-        result = Math.floor(Math.random() * Math.floor(operand));
-        break;
-      default:
-        throw new Err("Please provide a valid operand", "JoshTypeError");
+    case 'add':
+    case 'addition':
+    case '+':
+      result = base + operand;
+      break;
+    case 'sub':
+    case 'subtract':
+    case '-':
+      result = base - operand;
+      break;
+    case 'mult':
+    case 'multiply':
+    case '*':
+      result = base * operand;
+      break;
+    case 'div':
+    case 'divide':
+    case '/':
+      result = base / operand;
+      break;
+    case 'exp':
+    case 'exponent':
+    case '^':
+      result = Math.pow(base, operand);
+      break;
+    case 'mod':
+    case 'modulo':
+    case '%':
+      result = base % operand;
+      break;
+    case 'rand':
+    case 'random':
+      result = Math.floor(Math.random() * Math.floor(operand));
+      break;
+    default:
+      throw new Err('Please provide a valid operand', 'JoshTypeError');
     }
     if (result) {
       await this.set(key, path, result);
@@ -339,11 +339,15 @@ class JoshProvider {
   async findByValue(path, value) {
     await this.check();
     const docs = await this.db.find({}).toArray();
-    const finalDoc = {};
     for (const doc of docs) {
-      if (!value ? _get(doc.value, path) : value == _get(doc.value, path)) {
-        finalDoc[doc.key] = doc.value;
-        return finalDoc;
+      if (
+        !value ?
+          _get(doc.value, path) :
+          path ?
+            value == _get(doc.value, path) :
+            value == doc.value
+      ) {
+        return [doc.key, doc.value];
       }
     }
   }
@@ -361,7 +365,13 @@ class JoshProvider {
     const docs = await this.getAll();
     const finalDoc = [];
     for (const [key, val] of docs) {
-      if (!value ? _get(val, path) : value == _get(val, path)) {
+      if (
+        !value ?
+          _get(val, path) :
+          path ?
+            value == _get(val, path) :
+            value == val
+      ) {
         finalDoc.push([key, val]);
       }
     }
@@ -379,7 +389,7 @@ class JoshProvider {
     return finalDoc;
   }
   async push(key, path, value, allowDupes) {
-    await this.check(key, ["Array"], path);
+    await this.check(key, ['Array'], path);
     const data = await this.get(key, path);
     if (!allowDupes && data.indexOf(value) > -1) return this;
     data.push(value);
@@ -387,7 +397,7 @@ class JoshProvider {
     return this;
   }
   async remove(key, path, val) {
-    await this.check(key, ["Array"], path);
+    await this.check(key, ['Array'], path);
     const data = await this.get(key, path);
     const criteria = isFunction(val) ? val : (value) => val === value;
     const index = data.findIndex(criteria);
@@ -404,7 +414,7 @@ class JoshProvider {
     return all;
   }
   async includes(key, path = null, val) {
-    await this.check(key, ["Array"], path);
+    await this.check(key, ['Array'], path);
     const data = await this.get(key, path);
     if (!data) return;
     const criteria = isFunction(val) ? val : (value) => val === value;
@@ -416,7 +426,7 @@ class JoshProvider {
     await this.check();
     const docs = await this.getAll();
     return docs.some((doc) =>
-      path ? _get(doc[1], path) == value : doc[1] == value
+      path ? _get(doc[1], path) == value : doc[1] == value,
     );
   }
 
@@ -430,9 +440,9 @@ class JoshProvider {
     await this.check();
     let docs = await this.getAll();
     docs = docs.filter((doc) =>
-      path ? _get(doc[1], path) == value : doc[1] == value
+      path ? _get(doc[1], path) == value : doc[1] == value,
     );
-    return docs.length === (await this.count());
+    return docs.length === await this.count();
   }
 
   async everyByFunction(fn) {
@@ -476,7 +486,7 @@ class JoshProvider {
    */
   async has(key, path = null) {
     await this.check();
-    return (await this.get(key, path)) != null;
+    return await this.get(key, path) != null;
   }
   /**
    * Internal method used to validate persistent josh names (valid Windows filenames)
@@ -484,7 +494,7 @@ class JoshProvider {
    */
   validateName() {
     // Do not delete this internal method.
-    this.collection = this.collection.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+    this.collection = this.collection.replace(/[^a-z0-9]/gi, '_').toLowerCase();
   }
 
   /**
@@ -494,24 +504,25 @@ class JoshProvider {
    */
   async check(key, type, path = null) {
     if (!this.client.isConnected()) {
-      throw new Err("Connection to database not open");
+      throw new Err('Connection to database not open');
     }
     if (!key || !type) return;
     const value = await this.get(key, path);
-    if (!value)
+    if (!value) {
       throw new Err(
         `The document "${key}" of path "${path}" was not found in the database`,
-        "JoshTypeError"
+        'JoshTypeError',
       );
+    }
     const valueType = value.constructor.name;
     if (!type.includes(valueType)) {
       throw new Err(
         `The property ${
-          path ? path + " " : ""
+          path ? `${path} ` : ''
         }in key "${key}" is not of type "${type.join(
-          '" or "'
+          '" or "',
         )}"(key was of type "${valueType}")`,
-        "JoshTypeError"
+        'JoshTypeError',
       );
     }
   }
