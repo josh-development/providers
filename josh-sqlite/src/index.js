@@ -404,7 +404,7 @@ module.exports = class JoshProvider {
 
   someByFunction(fn) {
     const rows = this.db.prepare(
-      `SELECT key, value FROM '${this.name}' WHERE path = '::NULL::';'`,
+      `SELECT key, value FROM '${this.name}' WHERE path = '::NULL::';`,
     );
     return rows.map((row) => [row.key, eval(`(${row.value})`)]).some(fn);
   }
