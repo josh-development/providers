@@ -405,8 +405,8 @@ module.exports = class JoshProvider {
   someByFunction(fn) {
     const rows = this.db.prepare(
       `SELECT key, value FROM '${this.name}' WHERE path = '::NULL::';`,
-    );
-    return rows.map((row) => [row.key, eval(`(${row.value})`)]).some(fn);
+    ).all();
+    return rows.map((row) => [row.key, eval(`(${row.value})`)]).some(([key, value], _, array) => fn(value, key, array));
   }
 
   everyByPath(path, value) {

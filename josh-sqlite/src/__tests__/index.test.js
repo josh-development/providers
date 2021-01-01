@@ -120,6 +120,11 @@ test('Database can loop, filter, find', async () => {
     }
     expect(Object.keys(await provider.filterByFunction(v => v && v.count >= 100)).length).toBe(100);
     expect((await provider.findByFunction(v => v && v.count === 101)).key).toBe('object101');
+
+    // expect(await provider.someByPath('count', 101)).toBe(true)
+    expect(
+      await provider.someByFunction(value => value?.count === 101)
+    ).toBe(true);
     // test: <query> (upcoming)
 });
 
