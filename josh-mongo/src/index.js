@@ -1,27 +1,27 @@
-const { MongoClient, ObjectId } = require("mongodb");
+const { MongoClient, ObjectId } = require('mongodb');
 
-const { get: _get, unset, isFunction } = require("lodash");
+const { get: _get, unset, isFunction } = require('lodash');
 
-const Err = require("./error");
+const Err = require('./error');
 
 class JoshProvider {
   constructor(options) {
     if (!options.name) {
-      throw new Err("Must provide options.name", "JoshTypeError");
+      throw new Err('Must provide options.name', 'JoshTypeError');
     }
     this.name = options.name;
     if (!options.collection) {
-      throw new Err("Must provide options.collection", "JoshTypeError");
+      throw new Err('Must provide options.collection', 'JoshTypeError');
     }
     this.collection = options.collection;
     this.validateName();
     this.auth =
       options.user && options.password
         ? `${options.user}:${options.password}@`
-        : "";
-    this.dbName = options.dbName || "josh";
+        : '';
+    this.dbName = options.dbName || 'josh';
     this.port = options.port || 27017;
-    this.host = options.host || "localhost";
+    this.host = options.host || 'localhost';
     this.url =
       options.url ||
       `mongodb://${this.auth}${this.host}:${this.port}/${this.dbName}`;
@@ -71,18 +71,18 @@ class JoshProvider {
   async set(key, path, val) {
     await this.check();
     if (!key) {
-      throw new Error("Keys should be strings or numbers.");
+      throw new Error('Keys should be strings or numbers.');
     }
     await this.db.findOneAndUpdate(
       {
         key: { $eq: key },
       },
       {
-        $set: { key, [`${path ? `value.${path}` : "value"}`]: val },
+        $set: { key, [`${path ? `value.${path}` : 'value'}`]: val },
       },
       {
         upsert: true,
-      }
+      },
     );
     return this;
   }
@@ -156,7 +156,7 @@ class JoshProvider {
    * ```
    */
   async inc(key, path = null) {
-    await this.check(key, ["Number"], path);
+    await this.check(key, ['Number'], path);
     return this.set(key, path, (await this.get(key, path)) + 1);
   }
 
@@ -183,7 +183,7 @@ class JoshProvider {
    * ```
    */
   async dec(key, path = null) {
-    await this.check(key, ["Number"], path);
+    await this.check(key, ['Number'], path);
     return this.set(key, path, (await this.get(key, path)) - 1);
   }
 
@@ -201,52 +201,52 @@ class JoshProvider {
    * ```
    */
   async math(key, path = null, operation, operand) {
-    await this.check(key, ["Number"], path);
+    await this.check(key, ['Number'], path);
     const base = await this.get(key, path);
     let result = null;
     if (!base || !operation || !operand) {
       throw new Err(
-        "Math operation requires base, operation and operand parameters",
-        "JoshTypeError"
+        'Math operation requires base, operation and operand parameters',
+        'JoshTypeError',
       );
     }
     switch (operation) {
-      case "add":
-      case "addition":
-      case "+":
+      case 'add':
+      case 'addition':
+      case '+':
         result = base + operand;
         break;
-      case "sub":
-      case "subtract":
-      case "-":
+      case 'sub':
+      case 'subtract':
+      case '-':
         result = base - operand;
         break;
-      case "mult":
-      case "multiply":
-      case "*":
+      case 'mult':
+      case 'multiply':
+      case '*':
         result = base * operand;
         break;
-      case "div":
-      case "divide":
-      case "/":
+      case 'div':
+      case 'divide':
+      case '/':
         result = base / operand;
         break;
-      case "exp":
-      case "exponent":
-      case "^":
+      case 'exp':
+      case 'exponent':
+      case '^':
         result = Math.pow(base, operand);
         break;
-      case "mod":
-      case "modulo":
-      case "%":
+      case 'mod':
+      case 'modulo':
+      case '%':
         result = base % operand;
         break;
-      case "rand":
-      case "random":
+      case 'rand':
+      case 'random':
         result = Math.floor(Math.random() * Math.floor(operand));
         break;
       default:
-        throw new Err("Please provide a valid operand", "JoshTypeError");
+        throw new Err('Please provide a valid operand', 'JoshTypeError');
     }
     if (result) {
       await this.set(key, path, result);
@@ -389,7 +389,7 @@ class JoshProvider {
     return finalDoc;
   }
   async push(key, path, value, allowDupes) {
-    await this.check(key, ["Array"], path);
+    await this.check(key, ['Array'], path);
     const data = await this.get(key, path);
     if (!allowDupes && data.indexOf(value) > -1) return this;
     data.push(value);
@@ -397,7 +397,7 @@ class JoshProvider {
     return this;
   }
   async remove(key, path, val) {
-    await this.check(key, ["Array"], path);
+    await this.check(key, ['Array'], path);
     const data = await this.get(key, path);
     const criteria = isFunction(val) ? val : (value) => val === value;
     const index = data.findIndex(criteria);
@@ -414,7 +414,7 @@ class JoshProvider {
     return all;
   }
   async includes(key, path = null, val) {
-    await this.check(key, ["Array"], path);
+    await this.check(key, ['Array'], path);
     const data = await this.get(key, path);
     if (!data) return;
     const criteria = isFunction(val) ? val : (value) => val === value;
@@ -426,7 +426,7 @@ class JoshProvider {
     await this.check();
     const docs = await this.getAll();
     return docs.some((doc) =>
-      path ? _get(doc[1], path) == value : doc[1] == value
+      path ? _get(doc[1], path) == value : doc[1] == value,
     );
   }
 
@@ -440,7 +440,7 @@ class JoshProvider {
     await this.check();
     let docs = await this.getAll();
     return docs.every(([key, val]) =>
-      path ? _get(val, path) == value : val == value
+      path ? _get(val, path) == value : val == value,
     );
   }
 
@@ -485,7 +485,7 @@ class JoshProvider {
    */
   validateName() {
     // Do not delete this internal method.
-    this.collection = this.collection.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+    this.collection = this.collection.replace(/[^a-z0-9]/gi, '_').toLowerCase();
   }
 
   /**
@@ -495,25 +495,25 @@ class JoshProvider {
    */
   async check(key, type, path = null) {
     if (!this.client.isConnected()) {
-      throw new Err("Connection to database not open");
+      throw new Err('Connection to database not open');
     }
     if (!key || !type) return;
     const value = await this.get(key, path);
     if (!value) {
       throw new Err(
         `The document "${key}" of path "${path}" was not found in the database`,
-        "JoshTypeError"
+        'JoshTypeError',
       );
     }
     const valueType = value.constructor.name;
     if (!type.includes(valueType)) {
       throw new Err(
         `The property ${
-          path ? `${path} ` : ""
+          path ? `${path} ` : ''
         }in key "${key}" is not of type "${type.join(
-          '" or "'
+          '" or "',
         )}"(key was of type "${valueType}")`,
-        "JoshTypeError"
+        'JoshTypeError',
       );
     }
   }
