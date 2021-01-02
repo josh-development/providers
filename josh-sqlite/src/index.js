@@ -28,7 +28,6 @@ const {
 } = require('./utils.js');
 
 module.exports = class JoshProvider {
-
   constructor(options) {
     if (options.inMemory) {
       // This is there for testing purposes, really.
@@ -113,14 +112,14 @@ module.exports = class JoshProvider {
       };`,
     );
     const row = path ? query.get(key, path) : query.get(key);
-    return row ? eval(`(${row.value})`) : undefined;
+    return row ? this.parseData(row.value) : undefined;
   }
 
   getAll() {
     const stmt = this.db.prepare(
       `SELECT * FROM '${this.name}' WHERE path='::NULL::';`,
     );
-    return stmt.all().map((row) => [row.key, eval(`(${row.value})`)]);
+    return stmt.all().map((row) => [row.key, this.parseData(row.value)]);
   }
 
   getMany(keys) {
@@ -132,7 +131,7 @@ module.exports = class JoshProvider {
       )
       .all(keys)
       .reduce((acc, row) => {
-        acc[row.key] = eval(`(${row.value})`);
+        acc[row.key] = this.parseData(row.value);
         return acc;
       }, {});
   }
@@ -145,7 +144,7 @@ module.exports = class JoshProvider {
         }' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${Number(count)};`,
       )
       .all();
-    return count > 1 ? data : data[0];
+    return count > 1 ? this.parseData(data) : this.parseData(data[0]);
   }
 
   randomKey(count = 1) {
@@ -264,40 +263,40 @@ module.exports = class JoshProvider {
       );
     }
     switch (operation) {
-    case 'add':
-    case 'addition':
-    case '+':
-      result = base + operand;
-      break;
-    case 'sub':
-    case 'subtract':
-    case '-':
-      result = base - operand;
-      break;
-    case 'mult':
-    case 'multiply':
-    case '*':
-      result = base * operand;
-      break;
-    case 'div':
-    case 'divide':
-    case '/':
-      result = base / operand;
-      break;
-    case 'exp':
-    case 'exponent':
-    case '^':
-      result = Math.pow(base, operand);
-      break;
-    case 'mod':
-    case 'modulo':
-    case '%':
-      result = base % operand;
-      break;
-    case 'rand':
-    case 'random':
-      result = Math.floor(Math.random() * Math.floor(operand));
-      break;
+      case 'add':
+      case 'addition':
+      case '+':
+        result = base + operand;
+        break;
+      case 'sub':
+      case 'subtract':
+      case '-':
+        result = base - operand;
+        break;
+      case 'mult':
+      case 'multiply':
+      case '*':
+        result = base * operand;
+        break;
+      case 'div':
+      case 'divide':
+      case '/':
+        result = base / operand;
+        break;
+      case 'exp':
+      case 'exponent':
+      case '^':
+        result = Math.pow(base, operand);
+        break;
+      case 'mod':
+      case 'modulo':
+      case '%':
+        result = base % operand;
+        break;
+      case 'rand':
+      case 'random':
+        result = Math.floor(Math.random() * Math.floor(operand));
+        break;
     }
     return this.set(key, path, result);
   }
@@ -330,9 +329,9 @@ module.exports = class JoshProvider {
         path ? ' AND path = ?' : " AND path = '::NULL::'"
       } LIMIT 1;`,
     );
-    const results = path ?
-      query.get(serializeData(value), path) :
-      query.get(serializeData(value));
+    const results = path
+      ? query.get(serializeData(value), path)
+      : query.get(serializeData(value));
     return results ? { [results.key]: this.get(results.key) } : null;
   }
 
@@ -364,9 +363,9 @@ module.exports = class JoshProvider {
         path ? ' AND path = ?' : " AND path = '::NULL::'"
       }`,
     );
-    const rows = path ?
-      query.all(serializeData(value), path) :
-      query.all(serializeData(value));
+    const rows = path
+      ? query.all(serializeData(value), path)
+      : query.all(serializeData(value));
     return rows.reduce((acc, row) => {
       acc[row.key] = this.get(row.key);
       return acc;
@@ -377,7 +376,7 @@ module.exports = class JoshProvider {
     const rows = this.db
       .prepare(`SELECT key, value FROM '${this.name}' WHERE path = ?`)
       .all(path);
-    return rows.reduce((acc, row) => [...acc, eval(`(${row.value})`)], []);
+    return rows.reduce((acc, row) => [...acc, this.parseData(row.value)], []);
   }
 
   async mapByFunction(fn) {
@@ -398,15 +397,17 @@ module.exports = class JoshProvider {
       .prepare(
         `SELECT key FROM '${this.name}' WHERE path = ? AND value = ? LIMIT 1`,
       )
-      .get(path, value);
+      .get(path, serializeData(value));
     return row && row.key;
   }
 
   someByFunction(fn) {
-    const rows = this.db.prepare(
-      `SELECT key, value FROM '${this.name} WHERE path = '::NULL::';'`,
-    );
-    return rows.map((row) => [row.key, eval(`(${row.value})`)]).some(fn);
+    const rows = this.db
+      .prepare(`SELECT key, value FROM '${this.name}' WHERE path = '::NULL::';`)
+      .all();
+    return rows
+      .map((row) => [row.key, this.parseData(row.value)])
+      .some(([key, value], _, array) => fn(value, key, array));
   }
 
   everyByPath(path, value) {
@@ -414,7 +415,7 @@ module.exports = class JoshProvider {
       .prepare(
         `SELECT key FROM '${this.name}' WHERE path = ? AND value = ? LIMIT 1`,
       )
-      .all(path, value);
+      .all(path, serializeData(value));
     return row.length === this.count();
   }
 
@@ -550,9 +551,9 @@ module.exports = class JoshProvider {
     const executions = [];
     const currentData = this.has(key) ? this.get(key) : '::NULL::';
     const currentPaths = getPaths(currentData);
-    const paths = path ?
-      getPaths(_set(cloneDeep(currentData), path, newValue)) :
-      getPaths(newValue);
+    const paths = path
+      ? getPaths(_set(cloneDeep(currentData), path, newValue))
+      : getPaths(newValue);
 
     for (const [currentPath, value] of Object.entries(currentPaths)) {
       if (isNil(paths[currentPath]) || paths[currentPath] !== value) {
@@ -587,46 +588,6 @@ module.exports = class JoshProvider {
       ),
     );
     return this;
-  }
-
-  getDelimitedPath(base, key, valueIsArray) {
-    return valueIsArray ?
-      base ?
-        `${base}[${key}]` :
-        key :
-      base ?
-        `${base}.${key}` :
-        key;
-  }
-
-  serializeData(data) {
-    let serialized;
-    try {
-      serialized = serialize(onChange.target(data));
-    } catch (err) {
-      serialized = serialize(data);
-    }
-    return serialized;
-  }
-
-  getPaths(data, acc = {}, basePath = null) {
-    if (data === '::NULL::') return {};
-    if (!isObject(data)) {
-      acc[basePath || '::NULL::'] = this.serializeData(data);
-      return acc;
-    }
-    const source = isArray(data) ?
-      data.map((da, i) => [i, da]) :
-      Object.entries(data);
-    const returnPaths = source.reduce((paths, [key, value]) => {
-      const path = this.getDelimitedPath(basePath, key, !isArray(value));
-      if (isObject(value)) this.getPaths(value, paths, path);
-      paths[path.toString()] = this.serializeData(value);
-      return paths;
-    }, acc || {});
-    return basePath ?
-      returnPaths :
-      { ...returnPaths, '::NULL::': this.serializeData(data) };
   }
 
 };

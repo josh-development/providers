@@ -1,6 +1,6 @@
 {
   "name": "@josh-providers/sqlite",
-  "version": "1.0.17",
+  "version": "1.0.21",
   "description": "SQLite Provider for JOSH",
   "main": "src/index.js",
   "scripts": {
@@ -27,6 +27,7 @@
   "devDependencies": {
     "eslint": "6.8.0",
     "eslint-plugin-jest": "^24.1.0",
-    "jest": "^26.2.2"
+    "jest": "^26.2.2",
+    "prettier": "^2.2.1"
   }
 }
