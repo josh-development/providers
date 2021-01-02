@@ -242,7 +242,7 @@ test("Database can loop, filter, find", async () => {
   );
 });
 
-test("Database can push, remove, map, include and some", async () => {
+test("Database can push, remove, map, include, autoid and some", async () => {
   expect(await provider.push("array", null, "pushed")).toBe(provider);
   expect(await provider.get("array")).toEqual([1, 2, 3, 4, 5, "pushed"]);
   expect(await provider.remove("array", null, "pushed"));
@@ -252,6 +252,12 @@ test("Database can push, remove, map, include and some", async () => {
   expect(await provider.mapByFunction(([key]) => key)).toEqual(
     await provider.keys()
   );
+  expect(await provider.someByValue(42)).toBe(true);
+  expect(await provider.someByValue(3, "c")).toBe(true);
+  expect(await provider.someByFunction(([key]) => key == "number")).toBe(true);
+  expect(await provider.everyByValue(42)).toBe(false);
+  expect(await provider.everyByFunction(([key]) => key != null)).toBe(true);
+  expect((await provider.autoId()) != (await provider.autoId())).toBe(true);
 });
 
 test("Database can be deleted", async () => {
