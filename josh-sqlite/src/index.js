@@ -112,14 +112,14 @@ module.exports = class JoshProvider {
       };`,
     );
     const row = path ? query.get(key, path) : query.get(key);
-    return row ? eval(`(${row.value})`) : undefined;
+    return row ? this.parseData(row.value) : undefined;
   }
 
   getAll() {
     const stmt = this.db.prepare(
       `SELECT * FROM '${this.name}' WHERE path='::NULL::';`,
     );
-    return stmt.all().map((row) => [row.key, eval(`(${row.value})`)]);
+    return stmt.all().map((row) => [row.key, this.parseData(row.value)]);
   }
 
   getMany(keys) {
@@ -131,7 +131,7 @@ module.exports = class JoshProvider {
       )
       .all(keys)
       .reduce((acc, row) => {
-        acc[row.key] = eval(`(${row.value})`);
+        acc[row.key] = this.parseData(row.value);
         return acc;
       }, {});
   }
@@ -144,7 +144,7 @@ module.exports = class JoshProvider {
         }' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${Number(count)};`,
       )
       .all();
-    return count > 1 ? data : data[0];
+    return count > 1 ? this.parseData(data) : this.parseData(data[0]);
   }
 
   randomKey(count = 1) {
@@ -376,7 +376,7 @@ module.exports = class JoshProvider {
     const rows = this.db
       .prepare(`SELECT key, value FROM '${this.name}' WHERE path = ?`)
       .all(path);
-    return rows.reduce((acc, row) => [...acc, eval(`(${row.value})`)], []);
+    return rows.reduce((acc, row) => [...acc, this.parseData(row.value)], []);
   }
 
   async mapByFunction(fn) {
@@ -397,7 +397,7 @@ module.exports = class JoshProvider {
       .prepare(
         `SELECT key FROM '${this.name}' WHERE path = ? AND value = ? LIMIT 1`,
       )
-      .get(path, value);
+      .get(path, serializeData(value));
     return row && row.key;
   }
 
@@ -406,7 +406,7 @@ module.exports = class JoshProvider {
       .prepare(`SELECT key, value FROM '${this.name}' WHERE path = '::NULL::';`)
       .all();
     return rows
-      .map((row) => [row.key, eval(`(${row.value})`)])
+      .map((row) => [row.key, this.parseData(row.value)])
       .some(([key, value], _, array) => fn(value, key, array));
   }
 
@@ -415,7 +415,7 @@ module.exports = class JoshProvider {
       .prepare(
         `SELECT key FROM '${this.name}' WHERE path = ? AND value = ? LIMIT 1`,
       )
-      .all(path, value);
+      .all(path, serializeData(value));
     return row.length === this.count();
   }
 
@@ -590,43 +590,4 @@ module.exports = class JoshProvider {
     return this;
   }
 
-  getDelimitedPath(base, key, valueIsArray) {
-    return valueIsArray
-      ? base
-        ? `${base}[${key}]`
-        : key
-      : base
-      ? `${base}.${key}`
-      : key;
-  }
-
-  serializeData(data) {
-    let serialized;
-    try {
-      serialized = serialize(onChange.target(data));
-    } catch (err) {
-      serialized = serialize(data);
-    }
-    return serialized;
-  }
-
-  getPaths(data, acc = {}, basePath = null) {
-    if (data === '::NULL::') return {};
-    if (!isObject(data)) {
-      acc[basePath || '::NULL::'] = this.serializeData(data);
-      return acc;
-    }
-    const source = isArray(data)
-      ? data.map((da, i) => [i, da])
-      : Object.entries(data);
-    const returnPaths = source.reduce((paths, [key, value]) => {
-      const path = this.getDelimitedPath(basePath, key, !isArray(value));
-      if (isObject(value)) this.getPaths(value, paths, path);
-      paths[path.toString()] = this.serializeData(value);
-      return paths;
-    }, acc || {});
-    return basePath
-      ? returnPaths
-      : { ...returnPaths, '::NULL::': this.serializeData(data) };
-  }
 };
