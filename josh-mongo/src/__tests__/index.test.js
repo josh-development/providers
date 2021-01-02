@@ -247,6 +247,11 @@ test("Database can push, remove, map, include and some", async () => {
   expect(await provider.get("array")).toEqual([1, 2, 3, 4, 5, "pushed"]);
   expect(await provider.remove("array", null, "pushed"));
   expect(await provider.get("array")).toEqual([1, 2, 3, 4, 5]);
+  expect(await provider.includes("array", null, 3)).toEqual(true);
+  expect(await provider.includes("array", null, 10)).toEqual(false);
+  expect(await provider.mapByFunction(([key]) => key)).toEqual(
+    await provider.keys()
+  );
 });
 
 test("Database can be deleted", async () => {
