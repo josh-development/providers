@@ -22,9 +22,9 @@ const Err = require('./error.js');
 const {
   getPaths,
   serializeData,
-  serialize,
-  isObject,
-  onChange,
+  // serialize,
+  // isObject,
+  // onChange,
 } = require('./utils.js');
 
 module.exports = class JoshProvider {
@@ -263,40 +263,40 @@ module.exports = class JoshProvider {
       );
     }
     switch (operation) {
-      case 'add':
-      case 'addition':
-      case '+':
-        result = base + operand;
-        break;
-      case 'sub':
-      case 'subtract':
-      case '-':
-        result = base - operand;
-        break;
-      case 'mult':
-      case 'multiply':
-      case '*':
-        result = base * operand;
-        break;
-      case 'div':
-      case 'divide':
-      case '/':
-        result = base / operand;
-        break;
-      case 'exp':
-      case 'exponent':
-      case '^':
-        result = Math.pow(base, operand);
-        break;
-      case 'mod':
-      case 'modulo':
-      case '%':
-        result = base % operand;
-        break;
-      case 'rand':
-      case 'random':
-        result = Math.floor(Math.random() * Math.floor(operand));
-        break;
+    case 'add':
+    case 'addition':
+    case '+':
+      result = base + operand;
+      break;
+    case 'sub':
+    case 'subtract':
+    case '-':
+      result = base - operand;
+      break;
+    case 'mult':
+    case 'multiply':
+    case '*':
+      result = base * operand;
+      break;
+    case 'div':
+    case 'divide':
+    case '/':
+      result = base / operand;
+      break;
+    case 'exp':
+    case 'exponent':
+    case '^':
+      result = Math.pow(base, operand);
+      break;
+    case 'mod':
+    case 'modulo':
+    case '%':
+      result = base % operand;
+      break;
+    case 'rand':
+    case 'random':
+      result = Math.floor(Math.random() * Math.floor(operand));
+      break;
     }
     return this.set(key, path, result);
   }
@@ -329,9 +329,9 @@ module.exports = class JoshProvider {
         path ? ' AND path = ?' : " AND path = '::NULL::'"
       } LIMIT 1;`,
     );
-    const results = path
-      ? query.get(serializeData(value), path)
-      : query.get(serializeData(value));
+    const results = path ?
+      query.get(serializeData(value), path) :
+      query.get(serializeData(value));
     return results ? { [results.key]: this.get(results.key) } : null;
   }
 
@@ -363,9 +363,9 @@ module.exports = class JoshProvider {
         path ? ' AND path = ?' : " AND path = '::NULL::'"
       }`,
     );
-    const rows = path
-      ? query.all(serializeData(value), path)
-      : query.all(serializeData(value));
+    const rows = path ?
+      query.all(serializeData(value), path) :
+      query.all(serializeData(value));
     return rows.reduce((acc, row) => {
       acc[row.key] = this.get(row.key);
       return acc;
@@ -551,9 +551,9 @@ module.exports = class JoshProvider {
     const executions = [];
     const currentData = this.has(key) ? this.get(key) : '::NULL::';
     const currentPaths = getPaths(currentData);
-    const paths = path
-      ? getPaths(_set(cloneDeep(currentData), path, newValue))
-      : getPaths(newValue);
+    const paths = path ?
+      getPaths(_set(cloneDeep(currentData), path, newValue)) :
+      getPaths(newValue);
 
     for (const [currentPath, value] of Object.entries(currentPaths)) {
       if (isNil(paths[currentPath]) || paths[currentPath] !== value) {
@@ -589,5 +589,4 @@ module.exports = class JoshProvider {
     );
     return this;
   }
-
 };

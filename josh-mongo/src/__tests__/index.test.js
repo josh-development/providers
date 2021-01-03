@@ -34,8 +34,7 @@ test('Database instance is valid', () => {
 
 test('Database can be initialized', async () => {
   await provider.init();
-  expect(provider.isInitialized).toBe(true);
-  await provider.bulkDelete();
+  await provider.clear();
   expect(await provider.count()).toBe(0);
 });
 
@@ -59,13 +58,22 @@ test('Database can be written to with all supported values', async () => {
   ).toEqual(provider);
   expect(await provider.set('null', null, null)).toEqual(provider);
 
+  expect(await provider.set('object', 'd', 5)).toEqual(provider);
+
   await provider.inc('number');
   expect(await provider.get('number')).toBe(43);
   await provider.dec('number');
   expect(await provider.get('number')).toBe(42);
+  await provider.inc('object', 'a');
+  expect(await provider.get('object', 'a')).toBe(2);
+  await provider.dec('object', 'a');
+  expect(await provider.get('object', 'a')).toBe(1);
 });
 
 test('Database can retrieve data points as expected', async () => {
+  expect(await provider.get('object')).toEqual({ a: 1, b: 2, c: 3, d: 5 });
+  expect(await provider.get('object', 'd')).toEqual(5);
+  expect(await provider.set('object', 'd', 4)).toEqual(provider);
   expect(await provider.get('object')).toEqual({ a: 1, b: 2, c: 3, d: 4 });
   expect(await provider.get('array')).toEqual([1, 2, 3, 4, 5]);
   expect(await provider.get('number')).toEqual(42);
@@ -78,6 +86,11 @@ test('Database can retrieve data points as expected', async () => {
     d: { 1: 'one', 2: 'two' },
   });
   expect(await provider.get('null')).toBeNull();
+  expect((await provider.random())[0].length).toEqual(2);
+  expect((await provider.random(2)).length).toEqual(2);
+  expect((await provider.randomKey()).length).toEqual(1);
+  expect((await provider.randomKey(2)).length).toEqual(2);
+  // expect(await provider.random()).toNotBeNull();
 });
 
 test('Database returns expected statistical properties', async () => {
@@ -108,16 +121,37 @@ test('Database returns expected statistical properties', async () => {
 });
 
 test('Database can act on many rows at a time', async () => {
-  expect(await provider.getMany(['number', 'boolean'])).toEqual({
-    number: 42,
-    boolean: false,
-  });
+  expect(await provider.getMany(['number', 'boolean'])).toEqual([
+    ['number', 42],
+    ['boolean', false],
+  ]);
+  expect(await provider.getAll()).toEqual([
+    ['object', { a: 1, b: 2, c: 3, d: 4 }],
+    ['array', [1, 2, 3, 4, 5]],
+    ['number', 42],
+    ['string', 'This is a string'],
+    ['boolean', false],
+    [
+      'complexobject',
+      {
+        a: 1,
+        b: 2,
+        c: [1, 2, 3, 4, { a: [1, 2, 3, 4] }],
+        d: { 1: 'one', 2: 'two' },
+      },
+    ],
+    ['null', null],
+  ]);
   expect(
     await provider.setMany([
       ['new1', 'new1'],
       ['new2', 'new2'],
     ]),
   ).toEqual(provider);
+  expect(await provider.setMany([['new1', 'new2']])).toEqual(provider);
+  expect(await provider.get('new1')).toBe('new1');
+  expect(await provider.setMany([['new1', 'new2']], true)).toEqual(provider);
+  expect(await provider.get('new1')).toBe('new2');
   expect(await provider.count()).toBe(9);
   expect((await provider.keys()).sort()).toEqual(
     [
@@ -135,11 +169,11 @@ test('Database can act on many rows at a time', async () => {
 });
 
 test('Database supports math operations', async () => {
-  await provider.math('number', 'multiply', 2);
+  await provider.math('number', null, 'multiply', 2);
   expect(await provider.get('number')).toBe(84);
-  await provider.math('number', 'divide', 4);
+  await provider.math('number', null, 'divide', 4);
   expect(await provider.get('number')).toBe(21);
-  await provider.math('number', 'add', 21);
+  await provider.math('number', null, 'add', 21);
   expect(await provider.get('number')).toBe(42);
 });
 
@@ -166,12 +200,70 @@ test('Database can delete values and data at paths', async () => {
   expect(await provider.count()).toBe(10);
   await provider.deleteMany(['del1', 'del2']);
   expect(await provider.count()).toBe(8);
+  await provider.delete('object', 'a');
+  expect(await provider.get('object', 'a')).toBe(undefined);
+  await provider.set('object', 'a', 1);
 });
 
-// test('Database can be deleted', async () => {
-//   await provider.bulkDelete();
-//   expect(await provider.count()).toBe(0);
-// });
+test('Database can loop, filter, find', async () => {
+  expect(await provider.filterByValue('b', 2)).toEqual([
+    ['object', { a: 1, b: 2, c: 3, d: 4 }],
+    [
+      'complexobject',
+      {
+        a: 1,
+        b: 2,
+        c: [1, 2, 3, 4, { a: [1, 2, 3, 4] }],
+        d: { 1: 'one', 2: 'two' },
+      },
+    ],
+  ]);
+  expect(await provider.filterByValue(null, 42)).toEqual([['number', 42]]);
+  expect(await provider.findByValue('c', 3)).toEqual([
+    'object',
+    {
+      a: 1,
+      b: 2,
+      c: 3,
+      d: 4,
+    },
+  ]);
+  expect(await provider.findByValue(null, 42)).toEqual(['number', 42]);
+  // add a bunch of rows for function filter/find
+  for (let i = 0; i < 200; i++) {
+    await provider.set(`object${i}`, 'count', Number(i));
+  }
+  expect(
+    Object.keys(await provider.filterByFunction((v) => v && v.count >= 100))
+      .length,
+  ).toBe(100);
+  expect((await provider.findByFunction((v) => v && v.count === 101))[0]).toBe(
+    'object101',
+  );
+});
+
+test('Database can push, remove, map, include, autoid and some', async () => {
+  expect(await provider.push('array', null, 'pushed')).toBe(provider);
+  expect(await provider.get('array')).toEqual([1, 2, 3, 4, 5, 'pushed']);
+  expect(await provider.remove('array', null, 'pushed'));
+  expect(await provider.get('array')).toEqual([1, 2, 3, 4, 5]);
+  expect(await provider.includes('array', null, 3)).toEqual(true);
+  expect(await provider.includes('array', null, 10)).toEqual(false);
+  expect(await provider.mapByFunction(([key]) => key)).toEqual(
+    await provider.keys(),
+  );
+  expect(await provider.someByValue(42)).toBe(true);
+  expect(await provider.someByValue(3, 'c')).toBe(true);
+  expect(await provider.someByFunction(([key]) => key == 'number')).toBe(true);
+  expect(await provider.everyByValue(42)).toBe(false);
+  expect(await provider.everyByFunction(([key]) => key != null)).toBe(true);
+  expect((await provider.autoId()) != (await provider.autoId())).toBe(true);
+});
+
+test('Database can be deleted', async () => {
+  await provider.clear();
+  expect(await provider.count()).toBe(0);
+});
 
 test('Database can be closed', async () => {
   await provider.close();
@@ -182,31 +274,3 @@ test("Database can't be used after close", async () => {
     'Connection to database not open',
   );
 });
-
-// test('Database can loop, filter, find', async () => {
-//   expect(provider.filterByValue('b', 2)).toEqual({
-//     object: { b: 2, c: 3, d: 4, e: 5 },
-//     complexobject: {
-//       a: 1,
-//       b: 2,
-//       c: [1, 2, 3, 4, { a: [1, 2, 3, 4] }],
-//       d: { 1: 'one', 2: 'two' },
-//     },
-//   });
-//   expect(provider.findByValue('c', 3)).toEqual({
-//     object: { b: 2, c: 3, d: 4, e: 5 },
-//   });
-//   // add a bunch of rows for function filter/find
-//   for (let i = 0; i < 200; i++) {
-//     provider.set(`object${i}`, { count: Number(i) });
-//   }
-//   expect(
-//     Object.keys(await provider.filterByFunction((v) => v && v.count >= 100))
-//       .length
-//   ).toBe(100);
-//   s;
-//   expect((await provider.findByFunction((v) => v && v.count === 101)).key).toBe(
-//     'object101'
-//   );
-//   // test: <query> (upcoming)
-// });

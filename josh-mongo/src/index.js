@@ -1,11 +1,10 @@
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 
-const { get: _get } = require('lodash');
+const { get: _get, unset, isFunction } = require('lodash');
 
 const Err = require('./error');
 
 class JoshProvider {
-
   constructor(options) {
     if (!options.name) {
       throw new Err('Must provide options.name', 'JoshTypeError');
@@ -39,24 +38,6 @@ class JoshProvider {
       useUnifiedTopology: true,
     }).catch((err) => console.error(err));
     this.db = this.client.db(this.dbName).collection(this.collection);
-    return true;
-  }
-
-  /**
-   * Get settings
-   * @returns {Object} Returns an object containing all settings
-   */
-  get settings() {
-    return {
-      name: this.dbName,
-    };
-  }
-
-  /**
-   * Check is database is initialized and connected
-   * @returns {boolean} Returns true if connected successfully
-   */
-  get isInitialized() {
     return this.client.isConnected();
   }
 
@@ -66,6 +47,14 @@ class JoshProvider {
    */
   close() {
     return this.client.close();
+  }
+  /**
+   * Clears and shuts down the underlying database.
+   * @returns {Promise} Promise resolves when finished closing
+   */
+  destroy() {
+    this.clear();
+    return this.close();
   }
 
   /**
@@ -80,7 +69,7 @@ class JoshProvider {
    * ```
    */
   async set(key, path, val) {
-    this.check([[key, ['String', 'Number']]]);
+    await this.check();
     if (!key) {
       throw new Error('Keys should be strings or numbers.');
     }
@@ -100,16 +89,20 @@ class JoshProvider {
 
   /**
    * Set many keys and values
-   * @param {Array} arr This is a key value array to be set in the database
+   * @param {Array} arr This is a [key, value, path] array to be set in the database
+   * @param {boolean} overwrite Whether or not to overwrite existing values or ignore
    * @example
    * ```
-   * await JoshProvider.setMany([ ["hello", "world"], ["josh": true] ])
+   * await JoshProvider.setMany([ ["hello", "world"], ["josh": true], ["foo", true, "alive"] ])
    * ```
    */
-  async setMany(arr) {
-    this.check([[arr, ['Array']]]);
-    for (const [key, val] of arr) {
-      await this.set(key, val);
+  async setMany(arr, overwrite) {
+    await this.check();
+    for (const [key, val, path = null] of arr) {
+      const found = await this.get(key, path);
+      if (!found || (found && overwrite)) {
+        await this.set(key, path, val);
+      }
     }
     return this;
   }
@@ -125,14 +118,19 @@ class JoshProvider {
    * ```
    */
   async get(key, path) {
-    this.check([[key, ['String', 'Number']]]);
+    await this.check();
     const data = await this.db.findOne({
       key: { $eq: key },
     });
     if (!path) return data && data.value;
-    return _get(data, path);
+    return _get(data.value, path);
   }
 
+  async getAll() {
+    await this.check();
+    const docs = await this.db.find({}).toArray();
+    return docs.map((doc) => [doc.key, doc.value]);
+  }
   /**
    * Fetch multiple keys from the database
    * @param {string[]} arr Multiple keys to fetch from the database
@@ -143,26 +141,23 @@ class JoshProvider {
    * ```
    */
   async getMany(arr) {
-    this.check([[arr, ['Array']]]);
-    const finalDocs = {};
+    await this.check();
     const docs = await this.db.find({ key: { $in: arr } }).toArray();
-    for (const doc of docs) {
-      finalDocs[doc.key] = doc.value;
-    }
-    return finalDocs;
+    return docs.map((doc) => [doc.key, doc.value]);
   }
 
   /**
    * Increment the value of a document by 1
    * @param {(string|number)} key The document key to increment
+   * @param {string} path The path in document to increment
    * @example
    * ```
    * await JoshProvider.inc("joshes")
    * ```
    */
-  async inc(key) {
-    this.check();
-    return this.set(key, null, await this.get(key) + 1);
+  async inc(key, path = null) {
+    await this.check(key, ['Number'], path);
+    return this.set(key, path, await this.get(key, path) + 1);
   }
 
   /**
@@ -175,26 +170,27 @@ class JoshProvider {
    * ```
    */
   count(query = {}) {
-    this.check();
     return this.db.countDocuments(query);
   }
 
   /**
    * Decrement the value of a document by 1
    * @param {(string|number)} key The document key to decrement
+   * @param {string} path The path in the document to decrement
    * @example
    * ```
    * await JoshProvider.dec("joshes")
    * ```
    */
-  async dec(key) {
-    this.check();
-    return this.set(key, null, await this.get(key) - 1);
+  async dec(key, path = null) {
+    await this.check(key, ['Number'], path);
+    return this.set(key, path, await this.get(key, path) - 1);
   }
 
   /**
    * Perform mathmatical operations on the value of a document
    * @param {(string|number)} key The document key to transform
+   * @param {string} path The path in document to transform
    * @param {string} operation Valid operations are add, subtract, multiply, divide, exponent, modulo and random
    * @param {number} operand The number to transform the value with
    * @example
@@ -204,17 +200,13 @@ class JoshProvider {
    * await JoshProvider.math('number', 'exp', 2) // exponent
    * ```
    */
-  async math(key, operation, operand) {
-    this.check([
-      [key, ['String', 'Number']],
-      [operation, ['String']],
-      [operand, ['Number']],
-    ]);
-    const base = await this.get(key);
+  async math(key, path = null, operation, operand) {
+    await this.check(key, ['Number'], path);
+    const base = await this.get(key, path);
     let result = null;
     if (!base || !operation || !operand) {
       throw new Err(
-        'Math operation requires base, operation and operand',
+        'Math operation requires base, operation and operand parameters',
         'JoshTypeError',
       );
     }
@@ -257,11 +249,24 @@ class JoshProvider {
       throw new Err('Please provide a valid operand', 'JoshTypeError');
     }
     if (result) {
-      await this.set(key, null, result);
+      await this.set(key, path, result);
     }
     return this;
   }
 
+  async random(count = 1) {
+    await this.check();
+    const docs = await this.db
+      .aggregate([{ $sample: { size: count } }])
+      .toArray();
+    return docs.map((doc) => [doc.key, doc.value]);
+  }
+
+  async randomKey(count = 1) {
+    await this.check();
+    const docs = await this.random(count);
+    return docs.map((doc) => doc[0]);
+  }
   /**
    * Fetch all keys within a query
    * @param {Object} query Query to filter the keys by
@@ -271,14 +276,10 @@ class JoshProvider {
    * await JoshProvider.keys()
    * ```
    */
-  keys(query = {}) {
-    this.check([[query, ['Object']]]);
-    return new Promise((resolve, reject) => {
-      this.db.find(query).toArray((err, docs) => {
-        if (err) reject(err);
-        resolve(docs.map((doc) => doc.key));
-      });
-    });
+  async keys(query = {}) {
+    await this.check();
+    const docs = await this.db.find(query).toArray();
+    return docs.map((doc) => doc.key);
   }
 
   /**
@@ -290,29 +291,32 @@ class JoshProvider {
    * await JoshProvider.values()
    * ```
    */
-  values(query = {}) {
-    this.check([[query, ['Object']]]);
-    return new Promise((resolve, reject) => {
-      this.db.find(query).toArray((err, docs) => {
-        if (err) reject(err);
-        resolve(docs.map((doc) => doc.value));
-      });
-    });
+  async values(query = {}) {
+    await this.check();
+    const docs = await this.db.find(query).toArray();
+    return docs.map((doc) => doc.value);
   }
 
   /**
    * Delete a document from the database
    * @param {(string|value)} key The document key to delete
+   * @param {(string)} path The path in the value to delete
    * @example
    * ```
    * await JoshProvider.delete("josh");
    * ```
    */
-  async delete(key) {
-    this.check([[key, ['String', 'Number']]]);
-    await this.db.deleteOne({
-      key: key,
-    });
+  async delete(key, path = null) {
+    await this.check();
+    if (!path || path.length === 0) {
+      await this.db.deleteOne({
+        key: key,
+      });
+    } else {
+      const value = await this.get(key);
+      unset(value, path);
+      await this.set(key, null, value);
+    }
     return this;
   }
 
@@ -325,38 +329,155 @@ class JoshProvider {
    * ```
    */
   async deleteMany(arr) {
-    this.check([[arr, ['Array']]]);
+    await this.check();
     const query = {
       $in: arr,
     };
     await this.db.deleteMany({ key: query });
     return this;
   }
+  async findByValue(path, value) {
+    await this.check();
+    const docs = await this.db.find({}).toArray();
+    for (const doc of docs) {
+      if (
+        !value ?
+          _get(doc.value, path) :
+          path ?
+            value == _get(doc.value, path) :
+            value == doc.value
+      ) {
+        return [doc.key, doc.value];
+      }
+    }
+  }
+  async findByFunction(fn) {
+    await this.check();
+    const docs = await this.db.find({}).toArray();
+    for (const doc of docs) {
+      if (fn(doc.value)) {
+        return [doc.key, doc.value];
+      }
+    }
+  }
+  async filterByValue(path, value) {
+    await this.check();
+    const docs = await this.getAll();
+    const finalDoc = [];
+    for (const [key, val] of docs) {
+      if (
+        !value ?
+          _get(val, path) :
+          path ?
+            value == _get(val, path) :
+            value == val
+      ) {
+        finalDoc.push([key, val]);
+      }
+    }
+    return finalDoc;
+  }
+  async filterByFunction(fn) {
+    await this.check();
+    const docs = await this.getAll();
+    const finalDoc = [];
+    for (const [key, value] of docs) {
+      if (fn(value)) {
+        finalDoc.push([key, value]);
+      }
+    }
+    return finalDoc;
+  }
+  async push(key, path, value, allowDupes) {
+    await this.check(key, ['Array'], path);
+    const data = await this.get(key, path);
+    if (!allowDupes && data.indexOf(value) > -1) return this;
+    data.push(value);
+    this.set(key, path, data);
+    return this;
+  }
+  async remove(key, path, val) {
+    await this.check(key, ['Array'], path);
+    const data = await this.get(key, path);
+    const criteria = isFunction(val) ? val : (value) => val === value;
+    const index = data.findIndex(criteria);
+    if (index > -1) {
+      data.splice(index, 1);
+      await this.set(key, path, data);
+    }
+    return this;
+  }
+  async mapByFunction(fn) {
+    await this.check();
+    let all = await this.getAll();
+    all = all.map(fn);
+    return all;
+  }
+  async includes(key, path = null, val) {
+    await this.check(key, ['Array'], path);
+    const data = await this.get(key, path);
+    if (!data) return;
+    const criteria = isFunction(val) ? val : (value) => val === value;
+    const index = data.findIndex(criteria);
+    return index > -1;
+  }
 
+  async someByValue(value, path) {
+    await this.check();
+    const docs = await this.getAll();
+    return docs.some((doc) =>
+      path ? _get(doc[1], path) == value : doc[1] == value,
+    );
+  }
+
+  async someByFunction(fn) {
+    await this.check();
+    const docs = await this.getAll();
+    return docs.some(fn);
+  }
+
+  async everyByValue(value, path) {
+    await this.check();
+    const docs = await this.getAll();
+    return docs.every((doc) =>
+      path ? _get(doc[1], path) == value : doc[1] == value,
+    );
+  }
+
+  async everyByFunction(fn) {
+    await this.check();
+    const all = await this.getAll();
+    return all.every(fn);
+  }
+  autoId() {
+    return new ObjectId().toString();
+  }
   /**
    * Deletes all entries in the database.
    * @return {Promise<*>} Promise returned by the database after deletion
    * @example
    * ```
-   * await JoshProvider.bulkDelete()
+   * await JoshProvider.clear()
    * ```
    */
-  async bulkDelete() {
-    this.check();
+  async clear() {
+    await this.check();
     await this.db.deleteMany({});
     return this;
   }
   /**
    * Check for key in database
    * @param {(string|number)} key The document key to check
+   * @param {string} path The path in document to check
    * @return {boolean} True if key is found in database
    * @example
    * ```
    * await JoshProvider.has("number")
    * ```
    */
-  async has(key) {
-    return await this.get(key) != null;
+  async has(key, path = null) {
+    await this.check();
+    return await this.get(key, path) != null;
   }
   /**
    * Internal method used to validate persistent josh names (valid Windows filenames)
@@ -368,25 +489,34 @@ class JoshProvider {
   }
 
   /**
-   * Internal method used to check validity of the database and input
+   * Internal method used to check validity of the database and value of doc to change
    * @param {Array} input Input to type check
    * @private
    */
-  check(input = []) {
-    if (!this.isInitialized) {
+  async check(key, type, path = null) {
+    if (!this.client.isConnected()) {
       throw new Err('Connection to database not open');
     }
-    for (const [key, expected] of input) {
-      if (!expected.includes(key.constructor.name)) {
-        throw new Err(
-          `Input of ${
-            key.constructor.name
-          } was invalid, the supported data types are: ${expected.join(', ')}`,
-        );
-      }
+    if (!key || !type) return;
+    const value = await this.get(key, path);
+    if (!value) {
+      throw new Err(
+        `The document "${key}" of path "${path}" was not found in the database`,
+        'JoshTypeError',
+      );
+    }
+    const valueType = value.constructor.name;
+    if (!type.includes(valueType)) {
+      throw new Err(
+        `The property ${
+          path ? `${path} ` : ''
+        }in key "${key}" is not of type "${type.join(
+          '" or "',
+        )}"(key was of type "${valueType}")`,
+        'JoshTypeError',
+      );
     }
   }
-
 }
 
 module.exports = JoshProvider;
