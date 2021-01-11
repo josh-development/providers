@@ -8,6 +8,6 @@ config.json
 .vscode
 data/
 out/
-# config-mongo.json
+config-private.json
 yarn.lock
 test.js

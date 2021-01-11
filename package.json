@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "jsdoc-to-markdown": "^6.0.1",
+    "limax": "^2.1.0"
+  }
+}

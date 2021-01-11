@@ -1,5 +1,6 @@
 const Provider = require('../index.js');
 const config = require('./config-mongo.json');
+const privateConfig = require('./config-private.json');
 /* config-mongo.json example contents
 {
   "name": "josh",
@@ -23,7 +24,9 @@ if (!config || !config.collection) {
   process.exit(1);
 }
 
-const provider = new Provider(config);
+const provider = new Provider(privateConfig || config);
+
+jest.setTimeout(30000);
 
 afterAll(() => provider.close());
 

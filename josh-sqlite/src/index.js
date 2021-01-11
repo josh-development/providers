@@ -116,10 +116,13 @@ module.exports = class JoshProvider {
   }
 
   getAll() {
-    const stmt = this.db.prepare(
-      `SELECT * FROM '${this.name}' WHERE path='::NULL::';`,
-    );
-    return stmt.all().map((row) => [row.key, this.parseData(row.value)]);
+    return this.db
+      .prepare(`SELECT * FROM '${this.name}' WHERE path='::NULL::';`)
+      .all()
+      .reduce((acc, row) => {
+        acc[row.key] = this.parseData(row.value);
+        return acc;
+      }, {});
   }
 
   getMany(keys) {
@@ -144,7 +147,9 @@ module.exports = class JoshProvider {
         }' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${Number(count)};`,
       )
       .all();
-    return count > 1 ? this.parseData(data) : this.parseData(data[0]);
+    return data.reduce((acc, row) => {
+      acc[row.key] = this.parseData(row.value);
+    }, {});
   }
 
   randomKey(count = 1) {
@@ -155,7 +160,7 @@ module.exports = class JoshProvider {
         }' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${Number(count)};`,
       )
       .all();
-    return count > 1 ? data.map((row) => row.key) : data[0].key;
+    return data.map((row) => row.key);
   }
 
   has(key, path) {
@@ -204,6 +209,23 @@ module.exports = class JoshProvider {
     return this;
   }
 
+  // TODO: Figure out how to make this similar to GET, make this take an object also.
+  setMany(data, overwrite) {
+    if (isNil(data) || data.constructor.name !== 'Array') {
+      throw new Error('Provided data was not an array of [key, value] pairs.');
+    }
+    const existingKeys = this.keys();
+
+    this.runMany(
+      flatten(
+        data
+          .filter(([key]) => overwrite || !existingKeys.includes(key))
+          .map(([key, value]) => this.compareData(key, value)),
+      ),
+    );
+    return this;
+  }
+
   delete(key, path) {
     this.check(key, 'Object');
     if (!path || path.length === 0) {
@@ -213,6 +235,17 @@ module.exports = class JoshProvider {
     const value = this.get(key);
     unset(value, path);
     this.set(key, null, value);
+    return this;
+  }
+
+  deleteMany(keys) {
+    this.db
+      .prepare(
+        `DELETE FROM '${this.name}' WHERE key IN (${'?, '
+          .repeat(keys.length)
+          .slice(0, -2)}) AND path='::NULL::';`,
+      )
+      .run(keys);
     return this;
   }
 
@@ -242,6 +275,13 @@ module.exports = class JoshProvider {
     return this;
   }
 
+  includes(key, val, path = null) {
+    const data = this.get(key, path);
+    const criteria = isFunction(val) ? val : (value) => val === value;
+    const index = data.findIndex(criteria);
+    return index > -1;
+  }
+
   inc(key, path) {
     this.check(key, ['Number'], path);
     return this.set(key, path, this.get(key, path) + 1);
@@ -249,11 +289,11 @@ module.exports = class JoshProvider {
 
   dec(key, path) {
     this.check(key, ['Number'], path);
-    this.set(key, path, this.get(key, path) - 1);
-    return this;
+    return this.set(key, path, this.get(key, path) - 1);
   }
 
   math(key, path, operation, operand) {
+    this.check(key, ['Number'], path);
     const base = this.get(key, path);
     let result = null;
     if (base == undefined || operation == undefined || operand == undefined) {
@@ -263,42 +303,54 @@ module.exports = class JoshProvider {
       );
     }
     switch (operation) {
-    case 'add':
-    case 'addition':
-    case '+':
-      result = base + operand;
-      break;
-    case 'sub':
-    case 'subtract':
-    case '-':
-      result = base - operand;
-      break;
-    case 'mult':
-    case 'multiply':
-    case '*':
-      result = base * operand;
-      break;
-    case 'div':
-    case 'divide':
-    case '/':
-      result = base / operand;
-      break;
-    case 'exp':
-    case 'exponent':
-    case '^':
-      result = Math.pow(base, operand);
-      break;
-    case 'mod':
-    case 'modulo':
-    case '%':
-      result = base % operand;
-      break;
-    case 'rand':
-    case 'random':
-      result = Math.floor(Math.random() * Math.floor(operand));
-      break;
+      case 'add':
+      case 'addition':
+      case '+':
+        result = base + operand;
+        break;
+      case 'sub':
+      case 'subtract':
+      case '-':
+        result = base - operand;
+        break;
+      case 'mult':
+      case 'multiply':
+      case '*':
+        result = base * operand;
+        break;
+      case 'div':
+      case 'divide':
+      case '/':
+        result = base / operand;
+        break;
+      case 'exp':
+      case 'exponent':
+      case '^':
+        result = Math.pow(base, operand);
+        break;
+      case 'mod':
+      case 'modulo':
+      case '%':
+        result = base % operand;
+        break;
+      case 'rand':
+      case 'random':
+        result = Math.floor(Math.random() * Math.floor(operand));
+        break;
     }
     return this.set(key, path, result);
+  }
+
+  findByValue(path, value) {
+    const query = this.db.prepare(
+      `SELECT key, value FROM '${this.name}' WHERE value = ?${
+        path ? ' AND path = ?' : " AND path = '::NULL::'"
+      } LIMIT 1;`,
+    );
+    const results = path
+      ? query.get(serializeData(value), path)
+      : query.get(serializeData(value));
+    return results ? { [results.key]: this.get(results.key) } : null;
   }
 
   async findByFunction(fn, path) {
@@ -323,16 +375,19 @@ module.exports = class JoshProvider {
     return null;
   }
 
-  findByValue(path, value) {
+  filterByValue(path, value) {
     const query = this.db.prepare(
       `SELECT key, value FROM '${this.name}' WHERE value = ?${
         path ? ' AND path = ?' : " AND path = '::NULL::'"
-      } LIMIT 1;`,
+      }`,
     );
-    const results = path ?
-      query.get(serializeData(value), path) :
-      query.get(serializeData(value));
-    return results ? { [results.key]: this.get(results.key) } : null;
+    const rows = path
+      ? query.all(serializeData(value), path)
+      : query.all(serializeData(value));
+    return rows.reduce((acc, row) => {
+      acc[row.key] = this.get(row.key);
+      return acc;
+    }, {});
   }
 
   async filterByFunction(fn, path) {
@@ -357,21 +412,6 @@ module.exports = class JoshProvider {
     return returnObject;
   }
 
-  filterByValue(path, value) {
-    const query = this.db.prepare(
-      `SELECT key, value FROM '${this.name}' WHERE value = ?${
-        path ? ' AND path = ?' : " AND path = '::NULL::'"
-      }`,
-    );
-    const rows = path ?
-      query.all(serializeData(value), path) :
-      query.all(serializeData(value));
-    return rows.reduce((acc, row) => {
-      acc[row.key] = this.get(row.key);
-      return acc;
-    }, {});
-  }
-
   mapByValue(path) {
     const rows = this.db
       .prepare(`SELECT key, value FROM '${this.name}' WHERE path = ?`)
@@ -381,26 +421,20 @@ module.exports = class JoshProvider {
 
   async mapByFunction(fn) {
     const all = this.getAll();
-    const promises = all.map(([key, value]) => fn(value, key));
+    const promises = Object.entries(all).map(([key, value]) => fn(value, key));
     return Promise.all(promises);
   }
 
-  includes(key, val, path = null) {
-    const data = this.get(key, path);
-    const criteria = isFunction(val) ? val : (value) => val === value;
-    const index = data.findIndex(criteria);
-    return index > -1;
-  }
-
-  someByPath(path, value) {
+  someByValue(path, value) {
     const row = this.db
       .prepare(
         `SELECT key FROM '${this.name}' WHERE path = ? AND value = ? LIMIT 1`,
       )
       .get(path, serializeData(value));
-    return row && row.key;
+    return !isNil(row);
   }
 
+  // TODO: Make this accept async functions
   someByFunction(fn) {
     const rows = this.db
       .prepare(`SELECT key, value FROM '${this.name}' WHERE path = '::NULL::';`)
@@ -410,7 +444,7 @@ module.exports = class JoshProvider {
       .some(([key, value], _, array) => fn(value, key, array));
   }
 
-  everyByPath(path, value) {
+  everyByValue(path, value) {
     const row = this.db
       .prepare(
         `SELECT key FROM '${this.name}' WHERE path = ? AND value = ? LIMIT 1`,
@@ -422,36 +456,15 @@ module.exports = class JoshProvider {
   async everyByFunction(fn) {
     const all = this.getAll();
     let answerCount = 0;
-    for (const [key, value] of all) {
+    const entries = Object.entries(all);
+    for (const [key, value] of entries) {
       if (await fn(value, key)) {
         answerCount++;
       } else {
         break;
       }
     }
-    return answerCount === all.length;
-  }
-
-  // reduce(fn(accumulator, current))
-
-  close() {
-    return this.db.close();
-  }
-
-  destroy() {
-    this.clear();
-    const transaction = this.db.transaction((run) => {
-      for (const stmt of run) {
-        this.db.prepare(stmt).run();
-      }
-    });
-
-    transaction([
-      `DROP TABLE IF EXISTS '${this.name}';`,
-      `DROP TABLE IF EXISTS 'internal::changes::${this.name}';`,
-      `DELETE FROM 'internal::autonum' WHERE josh = '${this.name}';`,
-    ]);
-    return null;
+    return answerCount === entries.length;
   }
 
   autoId() {
@@ -467,11 +480,24 @@ module.exports = class JoshProvider {
     return lastnum.toString();
   }
 
-  // query(opts) {
-  //   throw new Err('NOT IMPLEMENTED YET');
-  //   // const [query, values] = buildQuery(opts, this.name);
-  //   // console.log(query, values);
-  // }
+  close() {
+    return this.db.close();
+  }
+
+  destroy() {
+    this.clear();
+    const transaction = this.db.transaction((run) => {
+      for (const stmt of run) {
+        this.db.prepare(stmt).run();
+      }
+    });
+
+    transaction([
+      `DROP TABLE IF EXISTS '${this.name}';`,
+      `DELETE FROM 'internal::autonum' WHERE josh = '${this.name}';`,
+    ]);
+    return null;
+  }
 
   /* INTERNAL METHODS */
 
@@ -551,9 +577,9 @@ module.exports = class JoshProvider {
     const executions = [];
     const currentData = this.has(key) ? this.get(key) : '::NULL::';
     const currentPaths = getPaths(currentData);
-    const paths = path ?
-      getPaths(_set(cloneDeep(currentData), path, newValue)) :
-      getPaths(newValue);
+    const paths = path
+      ? getPaths(_set(cloneDeep(currentData), path, newValue))
+      : getPaths(newValue);
 
     for (const [currentPath, value] of Object.entries(currentPaths)) {
       if (isNil(paths[currentPath]) || paths[currentPath] !== value) {
@@ -571,22 +597,5 @@ module.exports = class JoshProvider {
       executions.push([this.insertStmt, { key, path: currentPath, value }]);
     }
     return executions;
-  }
-
-  // TODO: Figure out how to make this similar to GET,
-  setMany(data, overwrite) {
-    if (isNil(data) || data.constructor.name !== 'Array') {
-      throw new Error('Provided data was not an array of [key, value] pairs.');
-    }
-    const existingKeys = this.keys();
-
-    this.runMany(
-      flatten(
-        data
-          .filter(([key]) => overwrite || !existingKeys.includes(key))
-          .map(([key, value]) => this.compareData(key, value)),
-      ),
-    );
-    return this;
   }
 };
