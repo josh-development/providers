@@ -67,7 +67,7 @@ class JoshProvider {
   async getAll() {
     await this.check();
     const docs = await this.db.find({}).toArray();
-    return docs.map((doc) => [doc.key, doc.value]);
+    return this.cursorToObject(docs);
   }
   /**
    * Fetch multiple keys from the database
@@ -80,8 +80,8 @@ class JoshProvider {
    */
   async getMany(arr) {
     await this.check();
-    const docs = await this.db.find({ key: { $in: arr } }).toArray();
-    return docs.map((doc) => [doc.key, doc.value]);
+    const cursor = await this.db.find({ key: { $in: arr } }).toArray();
+    return this.cursorToObject(cursor);
   }
 
   async random(count = 1) {
@@ -89,13 +89,15 @@ class JoshProvider {
     const docs = await this.db
       .aggregate([{ $sample: { size: count } }])
       .toArray();
-    return docs.map((doc) => [doc.key, doc.value]);
+    return this.cursorToObject(docs);
   }
 
   async randomKey(count = 1) {
     await this.check();
-    const docs = await this.random(count);
-    return docs.map((doc) => doc[0]);
+    const docs = await this.db
+      .aggregate([{ $sample: { size: count } }])
+      .toArray();
+    return docs.map(doc => doc.key);
   }
 
   /**
@@ -195,12 +197,12 @@ class JoshProvider {
    * await JoshProvider.setMany([ ["hello", "world"], ["josh": true], ["foo", true, "alive"] ])
    * ```
    */
-  async setMany(arr, overwrite) {
+  async setMany(obj, overwrite) {
     await this.check();
-    for (const [key, val, path = null] of arr) {
-      const found = await this.get(key, path);
+    for (const [key, val] of Object.entries(obj)) {
+      const found = await this.get(key);
       if (!found || (found && overwrite)) {
-        await this.set(key, path, val);
+        await this.set(key, null, val);
       }
     }
     return this;
@@ -223,6 +225,7 @@ class JoshProvider {
       });
     } else {
       const value = await this.get(key);
+      // TODO : Make this work for arrays (null value)
       unset(value, path);
       await this.set(key, null, value);
     }
@@ -413,7 +416,7 @@ class JoshProvider {
 
   async filterByValue(path, value) {
     await this.check();
-    const docs = await this.getAll();
+    const docs = await this.getAsArray();
     const finalDoc = [];
     for (const [key, val] of docs) {
       if (
@@ -431,9 +434,9 @@ class JoshProvider {
 
   async filterByFunction(fn) {
     await this.check();
-    const docs = await this.getAll();
+    const docs = await this.getAsArray();
     const finalDoc = [];
-    for (const [key, value] of docs) {
+    for (const { key, value } of docs) {
       if (fn(value)) {
         finalDoc.push([key, value]);
       }
@@ -448,37 +451,37 @@ class JoshProvider {
 
   async mapByFunction(fn) {
     await this.check();
-    let all = await this.getAll();
-    all = all.map(fn);
+    let all = await this.getAsArray();
+    all = all.map(({key, value}) => fn(value, key));
     return all;
   }
 
   async someByValue(value, path) {
     await this.check();
-    const docs = await this.getAll();
+    const docs = await this.getAsArray();
     return docs.some((doc) =>
-      path ? _get(doc[1], path) == value : doc[1] == value,
+      path ? _get(doc.value, path) == value : doc.value == value,
     );
   }
 
   async someByFunction(fn) {
     await this.check();
-    const docs = await this.getAll();
-    return docs.some(fn);
+    const docs = await this.getAsArray();
+    return docs.some(({ key, value }) => fn(value, key));
   }
 
   async everyByValue(value, path) {
     await this.check();
-    const docs = await this.getAll();
+    const docs = await this.getAsArray();
     return docs.every((doc) =>
-      path ? _get(doc[1], path) == value : doc[1] == value,
+      path ? _get(doc.value, path) == value : doc.value == value,
     );
   }
 
   async everyByFunction(fn) {
     await this.check();
-    const all = await this.getAll();
-    return all.every(fn);
+    const all = await this.getAsArray();
+    return all.every(({ key, value }) => fn(value, key));
   }
 
   autoId() {
@@ -539,6 +542,18 @@ class JoshProvider {
         'JoshTypeError',
       );
     }
+  }
+
+  cursorToObject(data) {
+    return data.reduce((acc, curr) => {
+      acc[curr.key] = curr.value;
+      return acc
+    }, {});
+  }
+
+  async getAsArray() {
+    await this.check();
+    return this.db.find({}).toArray();
   }
 }
 
