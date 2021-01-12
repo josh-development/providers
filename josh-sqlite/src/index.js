@@ -155,7 +155,7 @@ module.exports = class JoshProvider {
   randomKey(count = 1) {
     const data = this.db
       .prepare(
-        `SELECT rowid FROM '${
+        `SELECT key FROM '${
           this.name
         }' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${Number(count)};`,
       )
