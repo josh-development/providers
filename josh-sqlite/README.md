@@ -26,9 +26,9 @@ is ready for that.
 In your project folder, assuming the above pre-requisites are followed, you should be able to just install using this command: 
 
 ```
-npm i @josh-providers/sqlite
+npm i @joshdb/sqlite
 ** OR **
-yarn add @josh-providers/sqlite
+yarn add @joshdb/sqlite
 ```
 
 ## Usage
@@ -36,8 +36,8 @@ yarn add @josh-providers/sqlite
 Using the sqlite provider goes as such: 
 
 ```js
-const Josh = require('josh');
-const JoshSQlite = require('@josh-providers/sqlite');
+const Josh = require('@joshdb/core');
+const JoshSQlite = require('@joshdb/sqlite');
 
 const db = new Josh({
   name: 'testing',

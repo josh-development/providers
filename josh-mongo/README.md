@@ -15,9 +15,9 @@ If you don't know, or don't *want*, to host a Mongo DB server instance, you can 
 In your project folder, you should be able to install using this command: 
 
 ```
-npm i @josh-providers/mongo
+npm i @joshdb/mongo
 ** OR **
-yarn add @josh-providers/mongo
+yarn add @joshdb/mongo
 ```
 
 ## Usage
@@ -25,8 +25,8 @@ yarn add @josh-providers/mongo
 Using the mongo provider goes as such: 
 
 ```js
-const Josh = require('josh');
-const JoshMongo = require('@josh-providers/mongo');
+const Josh = require('@joshdb/core');
+const JoshMongo = require('@joshdb/mongo');
 
 const db = new Josh({
   name: 'testing',
