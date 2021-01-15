@@ -1,0 +1,31 @@
+{
+  "name": "@josh-providers/mongo",
+  "version": "1.1.0",
+  "description": "MongoDB Provider for JOSH",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint src/*.js --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eslachance/josh.git"
+  },
+  "author": "Evelyne Lachance",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/eslachance/josh/issues"
+  },
+  "homepage": "https://github.com/eslachance/josh#readme",
+  "dependencies": {
+    "atomically": "^1.7.0",
+    "uuid": "^8.3.2",
+    "write-file-atomic": "^3.0.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.15",
+    "eslint": "6.8.0",
+    "eslint-plugin-jest": "^24.1.0",
+    "jest": "^26.2.2"
+  }
+}
