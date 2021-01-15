@@ -1,7 +1,7 @@
 {
-  "name": "@joshdb/sqlite",
-  "version": "1.1.1",
-  "description": "SQLite Provider for JOSH",
+  "name": "@josh-providers/https",
+  "version": "1.0.0",
+  "description": "HTTPS Provider for JOSH",
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
@@ -19,8 +19,8 @@
   },
   "homepage": "https://josh.evie.dev/",
   "dependencies": {
-    "better-sqlite3": "^7.1.0",
     "lodash": "^4.17.15",
+    "node-fetch": "^2.6.1",
     "on-change": "^2.1.2",
     "serialize-javascript": "^5.0.1"
   },
