@@ -1,7 +1,7 @@
 {
-  "name": "@josh-providers/mongo",
-  "version": "1.1.0",
-  "description": "MongoDB Provider for JOSH",
+  "name": "@josh/json",
+  "version": "1.0.0",
+  "description": "JSON Provider for JOSH",
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/eslachance/josh.git"
   },
-  "author": "Evelyne Lachance",
+  "author": "Evelyne Lachance,DanCodes",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/eslachance/josh/issues"
