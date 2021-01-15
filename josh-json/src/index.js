@@ -2,13 +2,14 @@ const { get: _get, set: _set, unset, isFunction } = require('lodash');
 const Err = require('./error');
 const { FileManager } = require('./files.js');
 const uuidv4 = require('uuid').v4;
+const path = require('path');
 
 class JoshProvider {
   constructor(options = {}) {
     this.options = options;
-    this.dir = this.options.dataDir
-      ? path.resolve(this.options.dataDir)
-      : './data';
+    this.dir = this.options.dataDir ?
+      path.resolve(this.options.dataDir) :
+      './data';
     this.files = new FileManager(this.dir, options.providerOptions);
   }
   /**
@@ -67,7 +68,7 @@ class JoshProvider {
     const final = {};
     if (docs.length === 0) return {};
     for (let n = 0; n < count; n++) {
-      let [key, val] = docs[Math.floor(Math.random() * docs.length)];
+      const [key, val] = docs[Math.floor(Math.random() * docs.length)];
       final[key] = val;
     }
     return final;
@@ -91,7 +92,7 @@ class JoshProvider {
    */
   async has(key, path = null) {
     await this.check();
-    return (await this.get(key, path)) != null;
+    return await this.get(key, path) != null;
   }
 
   /**
@@ -121,7 +122,7 @@ class JoshProvider {
   async values() {
     await this.check();
     const docs = await this.files.getData();
-    return Object.entries(docs).map(([key, val]) => val);
+    return Object.entries(docs).map((doc) => doc[1]);
   }
 
   /**
@@ -133,7 +134,7 @@ class JoshProvider {
    * await JoshProvider.count()
    * ```
    */
-  async count(query = {}) {
+  async count() {
     return await this.files.getCount();
   }
 
@@ -153,7 +154,7 @@ class JoshProvider {
     if (!key) {
       throw new Error('Keys should be strings or numbers.');
     }
-    let data = (await this.files.getData(key)) || {};
+    let data = await this.files.getData(key) || {};
     if (path) {
       _set(data, path, val);
     } else {
@@ -165,7 +166,7 @@ class JoshProvider {
 
   /**
    * Set many keys and values
-   * @param {Array} arr This is a [key, value, path] array to be set in the database
+   * @param {Object} obj This is a {key: value} object to be set in the database
    * @param {boolean} overwrite Whether or not to overwrite existing values or ignore
    * @example
    * ```
@@ -216,7 +217,7 @@ class JoshProvider {
    */
   async deleteMany(arr) {
     await this.check();
-    for (let key of arr) {
+    for (const key of arr) {
       await this.delete(key);
     }
     return this;
@@ -277,7 +278,7 @@ class JoshProvider {
    */
   async inc(key, path = null) {
     await this.check(key, ['Number'], path);
-    return this.set(key, path, (await this.get(key, path)) + 1);
+    return this.set(key, path, await this.get(key, path) + 1);
   }
 
   /**
@@ -291,7 +292,7 @@ class JoshProvider {
    */
   async dec(key, path = null) {
     await this.check(key, ['Number'], path);
-    return this.set(key, path, (await this.get(key, path)) - 1);
+    return this.set(key, path, await this.get(key, path) - 1);
   }
 
   /**
@@ -318,42 +319,42 @@ class JoshProvider {
       );
     }
     switch (operation) {
-      case 'add':
-      case 'addition':
-      case '+':
-        result = base + operand;
-        break;
-      case 'sub':
-      case 'subtract':
-      case '-':
-        result = base - operand;
-        break;
-      case 'mult':
-      case 'multiply':
-      case '*':
-        result = base * operand;
-        break;
-      case 'div':
-      case 'divide':
-      case '/':
-        result = base / operand;
-        break;
-      case 'exp':
-      case 'exponent':
-      case '^':
-        result = Math.pow(base, operand);
-        break;
-      case 'mod':
-      case 'modulo':
-      case '%':
-        result = base % operand;
-        break;
-      case 'rand':
-      case 'random':
-        result = Math.floor(Math.random() * Math.floor(operand));
-        break;
-      default:
-        throw new Err('Please provide a valid operand', 'JoshTypeError');
+    case 'add':
+    case 'addition':
+    case '+':
+      result = base + operand;
+      break;
+    case 'sub':
+    case 'subtract':
+    case '-':
+      result = base - operand;
+      break;
+    case 'mult':
+    case 'multiply':
+    case '*':
+      result = base * operand;
+      break;
+    case 'div':
+    case 'divide':
+    case '/':
+      result = base / operand;
+      break;
+    case 'exp':
+    case 'exponent':
+    case '^':
+      result = Math.pow(base, operand);
+      break;
+    case 'mod':
+    case 'modulo':
+    case '%':
+      result = base % operand;
+      break;
+    case 'rand':
+    case 'random':
+      result = Math.floor(Math.random() * Math.floor(operand));
+      break;
+    default:
+      throw new Err('Please provide a valid operand', 'JoshTypeError');
     }
     if (result) {
       await this.set(key, path, result);
@@ -369,11 +370,11 @@ class JoshProvider {
     }));
     for (const doc of docs) {
       if (
-        !value
-          ? _get(doc.value, path)
-          : path
-          ? value == _get(doc.value, path)
-          : value == doc.value
+        !value ?
+          _get(doc.value, path) :
+          path ?
+            value == _get(doc.value, path) :
+            value == doc.value
       ) {
         return [doc.key, doc.value];
       }
@@ -399,11 +400,11 @@ class JoshProvider {
     const finalDoc = [];
     for (const [key, val] of docs) {
       if (
-        !value
-          ? _get(val, path)
-          : path
-          ? value == _get(val, path)
-          : value == val
+        !value ?
+          _get(val, path) :
+          path ?
+            value == _get(val, path) :
+            value == val
       ) {
         finalDoc.push([key, val]);
       }
@@ -423,7 +424,7 @@ class JoshProvider {
     return finalDoc;
   }
 
-  async mapByValue(path) {
+  async mapByValue() {
     await this.check();
     throw new Error('Not yet implemented');
   }
