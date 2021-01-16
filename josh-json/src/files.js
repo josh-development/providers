@@ -2,7 +2,7 @@ const atomic = require('atomically');
 const path = require('path');
 const { serializeData, parseData } = require('./utils');
 const fs = require('fs');
-const { isEqual } = require('lodash');
+const { isEqual, get: _get } = require('lodash');
 class FileManager {
   constructor(dir, opts) {
     this.options = opts || {};
@@ -11,6 +11,15 @@ class FileManager {
       fs.mkdirSync(dir);
     } catch {
       // don't need to do anything
+    }
+  }
+  async has(key, path) {
+    let index = await this.getFile('index.json');
+    if (!path) {
+      return index.files.find((x) => x.keys.includes(key)) != null;
+    } else {
+      let data = await this.getData(key);
+      return _get(data, path) != undefined;
     }
   }
   async getIndex(key) {
@@ -59,7 +68,7 @@ class FileManager {
     }
     let all = {};
     for (const file of index.files) {
-      all = { ...all, ...await this.getFile(file.location) };
+      all = { ...all, ...(await this.getFile(file.location)) };
     }
     return all;
   }
@@ -118,7 +127,7 @@ class FileManager {
   }
   async getCount() {
     const index = await this.getIndex();
-    return index.files.reduce((prev, curr) => prev += curr.keys.length, 0);
+    return index.files.reduce((prev, curr) => (prev += curr.keys.length), 0);
   }
 }
 module.exports = { FileManager };
