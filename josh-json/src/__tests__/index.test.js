@@ -1,22 +1,4 @@
 const Provider = require('../index.js');
-// const privateConfig = require('./config-private.json');
-/* config-mongo.json example contents
-{
-  "name": "josh",
-  "url": "mongodb+srv://<username>:<password>@cluster0.0zbvd.mongodb.net/<dbName>?retryWrites=true&w=majority"
-}
-
-NOTES:
-- The above refers to using Mongo Atlas for testing. Make sure to use the full URL that results from going to:
-  - Your Cluster
-  - Command Line Tools
-  - Connect Instructions
-  - Connection your Application (2nd option)
-  - Select NodeJS Driver, version 3.0
-  - Copy that string, replacing the username,password,dbname as necessary.
-
-- This testing WILL DELETE THE ENTIRE COLLECTION CONTENT, so do NOT connect this to a live collection OMG what's wrong with you!
-*/
 
 const provider = new Provider();
 
@@ -26,7 +8,6 @@ afterAll(() => provider.close());
 
 test('Database instance is valid', () => {
   expect(provider).not.toBe(null);
-  expect(provider.collection).toBe('josh');
 });
 
 test('Database can be initialized', async () => {
@@ -83,10 +64,10 @@ test('Database can retrieve data points as expected', async () => {
     d: { 1: 'one', 2: 'two' },
   });
   expect(await provider.get('null')).toBeNull();
-  expect((await provider.random())[0].length).toEqual(2);
-  expect((await provider.random(2)).length).toEqual(2);
-  expect((await provider.randomKey()).length).toEqual(1);
-  expect((await provider.randomKey(2)).length).toEqual(2);
+  expect(Object.entries(await provider.random()).length).toBe(1);
+  expect(Object.entries(await provider.random(2)).length).toEqual(2);
+  expect(Object.entries(await provider.randomKey()).length).toEqual(1);
+  expect(Object.entries(await provider.randomKey(2)).length).toEqual(2);
   // expect(await provider.random()).toNotBeNull();
 });
 
@@ -118,36 +99,35 @@ test('Database returns expected statistical properties', async () => {
 });
 
 test('Database can act on many rows at a time', async () => {
-  expect(await provider.getMany(['number', 'boolean'])).toEqual([
-    ['number', 42],
-    ['boolean', false],
-  ]);
-  expect(await provider.getAll()).toEqual([
-    ['object', { a: 1, b: 2, c: 3, d: 4 }],
-    ['array', [1, 2, 3, 4, 5]],
-    ['number', 42],
-    ['string', 'This is a string'],
-    ['boolean', false],
-    [
-      'complexobject',
-      {
-        a: 1,
-        b: 2,
-        c: [1, 2, 3, 4, { a: [1, 2, 3, 4] }],
-        d: { 1: 'one', 2: 'two' },
-      },
-    ],
-    ['null', null],
-  ]);
+  expect(await provider.getMany(['number', 'boolean'])).toEqual({
+    number: 42,
+    boolean: false,
+  });
+  expect(await provider.getAll()).toEqual({
+    object: { a: 1, b: 2, c: 3, d: 4 },
+    array: [1, 2, 3, 4, 5],
+    number: 42,
+    string: 'This is a string',
+    boolean: false,
+
+    complexobject: {
+      a: 1,
+      b: 2,
+      c: [1, 2, 3, 4, { a: [1, 2, 3, 4] }],
+      d: { 1: 'one', 2: 'two' },
+    },
+
+    null: null,
+  });
   expect(
-    await provider.setMany([
-      ['new1', 'new1'],
-      ['new2', 'new2'],
-    ]),
+    await provider.setMany({
+      new1: 'new1',
+      new2: 'new2',
+    }),
   ).toEqual(provider);
-  expect(await provider.setMany([['new1', 'new2']])).toEqual(provider);
+  expect(await provider.setMany({ new1: 'new2' })).toEqual(provider);
   expect(await provider.get('new1')).toBe('new1');
-  expect(await provider.setMany([['new1', 'new2']], true)).toEqual(provider);
+  expect(await provider.setMany({ new1: 'new2' }, true)).toEqual(provider);
   expect(await provider.get('new1')).toBe('new2');
   expect(await provider.count()).toBe(9);
   expect((await provider.keys()).sort()).toEqual(
@@ -190,10 +170,10 @@ test('Database can delete values and data at paths', async () => {
     ].sort(),
   );
 
-  await provider.setMany([
-    ['del1', 'del1'],
-    ['del2', 'del2'],
-  ]);
+  await provider.setMany({
+    del1: 'del1',
+    del2: 'del2',
+  });
   expect(await provider.count()).toBe(10);
   await provider.deleteMany(['del1', 'del2']);
   expect(await provider.count()).toBe(8);
@@ -246,14 +226,16 @@ test('Database can push, remove, map, include, autoid and some', async () => {
   expect(await provider.get('array')).toEqual([1, 2, 3, 4, 5]);
   expect(await provider.includes('array', null, 3)).toEqual(true);
   expect(await provider.includes('array', null, 10)).toEqual(false);
-  expect(await provider.mapByFunction(([key]) => key)).toEqual(
-    await provider.keys(),
+  expect(await provider.mapByFunction((value) => value)).toEqual(
+    await provider.values(),
   );
   expect(await provider.someByValue(42)).toBe(true);
   expect(await provider.someByValue(3, 'c')).toBe(true);
-  expect(await provider.someByFunction(([key]) => key == 'number')).toBe(true);
+  expect(
+    await provider.someByFunction((value, key) => value && key == 'number'),
+  ).toBe(true);
   expect(await provider.everyByValue(42)).toBe(false);
-  expect(await provider.everyByFunction(([key]) => key != null)).toBe(true);
+  expect(await provider.everyByFunction((value) => value != 'WOAH')).toBe(true);
   expect((await provider.autoId()) != (await provider.autoId())).toBe(true);
 });
 
@@ -268,6 +250,6 @@ test('Database can be closed', async () => {
 
 test("Database can't be used after close", async () => {
   await expect(provider.set('test', null, 'test')).rejects.toThrowError(
-    'Connection to database not open',
+    'Database has been closed',
   );
 });

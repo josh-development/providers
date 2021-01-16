@@ -37,3 +37,4 @@ jobs:
       - run: npm i -g yarn
       - run: cd josh-sqlite; yarn; yarn test; yarn lint;
       - run: cd josh-mongo; yarn; yarn test; yarn lint
+      - run: cd josh-json; yarn; yarn test; yarn lint
