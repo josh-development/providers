@@ -19,13 +19,14 @@
   "homepage": "https://github.com/eslachance/josh#readme",
   "dependencies": {
     "atomically": "^1.7.0",
+    "serialize-javascript": "^5.0.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "on-change": "^2.2.2",
     "@types/jest": "^26.0.15",
     "eslint": "6.8.0",
     "eslint-plugin-jest": "^24.1.0",
-    "jest": "^26.2.2"
+    "jest": "^26.2.2",
+    "on-change": "^2.2.2"
   }
 }
