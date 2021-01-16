@@ -18,7 +18,7 @@ Using the JSON provider goes as such:
 
 ```js
 const Josh = require('josh');
-const JoshJSON = require('@josh/json');
+const JoshJSON = require('@joshdb/json');
 
 const db = new Josh({
   name: 'testing',
