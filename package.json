@@ -3,7 +3,5 @@
     "jsdoc-to-markdown": "^6.0.1",
     "limax": "^2.1.0"
   },
-  "dependencies": {
-    "on-change": "^2.2.2"
-  }
+  "dependencies": {}
 }
