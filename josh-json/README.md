@@ -7,9 +7,9 @@ The JSON provider uses the `atomically` module for persistent storage of JOSH da
 In your project folder, you should be able to install using this command:
 
 ```
-npm i @josh/json
+npm i @joshdb/json
 ** OR **
-yarn add @josh/json
+yarn add @joshdb/json
 ```
 
 ## Usage
@@ -18,7 +18,7 @@ Using the JSON provider goes as such:
 
 ```js
 const Josh = require('josh');
-const JoshJSON = require('@josh/json');
+const JoshJSON = require('@joshdb/json');
 
 const db = new Josh({
   name: 'testing',
