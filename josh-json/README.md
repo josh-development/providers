@@ -7,7 +7,7 @@ The JSON provider uses the `atomically` module for persistent storage of JOSH da
 In your project folder, you should be able to install using this command:
 
 ```
-npm i @josh/json
+npm i @joshdb/json
 ** OR **
 yarn add @josh/json
 ```
