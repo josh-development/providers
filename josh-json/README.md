@@ -9,7 +9,7 @@ In your project folder, you should be able to install using this command:
 ```
 npm i @joshdb/json
 ** OR **
-yarn add @josh/json
+yarn add @joshdb/json
 ```
 
 ## Usage
