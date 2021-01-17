@@ -1,44 +1,24 @@
-const { MongoClient, ObjectId } = require('mongodb');
-
-const { get: _get, unset, isFunction } = require('lodash');
-
+const { get: _get, set: _set, unset, isFunction } = require('lodash');
 const Err = require('./error');
+const { FileManager } = require('./files.js');
+const uuidv4 = require('uuid').v4;
+const path = require('path');
 
 class JoshProvider {
-  constructor(options) {
-    if (!options.name) {
-      throw new Err('Must provide options.name', 'JoshTypeError');
-    }
-    this.name = options.name;
-    if (!options.collection) {
-      throw new Err('Must provide options.collection', 'JoshTypeError');
-    }
-    this.collection = options.collection;
-    this.validateName();
-    this.auth =
-      options.user && options.password ?
-        `${options.user}:${options.password}@` :
-        '';
-    this.dbName = options.dbName || 'josh';
-    this.port = options.port || 27017;
-    this.host = options.host || 'localhost';
-    this.url =
-      options.url ||
-      `mongodb://${this.auth}${this.host}:${this.port}/${this.dbName}`;
+  constructor(options = {}) {
+    this.options = options;
+    this.dir = this.options.dataDir ?
+      path.resolve(this.options.dataDir) :
+      './data';
+    this.files = new FileManager(this.dir, options.providerOptions);
   }
-
   /**
    * Internal method called on persistent joshs to load data from the underlying database.
    * @param {Map} josh In order to set data to the josh, one must be provided.
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
   async init() {
-    this.client = await MongoClient.connect(this.url, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }).catch((err) => console.error(err));
-    this.db = this.client.db(this.dbName).collection(this.collection);
-    return this.client.isConnected();
+    return true;
   }
 
   /**
@@ -51,19 +31,15 @@ class JoshProvider {
    * await JoshProvider.get("josh")
    * ```
    */
-  async get(key, path) {
-    await this.check();
-    const data = await this.db.findOne({
-      key: { $eq: key },
-    });
-    if (!path) return data && data.value;
-    return _get(data.value, path);
+  async get(key, path = null) {
+    const data = await this.files.getData(key);
+    return path ? _get(data, path) : data;
   }
 
   async getAll() {
     await this.check();
-    const docs = await this.db.find({}).toArray();
-    return this.cursorToObject(docs);
+    const data = await this.files.getData();
+    return data;
   }
   /**
    * Fetch multiple keys from the database
@@ -76,24 +52,34 @@ class JoshProvider {
    */
   async getMany(arr) {
     await this.check();
-    const cursor = await this.db.find({ key: { $in: arr } }).toArray();
-    return this.cursorToObject(cursor);
+    const data = await this.files.getData();
+    const final = {};
+    Object.entries(data).forEach(([key, val]) => {
+      if (arr.includes(key)) {
+        final[key] = val;
+      }
+    });
+    return final;
   }
 
   async random(count = 1) {
     await this.check();
-    const docs = await this.db
-      .aggregate([{ $sample: { size: count } }])
-      .toArray();
-    return this.cursorToObject(docs);
+    let docs = Object.entries(await this.getAll()) || [];
+    const final = {};
+    if (docs.length === 0) return {};
+    for (let n = 0; n < count; n++) {
+      const idx = Math.floor(Math.random() * docs.length);
+      const [key, val] = docs[idx];
+      docs = docs.filter((x) => x[0] != key);
+      final[key] = val;
+    }
+    return final;
   }
 
   async randomKey(count = 1) {
     await this.check();
-    const docs = await this.db
-      .aggregate([{ $sample: { size: count } }])
-      .toArray();
-    return docs.map((doc) => doc.key);
+    const docs = Object.entries(await this.random(count));
+    return docs.map(([key]) => key);
   }
 
   /**
@@ -108,7 +94,7 @@ class JoshProvider {
    */
   async has(key, path = null) {
     await this.check();
-    return await this.get(key, path) != null;
+    return await this.files.has(key, path);
   }
 
   /**
@@ -120,10 +106,10 @@ class JoshProvider {
    * await JoshProvider.keys()
    * ```
    */
-  async keys(query = {}) {
+  async keys() {
     await this.check();
-    const docs = await this.db.find(query).toArray();
-    return docs.map((doc) => doc.key);
+    const docs = await this.files.getData();
+    return Object.entries(docs).map(([key]) => key);
   }
 
   /**
@@ -135,10 +121,10 @@ class JoshProvider {
    * await JoshProvider.values()
    * ```
    */
-  async values(query = {}) {
+  async values() {
     await this.check();
-    const docs = await this.db.find(query).toArray();
-    return docs.map((doc) => doc.value);
+    const docs = await this.files.getData();
+    return Object.entries(docs).map((doc) => doc[1]);
   }
 
   /**
@@ -150,8 +136,8 @@ class JoshProvider {
    * await JoshProvider.count()
    * ```
    */
-  async count(query = {}) {
-    return this.db.countDocuments(query);
+  async count() {
+    return await this.files.getCount();
   }
 
   /**
@@ -170,23 +156,19 @@ class JoshProvider {
     if (!key) {
       throw new Error('Keys should be strings or numbers.');
     }
-    await this.db.findOneAndUpdate(
-      {
-        key: { $eq: key },
-      },
-      {
-        $set: { key, [`${path ? `value.${path}` : 'value'}`]: val },
-      },
-      {
-        upsert: true,
-      },
-    );
+    let data = await this.files.getData(key) || {};
+    if (path) {
+      _set(data, path, val);
+    } else {
+      data = val;
+    }
+    await this.files.setData(key, data);
     return this;
   }
 
   /**
    * Set many keys and values
-   * @param {Object} obj  This is a [key, value, path] array to be set in the database
+   * @param {Object} obj This is a {key: value} object to be set in the database
    * @param {boolean} overwrite Whether or not to overwrite existing values or ignore
    * @example
    * ```
@@ -215,16 +197,15 @@ class JoshProvider {
    */
   async delete(key, path = null) {
     await this.check();
+    const data = await this.files.getData(key);
     if (!path || path.length === 0) {
-      await this.db.deleteOne({
-        key: key,
-      });
+      await this.files.deleteData(key);
+      return this;
     } else {
-      const value = await this.get(key);
       // TODO : Make this work for arrays (null value)
-      unset(value, path);
-      await this.set(key, null, value);
+      unset(data, path);
     }
+    await this.set(key, null, data);
     return this;
   }
 
@@ -238,10 +219,9 @@ class JoshProvider {
    */
   async deleteMany(arr) {
     await this.check();
-    const query = {
-      $in: arr,
-    };
-    await this.db.deleteMany({ key: query });
+    for (const key of arr) {
+      await this.delete(key);
+    }
     return this;
   }
 
@@ -255,7 +235,7 @@ class JoshProvider {
    */
   async clear() {
     await this.check();
-    await this.db.deleteMany({});
+    await this.files.deleteAll();
     return this;
   }
 
@@ -386,7 +366,10 @@ class JoshProvider {
 
   async findByValue(path, value) {
     await this.check();
-    const docs = await this.db.find({}).toArray();
+    const docs = Object.entries(await this.getAll()).map((doc) => ({
+      key: doc[0],
+      value: doc[1],
+    }));
     for (const doc of docs) {
       if (
         !value ?
@@ -402,7 +385,10 @@ class JoshProvider {
 
   async findByFunction(fn) {
     await this.check();
-    const docs = await this.db.find({}).toArray();
+    const docs = Object.entries(await this.getAll()).map((doc) => ({
+      key: doc[0],
+      value: doc[1],
+    }));
     for (const doc of docs) {
       if (fn(doc.value)) {
         return [doc.key, doc.value];
@@ -412,9 +398,9 @@ class JoshProvider {
 
   async filterByValue(path, value) {
     await this.check();
-    const docs = await this.getAsArray();
+    const docs = Object.entries(await this.getAll());
     const finalDoc = [];
-    for (const { key, value: val } of docs) {
+    for (const [key, val] of docs) {
       if (
         !value ?
           _get(val, path) :
@@ -430,9 +416,9 @@ class JoshProvider {
 
   async filterByFunction(fn) {
     await this.check();
-    const docs = await this.getAsArray();
+    const docs = Object.entries(await this.getAll());
     const finalDoc = [];
-    for (const { key, value } of docs) {
+    for (const [key, value] of docs) {
       if (fn(value)) {
         finalDoc.push([key, value]);
       }
@@ -440,21 +426,24 @@ class JoshProvider {
     return finalDoc;
   }
 
-  async mapByValue(/* path */) {
+  async mapByValue() {
     await this.check();
     throw new Error('Not yet implemented');
   }
 
   async mapByFunction(fn) {
     await this.check();
-    let all = await this.getAsArray();
-    all = all.map(({ key, value }) => fn(value, key));
+    let all = await Object.entries(await this.getAll());
+    all = all.map(([key, value]) => fn(value, key));
     return all;
   }
 
   async someByValue(value, path) {
     await this.check();
-    const docs = await this.getAsArray();
+    const docs = Object.entries(await this.getAll()).map((doc) => ({
+      key: doc[0],
+      value: doc[1],
+    }));
     return docs.some((doc) =>
       path ? _get(doc.value, path) == value : doc.value == value,
     );
@@ -462,13 +451,16 @@ class JoshProvider {
 
   async someByFunction(fn) {
     await this.check();
-    const docs = await this.getAsArray();
-    return docs.some(({ key, value }) => fn(value, key));
+    const docs = Object.entries(await this.getAll());
+    return docs.some(([key, value]) => fn(value, key));
   }
 
   async everyByValue(value, path) {
     await this.check();
-    const docs = await this.getAsArray();
+    const docs = Object.entries(await this.getAll()).map((doc) => ({
+      key: doc[0],
+      value: doc[1],
+    }));
     return docs.every((doc) =>
       path ? _get(doc.value, path) == value : doc.value == value,
     );
@@ -476,12 +468,12 @@ class JoshProvider {
 
   async everyByFunction(fn) {
     await this.check();
-    const all = await this.getAsArray();
-    return all.every(({ key, value }) => fn(value, key));
+    const all = Object.entries(await this.getAll());
+    return all.every(([key, value]) => fn(value, key));
   }
 
   autoId() {
-    return new ObjectId().toString();
+    return uuidv4();
   }
 
   /**
@@ -489,25 +481,17 @@ class JoshProvider {
    * @returns {Promise} Promise resolves when finished closing
    */
   close() {
-    return this.client.close();
+    delete this.files;
+    return this;
   }
 
   /**
    * Clears and shuts down the underlying database.
    * @returns {Promise} Promise resolves when finished closing
    */
-  destroy() {
-    this.clear();
+  async destroy() {
+    await this.files.deleteAll();
     return this.close();
-  }
-
-  /**
-   * Internal method used to validate persistent josh names (valid Windows filenames)
-   * @private
-   */
-  validateName() {
-    // Do not delete this internal method.
-    this.collection = this.collection.replace(/[^a-z0-9]/gi, '_').toLowerCase();
   }
 
   /**
@@ -518,9 +502,7 @@ class JoshProvider {
    * @private
    */
   async check(key, type, path = null) {
-    if (!this.client.isConnected()) {
-      throw new Err('Connection to database not open');
-    }
+    if (!this.files) throw new Err('Database has been closed');
     if (!key || !type) return;
     const value = await this.get(key, path);
     if (!value) {
@@ -540,18 +522,6 @@ class JoshProvider {
         'JoshTypeError',
       );
     }
-  }
-
-  cursorToObject(data) {
-    return data.reduce((acc, curr) => {
-      acc[curr.key] = curr.value;
-      return acc;
-    }, {});
-  }
-
-  async getAsArray() {
-    await this.check();
-    return this.db.find({}).toArray();
   }
 }
 
