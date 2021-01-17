@@ -7,9 +7,9 @@ const path = require('path');
 class JoshProvider {
   constructor(options = {}) {
     this.options = options;
-    this.dir = this.options.dataDir
-      ? path.resolve(this.options.dataDir)
-      : './data';
+    this.dir = this.options.dataDir ?
+      path.resolve(this.options.dataDir) :
+      './data';
     this.files = new FileManager(this.dir, options.providerOptions);
   }
   /**
@@ -68,7 +68,7 @@ class JoshProvider {
     const final = {};
     if (docs.length === 0) return {};
     for (let n = 0; n < count; n++) {
-      let idx = Math.floor(Math.random() * docs.length);
+      const idx = Math.floor(Math.random() * docs.length);
       const [key, val] = docs[idx];
       docs = docs.filter((x) => x[0] != key);
       final[key] = val;
@@ -156,7 +156,7 @@ class JoshProvider {
     if (!key) {
       throw new Error('Keys should be strings or numbers.');
     }
-    let data = (await this.files.getData(key)) || {};
+    let data = await this.files.getData(key) || {};
     if (path) {
       _set(data, path, val);
     } else {
@@ -280,7 +280,7 @@ class JoshProvider {
    */
   async inc(key, path = null) {
     await this.check(key, ['Number'], path);
-    return this.set(key, path, (await this.get(key, path)) + 1);
+    return this.set(key, path, await this.get(key, path) + 1);
   }
 
   /**
@@ -294,7 +294,7 @@ class JoshProvider {
    */
   async dec(key, path = null) {
     await this.check(key, ['Number'], path);
-    return this.set(key, path, (await this.get(key, path)) - 1);
+    return this.set(key, path, await this.get(key, path) - 1);
   }
 
   /**
@@ -321,42 +321,42 @@ class JoshProvider {
       );
     }
     switch (operation) {
-      case 'add':
-      case 'addition':
-      case '+':
-        result = base + operand;
-        break;
-      case 'sub':
-      case 'subtract':
-      case '-':
-        result = base - operand;
-        break;
-      case 'mult':
-      case 'multiply':
-      case '*':
-        result = base * operand;
-        break;
-      case 'div':
-      case 'divide':
-      case '/':
-        result = base / operand;
-        break;
-      case 'exp':
-      case 'exponent':
-      case '^':
-        result = Math.pow(base, operand);
-        break;
-      case 'mod':
-      case 'modulo':
-      case '%':
-        result = base % operand;
-        break;
-      case 'rand':
-      case 'random':
-        result = Math.floor(Math.random() * Math.floor(operand));
-        break;
-      default:
-        throw new Err('Please provide a valid operand', 'JoshTypeError');
+    case 'add':
+    case 'addition':
+    case '+':
+      result = base + operand;
+      break;
+    case 'sub':
+    case 'subtract':
+    case '-':
+      result = base - operand;
+      break;
+    case 'mult':
+    case 'multiply':
+    case '*':
+      result = base * operand;
+      break;
+    case 'div':
+    case 'divide':
+    case '/':
+      result = base / operand;
+      break;
+    case 'exp':
+    case 'exponent':
+    case '^':
+      result = Math.pow(base, operand);
+      break;
+    case 'mod':
+    case 'modulo':
+    case '%':
+      result = base % operand;
+      break;
+    case 'rand':
+    case 'random':
+      result = Math.floor(Math.random() * Math.floor(operand));
+      break;
+    default:
+      throw new Err('Please provide a valid operand', 'JoshTypeError');
     }
     if (result) {
       await this.set(key, path, result);
@@ -372,11 +372,11 @@ class JoshProvider {
     }));
     for (const doc of docs) {
       if (
-        !value
-          ? _get(doc.value, path)
-          : path
-          ? value == _get(doc.value, path)
-          : value == doc.value
+        !value ?
+          _get(doc.value, path) :
+          path ?
+            value == _get(doc.value, path) :
+            value == doc.value
       ) {
         return [doc.key, doc.value];
       }
@@ -402,11 +402,11 @@ class JoshProvider {
     const finalDoc = [];
     for (const [key, val] of docs) {
       if (
-        !value
-          ? _get(val, path)
-          : path
-          ? value == _get(val, path)
-          : value == val
+        !value ?
+          _get(val, path) :
+          path ?
+            value == _get(val, path) :
+            value == val
       ) {
         finalDoc.push([key, val]);
       }
@@ -496,7 +496,9 @@ class JoshProvider {
 
   /**
    * Internal method used to check validity of the database and value of doc to change
-   * @param {Array} input Input to type check
+   * @param {Array} key key to fetch from database
+   * @param {any} type Type to check databse doc
+   * @param {string} path Path in doc to check
    * @private
    */
   async check(key, type, path = null) {
