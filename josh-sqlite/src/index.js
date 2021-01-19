@@ -545,7 +545,7 @@ module.exports = class JoshProvider {
     }
     if (!type) return;
     if (!isArray(type)) type = [type];
-    if (!isNil(path)) {
+    if (!isNil(path) && path !== '') {
       this.check(key, 'Object');
       const data = this.get(key);
       if (isNil(_get(data, path))) {
