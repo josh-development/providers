@@ -55,7 +55,7 @@ module.exports = class JoshProvider {
    * @param {Map} Josh In order to set data to the Josh, one must be provided.
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
-  async init() {
+  init() {
     const table = this.db
       .prepare(
         "SELECT count(*) FROM sqlite_master WHERE type='table' AND name = ?;",
