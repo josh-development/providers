@@ -1,16 +1,12 @@
 const { get: _get, set: _set, unset, isFunction } = require('lodash');
 const Err = require('./error');
-const { FileManager } = require('./files.js');
+const { DatabaseManager } = require('./handler.js');
 const uuidv4 = require('uuid').v4;
-const path = require('path');
 
 class JoshProvider {
   constructor(options = {}) {
     this.options = options;
-    this.dir = this.options.dataDir
-      ? path.resolve(this.options.dataDir)
-      : './data';
-    this.files = new FileManager(this.dir, options.providerOptions);
+    this.db = new DatabaseManager(options.providerOptions);
   }
   /**
    * Internal method called on persistent joshs to load data from the underlying database.
@@ -18,6 +14,7 @@ class JoshProvider {
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
   async init() {
+    await this.db.load();
     return true;
   }
 
@@ -32,13 +29,13 @@ class JoshProvider {
    * ```
    */
   async get(key, path = null) {
-    const data = await this.files.getData(key);
+    const data = await this.db.get(key);
     return path ? _get(data, path) : data;
   }
 
   async getAll() {
     await this.check();
-    const data = await this.files.getData();
+    const data = await this.db.getAll();
     return data;
   }
   /**
@@ -51,8 +48,9 @@ class JoshProvider {
    * ```
    */
   async getMany(arr) {
+    // this could be made into an index search, TODO
     await this.check();
-    const data = await this.files.getData();
+    const data = await this.db.getAll();
     const final = {};
     Object.entries(data).forEach(([key, val]) => {
       if (arr.includes(key)) {
@@ -94,7 +92,7 @@ class JoshProvider {
    */
   async has(key, path = null) {
     await this.check();
-    return await this.files.has(key, path);
+    return await this.db.has(key, path);
   }
 
   /**
@@ -108,8 +106,8 @@ class JoshProvider {
    */
   async keys() {
     await this.check();
-    const docs = await this.files.getData();
-    return Object.entries(docs).map(([key]) => key);
+    const docs = await this.db.getKeys();
+    return docs;
   }
 
   /**
@@ -123,7 +121,7 @@ class JoshProvider {
    */
   async values() {
     await this.check();
-    const docs = await this.files.getData();
+    const docs = await this.db.getAll();
     return Object.entries(docs).map((doc) => doc[1]);
   }
 
@@ -137,7 +135,7 @@ class JoshProvider {
    * ```
    */
   async count() {
-    return await this.files.getCount();
+    return await this.db.count();
   }
 
   /**
@@ -156,13 +154,13 @@ class JoshProvider {
     if (!key) {
       throw new Error('Keys should be strings or numbers.');
     }
-    let data = (await this.files.getData(key)) || {};
+    let data = (await this.db.get(key)) || {};
     if (path) {
       _set(data, path, val);
     } else {
       data = val;
     }
-    await this.files.setData(key, data);
+    await this.db.set(key, data);
     return this;
   }
 
@@ -197,9 +195,9 @@ class JoshProvider {
    */
   async delete(key, path = null) {
     await this.check();
-    const data = await this.files.getData(key);
+    const data = await this.db.getData(key);
     if (!path || path.length === 0) {
-      await this.files.deleteData(key);
+      await this.db.deleteData(key);
       return this;
     } else {
       // TODO : Make this work for arrays (null value)
@@ -235,7 +233,7 @@ class JoshProvider {
    */
   async clear() {
     await this.check();
-    await this.files.deleteAll();
+    await this.db.deleteAll();
     return this;
   }
 
@@ -481,7 +479,7 @@ class JoshProvider {
    * @returns {Promise} Promise resolves when finished closing
    */
   close() {
-    delete this.files;
+    delete this.db;
     return this;
   }
 
@@ -490,7 +488,7 @@ class JoshProvider {
    * @returns {Promise} Promise resolves when finished closing
    */
   async destroy() {
-    await this.files.deleteAll();
+    await this.db.deleteAll();
     return this.close();
   }
 
@@ -502,7 +500,7 @@ class JoshProvider {
    * @private
    */
   async check(key, type, path = null) {
-    if (!this.files) throw new Err('Database has been closed');
+    if (!this.db) throw new Err('Database has been closed');
     if (!key || !type) return;
     const value = await this.get(key, path);
     if (!value) {
