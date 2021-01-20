@@ -27,6 +27,7 @@
     "webpack": "^5.15.0"
   },
   "devDependencies": {
+    "@jest/globals": "^26.6.2",
     "@types/jest": "^26.0.15",
     "eslint": "6.8.0",
     "eslint-plugin-jest": "^24.1.0",
