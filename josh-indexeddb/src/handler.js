@@ -6,6 +6,8 @@ var idb =
 var IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction;
 var IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange;
 
+const Err = require('./error');
+
 class DatabaseManager {
   constructor() {
     return this;
@@ -91,7 +93,7 @@ class DatabaseManager {
       };
 
       request.onerror = () => {
-        rej(request.error);
+        rej(new Err(request.error));
       };
     });
   }

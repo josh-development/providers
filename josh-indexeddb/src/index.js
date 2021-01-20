@@ -92,6 +92,9 @@ class JoshProvider {
    */
   async has(key, path = null) {
     await this.check();
+    if (path) {
+      return (await this.get(key, path)) != null;
+    }
     return await this.db.has(key, path);
   }
 
@@ -195,12 +198,12 @@ class JoshProvider {
    */
   async delete(key, path = null) {
     await this.check();
-    const data = await this.db.getData(key);
+    let data;
     if (!path || path.length === 0) {
-      await this.db.deleteData(key);
+      await this.db.delete(key);
       return this;
     } else {
-      // TODO : Make this work for arrays (null value)
+      data = await this.db.get(key);
       unset(data, path);
     }
     await this.set(key, null, data);
@@ -233,7 +236,7 @@ class JoshProvider {
    */
   async clear() {
     await this.check();
-    await this.db.deleteAll();
+    await this.db.clear();
     return this;
   }
 
@@ -488,7 +491,7 @@ class JoshProvider {
    * @returns {Promise} Promise resolves when finished closing
    */
   async destroy() {
-    await this.db.deleteAll();
+    await this.db.clear();
     return this.close();
   }
 

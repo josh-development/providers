@@ -3,5 +3,7 @@
     "jsdoc-to-markdown": "^6.0.1",
     "limax": "^2.1.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@joshdb/core": "^1.1.3"
+  }
 }
