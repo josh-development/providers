@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
-    "build": "webpack --entry ./src/test.js --mode development",
+    "build": "webpack --entry ./src/tests.js --mode development",
     "dev": "yarn build --watch",
     "lint": "eslint src/*.js --fix"
   },
