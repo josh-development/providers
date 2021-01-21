@@ -32,7 +32,6 @@ const getPaths = (data, acc = {}, basePath = null) => {
     Object.entries(data);
   const returnPaths = source.reduce((paths, [key, value]) => {
     const path = getDelimitedPath(basePath, key, !isArray(value));
-    if (isObject(value)) getPaths(value, paths, path);
     paths[path.toString()] = JSON.stringify(value);
     return paths;
   }, acc || {});
