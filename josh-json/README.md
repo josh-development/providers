@@ -34,8 +34,6 @@ db.defer.then(async () => {
 
 ## Provider Options
 
-Let's try to make some sense of the options. In the above example I use the URL for the connection, using a JSON Atlas cluster.
-
 Here is a list of full options this provider supports:
 
 | Param                       | Type                | Description                                                            |

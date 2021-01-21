@@ -1,5 +1,5 @@
 {
-  "name": "@joshdb/json",
+  "name": "@joshdb/indexeddb",
   "version": "1.0.0",
   "description": "JSON Provider for JOSH",
   "main": "src/index.js",
