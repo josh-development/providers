@@ -12,3 +12,4 @@ config-private.json
 yarn.lock
 test.js
 bench.json
+**/dist/*.js*
