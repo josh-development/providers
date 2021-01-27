@@ -38,7 +38,7 @@ db.defer.then(async () => {
 
 ```html
 <script src="https://unpkg.com/@joshdb/core"></script>
-<script src="https://unpkg.com/@joshdb/indexeddb"></script>
+<script src="https://unpkg.com/@joshdb/indexeddb@latest/dist/main.js"></script>
 <script>
   const Josh = require('josh');
   const JoshIndexedDB = require('@joshdb/indexeddb');
