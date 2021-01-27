@@ -58,10 +58,10 @@ db.defer.then(async () => {
 
 ## Provider Options
 
-Here is a list of full options this provider supports: |
-Param | Type | Description | | ----------------- | ------------------- |
---------------------------- | | [providerOptions] | <code>Object</code> | The
-Provider Options Object |
+| Param                   | Type                | Description |
+| ----------------------- | ------------------- | ----------- |
+| [providerOptions]       | <code>Object</code> | The         |
+| Provider Options Object |
 
 ```
 
