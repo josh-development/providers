@@ -58,10 +58,9 @@ db.defer.then(async () => {
 
 ## Provider Options
 
-| Param                   | Type                | Description |
-| ----------------------- | ------------------- | ----------- |
-| [providerOptions]       | <code>Object</code> | The         |
-| Provider Options Object |
+| Param             | Type                | Description                 |
+| ----------------- | ------------------- | --------------------------- |
+| [providerOptions] | <code>Object</code> | The Provider Options Object |
 
 ```
 
