@@ -1,7 +1,12 @@
-const { get: _get, set: _set, unset, isFunction } = require('lodash');
+// Importing functions independently makes the final build a lot smaller
+const _get = require('lodash/get');
+const _set = require('lodash/set');
+const unset = require('lodash/unset');
+const isFunction = require('lodash/isFunction');
+
 const Err = require('./error');
 const { DatabaseManager } = require('./handler.js');
-const uuidv4 = require('uuid').v4;
+const { v4: uuidv4 } = require('uuid');
 
 class JoshProvider {
   constructor(options = {}) {

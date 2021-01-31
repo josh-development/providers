@@ -16,6 +16,8 @@ yarn add @joshdb/indexeddb
 
 Using the IndexedDB provider goes as such:
 
+### Webpack
+
 ```js
 const Josh = require('josh');
 const JoshIndexedDB = require('@joshdb/indexeddb');
@@ -32,9 +34,29 @@ db.defer.then(async () => {
 });
 ```
 
-## Provider Options
+### CDN
 
-Here is a list of full options this provider supports:
+```html
+<script src="https://unpkg.com/@joshdb/core"></script>
+<script src="https://unpkg.com/@joshdb/indexeddb@latest/dist/main.js"></script>
+<script>
+  const Josh = require('josh');
+  const JoshIndexedDB = require('@joshdb/indexeddb');
+
+  const db = new Josh({
+    name: 'testing',
+    provider: JoshIndexedDB,
+    // See below for all provider options.
+    providerOptions: {},
+  });
+
+  db.defer.then(async () => {
+    console.log(`Connected, there are ${await db.size} rows in the database.`);
+  });
+</script>
+```
+
+## Provider Options
 
 | Param             | Type                | Description                 |
 | ----------------- | ------------------- | --------------------------- |
