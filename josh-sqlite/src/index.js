@@ -276,7 +276,7 @@ module.exports = class JoshProvider {
     return this;
   }
 
-  includes(key, val, path = null) {
+  includes(key, path, val) {
     const data = this.get(key, path);
     const criteria = isFunction(val) ? val : (value) => val === value;
     const index = data.findIndex(criteria);
