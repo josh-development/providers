@@ -275,7 +275,6 @@ module.exports = class JoshProvider {
     this.set(key, path, data);
     return this;
   }
-
   includes(key, path = null, val) {
     const data = this.get(key, path);
     const criteria = isFunction(val) ? val : (value) => val === value;
