@@ -146,7 +146,9 @@ test('Database can delete values and data at paths', () => {
   expect(provider.get('object')).toEqual({ b: 2, c: 3, d: 4, e: 5 });
 
   // Arrays
+  expect(provider.includes('array', null, 4)).toBe(true);
   provider.remove('array', null, 4);
+  expect(provider.includes('array', null, 4)).toBe(false);
   expect(provider.get('array')).toEqual([1, 2, 3, 5, 6, 7]);
 });
 
