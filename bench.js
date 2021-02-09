@@ -1,6 +1,6 @@
 const data = require('./bench.json');
 
-async function test(name, provider) {
+async function test(name, provider, mb) {
   const times = [];
   const start = new Date();
   const id = Math.random().toString();
@@ -55,7 +55,7 @@ const providers = [
     await p.init();
     provider.times = [0, 0, 0, 0];
     for (let i = 0; i <= runs; i++) {
-      const ran = await test(provider.name, p /*mb*/);
+      const ran = await test(provider.name, p /*, mb*/);
       ran.forEach((val, ind) => {
         provider.times[ind] += val;
       });
