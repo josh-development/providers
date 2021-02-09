@@ -21,6 +21,10 @@ async function test(name, provider, mb) {
     await provider.delete(key.key);
   }
   times.push(new Date() - start - times.reduce((prev, curr) => (prev += curr)));
+  for (let key of data.keys) {
+    await provider.has(key.key);
+  }
+  times.push(new Date() - start - times.reduce((prev, curr) => (prev += curr)));
   return times;
 }
 
@@ -53,7 +57,7 @@ const providers = [
     console.log('Starting', provider.name);
     const p = new provider.fn(provider.conf);
     await p.init();
-    provider.times = [0, 0, 0, 0];
+    provider.times = [0, 0, 0, 0, 0];
     for (let i = 0; i <= runs; i++) {
       const ran = await test(provider.name, p /*, mb*/);
       ran.forEach((val, ind) => {
@@ -65,7 +69,7 @@ const providers = [
   providers.forEach((provider, index) => {
     docs[index] = { name: provider.name };
     provider.times.forEach((time, ind) => {
-      docs[index][['Generate', 'Set', 'Get', 'Delete'][ind]] =
+      docs[index][['Generate', 'Set', 'Get', 'Delete', 'Has'][ind]] =
         Math.round(time / runs) + 'ms';
     });
     docs[index].Total = Math.round(
