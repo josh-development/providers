@@ -55,7 +55,7 @@ module.exports = class JoshProvider {
    * @param {Map} Josh In order to set data to the Josh, one must be provided.
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
-  init() {
+  async init() {
     const table = this.db
       .prepare(
         "SELECT count(*) FROM sqlite_master WHERE type='table' AND name = ?;",
@@ -367,7 +367,7 @@ module.exports = class JoshProvider {
           )
         ) {
           finished = true;
-          return { key, value };
+          return { key, value: this.parseData(value) };
         }
       }
       lastRowId = rows.length > 0 ? rows[rows.length - 1].rowid : null;
