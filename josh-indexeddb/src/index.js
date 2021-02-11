@@ -444,7 +444,7 @@ class JoshProvider {
     return all;
   }
 
-  async someByValue(value, path) {
+  async someByValue(path, value) {
     await this.check();
     const docs = Object.entries(await this.getAll()).map((doc) => ({
       key: doc[0],

@@ -16,9 +16,9 @@ class JoshProvider {
     this.collection = options.collection;
     this.validateName();
     this.auth =
-      options.user && options.password ?
-        `${options.user}:${options.password}@` :
-        '';
+      options.user && options.password
+        ? `${options.user}:${options.password}@`
+        : '';
     this.dbName = options.dbName || 'josh';
     this.port = options.port || 27017;
     this.host = options.host || 'localhost';
@@ -108,7 +108,7 @@ class JoshProvider {
    */
   async has(key, path = null) {
     await this.check();
-    return await this.get(key, path) != null;
+    return (await this.get(key, path)) != null;
   }
 
   /**
@@ -300,7 +300,7 @@ class JoshProvider {
    */
   async inc(key, path = null) {
     await this.check(key, ['Number'], path);
-    return this.set(key, path, await this.get(key, path) + 1);
+    return this.set(key, path, (await this.get(key, path)) + 1);
   }
 
   /**
@@ -314,7 +314,7 @@ class JoshProvider {
    */
   async dec(key, path = null) {
     await this.check(key, ['Number'], path);
-    return this.set(key, path, await this.get(key, path) - 1);
+    return this.set(key, path, (await this.get(key, path)) - 1);
   }
 
   /**
@@ -341,42 +341,42 @@ class JoshProvider {
       );
     }
     switch (operation) {
-    case 'add':
-    case 'addition':
-    case '+':
-      result = base + operand;
-      break;
-    case 'sub':
-    case 'subtract':
-    case '-':
-      result = base - operand;
-      break;
-    case 'mult':
-    case 'multiply':
-    case '*':
-      result = base * operand;
-      break;
-    case 'div':
-    case 'divide':
-    case '/':
-      result = base / operand;
-      break;
-    case 'exp':
-    case 'exponent':
-    case '^':
-      result = Math.pow(base, operand);
-      break;
-    case 'mod':
-    case 'modulo':
-    case '%':
-      result = base % operand;
-      break;
-    case 'rand':
-    case 'random':
-      result = Math.floor(Math.random() * Math.floor(operand));
-      break;
-    default:
-      throw new Err('Please provide a valid operand', 'JoshTypeError');
+      case 'add':
+      case 'addition':
+      case '+':
+        result = base + operand;
+        break;
+      case 'sub':
+      case 'subtract':
+      case '-':
+        result = base - operand;
+        break;
+      case 'mult':
+      case 'multiply':
+      case '*':
+        result = base * operand;
+        break;
+      case 'div':
+      case 'divide':
+      case '/':
+        result = base / operand;
+        break;
+      case 'exp':
+      case 'exponent':
+      case '^':
+        result = Math.pow(base, operand);
+        break;
+      case 'mod':
+      case 'modulo':
+      case '%':
+        result = base % operand;
+        break;
+      case 'rand':
+      case 'random':
+        result = Math.floor(Math.random() * Math.floor(operand));
+        break;
+      default:
+        throw new Err('Please provide a valid operand', 'JoshTypeError');
     }
     if (result) {
       await this.set(key, path, result);
@@ -389,13 +389,15 @@ class JoshProvider {
     const docs = await this.db.find({}).toArray();
     for (const doc of docs) {
       if (
-        !value ?
-          _get(doc.value, path) :
-          path ?
-            value == _get(doc.value, path) :
-            value == doc.value
+        !value
+          ? _get(doc.value, path)
+          : path
+          ? value == _get(doc.value, path)
+          : value == doc.value
       ) {
-        return [doc.key, doc.value];
+        return {
+          [doc.key]: doc.value,
+        };
       }
     }
   }
@@ -405,7 +407,7 @@ class JoshProvider {
     const docs = await this.db.find({}).toArray();
     for (const doc of docs) {
       if (fn(doc.value)) {
-        return [doc.key, doc.value];
+        return { [doc.key]: doc.value };
       }
     }
   }
@@ -413,16 +415,16 @@ class JoshProvider {
   async filterByValue(path, value) {
     await this.check();
     const docs = await this.getAsArray();
-    const finalDoc = [];
+    const finalDoc = {};
     for (const { key, value: val } of docs) {
       if (
-        !value ?
-          _get(val, path) :
-          path ?
-            value == _get(val, path) :
-            value == val
+        !value
+          ? _get(val, path)
+          : path
+          ? value == _get(val, path)
+          : value == val
       ) {
-        finalDoc.push([key, val]);
+        finalDoc[key] = val;
       }
     }
     return finalDoc;
@@ -452,7 +454,7 @@ class JoshProvider {
     return all;
   }
 
-  async someByValue(value, path) {
+  async someByValue(path, value) {
     await this.check();
     const docs = await this.getAsArray();
     return docs.some((doc) =>
@@ -466,7 +468,7 @@ class JoshProvider {
     return docs.some(({ key, value }) => fn(value, key));
   }
 
-  async everyByValue(value, path) {
+  async everyByValue(path, value) {
     await this.check();
     const docs = await this.getAsArray();
     return docs.every((doc) =>

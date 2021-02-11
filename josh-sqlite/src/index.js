@@ -212,14 +212,14 @@ module.exports = class JoshProvider {
 
   // TODO: Figure out how to make this similar to GET, make this take an object also.
   setMany(data, overwrite) {
-    if (isNil(data) || data.constructor.name !== 'Array') {
-      throw new Error('Provided data was not an array of [key, value] pairs.');
+    if (isNil(data) || data.constructor.name !== 'Object') {
+      throw new Error('Provided data was not an object of {key, value} pairs.');
     }
     const existingKeys = this.keys();
 
     this.runMany(
       flatten(
-        data
+        Object.entries(data)
           .filter(([key]) => overwrite || !existingKeys.includes(key))
           .map(([key, value]) => this.compareData(key, value)),
       ),
@@ -366,7 +366,7 @@ module.exports = class JoshProvider {
           )
         ) {
           finished = true;
-          return { key, value: this.parseData(value) };
+          return { [key]: this.parseData(value) };
         }
       }
       lastRowId = rows.length > 0 ? rows[rows.length - 1].rowid : null;
@@ -426,12 +426,15 @@ module.exports = class JoshProvider {
   }
 
   someByValue(path, value) {
-    const row = this.db
-      .prepare(
-        `SELECT key FROM '${this.name}' WHERE path = ? AND value = ? LIMIT 1`,
-      )
-      .get(path, serializeData(value));
-    return !isNil(row);
+    // const row = this.db
+    //   .prepare(
+    //     `SELECT key FROM '${this.name}' WHERE path = ? AND value = ? LIMIT 1`,
+    //   )
+    //   .get(path, serializeData(value));
+    // return !isNil(row);
+    return this.someByFunction((val) =>
+      path ? _get(val, path) === value : val === value,
+    );
   }
 
   // TODO: Make this accept async functions
