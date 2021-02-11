@@ -1,7 +1,7 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Node.js CI
+name: Josh - Mongo - Node.js CI
 
 on:
   push:
@@ -35,6 +35,5 @@ jobs:
         with:
           mongodb-version: 4.2
       - run: npm i -g yarn
-      - run: cd josh-sqlite; yarn; yarn test; yarn lint;
-      - run: cd josh-mongo; yarn; yarn test; yarn lint
-      - run: cd josh-json; yarn; yarn test; yarn lint
+      - run: cd josh-tests; yarn;
+      - run: cd josh-mongo; yarn; yarn test; yarn lint;
