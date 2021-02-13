@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "file-system": "^2.2.2",
     "jsdoc-to-markdown": "^6.0.1",
     "limax": "^2.1.0"
   },
