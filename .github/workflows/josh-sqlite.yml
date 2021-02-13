@@ -31,5 +31,5 @@ jobs:
           # An explicit key for restoring and saving the cache
           key: ${{ matrix.node-version }}
       - run: npm i -g yarn
-      - run: cd josh-tests; yarn;
-      - run: cd josh-sqlite; yarn; yarn test; yarn lint;
+      - run: cd josh-tests && yarn
+      - run: cd josh-sqlite && yarn --ignore-scripts --frozen-lockfile && yarn test && yarn lint;
