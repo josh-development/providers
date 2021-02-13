@@ -407,7 +407,7 @@ module.exports = class JoshProvider {
           returnObject[key] = this.parseData(value);
         }
       }
-      lastRowId = rows.length > 0 ? rows[rows.length - 1].rowid : null;
+      lastRowId = rows.length ? rows[rows.length - 1].rowid : null;
       if (rows.length < 100) finished = true;
     }
     return returnObject;
