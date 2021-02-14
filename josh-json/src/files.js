@@ -14,7 +14,7 @@ class FileManager {
     }
   }
   async has(key, path) {
-    const index = await this.getFile('index.json');
+    const index = await this.getIndex();
     if (!path) {
       return index.files.find((x) => x.keys.includes(key)) != null;
     } else {
@@ -68,7 +68,7 @@ class FileManager {
     }
     let all = {};
     for (const file of index.files) {
-      all = { ...all, ...await this.getFile(file.location) };
+      all = { ...all, ...(await this.getFile(file.location)) };
     }
     return all;
   }
@@ -127,7 +127,7 @@ class FileManager {
   }
   async getCount() {
     const index = await this.getIndex();
-    return index.files.reduce((prev, curr) => prev += curr.keys.length, 0);
+    return index.files.reduce((prev, curr) => (prev += curr.keys.length), 0);
   }
 }
 module.exports = { FileManager };
