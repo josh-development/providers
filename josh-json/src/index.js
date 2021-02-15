@@ -378,7 +378,7 @@ class JoshProvider {
           ? value == _get(doc.value, path)
           : value == doc.value
       ) {
-        return [doc.key, doc.value];
+        return { [doc.key]: doc.value };
       }
     }
   }
@@ -391,7 +391,7 @@ class JoshProvider {
     }));
     for (const doc of docs) {
       if (fn(doc.value)) {
-        return [doc.key, doc.value];
+        return { [doc.key]: doc.value };
       }
     }
   }
@@ -399,7 +399,7 @@ class JoshProvider {
   async filterByValue(path, value) {
     await this.check();
     const docs = Object.entries(await this.getAll());
-    const finalDoc = [];
+    const finalDoc = {};
     for (const [key, val] of docs) {
       if (
         !value
@@ -408,7 +408,7 @@ class JoshProvider {
           ? value == _get(val, path)
           : value == val
       ) {
-        finalDoc.push([key, val]);
+        finalDoc[key] = val;
       }
     }
     return finalDoc;
@@ -438,7 +438,7 @@ class JoshProvider {
     return all;
   }
 
-  async someByValue(value, path) {
+  async someByValue(path, value) {
     await this.check();
     const docs = Object.entries(await this.getAll()).map((doc) => ({
       key: doc[0],
@@ -455,7 +455,7 @@ class JoshProvider {
     return docs.some(([key, value]) => fn(value, key));
   }
 
-  async everyByValue(value, path) {
+  async everyByValue(path, value) {
     await this.check();
     const docs = Object.entries(await this.getAll()).map((doc) => ({
       key: doc[0],
