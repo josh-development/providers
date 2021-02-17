@@ -12,8 +12,8 @@ const serializeData = (data) => {
   return serialized;
 };
 
-const getDelimitedPath = (base, key, valueIsArray) =>
-  valueIsArray ?
+const getDelimitedPath = (base, key, parentIsArray) =>
+  parentIsArray ?
     base ?
       `${base}[${key}]` :
       key :
