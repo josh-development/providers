@@ -151,7 +151,7 @@ async cleanupEmpty() {
     const dataKeys = Object.keys(await this.getFile(file.location));
     if (isEqual(keys, dataKeys)) return;
       for (const key of keys) {
-        if (!dataKeys.includes(key)) await keys.splice(keys.indexOf(key), 1)
+        if (!dataKeys.includes(key)) await keys.splice(keys.indexOf(key))
       }
     index.files[index.files.indexOf(file)].keys = keys;
     await this.setIndex(index);
