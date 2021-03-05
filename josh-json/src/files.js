@@ -131,7 +131,8 @@ class FileManager {
   }
   async indexAll() {
     const index = await this.getFile('index.json');
-    for (const file of index.files) {
+    const files = index.files;
+    for (const file of files) {
     const keys = file.keys;
     const dataKeys = Object.keys(await this.getFile(file.location));
     if (isEqual(keys, dataKeys)) return;
@@ -145,7 +146,8 @@ class FileManager {
   }
   async cleanupEmpty() {
     const index = await this.getFile('index.json');
-    for (const file of index.files) {
+    const files = index.files;
+    for (const file of files) {
       const keys = file.keys;
       const dataKeys = Object.keys(await this.getFile(file.location));
       if (isEqual(keys, dataKeys)) return;
