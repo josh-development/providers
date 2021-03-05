@@ -18,6 +18,8 @@ class JoshProvider {
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
   async init() {
+    await this._cleanupEmpty();
+    await this._indexAll();
     return true;
   }
 
@@ -523,6 +525,14 @@ class JoshProvider {
       );
     }
   }
+}
+async _indexAll() {
+  if (!this.indexAll) return;
+  return await this.files.indexAll();
+}
+async _cleanupEmpty() {
+  if (!this.cleanupEmpty) return;
+  return await this.files.cleanupEmpty();
 }
 
 module.exports = JoshProvider;
