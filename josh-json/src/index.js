@@ -525,14 +525,14 @@ class JoshProvider {
       );
     }
   }
-}
-async _indexAll() {
-  if (!this.indexAll) return;
-  return await this.files.indexAll();
-}
-async _cleanupEmpty() {
-  if (!this.cleanupEmpty) return;
-  return await this.files.cleanupEmpty();
+  async _indexAll() {
+    if (!this.indexAll) return;
+    return await this.files.indexAll();
+  }
+  async _cleanupEmpty() {
+    if (!this.cleanupEmpty) return;
+    return await this.files.cleanupEmpty();
+  }
 }
 
 module.exports = JoshProvider;
