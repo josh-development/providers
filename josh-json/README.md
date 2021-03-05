@@ -36,8 +36,10 @@ db.defer.then(async () => {
 
 Here is a list of full options this provider supports:
 
-| Param                       | Type                | Description                                                            |
-| --------------------------- | ------------------- | ---------------------------------------------------------------------- |
-| [providerOptions]           | <code>Object</code> | The Provider Options Object, with the below properties:                |
-| [providerOptions.maxLength] | <code>string</code> | Optional, defaults to `100`. The amount of entries per json chunk file |
-| [providerOptions.dataDir]   | <code>string</code> | Optional, defaults to `data`. The location for the stored json files   |
+| Param                          | Type                 | Description                                                            |
+| ------------------------------ | -------------------- | ---------------------------------------------------------------------- |
+| [providerOptions]              | <code>Object</code>  | The Provider Options Object, with the below properties:                |
+| [providerOptions.maxLength]    | <code>string</code>  | Optional, defaults to `100`. The amount of entries per json chunk file |
+| [providerOptions.dataDir]      | <code>string</code>  | Optional, defaults to `data`. The location for the stored json files   |
+| [providerOptions.indexAll]     | <code>boolean</code> | Optional, defaults to `true`. Adds new keys from the stored json files |
+| [providerOptions.cleanupEmpty] | <code>boolean</code> | Optional, defaults to `false`. Cleans out empty keys from index file   |
