@@ -11,6 +11,13 @@ class JoshProvider {
       ? path.resolve(this.options.dataDir)
       : './data';
     this.files = new FileManager(this.dir, options.providerOptions);
+    
+    if (typeof this.options.indexAll !== 'boolean' && typeof this.options.indexAll !== 'undefined') throw new Error('IndexAll option must be typeof Boolean.')
+    if (typeof this.options.indexAll === 'undefined') this.options.indexAll = true
+    this.indexAll = this.options.indexAll
+    if (typeof this.options.cleanupEmpty !== 'boolean' && typeof this.options.cleanupEmpty !== 'undefined') throw new Error('IndexAll option must be typeof Boolean.');
+    if (typeof this.options.cleanupEmpty === 'undefined') this.options.cleanupEmpty = false;
+    this.cleanupEmpty = this.options.cleanupEmpty
   }
   /**
    * Internal method called on persistent joshs to load data from the underlying database.
