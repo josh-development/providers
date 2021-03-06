@@ -18,10 +18,8 @@ class JoshProvider {
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
   async init() {
-    if (typeof this.options.indexAll === 'undefined') this.options.indexAll = true;
-    if (typeof this.options.cleanupEmpty === 'undefined') this.options.cleanupEmpty = false;
     if (this.options.indexAll) await this.files.indexAll();
-    if (this.options.cleanupEmpty) await this.files.cleanupEmpty();
+    if (!this.options.cleanupEmpty) await this.files.cleanupEmpty();
     return true;
   }
 
