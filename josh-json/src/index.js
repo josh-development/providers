@@ -11,13 +11,6 @@ class JoshProvider {
       ? path.resolve(this.options.dataDir)
       : './data';
     this.files = new FileManager(this.dir, options.providerOptions);
-    
-    if (typeof this.options.indexAll !== 'boolean' && typeof this.options.indexAll !== 'undefined') throw new Error('IndexAll option must be typeof Boolean.')
-    if (typeof this.options.indexAll === 'undefined') this.options.indexAll = true
-    this.indexAll = this.options.indexAll
-    if (typeof this.options.cleanupEmpty !== 'boolean' && typeof this.options.cleanupEmpty !== 'undefined') throw new Error('IndexAll option must be typeof Boolean.');
-    if (typeof this.options.cleanupEmpty === 'undefined') this.options.cleanupEmpty = false;
-    this.cleanupEmpty = this.options.cleanupEmpty
   }
   /**
    * Internal method called on persistent joshs to load data from the underlying database.
@@ -25,8 +18,10 @@ class JoshProvider {
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
   async init() {
-    await this._cleanupEmpty();
-    await this._indexAll();
+    if (typeof this.options.indexAll === 'undefined') this.options.indexAll = true;
+    if (typeof this.options.cleanupEmpty === 'undefined') this.options.cleanupEmpty = false;
+    if (this.options.indexAll) await this.files.indexAll();
+    if (this.options.cleanupEmpty) await this.files.cleanupEmpty();
     return true;
   }
 
@@ -531,14 +526,6 @@ class JoshProvider {
         'JoshTypeError',
       );
     }
-  }
-  async _indexAll() {
-    if (!this.indexAll) return;
-    return await this.files.indexAll();
-  }
-  async _cleanupEmpty() {
-    if (!this.cleanupEmpty) return;
-    return await this.files.cleanupEmpty();
   }
 }
 
