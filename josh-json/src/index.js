@@ -19,7 +19,7 @@ class JoshProvider {
    */
   async init() {
     if (this.options.indexAll) await this.files.indexAll();
-    if (!this.options.cleanupEmpty) await this.files.cleanupEmpty();
+    if (this.options.cleanupEmpty) await this.files.cleanupEmpty();
     return true;
   }
 
