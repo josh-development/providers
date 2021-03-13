@@ -129,5 +129,33 @@ class FileManager {
     const index = await this.getIndex();
     return index.files.reduce((prev, curr) => (prev += curr.keys.length), 0);
   }
+  async indexAll() {
+    const index = await this.getIndex();
+    for (let file of index.files) {
+      const keys = file.keys;
+      const dataKeys = Object.keys(await this.getFile(file.location));
+      if (isEqual(keys, dataKeys)) return;
+      for (const key of dataKeys) {
+        if (!keys.includes(key)) keys.push(key);
+      }
+      index.files[index.files.indexOf(file)].keys = keys;
+      await this.setIndex(index);
+    }
+    return;
+  }
+  async cleanupEmpty() {
+    const index = await this.getIndex();
+    for (const file of index.files) {
+      const keys = file.keys;
+      const dataKeys = Object.keys(await this.getFile(file.location));
+      if (isEqual(keys, dataKeys)) return;
+      for (const key of keys) {
+        if (!dataKeys.includes(key)) keys.splice(keys.indexOf(key))
+      }
+      index.files[index.files.indexOf(file)].keys = keys;
+      await this.setIndex(index);
+    }
+    return;
+  }
 }
 module.exports = { FileManager };
