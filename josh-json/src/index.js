@@ -11,8 +11,8 @@ class JoshProvider {
       ? path.resolve(this.options.dataDir)
       : './data';
     this.files = new FileManager(this.dir, options.providerOptions);
-    this.indexAll = this.options.indexAll ?? true
-    this.cleanupEmpty = this.options.cleanupEmpty ?? true
+    this.indexAll = this.options.indexAll ?? false
+    this.cleanupEmpty = this.options.cleanupEmpty ?? false
   }
   /**
    * Internal method called on persistent joshs to load data from the underlying database.
