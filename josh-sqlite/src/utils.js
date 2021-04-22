@@ -24,7 +24,7 @@ const getDelimitedPath = (base, key, parentIsArray) =>
 const getPaths = (data, acc = {}, basePath = null) => {
   if (data === '::NULL::') return {};
   if (!isObject(data)) {
-    acc[basePath || '::NULL::'] = JSON.stringify(data);
+    acc[basePath || '::NULL::'] = serializeData(data);
     return acc;
   }
   const source = isArray(data) ?
@@ -33,12 +33,12 @@ const getPaths = (data, acc = {}, basePath = null) => {
   const returnPaths = source.reduce((paths, [key, value]) => {
     const path = getDelimitedPath(basePath, key, isArray(data));
     if (isObject(value)) getPaths(value, paths, path);
-    paths[path.toString()] = JSON.stringify(value);
+    paths[path.toString()] = serializeData(value);
     return paths;
   }, acc || {});
-  return basePath ?
-    returnPaths :
-    { ...returnPaths, '::NULL::': JSON.stringify(data) };
+  return basePath
+    ? returnPaths
+    : { ...returnPaths, '::NULL::': serializeData(data) };
 };
 
 const sanitize = (str) =>

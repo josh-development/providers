@@ -583,9 +583,8 @@ module.exports = class JoshProvider {
     const paths = path
       ? getPaths(_set(cloneDeep(currentData), path, newValue))
       : getPaths(newValue);
-
     for (const [currentPath, value] of Object.entries(currentPaths)) {
-      if (isNil(paths[currentPath]) || paths[currentPath] !== value) {
+      if (!isNil(paths[currentPath]) || paths[currentPath] !== value) {
         executions.push([this.deleteStmt, { key, path: currentPath }]);
         if (!isNil(paths[currentPath])) {
           executions.push([
