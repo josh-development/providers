@@ -11,6 +11,8 @@ class JoshProvider {
       ? path.resolve(this.options.dataDir)
       : './data';
     this.files = new FileManager(this.dir, options.providerOptions);
+    this.indexAll = this.options.indexAll ?? false
+    this.cleanupEmpty = this.options.cleanupEmpty ?? false
   }
   /**
    * Internal method called on persistent joshs to load data from the underlying database.
@@ -18,6 +20,8 @@ class JoshProvider {
    * @returns {Promise} Returns the defer promise to await the ready state.
    */
   async init() {
+    if (this.options.indexAll) await this.files.indexAll();
+    if (this.options.cleanupEmpty) await this.files.cleanupEmpty();
     return true;
   }
 
