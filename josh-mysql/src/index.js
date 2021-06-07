@@ -10,6 +10,7 @@ const {
   flatten,
   cloneDeep,
   unset,
+  isEqual,
 } = require('lodash');
 
 
@@ -25,6 +26,40 @@ const {
 } = require('./utils.js');
 // const db = require("../../test.js");
 
+// Created connections
+// Struture containing
+/*
+{
+  connection, // The mysql Connection object
+  options // The options passed in this connection (may be a string or an object)
+}
+*/
+class Connections extends Array {
+  findConnection(options) {
+    const obj = this.find(value => isEqual(value.options, options));
+    return obj ? obj.connection : null;
+  }
+
+  create(options) {
+    // try to prevent bad use of createCollection function
+    try {
+      const connection = mysql.createConnection(options);
+      this.push({ options, connection });
+      return connection;
+    } catch (e) {
+      throw new Err(`Error during initialization: ${e.message}`)
+    }
+  }
+
+  delete(connection) {
+    const i = this.findIndex(value => value.connection === connection);
+    if (i < 0) return null;
+    return this.splice(i, 1);
+  }
+}
+
+const connections = new Connections();
+
 module.exports = class JoshProvider {
   constructor(options) {
     if (options.inMemory) {
@@ -34,10 +69,12 @@ module.exports = class JoshProvider {
 
       this.name = options.name;
       this.validateName();
-      this.db = options.connection;
 
-      // find a way to improve that
-      if (!this.db || this.db.constructor.name !== "Connection") throw new Error("Must provider options.connection");
+      let db = connections.findConnection(options.connection);
+
+      if (!db || options.forceCreateNew === true) db = connections.create(options.connection);
+
+      this.db = db;
     }
   }
 
