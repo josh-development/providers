@@ -374,27 +374,10 @@ module.exports = class JoshProvider {
       .then(async data => data ? { [data.objkey]: await this.get(data.objkey) } : null)
   }
 
-  //todo
   async findByFunction(fn, path) {
-    throw new Error("Not yet implemented");
-    // Next code is basically just sqlite one
-    let lastRowId = 0;
-    let finished = false;
-    while (!finished) {
-      const rows = this.getPaginatedStmt.all({ lastRowId, limit: 10 });
-      for (const { key, value } of rows) {
-        if (
-          await fn(
-            path ? _get(this.parseData(value), path) : this.parseData(value),
-            key,
-          )
-        ) {
-          finished = true;
-          return { [key]: this.parseData(value) };
-        }
-      }
-      lastRowId = rows.length > 0 ? rows[rows.length - 1].rowid : null;
-      if (rows.length < 10) finished = true;
+    const all = Object.entries(await this.getAll()).map(([key, value]) => [key, value]);
+    for (const [key, value] of all) {
+      if (await fn(path ? _get(value, path) : value, key) === true) return { [key]: value };
     }
     return null;
   }
@@ -405,29 +388,13 @@ module.exports = class JoshProvider {
       .then(data => this.getMany(data.map(r => r.objkey)));
   }
 
-  //todo
   async filterByFunction(fn, path) {
-    throw new Error("Not yet implemented")
-    // next code is also josh-sqlite one
-    let lastRowId = 0;
-    let finished = false;
-    const returnObject = {};
-    while (!finished) {
-      const rows = this.getPaginatedStmt.all({ lastRowId, limit: 100 });
-      for (const { key, value } of rows) {
-        if (
-          await fn(
-            path ? _get(this.parseData(value), path) : this.parseData(value),
-            key,
-          )
-        ) {
-          returnObject[key] = this.parseData(value);
-        }
-      }
-      lastRowId = rows.length ? rows[rows.length - 1].rowid : null;
-      if (rows.length < 100) finished = true;
+    const all = Object.entries(await this.getAll()).map(([key, value]) => [key, value]);
+    const toReturn = {};
+    for (const [key, value] of all) {
+      if (await fn(path ? _get(value, path) : value, key) === true) toReturn[key] = value;
     }
-    return returnObject;
+    return toReturn;
   }
 
   mapByValue(path) {
