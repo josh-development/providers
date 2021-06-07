@@ -10,7 +10,6 @@ const {
   flatten,
   cloneDeep,
   unset,
-  isEqual,
 } = require('lodash');
 
 
@@ -26,40 +25,6 @@ const {
 } = require('./utils.js');
 // const db = require("../../test.js");
 
-// Created connections
-// Struture containing
-/*
-{
-  connection, // The mysql Connection object
-  options // The options passed in this connection (may be a string or an object)
-}
-*/
-class Connections extends Array {
-  findConnection(options) {
-    const obj = this.find(value => isEqual(value.options, options));
-    return obj ? obj.connection : null;
-  }
-
-  create(options) {
-    // try to prevent bad use of createCollection function
-    try {
-      const connection = mysql.createConnection(options);
-      this.push({ options, connection });
-      return connection;
-    } catch (e) {
-      throw new Err(`Error during initialization: ${e.message}`)
-    }
-  }
-
-  delete(connection) {
-    const i = this.findIndex(value => value.connection === connection);
-    if (i < 0) return null;
-    return this.splice(i, 1);
-  }
-}
-
-const connections = new Connections();
-
 module.exports = class JoshProvider {
   constructor(options) {
     if (options.inMemory) {
@@ -70,11 +35,11 @@ module.exports = class JoshProvider {
       this.name = options.name;
       this.validateName();
 
-      let db = connections.findConnection(options.connection);
-
-      if (!db || options.forceCreateNew === true) db = connections.create(options.connection);
-
-      this.db = db;
+      try {
+        this.db = mysql.createPool(options.connection);
+      } catch (e) {
+        throw new Err(e.message, 'JOSHMySQLInitializationError')
+      }
     }
   }
 
@@ -103,19 +68,32 @@ module.exports = class JoshProvider {
   runMany(transactions) {
     return new Promise((resolve, reject) => {
 
-      this.db.beginTransaction(async err => {
-        if (err) return reject(err);
+      this.db.getConnection((err, connection) => {
+        if (err) return connection.rollback(() => {
+          connection.release();
+          reject(err);
+        });
 
-        try {
+        connection.beginTransaction(async err => {
+          if (err) return connection.rollback(() => {
+            connection.release();
+            reject(err);
+          });
 
-          for (let [sql, values] of transactions) {
-            await this.query(sql, values);
+          try {
+
+            for (let [sql, values] of transactions) {
+              await this.query(sql, values);
+            }
+            connection.commit(resolve);
+            connection.release();
+
+          } catch (e) {
+            connection.rollback(() => reject(e));
+            connection.release();
           }
-          this.db.commit(resolve);
+        });
 
-        } catch (e) {
-          this.db.rollback(() => reject(e));
-        }
       });
 
     });
