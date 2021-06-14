@@ -17,7 +17,7 @@ yarn add @joshdb/json
 Using the JSON provider goes as such:
 
 ```js
-const Josh = require('josh');
+const Josh = require('@joshdb/core');
 const JoshJSON = require('@joshdb/json');
 
 const db = new Josh({

@@ -19,7 +19,7 @@ Using the IndexedDB provider goes as such:
 ### Webpack
 
 ```js
-const Josh = require('josh');
+const Josh = require('@joshdb/core');
 const JoshIndexedDB = require('@joshdb/indexeddb');
 
 const db = new Josh({
