@@ -56,7 +56,7 @@ class JoshProvider {
     const data = await this.db.findOne({
       key: { $eq: key },
     });
-    if (!path) return data && data.value;
+    if (!path) return data ? data.value : null;
     return _get(data.value, path);
   }
 
