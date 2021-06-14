@@ -57,7 +57,7 @@ class JoshProvider {
       key: { $eq: key },
     });
     if (!path) return data ? data.value : null;
-    return _get(data.value, path);
+    return _get(data, `value.${path}`);
   }
 
   async getAll() {
