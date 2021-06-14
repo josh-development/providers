@@ -296,7 +296,7 @@ module.exports = class JoshProvider {
     this.check(key, ['Number'], path);
     const base = this.get(key, path);
     let result = null;
-    if (base == undefined || operation == undefined || operand == undefined) {
+    if (isNil(base) || isNil(operation) || isNil(operand)) {
       throw new Err(
         'Math operation requires base, operation and operand',
         'JoshTypeError',
