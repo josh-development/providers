@@ -131,9 +131,6 @@ module.exports = class JoshProvider {
     this.deleteStmt = `DELETE FROM ${this.name} WHERE objkey=? AND path=?;`;
     this.insertStmt = `INSERT INTO ${this.name} (objkey, path, val) VALUES (?, ?, ?);`;
 
-    //TODO
-    this.getPaginatedStmt = `SELECT ROWID, * FROM ${this.name} WHERE rowid > @lastRowId AND path = '::NULL::' ORDER BY rowid LIMIT @limit;`;
-
     this.isInitialized = true;
   }
 
@@ -210,7 +207,6 @@ module.exports = class JoshProvider {
     return this;
   }
 
-  // TODO: Figure out how to make this similar to GET, make this take an object also.
   async setMany(data, overwrite) {
     if (isNil(data) || data.constructor.name !== 'Object') {
       throw new Error('Provided data was not an object of {key, value} pairs.');
