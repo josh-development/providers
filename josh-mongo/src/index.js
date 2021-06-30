@@ -1,6 +1,6 @@
 const { MongoClient, ObjectId } = require('mongodb');
 
-const { get: _get, unset, isFunction } = require('lodash');
+const { get: _get, unset, isFunction, isNil } = require('lodash');
 
 const Err = require('./error');
 
@@ -334,7 +334,7 @@ class JoshProvider {
     await this.check(key, ['Number'], path);
     const base = await this.get(key, path);
     let result = null;
-    if (!base || !operation || !operand) {
+    if (isNil(base) || isNil(operation) || isNil(operand)) {
       throw new Err(
         'Math operation requires base, operation and operand parameters',
         'JoshTypeError',
@@ -525,7 +525,7 @@ class JoshProvider {
     }
     if (!key || !type) return;
     const value = await this.get(key, path);
-    if (!value) {
+    if (isNil(value)) {
       throw new Err(
         `The document "${key}" of path "${path}" was not found in the database`,
         'JoshTypeError',

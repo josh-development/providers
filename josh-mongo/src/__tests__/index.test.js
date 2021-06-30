@@ -1,7 +1,6 @@
 const Provider = require('../index.js');
 const config = require('./config-mongo.json');
 const JoshTests = require('../../../josh-tests');
-// const privateConfig = require('./config-private.json');
 /* config-mongo.json example contents
 {
   "name": "josh",
