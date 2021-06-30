@@ -114,7 +114,7 @@ module.exports = class JoshProvider {
 
     if (!database || !database["DATABASE()"]) throw new Error("Connection must have a database");
 
-    await this.query(`CREATE TABLE IF NOT EXISTS ${this.name} (objkey VARCHAR(255), path VARCHAR(255), val TEXT, PRIMARY KEY(objkey, path)) ENGINE=INNODB;`)
+    await this.query(`CREATE TABLE IF NOT EXISTS ${this.name} (objkey VARCHAR(255), path VARCHAR(255), val LONGTEXT, PRIMARY KEY(objkey, path)) ENGINE=INNODB;`)
       .catch(console.error);
 
     await this.query(`CREATE TABLE IF NOT EXISTS internal_autonum (josh VARCHAR(255) PRIMARY KEY, lastnum INTEGER) ENGINE=INNODB;`)
