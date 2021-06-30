@@ -1,4 +1,4 @@
-const fs = require('file-system');
+const fs = require('fs');
 const path = require('path');
 function fetchTests(dir, all = []) {
   dir = path.resolve(dir);

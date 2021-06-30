@@ -1,7 +1,6 @@
 const Provider = require('../index.js');
 const config = require('./config-mongo.json');
 const JoshTests = require('../../../josh-tests');
-// const privateConfig = require('./config-private.json');
 /* config-mongo.json example contents
 {
   "name": "josh",
@@ -25,7 +24,7 @@ if (!config || !config.collection) {
   process.exit(1);
 }
 
-const provider = new Provider(config || require('./config-private.json'));
+const provider = new Provider(require('./config-private.json') || config);
 
 const tests = new JoshTests(provider);
 

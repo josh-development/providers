@@ -1,4 +1,4 @@
-const { get: _get, set: _set, unset, isFunction } = require('lodash');
+const { get: _get, set: _set, unset, isFunction, isNil } = require('lodash');
 const Err = require('./error');
 const { FileManager } = require('./files.js');
 const uuidv4 = require('uuid').v4;
@@ -318,7 +318,7 @@ class JoshProvider {
     await this.check(key, ['Number'], path);
     const base = await this.get(key, path);
     let result = null;
-    if (!base || !operation || !operand) {
+    if (isNil(base) || isNil(operation) || isNil(operand)) {
       throw new Err(
         'Math operation requires base, operation and operand parameters',
         'JoshTypeError',
@@ -376,7 +376,7 @@ class JoshProvider {
     }));
     for (const doc of docs) {
       if (
-        !value
+        isNil(value)
           ? _get(doc.value, path)
           : path
           ? value == _get(doc.value, path)
@@ -406,7 +406,7 @@ class JoshProvider {
     const finalDoc = {};
     for (const [key, val] of docs) {
       if (
-        !value
+        isNil(value)
           ? _get(val, path)
           : path
           ? value == _get(val, path)
@@ -509,7 +509,7 @@ class JoshProvider {
     if (!this.files) throw new Err('Database has been closed');
     if (!key || !type) return;
     const value = await this.get(key, path);
-    if (!value) {
+    if (isNil(value)) {
       throw new Err(
         `The document "${key}" of path "${path}" was not found in the database`,
         'JoshTypeError',
