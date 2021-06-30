@@ -25,7 +25,7 @@ if (!config || !config.collection) {
   process.exit(1);
 }
 
-const provider = new Provider(config || require('./config-private.json'));
+const provider = new Provider(config || require('./config-mongo.json'));
 
 const tests = new JoshTests(provider);
 
