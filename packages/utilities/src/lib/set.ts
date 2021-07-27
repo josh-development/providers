@@ -1,4 +1,4 @@
-export function set<D extends Record<string, any>, V>(data: D, path: string, value: V): D {
+export function set<Data extends Record<string, any>, Value>(data: Data, path: string, value: Value): Data {
 	const fullPath = path.replace(/\[/g, '.').replace(/]/g, '').split('.').filter(Boolean);
 
 	fullPath.reduce((previousStep, step, index) => {
