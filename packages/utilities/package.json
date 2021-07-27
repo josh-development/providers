@@ -1,0 +1,30 @@
+{
+	"name": "@joshdb/utilities",
+	"version": "1.0.0",
+	"license": "Apache-2.0",
+	"description": "Simple utilities for the JOSH project",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"test": "jest --verbose",
+		"lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
+		"build": "tsc -b src",
+		"prepublishOnly": "rollup-type-bundler"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/eslachance/josh-providers.git",
+		"directory": "packages/map"
+	},
+	"files": [
+		"dist",
+		"!dist/*.tsbuildinfo"
+	],
+	"engines": {
+		"node": ">=14",
+		"npm": ">=6"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
