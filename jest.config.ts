@@ -9,7 +9,7 @@ export default async (): Promise<Config.InitialOptions> => ({
 	testMatch: ['<rootDir>/packages/**/tests/**/*.test.ts'],
 	globals: {
 		'ts-jest': {
-			tsconfig: '<rootDir>/packages/**/tests/tsconfig.json'
+			tsconfig: '<rootDir>/tsconfig.base.json'
 		}
 	}
 });
