@@ -3,8 +3,7 @@ name: Continuous Integration
 on:
   push:
     branches:
-      - main
-      - stable
+      - master
   pull_request:
 
 jobs:
@@ -29,8 +28,6 @@ jobs:
       - name: Install Dependencies if Cache Miss
         if: ${{ !steps.cache-restore.outputs.cache-hit }}
         run: yarn --frozen-lockfile
-      - name: Build ESLint, Prettier and Utilities
-        run: yarn build:1
       - name: Run ESLint
         run: yarn lint --fix=false
 
@@ -53,16 +50,6 @@ jobs:
       - name: Install Dependencies if Cache Miss
         if: ${{ !steps.cache-restore.outputs.cache-hit }}
         run: yarn --frozen-lockfile
-      - name: Build Async Queue
-        run: yarn workspace @sapphire/async-queue build
-      - name: Build Utilities
-        run: yarn workspace @sapphire/utilities build
-      - name: Build Time Utilities
-        run: yarn workspace @sapphire/time-utilities build
-      - name: Build Discord Utilities
-        run: yarn workspace @sapphire/discord-utilities build
-      - name: Build Discord.js Utilities
-        run: yarn workspace @sapphire/discord.js-utilities build
       - name: Run tests
         run: yarn test --coverage
       - name: Store code coverage report
@@ -92,5 +79,5 @@ jobs:
       - name: Install Dependencies if Cache Miss
         if: ${{ !steps.cache-restore.outputs.cache-hit }}
         run: yarn --frozen-lockfile
-      - name: Compile Projects
+      - name: Build Code
         run: yarn build
