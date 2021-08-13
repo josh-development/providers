@@ -1,6 +1,6 @@
 {
   "name": "@joshdb/json",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "JSON Provider for JOSH",
   "main": "src/index.js",
   "scripts": {
@@ -11,7 +11,10 @@
     "type": "git",
     "url": "git+https://github.com/eslachance/josh.git"
   },
-  "author": "Evelyne Lachance,DanCodes",
+  "author": "Evelyne Lachance <me@evie.codes> (https://evie.codes)",
+  "contributors": [
+    "DanCodes <dan@dancodes.online> (https://dancodes.online)"
+  ],
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/eslachance/josh/issues"
