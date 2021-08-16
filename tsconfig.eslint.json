@@ -6,6 +6,7 @@
 		"packages/**/*.ts",
 		"packages/**/jest.config.ts",
 		"packages/**/scripts/rollup.config.ts",
-		"packages/**/tests/*.ts"
+		"packages/**/tests/*.ts",
+		"scripts"
 	]
 }
