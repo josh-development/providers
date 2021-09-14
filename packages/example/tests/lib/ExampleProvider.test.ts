@@ -1,281 +1,314 @@
-import { Method, Payload } from '@joshdb/core';
 import { ExampleProvider } from '../../src';
+import { Method, Payload } from '@joshdb/core';
 
-const provider = new ExampleProvider();
-
-describe('ExampleProviderClass', () => {
-	describe('Initialization', () => {
-		test('GIVEN init() THEN returns true', () => {
-			void expect(provider.init({ name: 'tests' })).resolves.toBe(true);
+describe('ExampleProvider', () => {
+	describe('is a class', () => {
+		test('GIVEN typeof ExampleProvider THEN returns function', () => {
+			expect(typeof ExampleProvider).toBe('function');
 		});
 
-		test('GIVEN name THEN returns provider name', () => {
-			expect(provider.name).toBe('tests');
+		test('GIVEN typeof ...prototype THEN returns object', () => {
+			expect(typeof ExampleProvider.prototype).toBe('object');
 		});
 	});
 
-	describe('Payload validation', () => {
-		test('GIVEN autoKey() THEN returns payload for autoKey', () => {
-			const { method, trigger, data } = provider.autoKey({ method: Method.AutoKey, data: '' });
+	describe('can manipulate provider data', () => {
+		const provider = new ExampleProvider();
 
-			expect(method).toBe(Method.AutoKey);
-			expect(trigger).toBeUndefined();
-			expect(data).toBe('');
+		beforeEach(() => {
+			provider.clear({ method: Method.Clear });
 		});
 
-		test('GIVEN dec() THEN returns payload for dec', () => {
-			const { method, trigger, key, path, data } = provider.dec({ method: Method.Dec, key: '' });
+		describe('with autoKey method', () => {
+			test('GIVEN ... THEN returns payload', () => {
+				const payload = provider.autoKey({ method: Method.AutoKey, data: '0' });
 
-			expect(method).toBe(Method.Dec);
-			expect(trigger).toBeUndefined();
-			expect(key).toBe('');
-			expect(path).toBeUndefined();
-			expect(data).toBeUndefined();
+				expect(typeof payload).toBe('object');
+			});
 		});
 
-		test('GIVEN delete() THEN returns payload for delete', () => {
-			const { method, trigger, key, path } = provider.delete({ method: Method.Delete, key: '' });
+		describe('with clear method', () => {
+			test('GIVEN ... THEN returns payload', () => {
+				const payload = provider.clear({ method: Method.Clear });
 
-			expect(method).toBe(Method.Delete);
-			expect(trigger).toBeUndefined();
-			expect(key).toBe('');
-			expect(path).toBeUndefined();
+				expect(typeof payload).toBe('object');
+			});
 		});
 
-		test('GIVEN ensure() THEN returns payload for ensure', () => {
-			const { method, trigger, key, data, defaultValue } = provider.ensure({ method: Method.Ensure, key: '', data: '', defaultValue: '' });
+		describe('with dec method', () => {
+			test('GIVEN ... THEN returns payload', () => {
+				const payload = provider.dec({ method: Method.Dec, key: 'test:dec', path: [] });
 
-			expect(method).toBe(Method.Ensure);
-			expect(trigger).toBeUndefined();
-			expect(key).toBe('');
-			expect(data).toBe('');
-			expect(defaultValue).toBe('');
+				expect(typeof payload).toBe('object');
+			});
 		});
 
-		test('GIVEN filterByData() THEN returns payload for filterByData', () => {
-			const { method, trigger, type, path, inputData, data } = provider.filterByData({
-				method: Method.Filter,
-				type: Payload.Type.Data,
-				inputData: '',
-				data: {}
+		describe('with delete method', () => {
+			test('GIVEN ... THEN returns payload', () => {
+				const payload = provider.delete({ method: Method.Delete, key: 'test:delete', path: [] });
+
+				expect(typeof payload).toBe('object');
+			});
+		});
+
+		describe('with ensure method', () => {
+			test('GIVEN ... THEN returns payload', () => {
+				const payload = provider.ensure({ method: Method.Ensure, key: 'test:ensure', defaultValue: 'defaultValue', data: 'defaultValue' });
+
+				expect(typeof payload).toBe('object');
+			});
+		});
+
+		describe('with every method', () => {
+			describe('hook type', () => {
+				test('GIVEN ... THEN returns payload', () => {
+					const payload = provider.every({ method: Method.Every, type: Payload.Type.Hook, hook: (value) => value === 'value', data: true });
+
+					expect(typeof payload).toBe('object');
+				});
+
+				describe('with value type', () => {
+					const payload = provider.every({ method: Method.Every, type: Payload.Type.Value, path: ['path'], value: 'value', data: true });
+
+					expect(typeof payload).toBe('object');
+				});
 			});
 
-			expect(method).toBe(Method.Filter);
-			expect(trigger).toBeUndefined();
-			expect(type).toBe(Payload.Type.Data);
-			expect(path).toBeUndefined();
-			expect(inputData).toBe('');
-			expect(data).toEqual({});
-		});
+			describe('with filter method', () => {
+				describe('hook type', () => {
+					test('GIVEN ... THEN returns payload', () => {
+						const payload = provider.filter({ method: Method.Filter, type: Payload.Type.Hook, hook: (value) => value === 'value', data: {} });
 
-		test('GIVEN filterByHook() THEN returns payload for filterByHook', () => {
-			const { method, trigger, type, path, inputHook, data } = provider.filterByHook({
-				method: Method.Filter,
-				type: Payload.Type.Hook,
-				inputHook: () => true,
-				data: {}
+						expect(typeof payload).toBe('object');
+					});
+				});
+
+				describe('value type', () => {
+					test('GIVEN ... THEN returns payload', () => {
+						const payload = provider.filter({ method: Method.Filter, type: Payload.Type.Value, path: ['path'], value: 'value', data: {} });
+
+						expect(typeof payload).toBe('object');
+					});
+				});
 			});
 
-			expect(method).toBe(Method.Filter);
-			expect(trigger).toBeUndefined();
-			expect(type).toBe(Payload.Type.Hook);
-			expect(path).toBeUndefined();
-			expect(typeof inputHook).toBe('function');
-			expect(data).toEqual({});
-		});
+			describe('with find method', () => {
+				describe('hook type', () => {
+					test('GIVEN ... THEN returns payload', () => {
+						const payload = provider.find({ method: Method.Find, type: Payload.Type.Hook, hook: (value) => value === 'value' });
 
-		test('GIVEN findByData() THEN returns payload for findByData', () => {
-			const { method, trigger, type, path, inputData, data } = provider.findByData({
-				method: Method.Find,
-				type: Payload.Type.Data,
-				inputData: ''
+						expect(typeof payload).toBe('object');
+					});
+				});
+
+				describe('value type', () => {
+					test('GIVEN ... THEN returns payload', () => {
+						const payload = provider.find({ method: Method.Find, type: Payload.Type.Value, path: ['path'], value: 'value' });
+
+						expect(typeof payload).toBe('object');
+					});
+				});
 			});
 
-			expect(method).toBe(Method.Find);
-			expect(trigger).toBeUndefined();
-			expect(type).toBe(Payload.Type.Data);
-			expect(path).toBeUndefined();
-			expect(inputData).toBe('');
-			expect(data).toBeUndefined();
-		});
+			describe('with get method', () => {
+				test('GIVEN ... THEN returns payload', () => {
+					const payload = provider.get({ method: Method.Get, key: 'test:get', path: [] });
 
-		test('GIVEN findByHook() THEN returns payload for findByHook', () => {
-			const { method, trigger, type, path, inputHook, data } = provider.findByHook({
-				method: Method.Find,
-				type: Payload.Type.Hook,
-				inputHook: () => true
+					expect(typeof payload).toBe('object');
+				});
 			});
 
-			expect(method).toBe(Method.Find);
-			expect(trigger).toBeUndefined();
-			expect(type).toBe(Payload.Type.Hook);
-			expect(path).toBeUndefined();
-			expect(typeof inputHook).toBe('function');
-			expect(data).toBeUndefined();
-		});
+			describe('with getAll method', () => {
+				test('GIVEN ... THEN returns payload', () => {
+					const payload = provider.getAll({ method: Method.GetAll, data: {} });
 
-		test('GIVEN get() THEN returns payload for get', () => {
-			const { method, trigger, key, path, data } = provider.get({ method: Method.Get, key: '' });
-
-			expect(method).toBe(Method.Get);
-			expect(trigger).toBeUndefined();
-			expect(key).toBe('');
-			expect(path).toBeUndefined();
-			expect(data).toBeUndefined();
-		});
-
-		test('GIVEN getAll() THEN returns payload for getAll', () => {
-			const { method, trigger, data } = provider.getAll({ method: Method.GetAll, data: {} });
-
-			expect(method).toBe(Method.GetAll);
-			expect(trigger).toBeUndefined();
-			expect(data).toEqual({});
-		});
-
-		test('GIVEN getMany() THEN returns payload for getMany', () => {
-			const { method, trigger, keyPaths, data } = provider.getMany({ method: Method.GetMany, keyPaths: [], data: {} });
-
-			expect(method).toBe(Method.GetMany);
-			expect(trigger).toBeUndefined();
-			expect(keyPaths).toEqual([]);
-			expect(data).toEqual({});
-		});
-
-		test('GIVEN has() THEN returns payload for has', () => {
-			const { method, trigger, key, path, data } = provider.has({ method: Method.Has, key: '', data: false });
-
-			expect(method).toBe(Method.Has);
-			expect(trigger).toBeUndefined();
-			expect(key).toBe('');
-			expect(path).toBeUndefined();
-			expect(data).toBe(false);
-		});
-
-		test('GIVEN keys() THEN returns payload for keys', () => {
-			const { method, trigger, data } = provider.keys({ method: Method.Keys, data: [] });
-
-			expect(method).toBe(Method.Keys);
-			expect(trigger).toBeUndefined();
-			expect(data).toEqual([]);
-		});
-
-		test('GIVEN push() THEN returns payload for push', () => {
-			const { method, trigger, key } = provider.push({ method: Method.Push, key: '' }, '');
-
-			expect(method).toBe(Method.Push);
-			expect(trigger).toBeUndefined();
-			expect(key).toBe('');
-		});
-
-		test('GIVEN random() THEN returns payload for random', () => {
-			const { method, trigger, data } = provider.random({ method: Method.Random });
-
-			expect(method).toBe(Method.Random);
-			expect(trigger).toBeUndefined();
-			expect(data).toBeUndefined();
-		});
-
-		test('GIVEN randomKey() THEN returns payload for randomKey', () => {
-			const { method, trigger, data } = provider.randomKey({ method: Method.RandomKey });
-
-			expect(method).toBe(Method.RandomKey);
-			expect(trigger).toBeUndefined();
-			expect(data).toBeUndefined();
-		});
-
-		test('GIVEN set() THEN returns payload for set', () => {
-			const { method, trigger, key, path } = provider.set({ method: Method.Set, key: '' }, '');
-
-			expect(method).toBe(Method.Set);
-			expect(trigger).toBeUndefined();
-			expect(key).toBe('');
-			expect(path).toBeUndefined();
-		});
-
-		test('GIVEN setMany() THEN returns payload for setMany', () => {
-			const { method, trigger, keyPaths } = provider.setMany({ method: Method.SetMany, keyPaths: [] }, '');
-
-			expect(method).toBe(Method.SetMany);
-			expect(trigger).toBeUndefined();
-			expect(keyPaths).toEqual([]);
-		});
-
-		test('GIVEN size() THEN returns payload for size', () => {
-			const { method, trigger, data } = provider.size({ method: Method.Size, data: 0 });
-
-			expect(method).toBe(Method.Size);
-			expect(trigger).toBeUndefined();
-			expect(data).toBe(0);
-		});
-
-		test('GIVEN someByData() THEN returns payload for someByData', () => {
-			const { method, trigger, path, inputData, data } = provider.someByData({
-				method: Method.Some,
-				type: Payload.Type.Data,
-				inputData: '',
-				data: false
+					expect(typeof payload).toBe('object');
+				});
 			});
 
-			expect(method).toBe(Method.Some);
-			expect(trigger).toBeUndefined();
-			expect(path).toBeUndefined();
-			expect(inputData).toBe('');
-			expect(data).toBe(false);
-		});
+			describe('with getMany method', () => {
+				test('GIVEN ... THEN returns payload', () => {
+					const payload = provider.getMany({ method: Method.GetMany, keys: ['test:getMany'], data: {} });
 
-		test('GIVEN someByHook() THEN returns payload for someByHook', () => {
-			const { method, trigger, path, inputHook, data } = provider.someByHook({
-				method: Method.Some,
-				type: Payload.Type.Hook,
-				inputHook: () => true,
-				data: false
+					expect(typeof payload).toBe('object');
+				});
 			});
 
-			expect(method).toBe(Method.Some);
-			expect(trigger).toBeUndefined();
-			expect(path).toBeUndefined();
-			expect(typeof inputHook).toBe('function');
-			expect(data).toBe(false);
-		});
+			describe('with has method', () => {
+				test('GIVEN ... THEN returns payload', () => {
+					const payload = provider.has({ method: Method.Has, key: 'test:has', path: [], data: false });
 
-		test('GIVEN updateByData() THEN returns payload for updateByData', () => {
-			const { method, trigger, key, path, inputData, data } = provider.updateByData({
-				method: Method.Update,
-				type: Payload.Type.Data,
-				key: '',
-				inputData: ''
+					expect(typeof payload).toBe('object');
+				});
 			});
 
-			expect(method).toBe(Method.Update);
-			expect(trigger).toBeUndefined();
-			expect(key).toBe('');
-			expect(path).toBeUndefined();
-			expect(inputData).toBe('');
-			expect(data).toBeUndefined();
-		});
+			describe('with inc method', () => {
+				test('GIVEN ... THEN returns payload', () => {
+					const payload = provider.inc({ method: Method.Inc, key: 'test:inc', path: [] });
 
-		test('GIVEN updateByHook() THEN returns payload for updateByHook', () => {
-			const { method, trigger, key, path, inputHook, data } = provider.updateByHook({
-				method: Method.Update,
-				type: Payload.Type.Hook,
-				key: '',
-				inputHook: () => ''
+					expect(typeof payload).toBe('object');
+				});
 			});
 
-			expect(method).toBe(Method.Update);
-			expect(trigger).toBeUndefined();
-			expect(key).toBe('');
-			expect(path).toBeUndefined();
-			expect(typeof inputHook).toBe('function');
-			expect(data).toBeUndefined();
-		});
+			describe('with keys method', () => {
+				test('GIVEN ... THEN returns payload', () => {
+					const payload = provider.keys({ method: Method.Keys, data: [] });
 
-		test('GIVEN values() THEN returns payload for values', () => {
-			const { method, trigger, data } = provider.values({ method: Method.Values, data: [] });
+					expect(typeof payload).toBe('object');
+				});
+			});
 
-			expect(method).toBe(Method.Values);
-			expect(trigger).toBeUndefined();
-			expect(data).toEqual([]);
+			describe('with map method', () => {
+				describe('hook type', () => {
+					test('GIVEN ... THEN returns payload', () => {
+						const payload = provider.map({ method: Method.Map, type: Payload.Type.Hook, hook: (value) => value, data: [] });
+
+						expect(typeof payload).toBe('object');
+					});
+				});
+
+				describe('path type', () => {
+					test('GIVEN ... THEN returns payload', () => {
+						const payload = provider.map({ method: Method.Map, type: Payload.Type.Path, path: [], data: [] });
+
+						expect(typeof payload).toBe('object');
+					});
+				});
+			});
+
+			describe('with partition method', () => {
+				describe('hook type', () => {
+					test('GIVEN ... THEN returns payload', () => {
+						const payload = provider.partition({
+							method: Method.Partition,
+							type: Payload.Type.Hook,
+							hook: (value) => value === 'value',
+							data: { truthy: {}, falsy: {} }
+						});
+
+						expect(typeof payload).toBe('object');
+					});
+				});
+
+				describe('value type', () => {
+					test('GIVEN ... THEN returns payload', () => {
+						const payload = provider.partition({
+							method: Method.Partition,
+							type: Payload.Type.Value,
+							path: [],
+							value: 'value',
+							data: { truthy: {}, falsy: {} }
+						});
+						expect(typeof payload).toBe('object');
+					});
+				});
+			});
+
+			describe('with push method', () => {
+				test('GIVEN ... THEN returns payload', () => {
+					const payload = provider.push({ method: Method.Push, key: 'test:push', path: [], value: 'value' });
+
+					expect(typeof payload).toBe('object');
+				});
+			});
+
+			describe('with random method', () => {
+				test('GIVEN ... THEN returns payload', () => {
+					const payload = provider.random({ method: Method.Random });
+
+					expect(typeof payload).toBe('object');
+				});
+			});
+
+			describe('with randomKey', () => {
+				test('GIVEN ... THEN returns payload', () => {
+					const payload = provider.randomKey({ method: Method.RandomKey });
+
+					expect(typeof payload).toBe('object');
+				});
+			});
+
+			describe('with remove method', () => {
+				describe('hook type', () => {
+					test('GIVEN ... THEN returns payload', () => {
+						const payload = provider.remove({
+							method: Method.Remove,
+							type: Payload.Type.Hook,
+							key: 'test:remove',
+							path: [],
+							hook: (value) => value === 'value'
+						});
+
+						expect(typeof payload).toBe('object');
+					});
+				});
+
+				describe('value type', () => {
+					test('GIVEN ... THEN returns payload', () => {
+						const payload = provider.remove({ method: Method.Remove, type: Payload.Type.Value, key: 'test:remove', path: [], value: 'value' });
+
+						expect(typeof payload).toBe('object');
+					});
+				});
+			});
+
+			describe('with set method', () => {
+				test('GIVEN ... THEN returns payload', () => {
+					const payload = provider.set({ method: Method.Set, key: 'test:set', path: [], value: 'value' });
+
+					expect(typeof payload).toBe('object');
+				});
+			});
+
+			describe('with setMany method', () => {
+				test('GIVEN ... THEN returns payload', () => {
+					const payload = provider.setMany({ method: Method.SetMany, keys: ['test:setMany'], value: 'value' });
+
+					expect(typeof payload).toBe('object');
+				});
+			});
+
+			describe('with size method', () => {
+				test('GIVEN ... THEN returns payload', () => {
+					const payload = provider.size({ method: Method.Size, data: 0 });
+
+					expect(typeof payload).toBe('object');
+				});
+			});
+
+			describe('with some method', () => {
+				describe('hook type', () => {
+					test('GIVEN ... THEN returns payload', () => {
+						const payload = provider.some({ method: Method.Some, type: Payload.Type.Hook, hook: (value) => value === 'value', data: false });
+
+						expect(typeof payload).toBe('object');
+					});
+				});
+
+				describe('value type', () => {
+					test('GIVEN ... THEN returns payload', () => {
+						const payload = provider.some({ method: Method.Some, type: Payload.Type.Value, path: ['path'], value: 'value', data: false });
+
+						expect(typeof payload).toBe('object');
+					});
+				});
+			});
+
+			describe('with update method', () => {
+				test('GIVEN ... THEN returns payload', () => {
+					const payload = provider.update({ method: Method.Update, key: 'test:update', path: [], hook: (value) => value });
+
+					expect(typeof payload).toBe('object');
+				});
+			});
+
+			describe('with values method', () => {
+				test('GIVEN ... THEN returns payload', () => {
+					const payload = provider.values({ method: Method.Values, data: [] });
+
+					expect(typeof payload).toBe('object');
+				});
+			});
 		});
 	});
 });

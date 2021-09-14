@@ -1,12 +1,18 @@
 import {
 	AutoKeyPayload,
+	ClearPayload,
 	DecPayload,
 	DeletePayload,
 	EnsurePayload,
-	FilterByDataPayload,
+	EveryByHookPayload,
+	EveryByValuePayload,
+	EveryPayload,
 	FilterByHookPayload,
-	FindByDataPayload,
+	FilterByValuePayload,
+	FilterPayload,
 	FindByHookPayload,
+	FindByValuePayload,
+	FindPayload,
 	GetAllPayload,
 	GetManyPayload,
 	GetPayload,
@@ -14,117 +20,152 @@ import {
 	IncPayload,
 	JoshProvider,
 	KeysPayload,
+	MapByHookPayload,
+	MapByPathPayload,
+	MapPayload,
+	Method,
+	PartitionByHookPayload,
+	PartitionByValuePayload,
+	PartitionPayload,
 	PushPayload,
 	RandomKeyPayload,
 	RandomPayload,
+	RemoveByHookPayload,
+	RemoveByValuePayload,
+	RemovePayload,
 	SetManyPayload,
 	SetPayload,
 	SizePayload,
-	SomeByDataPayload,
 	SomeByHookPayload,
-	UpdateByDataPayload,
-	UpdateByHookPayload,
+	SomeByValuePayload,
+	SomePayload,
+	UpdatePayload,
 	ValuesPayload
 } from '@joshdb/core';
 
-export class ExampleProvider<Value = unknown> extends JoshProvider<Value> {
-	public autoKey(payload: AutoKeyPayload): AutoKeyPayload {
+export class ExampleProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
+	public [Method.AutoKey](payload: AutoKeyPayload): AutoKeyPayload {
 		return payload;
 	}
 
-	public dec(payload: DecPayload): DecPayload {
+	public [Method.Clear](payload: ClearPayload): ClearPayload {
 		return payload;
 	}
 
-	public delete(payload: DeletePayload): DeletePayload {
+	public [Method.Dec](payload: DecPayload): DecPayload {
 		return payload;
 	}
 
-	public ensure<CustomValue = Value>(payload: EnsurePayload<CustomValue>): EnsurePayload<CustomValue> {
+	public [Method.Delete](payload: DeletePayload): DeletePayload {
 		return payload;
 	}
 
-	public filterByData<CustomValue = Value>(payload: FilterByDataPayload<CustomValue>): FilterByDataPayload<CustomValue> {
+	public [Method.Ensure](payload: EnsurePayload<StoredValue>): EnsurePayload<StoredValue> {
 		return payload;
 	}
 
-	public filterByHook<CustomValue = Value>(payload: FilterByHookPayload<CustomValue>): FilterByHookPayload<CustomValue> {
+	public [Method.Every]<HookValue>(payload: EveryByHookPayload<HookValue>): EveryByHookPayload<HookValue>;
+
+	public [Method.Every]<Value>(payload: EveryByValuePayload): EveryByValuePayload;
+	public [Method.Every]<HookValue>(payload: EveryPayload<HookValue>): EveryPayload<HookValue> {
 		return payload;
 	}
 
-	public findByData<CustomValue = Value>(payload: FindByDataPayload<CustomValue>): FindByDataPayload<CustomValue> {
+	public [Method.Filter](payload: FilterByHookPayload<StoredValue>): FilterByHookPayload<StoredValue>;
+
+	public [Method.Filter](payload: FilterByValuePayload<StoredValue>): FilterByValuePayload<StoredValue>;
+	public [Method.Filter](payload: FilterPayload<StoredValue>): FilterPayload<StoredValue> {
 		return payload;
 	}
 
-	public findByHook<CustomValue = Value>(payload: FindByHookPayload<CustomValue>): FindByHookPayload<CustomValue> {
+	public [Method.Find](payload: FindByHookPayload<StoredValue>): FindByHookPayload<StoredValue>;
+
+	public [Method.Find](payload: FindByValuePayload<StoredValue>): FindByValuePayload<StoredValue>;
+	public [Method.Find](payload: FindPayload<StoredValue>): FindPayload<StoredValue> {
 		return payload;
 	}
 
-	public get<CustomValue = Value>(payload: GetPayload<CustomValue>): GetPayload<CustomValue> {
+	public [Method.Get]<DataValue>(payload: GetPayload<DataValue>): GetPayload<DataValue> {
 		return payload;
 	}
 
-	public getAll<CustomValue = Value>(payload: GetAllPayload<CustomValue>): GetAllPayload<CustomValue> {
+	public [Method.GetAll](payload: GetAllPayload<StoredValue>): GetAllPayload<StoredValue> {
 		return payload;
 	}
 
-	public getMany<CustomValue = Value>(payload: GetManyPayload<CustomValue>): GetManyPayload<CustomValue> {
+	public [Method.GetMany](payload: GetManyPayload<StoredValue>): GetManyPayload<StoredValue> {
 		return payload;
 	}
 
-	public has(payload: HasPayload): HasPayload {
+	public [Method.Has](payload: HasPayload): HasPayload {
 		return payload;
 	}
 
-	public inc(payload: IncPayload): IncPayload {
+	public [Method.Inc](payload: IncPayload): IncPayload {
 		return payload;
 	}
 
-	public keys(payload: KeysPayload): KeysPayload {
+	public [Method.Keys](payload: KeysPayload): KeysPayload {
 		return payload;
 	}
 
-	public push<CustomValue = Value>(payload: PushPayload, _value: CustomValue): PushPayload {
+	public [Method.Map]<Value, HookValue>(payload: MapByHookPayload<Value, HookValue>): MapByHookPayload<Value, HookValue>;
+
+	public [Method.Map]<Value = StoredValue>(payload: MapByPathPayload<Value>): MapByPathPayload<Value>;
+	public [Method.Map]<Value = StoredValue, HookValue = Value>(payload: MapPayload<Value, HookValue>): MapPayload<Value, HookValue> {
 		return payload;
 	}
 
-	public random<CustomValue = Value>(payload: RandomPayload<CustomValue>): RandomPayload<CustomValue> {
+	public [Method.Partition](payload: PartitionByHookPayload<StoredValue>): PartitionByHookPayload<StoredValue>;
+
+	public [Method.Partition](payload: PartitionByValuePayload<StoredValue>): PartitionByValuePayload<StoredValue>;
+	public [Method.Partition](payload: PartitionPayload<StoredValue>): PartitionPayload<StoredValue> {
 		return payload;
 	}
 
-	public randomKey(payload: RandomKeyPayload): RandomKeyPayload {
+	public [Method.Push]<Value>(payload: PushPayload<Value>): PushPayload<Value> {
 		return payload;
 	}
 
-	public set<CustomValue = Value>(payload: SetPayload, _value: CustomValue): SetPayload {
+	public [Method.Random](payload: RandomPayload<StoredValue>): RandomPayload<StoredValue> {
 		return payload;
 	}
 
-	public setMany<CustomValue = Value>(payload: SetManyPayload, _value: CustomValue): SetManyPayload {
+	public [Method.RandomKey](payload: RandomKeyPayload): RandomKeyPayload {
 		return payload;
 	}
 
-	public size(payload: SizePayload): SizePayload {
+	public [Method.Remove]<HookValue>(payload: RemoveByHookPayload<HookValue>): RemoveByHookPayload<HookValue>;
+
+	public [Method.Remove]<Value>(payload: RemoveByValuePayload): RemoveByValuePayload;
+	public [Method.Remove]<HookValue>(payload: RemovePayload<HookValue>): RemovePayload<HookValue> {
 		return payload;
 	}
 
-	public someByData<CustomValue = Value>(payload: SomeByDataPayload<CustomValue>): SomeByDataPayload<CustomValue> {
+	public [Method.Set]<Value = StoredValue>(payload: SetPayload<Value>): SetPayload<Value> {
 		return payload;
 	}
 
-	public someByHook<CustomValue = Value>(payload: SomeByHookPayload<CustomValue>): SomeByHookPayload<CustomValue> {
+	public [Method.SetMany](payload: SetManyPayload<StoredValue>): SetManyPayload<StoredValue> {
 		return payload;
 	}
 
-	public updateByData<CustomValue = Value>(payload: UpdateByDataPayload<CustomValue>): UpdateByDataPayload<CustomValue> {
+	public [Method.Size](payload: SizePayload): SizePayload {
 		return payload;
 	}
 
-	public updateByHook<CustomValue = Value>(payload: UpdateByHookPayload<CustomValue>): UpdateByHookPayload<CustomValue> {
+	public [Method.Some]<HookValue>(payload: SomeByHookPayload<HookValue>): SomeByHookPayload<HookValue>;
+
+	public [Method.Some]<Value>(payload: SomeByValuePayload): SomeByValuePayload;
+	public [Method.Some]<HookValue>(payload: SomePayload<HookValue>): SomePayload<HookValue> {
 		return payload;
 	}
 
-	public values<CustomValue = Value>(payload: ValuesPayload<CustomValue>): ValuesPayload<CustomValue> {
+	public [Method.Update]<Value, HookValue>(payload: UpdatePayload<StoredValue, Value, HookValue>): UpdatePayload<StoredValue, Value, HookValue> {
+		return payload;
+	}
+
+	public [Method.Values](payload: ValuesPayload<StoredValue>): ValuesPayload<StoredValue> {
 		return payload;
 	}
 }

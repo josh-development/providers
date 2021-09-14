@@ -13,7 +13,7 @@
 	},
 	"dependencies": {
 		"@joshdb/core": "RealShadowNova/joshdb-core#build",
-		"@realware/utilities": "^1.0.1",
+		"@realware/utilities": "^2.0.2",
 		"@sapphire/stopwatch": "^1.1.4",
 		"@sapphire/utilities": "^2.0.1"
 	},
