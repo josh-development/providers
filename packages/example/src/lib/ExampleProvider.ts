@@ -23,6 +23,7 @@ import {
 	MapByHookPayload,
 	MapByPathPayload,
 	MapPayload,
+	MathPayload,
 	Method,
 	PartitionByHookPayload,
 	PartitionByValuePayload,
@@ -113,6 +114,10 @@ export class ExampleProvider<StoredValue = unknown> extends JoshProvider<StoredV
 
 	public [Method.Map]<Value = StoredValue>(payload: MapByPathPayload<Value>): MapByPathPayload<Value>;
 	public [Method.Map]<Value = StoredValue, HookValue = Value>(payload: MapPayload<Value, HookValue>): MapPayload<Value, HookValue> {
+		return payload;
+	}
+
+	public [Method.Math](payload: MathPayload): MathPayload {
 		return payload;
 	}
 

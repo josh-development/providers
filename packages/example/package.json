@@ -14,8 +14,8 @@
 	"dependencies": {
 		"@joshdb/core": "RealShadowNova/joshdb-core#build",
 		"@realware/utilities": "^2.0.2",
-		"@sapphire/stopwatch": "^1.1.4",
-		"@sapphire/utilities": "^2.0.1"
+		"@sapphire/stopwatch": "^1.2.1",
+		"@sapphire/utilities": "^3.0.2"
 	},
 	"repository": {
 		"type": "git",
