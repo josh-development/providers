@@ -44,6 +44,11 @@ import {
 	ValuesPayload
 } from '@joshdb/core';
 
+/**
+ * NOTE: This is just a placeholder to represent file structure.
+ * For a complete provider please refer to the default provider,
+ * [MapProvider](https://github.com/RealShadowNova/joshdb-core/blob/main/src/lib/structures/defaultProvider/MapProvider.ts) from the core package.
+ */
 export class ExampleProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
 	public [Method.AutoKey](payload: AutoKeyPayload): AutoKeyPayload {
 		return payload;
