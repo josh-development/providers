@@ -14,7 +14,7 @@
 		"build": "lerna run build",
 		"commit": "git-cz --disable-emoji",
 		"update": "yarn upgrade-interactive --latest",
-		"prepare": "husky install .github/husky"
+		"prepare": "husky install .husky"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^13.2.1",
