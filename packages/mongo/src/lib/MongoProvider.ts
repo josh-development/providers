@@ -36,7 +36,6 @@ import {
 	isSomeByValuePayload,
 	JoshError,
 	JoshProvider,
-	JoshProviderError,
 	KeysPayload,
 	MapByHookPayload,
 	MapByPathPayload,
@@ -64,44 +63,24 @@ import {
 } from '@joshdb/core';
 import { v4 } from 'uuid';
 import mongoose, { Mongoose } from 'mongoose';
-import { getModelForClass, prop, ReturnModelType, Severity } from '@typegoose/typegoose';
+import { getModelForClass, ReturnModelType, Severity } from '@typegoose/typegoose';
+import { MongoDocType } from './MongoDoc';
+import { MongoProviderError } from './MongoProviderError';
 import type { BeAnObject } from '@typegoose/typegoose/lib/types';
-import { isString } from '@typegoose/typegoose/lib/internal/utils';
-
-class DocType {
-	@prop({ required: true })
-	public key!: string;
-
-	@prop({ required: true })
-	public value: any;
-}
-
-/**
- * The error class for the MongoProvider.
- * @since 2.0.0
- */
-export class MongoProviderError extends JoshProviderError {
-	/**
-	 * The name for this error.
-	 */
-	public get name() {
-		return 'MongoProviderError';
-	}
-}
 
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
 	private connectionURI: string;
 
 	private client?: Mongoose;
 
-	private collection?: ReturnModelType<typeof DocType, BeAnObject>;
+	private collection?: ReturnModelType<typeof MongoDocType, BeAnObject>;
 
 	public constructor(options: MongoProvider.Options) {
-		super({});
+		super(options);
 
 		let { collection } = options;
 
-		if (!isString(collection)) {
+		if (typeof collection !== 'string') {
 			throw new JoshError({
 				identifier: MongoProvider.Identifiers.InvalidCollectionName,
 				message: 'Collection name must be provided and be a valid string'
@@ -110,7 +89,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 		collection = collection.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
-		this.collection = getModelForClass(DocType, { schemaOptions: { collection }, options: { allowMixed: Severity.ALLOW } });
+		this.collection = getModelForClass(MongoDocType, { schemaOptions: { collection }, options: { allowMixed: Severity.ALLOW } });
 
 		if (options.auth?.url) {
 			this.connectionURI = options.auth.url;
@@ -122,8 +101,6 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 			this.connectionURI = `mongodb://${auth}${host}:${port}/${dbName}`;
 		}
-
-		return this;
 	}
 
 	public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
@@ -154,7 +131,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 		const { data: value } = (await this.get({ key, method: Method.Get, path })) as { data: any };
 
 		if (value === undefined) {
-			payload.error = new JoshProviderError({
+			payload.error = new MongoProviderError({
 				identifier: MongoProvider.Identifiers.DecInvalidType,
 				message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
 				method: Method.Dec
@@ -163,7 +140,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 			return payload;
 		}
 		if (!isNumber(value)) {
-			payload.error = new JoshProviderError({
+			payload.error = new MongoProviderError({
 				identifier: MongoProvider.Identifiers.DecInvalidType,
 				message:
 					path.length === 0 ? `The data at "${key}" must be of type "number".` : `The data at "${key}.${path.join('.')}" must be of type "number".`,
@@ -722,12 +699,18 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 export namespace MongoProvider {
 	export interface Options {
 		collection: string;
+
 		auth?: {
 			user?: string;
+
 			password?: string;
+
 			dbName?: string;
+
 			port?: number;
+
 			host?: string;
+
 			url?: string;
 		};
 	}
