@@ -1,0 +1,44 @@
+name: Josh-Mongo
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Cache
+        uses: actions/cache@v2.1.3
+        with:
+          path: node_modules
+          key: ${{ matrix.node-version }}
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.3.0
+        with:
+          mongodb-version: 5.0
+      - name: Install yarn
+        run: npm i -g yarn
+      - name: Install core dependencies
+        run: yarn ci
+      - name: Install mongo dependencies
+        working-directory: packages/mongo
+        run: yarn ci
+      - name: Run linter
+        working-directory: packages/mongo
+        run: yarn lint
+      - name: Run tests
+        working-directory: packages/mongo
+        run: yarn test
