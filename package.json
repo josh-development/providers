@@ -1,29 +1,20 @@
 {
-	"name": "@joshdb/core",
-	"version": "2.0.0",
-	"description": "JavaScript Object Storage Helper",
-	"author": "Evelyne Lachance <eslachance@gmail.com> (https://evie.codes/)",
-	"license": "Apache-2.0",
-	"private": false,
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
+	"name": "root",
+	"private": true,
+	"workspaces": [
+		"packages/*"
+	],
 	"scripts": {
-		"lint": "eslint src tests scripts --ext mjs,ts --fix",
-		"format": "prettier --write {src,tests,scripts}/**/*.{mjs,ts}",
+		"clean": "rimraf packages/**/dist packages/**/node_modules/.cache",
+		"clean:full": "yarn clean && rimraf packages/**/node_modules",
+		"lint": "eslint packages --ext mjs,ts --fix",
+		"format": "prettier --write packages/**/{src,tests,scripts}/**/*.{mjs,ts}",
 		"test": "jest --verbose",
 		"test:watch": "jest --verbose --watch",
-		"update": "yarn upgrade-interactive --latest",
-		"clean": "node scripts/clean-dist.mjs",
-		"build": "tsc -b src && rollup -c scripts/rollup.bundle.ts",
-		"watch": "tsc -b src -w",
+		"build": "lerna run build",
 		"commit": "git-cz --disable-emoji",
-		"prepublishOnly": "rollup-type-bundler",
+		"update": "yarn upgrade-interactive --latest",
 		"prepare": "husky install .github/husky"
-	},
-	"dependencies": {
-		"@realware/utilities": "^2.0.2",
-		"@sapphire/pieces": "^3.0.1",
-		"@sapphire/utilities": "^3.0.2"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^13.2.1",
@@ -33,10 +24,11 @@
 		"@sapphire/ts-config": "^3.1.0",
 		"@types/jest": "^27.0.2",
 		"@types/node": "^16.10.3",
-		"eslint": "^7.32.0",
+		"eslint": "^8.0.0",
 		"husky": "^7.0.4",
 		"jest": "^27.2.5",
 		"jest-circus": "^27.2.5",
+		"lerna": "^4.0.0",
 		"lint-staged": "^11.2.3",
 		"prettier": "^2.4.1",
 		"pretty-quick": "^3.1.1",
@@ -48,23 +40,11 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/eslachance/josh"
+		"url": "git+https://github.com/eslachance/josh-providers.git"
 	},
-	"files": [
-		"dist",
-		"!dist/*.tsbuildinfo"
-	],
 	"engines": {
 		"node": ">=16",
 		"npm": ">=6"
-	},
-	"keywords": [],
-	"bugs": {
-		"url": "https://github.com/eslachance/josh/issues"
-	},
-	"homepage": "https://github.com/eslachance/josh",
-	"publishConfig": {
-		"access": "public"
 	},
 	"commitlint": {
 		"extends": [
