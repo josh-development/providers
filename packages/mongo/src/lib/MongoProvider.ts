@@ -66,6 +66,7 @@ import { v4 } from 'uuid';
 import mongoose, { Mongoose } from 'mongoose';
 import { getModelForClass, prop, ReturnModelType, Severity } from '@typegoose/typegoose';
 import type { BeAnObject } from '@typegoose/typegoose/lib/types';
+import { isString } from '@typegoose/typegoose/lib/internal/utils';
 
 class DocType {
 	@prop({ required: true })
@@ -96,16 +97,18 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	private collection?: ReturnModelType<typeof DocType, BeAnObject>;
 
 	public constructor(options: MongoProvider.Options) {
-		super();
+		super({});
 
-		if (!options.collection) {
+		let { collection } = options;
+
+		if (!isString(collection)) {
 			throw new JoshError({
 				identifier: MongoProvider.Identifiers.InvalidCollectionName,
-				message: 'Collection name must be provided'
+				message: 'Collection name must be provided and be a valid string'
 			});
 		}
 
-		const collection = options.collection.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+		collection = collection.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
 		this.collection = getModelForClass(DocType, { schemaOptions: { collection }, options: { allowMixed: Severity.ALLOW } });
 
