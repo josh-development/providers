@@ -90,7 +90,9 @@ export class MongoProviderError extends JoshProviderError {
 
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
 	private connectionURI: string;
+
 	private client?: Mongoose;
+
 	private collection?: ReturnModelType<typeof DocType, BeAnObject>;
 
 	public constructor(options: MongoProvider.Options) {
