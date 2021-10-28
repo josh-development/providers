@@ -1,5 +1,3 @@
-import { deleteFromObject, getFromObject, hasFromObject } from '@realware/utilities';
-import { isNumber, isPrimitive } from '@sapphire/utilities';
 import {
 	AutoKeyPayload,
 	ClearPayload,
@@ -61,24 +59,48 @@ import {
 	UpdatePayload,
 	ValuesPayload
 } from '@joshdb/core';
-import { v4 } from 'uuid';
-import mongoose, { Mongoose } from 'mongoose';
+import { deleteFromObject, getFromObject, hasFromObject } from '@realware/utilities';
+import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
 import { getModelForClass, ReturnModelType, Severity } from '@typegoose/typegoose';
+import type { BeAnObject } from '@typegoose/typegoose/lib/types';
+import mongoose, { Mongoose } from 'mongoose';
+import { v4 } from 'uuid';
 import { MongoDocType } from './MongoDoc';
 import { MongoProviderError } from './MongoProviderError';
-import type { BeAnObject } from '@typegoose/typegoose/lib/types';
 
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
 	private connectionURI: string;
 
-	private client?: Mongoose;
+	private _client?: Mongoose;
 
-	private collection?: ReturnModelType<typeof MongoDocType, BeAnObject>;
+	private get client(): Mongoose {
+		if (isNullOrUndefined(this._client)) {
+			throw new JoshError({
+				message: 'Client is not connected, most likely due to init not being called',
+				identifier: MongoProvider.Identifiers.NotConnected
+			});
+		}
+
+		return this._client;
+	}
+
+	private _collection?: ReturnModelType<typeof MongoDocType, BeAnObject>;
+
+	private get collection(): ReturnModelType<typeof MongoDocType, BeAnObject> {
+		if (isNullOrUndefined(this._collection)) {
+			throw new JoshError({
+				message: 'Collection is undefined, most likely due to init not being called',
+				identifier: MongoProvider.Identifiers.NotConnected
+			});
+		}
+
+		return this._collection;
+	}
 
 	public constructor(options: MongoProvider.Options) {
 		super(options);
 
-		let { collection } = options;
+		let { collection, auth, enforceCollectionName } = options;
 
 		if (typeof collection !== 'string') {
 			throw new JoshError({
@@ -87,31 +109,33 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 			});
 		}
 
-		collection = collection.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+		if (enforceCollectionName !== false) {
+			collection = collection.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+		}
 
-		this.collection = getModelForClass(MongoDocType, { schemaOptions: { collection }, options: { allowMixed: Severity.ALLOW } });
+		this._collection = getModelForClass(MongoDocType, { schemaOptions: { collection }, options: { allowMixed: Severity.ALLOW } });
 
-		if (options.auth?.url) {
-			this.connectionURI = options.auth.url;
+		if (auth?.url) {
+			this.connectionURI = auth.url;
 		} else {
-			const auth = options.auth?.user && options.auth.password ? `${options.auth.user}:${options.auth.password}@` : '';
-			const dbName = options.auth?.dbName || 'josh';
-			const host = options.auth?.host || 'localhost';
-			const port = options.auth?.port || 27017;
+			const authUser = auth?.user && auth.password ? `${auth.user}:${auth.password}@` : '';
+			const dbName = auth?.dbName || 'josh';
+			const host = auth?.host || 'localhost';
+			const port = auth?.port || 27017;
 
-			this.connectionURI = `mongodb://${auth}${host}:${port}/${dbName}`;
+			this.connectionURI = `mongodb://${authUser}${host}:${port}/${dbName}`;
 		}
 	}
 
 	public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
-		this.client = await mongoose.connect(this.connectionURI);
+		this._client = await mongoose.connect(this.connectionURI);
 		context = await super.init(context);
 
 		return context;
 	}
 
 	public async close() {
-		return this.client?.disconnect();
+		return this.client.disconnect();
 	}
 
 	public [Method.AutoKey](payload: AutoKeyPayload): AutoKeyPayload {
@@ -121,7 +145,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	}
 
 	public async [Method.Clear](payload: ClearPayload): Promise<ClearPayload> {
-		await this.collection?.deleteMany({});
+		await this.collection.deleteMany({});
 
 		return payload;
 	}
@@ -139,6 +163,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 			return payload;
 		}
+
 		if (!isNumber(value)) {
 			payload.error = new MongoProviderError({
 				identifier: MongoProvider.Identifiers.DecInvalidType,
@@ -188,7 +213,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 		if (isEveryByHookPayload(payload)) {
 			const { hook } = payload;
 
-			for (const [_key, value] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data)) {
+			for (const value of (await this.values({ method: Method.Values, data: [] })).data) {
 				const everyValue = await hook(value);
 
 				if (everyValue) continue;
@@ -289,7 +314,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	public async [Method.Get]<StoredValue>(payload: GetPayload<StoredValue>): Promise<GetPayload<StoredValue>> {
 		const { key, path } = payload;
 
-		const doc = await this.collection?.findOne({ key });
+		const doc = await this.collection.findOne({ key });
 
 		if (!doc) {
 			payload.data = undefined;
@@ -305,7 +330,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	}
 
 	public async [Method.GetAll](payload: GetAllPayload<StoredValue>): Promise<GetAllPayload<StoredValue>> {
-		const docs = (await this.collection?.find({})) || [];
+		const docs = (await this.collection.find({})) || [];
 
 		for (const doc of docs) {
 			payload.data[doc.key] = doc.value;
@@ -317,7 +342,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	public async [Method.GetMany](payload: GetManyPayload<StoredValue>): Promise<GetManyPayload<StoredValue>> {
 		const { keys } = payload;
 
-		const docs = (await this.collection?.find({ key: { $in: keys } })) || [];
+		const docs = (await this.collection.find({ key: { $in: keys } })) || [];
 
 		for (const doc of docs) {
 			payload.data[doc.key] = doc.value;
@@ -329,7 +354,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	public async [Method.Has](payload: HasPayload): Promise<HasPayload> {
 		const { key, path } = payload;
 
-		const isThere = await this.collection?.exists({ key });
+		const isThere = await this.collection.exists({ key });
 
 		if (isThere) {
 			payload.data = true;
@@ -370,7 +395,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	}
 
 	public async [Method.Keys](payload: KeysPayload): Promise<KeysPayload> {
-		const docs = (await this.collection?.find({})) || [];
+		const docs = (await this.collection.find({})) || [];
 
 		for (const doc of docs) payload.data.push(doc.key);
 
@@ -395,9 +420,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 		if (isMapByPathPayload(payload)) {
 			const { path } = payload;
 
-			for (const value of (await this.values({ method: Method.Values, data: [] })).data) {
+			for (const value of (await this.values({ method: Method.Values, data: [] })).data)
 				payload.data.push((path.length === 0 ? value : getFromObject(value, path)) as DataValue);
-			}
 		}
 
 		return payload;
@@ -531,7 +555,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	}
 
 	public async [Method.Random](payload: RandomPayload<StoredValue>): Promise<RandomPayload<StoredValue>> {
-		const docs = (await this.collection?.aggregate([{ $sample: { size: 1 } }])) || [];
+		const docs = (await this.collection.aggregate([{ $sample: { size: 1 } }])) || [];
 
 		payload.data = docs.length > 0 ? docs[0].value : '';
 
@@ -539,7 +563,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	}
 
 	public async [Method.RandomKey](payload: RandomKeyPayload): Promise<RandomKeyPayload> {
-		const docs = (await this.collection?.aggregate([{ $sample: { size: 1 } }])) || [];
+		const docs = (await this.collection.aggregate([{ $sample: { size: 1 } }])) || [];
 
 		payload.data = docs.length > 0 ? docs[0].key : '';
 
@@ -611,7 +635,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	public async [Method.Set]<Value = StoredValue>(payload: SetPayload<Value>): Promise<SetPayload<Value>> {
 		const { key, path, value } = payload;
 
-		await this.collection?.findOneAndUpdate(
+		await this.collection.findOneAndUpdate(
 			{
 				key: { $eq: key }
 			},
@@ -629,15 +653,13 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	public async [Method.SetMany](payload: SetManyPayload<StoredValue>): Promise<SetManyPayload<StoredValue>> {
 		const { keys, value } = payload;
 
-		for (const key of keys) {
-			await this.set({ key, value, path: [], method: Method.Set });
-		}
+		for (const key of keys) await this.set({ key, value, path: [], method: Method.Set });
 
 		return payload;
 	}
 
 	public async [Method.Size](payload: SizePayload): Promise<SizePayload> {
-		payload.data = (await this.collection?.countDocuments({})) || 0;
+		payload.data = (await this.collection.countDocuments({})) || 0;
 
 		return payload;
 	}
@@ -688,7 +710,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	}
 
 	public async [Method.Values](payload: ValuesPayload<StoredValue>): Promise<ValuesPayload<StoredValue>> {
-		const docs = (await this.collection?.find({})) || [];
+		const docs = (await this.collection.find({})) || [];
 
 		for (const doc of docs) payload.data.push(doc.value);
 
@@ -699,6 +721,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 export namespace MongoProvider {
 	export interface Options {
 		collection: string;
+
+		enforceCollectionName?: boolean;
 
 		auth?: {
 			user?: string;
