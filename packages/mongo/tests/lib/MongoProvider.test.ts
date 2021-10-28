@@ -211,6 +211,7 @@ describe('MongoProvider', () => {
 							value: 'value',
 							data: { truthy: {}, falsy: {} }
 						});
+
 						expect(typeof payload).toBe('object');
 					});
 				});

@@ -108,13 +108,16 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 	public constructor(options: MongoProviderOptions) {
 		super();
+
 		if (!options.collection) {
 			throw new JoshError({
 				identifier: MongoProvider.Identifiers.InvalidCollectionName,
 				message: 'Collection name must be provided'
 			});
 		}
+
 		const collection = options.collection.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
 		this.collection = getModelForClass(DocType, { schemaOptions: { collection }, options: { allowMixed: Severity.ALLOW } });
 
 		if (options.auth?.url) {
@@ -124,14 +127,17 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 			const dbName = options.auth?.dbName || 'josh';
 			const host = options.auth?.host || 'localhost';
 			const port = options.auth?.port || 27017;
+
 			this.connectionURI = `mongodb://${auth}${host}:${port}/${dbName}`;
 		}
+
 		return this;
 	}
 
 	public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
 		this.client = await mongoose.connect(this.connectionURI);
 		context = await super.init(context);
+
 		return context;
 	}
 
@@ -141,11 +147,13 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 	public [Method.AutoKey](payload: AutoKeyPayload): AutoKeyPayload {
 		payload.data = v4();
+
 		return payload;
 	}
 
 	public async [Method.Clear](payload: ClearPayload): Promise<ClearPayload> {
 		await this.collection?.deleteMany({});
+
 		return payload;
 	}
 
@@ -159,6 +167,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 				message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
 				method: Method.Dec
 			});
+
 			return payload;
 		}
 		if (!isNumber(value)) {
@@ -168,6 +177,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 					path.length === 0 ? `The data at "${key}" must be of type "number".` : `The data at "${key}.${path.join('.')}" must be of type "number".`,
 				method: Method.Dec
 			});
+
 			return payload;
 		}
 
@@ -188,6 +198,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 			return payload;
 		}
+
 		return payload;
 	}
 
@@ -279,6 +290,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 				if (!foundValue) continue;
 
 				payload.data = value;
+
 				break;
 			}
 		}
@@ -312,10 +324,12 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 		if (!doc) {
 			payload.data = undefined;
+
 			return payload;
 		}
 
 		payload.data = doc.value;
+
 		if (path.length > 0) payload.data = getFromObject(payload.data, path);
 
 		return payload;
@@ -335,6 +349,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 		const { keys } = payload;
 
 		const docs = (await this.collection?.find({ key: { $in: keys } })) || [];
+
 		for (const doc of docs) {
 			payload.data[doc.key] = doc.value;
 		}
@@ -346,6 +361,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 		const { key, path } = payload;
 
 		const isThere = await this.collection?.exists({ key });
+
 		if (isThere) {
 			payload.data = true;
 
@@ -386,7 +402,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 	public async [Method.Keys](payload: KeysPayload): Promise<KeysPayload> {
 		const docs = (await this.collection?.find({})) || [];
+
 		for (const doc of docs) payload.data.push(doc.key);
+
 		return payload;
 	}
 
@@ -400,6 +418,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	): Promise<MapPayload<DataValue, HookValue>> {
 		if (isMapByHookPayload(payload)) {
 			const { hook } = payload;
+
 			// @ts-expect-error 2345
 			for (const value of (await this.values({ method: Method.Values, data: [] })).data) payload.data.push(await hook(value));
 		}
@@ -408,8 +427,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 			const { path } = payload;
 
 			for (const value of (await this.values({ method: Method.Values, data: [] })).data) {
-				// @ts-expect-error 2345
-				payload.data.push(path.length === 0 ? value : getFromObject(value, path));
+				payload.data.push((path.length === 0 ? value : getFromObject(value, path)) as DataValue);
 			}
 		}
 
@@ -443,26 +461,32 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 		switch (operator) {
 			case MathOperator.Addition:
 				data += operand;
+
 				break;
 
 			case MathOperator.Subtraction:
 				data -= operand;
+
 				break;
 
 			case MathOperator.Multiplication:
 				data *= operand;
+
 				break;
 
 			case MathOperator.Division:
 				data /= operand;
+
 				break;
 
 			case MathOperator.Remainder:
 				data %= operand;
+
 				break;
 
 			case MathOperator.Exponent:
 				data **= operand;
+
 				break;
 		}
 
@@ -539,6 +563,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 	public async [Method.Random](payload: RandomPayload<StoredValue>): Promise<RandomPayload<StoredValue>> {
 		const docs = (await this.collection?.aggregate([{ $sample: { size: 1 } }])) || [];
+
 		payload.data = docs.length > 0 ? docs[0].value : '';
 
 		return payload;
@@ -546,7 +571,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 	public async [Method.RandomKey](payload: RandomKeyPayload): Promise<RandomKeyPayload> {
 		const docs = (await this.collection?.aggregate([{ $sample: { size: 1 } }])) || [];
+
 		payload.data = docs.length > 0 ? docs[0].key : '';
+
 		return payload;
 	}
 
@@ -632,14 +659,17 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 	public async [Method.SetMany](payload: SetManyPayload<StoredValue>): Promise<SetManyPayload<StoredValue>> {
 		const { keys, value } = payload;
+
 		for (const key of keys) {
 			await this.set({ key, value, path: [], method: Method.Set });
 		}
+
 		return payload;
 	}
 
 	public async [Method.Size](payload: SizePayload): Promise<SizePayload> {
 		payload.data = (await this.collection?.countDocuments({})) || 0;
+
 		return payload;
 	}
 
@@ -655,6 +685,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 				if (!someValue) continue;
 
 				payload.data = true;
+
 				break;
 			}
 		}
@@ -689,7 +720,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 	public async [Method.Values](payload: ValuesPayload<StoredValue>): Promise<ValuesPayload<StoredValue>> {
 		const docs = (await this.collection?.find({})) || [];
+
 		for (const doc of docs) payload.data.push(doc.value);
+
 		return payload;
 	}
 }
