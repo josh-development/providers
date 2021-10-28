@@ -26,6 +26,7 @@
 		"@sapphire/utilities": "^3.0.2"
 	},
 	"devDependencies": {
+		"@types/uuid": "^8.3.1",
 		"@commitlint/cli": "^13.2.1",
 		"@commitlint/config-conventional": "^13.2.0",
 		"@favware/rollup-type-bundler": "^1.0.5",
