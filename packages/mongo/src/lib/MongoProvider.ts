@@ -84,25 +84,14 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 		return this._client;
 	}
 
-	private _collection?: ReturnModelType<typeof MongoDocType, BeAnObject>;
-
-	private get collection(): ReturnModelType<typeof MongoDocType, BeAnObject> {
-		if (isNullOrUndefined(this._collection)) {
-			throw new JoshError({
-				message: 'Collection is undefined, most likely due to init not being called',
-				identifier: MongoProvider.Identifiers.NotConnected
-			});
-		}
-
-		return this._collection;
-	}
+	private collection: ReturnModelType<typeof MongoDocType, BeAnObject>;
 
 	public constructor(options: MongoProvider.Options) {
 		super(options);
 
 		let { collection, auth, enforceCollectionName } = options;
 
-		if (typeof collection !== 'string') {
+		if (!collection.length) {
 			throw new JoshError({
 				identifier: MongoProvider.Identifiers.InvalidCollectionName,
 				message: 'Collection name must be provided and be a valid string'
@@ -113,7 +102,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 			collection = collection.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 		}
 
-		this._collection = getModelForClass(MongoDocType, { schemaOptions: { collection }, options: { allowMixed: Severity.ALLOW } });
+		this.collection = getModelForClass(MongoDocType, { schemaOptions: { collection }, options: { allowMixed: Severity.ALLOW } });
 
 		if (auth?.url) {
 			this.connectionURI = auth.url;
