@@ -14,7 +14,7 @@
 		"build": "lerna run build",
 		"commit": "git-cz --disable-emoji",
 		"update": "yarn upgrade-interactive --latest",
-		"prepare": "husky install .github/husky"
+		"prepare": "husky install"
 	},
 	"devDependencies": {
 		"@types/uuid": "^8.3.1",
@@ -25,7 +25,9 @@
 		"@sapphire/ts-config": "^3.1.0",
 		"@types/jest": "^27.0.2",
 		"@types/node": "^16.10.3",
+		"@typescript-eslint/eslint-plugin": "^5.2.0",
 		"eslint": "^8.0.0",
+		"eslint-config-prettier": "^8.3.0",
 		"husky": "^7.0.4",
 		"jest": "^27.2.5",
 		"jest-circus": "^27.2.5",
@@ -54,5 +56,8 @@
 	},
 	"lint-staged": {
 		"*.{mjs,js,ts}": "eslint --fix --ext mjs,js,ts"
+	},
+	"dependencies": {
+		"eslint-plugin-prettier": "^4.0.0"
 	}
 }

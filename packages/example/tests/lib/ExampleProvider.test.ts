@@ -199,6 +199,7 @@ describe('ExampleProvider', () => {
 							value: 'value',
 							data: { truthy: {}, falsy: {} }
 						});
+
 						expect(typeof payload).toBe('object');
 					});
 				});
