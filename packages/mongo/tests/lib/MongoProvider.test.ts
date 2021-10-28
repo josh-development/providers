@@ -15,12 +15,8 @@ describe('MongoProvider', () => {
 	describe('can manipulate provider data', () => {
 		const provider = new MongoProvider({ collection: 'josh-test' });
 
-		beforeAll((cb) => {
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			provider.init({ name: 'joshtest' }).then(() => {
-				console.log('Connected');
-				cb();
-			});
+		beforeAll(async () => {
+			await provider.init({ name: 'joshtest' });
 		});
 
 		beforeEach(async () => {
