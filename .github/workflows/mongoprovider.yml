@@ -32,10 +32,10 @@ jobs:
       - name: Install yarn
         run: npm i -g yarn
       - name: Install core dependencies
-        run: yarn ci
+        run: yarn
       - name: Install mongo dependencies
         working-directory: packages/mongo
-        run: yarn ci
+        run: yarn
       - name: Run linter
         working-directory: packages/mongo
         run: yarn lint
