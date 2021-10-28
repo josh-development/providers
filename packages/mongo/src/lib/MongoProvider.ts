@@ -62,7 +62,6 @@ import {
 	UpdatePayload,
 	ValuesPayload
 } from '@joshdb/core';
-
 import { v4 } from 'uuid';
 import mongoose, { Mongoose } from 'mongoose';
 import { getModelForClass, prop, ReturnModelType, Severity } from '@typegoose/typegoose';
@@ -89,24 +88,12 @@ export class MongoProviderError extends JoshProviderError {
 	}
 }
 
-export interface MongoProviderOptions {
-	collection: string;
-	auth?: {
-		user?: string;
-		password?: string;
-		dbName?: string;
-		port?: number;
-		host?: string;
-		url?: string;
-	};
-}
-
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
 	private connectionURI: string;
 	private client?: Mongoose;
 	private collection?: ReturnModelType<typeof DocType, BeAnObject>;
 
-	public constructor(options: MongoProviderOptions) {
+	public constructor(options: MongoProvider.Options) {
 		super();
 
 		if (!options.collection) {
@@ -728,6 +715,17 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 }
 
 export namespace MongoProvider {
+	export interface Options {
+		collection: string;
+		auth?: {
+			user?: string;
+			password?: string;
+			dbName?: string;
+			port?: number;
+			host?: string;
+			url?: string;
+		};
+	}
 	export enum Identifiers {
 		InvalidCollectionName = 'invalidCollectionName',
 
