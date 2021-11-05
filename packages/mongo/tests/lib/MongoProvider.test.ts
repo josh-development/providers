@@ -1,5 +1,5 @@
-import { MongoProvider } from '../../src';
 import { Method, Payload } from '@joshdb/core';
+import { MongoProvider } from '../../src';
 
 describe('MongoProvider', () => {
 	describe('is a class', () => {
@@ -13,7 +13,7 @@ describe('MongoProvider', () => {
 	});
 
 	describe('can manipulate provider data', () => {
-		const provider = new MongoProvider({ collection: 'josh-test' });
+		const provider = new MongoProvider({ collectionName: 'josh-test' });
 
 		beforeAll(async () => {
 			await provider.init({ name: 'joshtest' });

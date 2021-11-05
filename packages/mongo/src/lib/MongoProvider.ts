@@ -76,6 +76,10 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 	private _collection?: ReturnModelType<typeof MongoDoc, Record<string, any>>;
 
+	public constructor(options: MongoProvider.Options) {
+		super(options);
+	}
+
 	public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
 		context = await super.init(context);
 
