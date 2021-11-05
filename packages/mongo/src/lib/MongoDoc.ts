@@ -1,15 +1,7 @@
-import { modelOptions, prop, Severity } from '@typegoose/typegoose';
+import type { MongoDocType } from './MongoDocType';
+import { MongoDocSchema } from './MongoDocSchema';
+import mongoose, { Model } from 'mongoose';
 
-@modelOptions({
-	options: {
-		allowMixed: Severity.ALLOW,
-		customName: 'notification'
-	}
-})
-export class MongoDoc {
-	@prop({ required: true })
-	public key!: string;
-
-	@prop({ required: true })
-	public value: unknown;
+export function generateMongoDoc(collectionName: string): Model<MongoDocType> {
+	return mongoose.model('MongoDoc', MongoDocSchema, collectionName);
 }

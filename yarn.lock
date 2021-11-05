@@ -1662,17 +1662,6 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.2.tgz#423c77877d0569db20e1fc80885ac4118314010e"
   integrity sha512-eZxlbI8GZscaGS7kkc/trHTT5xgrjH3/1n2JDwusC9iahPKWMRvRjJSAN5mCXviuTGQ/lHnhvv8Q1YTpnfz9gA==
 
-"@typegoose/typegoose@^9.2.0":
-  version "9.2.0"
-  resolved "https://registry.yarnpkg.com/@typegoose/typegoose/-/typegoose-9.2.0.tgz#53b4aad4621a311b3c83f065e7e677ab11878a6f"
-  integrity sha512-nBhR8FDt1XFIwpeINQU0YbFILLjiOLp8i8ohiRW7f2fVeJu78Yq3AlAr4RR767FaL9Lyv0xmg3CuZYctxji2KQ==
-  dependencies:
-    lodash "^4.17.20"
-    loglevel "^1.7.0"
-    reflect-metadata "^0.1.13"
-    semver "^7.3.2"
-    tslib "^2.3.1"
-
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.14":
   version "7.1.16"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.1.16.tgz#bc12c74b7d65e82d29876b5d0baf5c625ac58702"
@@ -4929,11 +4918,6 @@ log-update@^4.0.0:
     slice-ansi "^4.0.0"
     wrap-ansi "^6.2.0"
 
-loglevel@^1.7.0:
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.7.1.tgz#005fde2f5e6e47068f935ff28573e125ef72f197"
-  integrity sha512-Hesni4s5UkWkwCGJMQGAh71PaLUmKFM60dHvq0zi/vDhhrzuk+4GgNbTXJ12YYQJn6ZKBDNIjYcuQGKudvqrIw==
-
 lru-cache@^6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-6.0.0.tgz#6d6fe6570ebd96aaf90fcad1dafa3b2566db3a94"
@@ -6184,11 +6168,6 @@ redent@^3.0.0:
   dependencies:
     indent-string "^4.0.0"
     strip-indent "^3.0.0"
-
-reflect-metadata@^0.1.13:
-  version "0.1.13"
-  resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.13.tgz#67ae3ca57c972a2aa1642b10fe363fe32d49dc08"
-  integrity sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==
 
 regexp-clone@1.0.0, regexp-clone@^1.0.0:
   version "1.0.0"

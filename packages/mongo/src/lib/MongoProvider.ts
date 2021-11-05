@@ -59,12 +59,12 @@ import {
 	UpdatePayload,
 	ValuesPayload
 } from '@joshdb/core';
-import { deleteFromObject, getFromObject, hasFromObject } from '@realware/utilities';
+import { deleteFromObject, getFromObject } from '@realware/utilities';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
-import { getModelForClass, ReturnModelType, Severity } from '@typegoose/typegoose';
-import mongoose, { Mongoose } from 'mongoose';
+import mongoose, { Model, Mongoose } from 'mongoose';
 import { v4 } from 'uuid';
-import { MongoDoc } from './MongoDoc';
+import { generateMongoDoc } from './MongoDoc';
+import type { MongoDocType } from './MongoDocType';
 import { MongoProviderError } from './MongoProviderError';
 
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
@@ -74,7 +74,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 	private _client?: Mongoose;
 
-	private _collection?: ReturnModelType<typeof MongoDoc, Record<string, any>>;
+	private _collection?: Model<MongoDocType>;
 
 	public constructor(options: MongoProvider.Options) {
 		super(options);
@@ -91,10 +91,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 				identifier: MongoProvider.Identifiers.InitMissingCollectionName
 			});
 
-		this._collection = getModelForClass(MongoDoc, {
-			schemaOptions: { collection: enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName },
-			options: { allowMixed: Severity.ALLOW }
-		});
+		this._collection = generateMongoDoc(enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName);
 
 		if (typeof authentication === 'string') this.connectionURI = authentication;
 		else {
@@ -136,7 +133,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 		if (data === undefined) {
 			payload.error = new MongoProviderError({
-				identifier: MongoProvider.Identifiers.DecInvalidType,
+				identifier: MongoProvider.Identifiers.DecMissingData,
 				message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
 				method: Method.Dec
 			});
@@ -163,12 +160,18 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	public async [Method.Delete](payload: DeletePayload): Promise<DeletePayload> {
 		const { key, path } = payload;
 
+		if (path.length === 0) {
+			await this.collection.deleteOne({ key });
+
+			return payload;
+		}
+
 		if ((await this.has({ method: Method.Has, key, path, data: false })).data) {
 			const { data } = await this.get({ method: Method.Get, key, path: [] });
 
 			deleteFromObject(data, path);
 
-			await this.set({ key, path, value: data, method: Method.Set });
+			await this.set({ method: Method.Set, key, path: [], value: data });
 
 			return payload;
 		}
@@ -179,10 +182,10 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	public async [Method.Ensure](payload: EnsurePayload<StoredValue>): Promise<EnsurePayload<StoredValue>> {
 		const { key } = payload;
 
-		if (!(await this.has({ key, method: Method.Has, data: false, path: [] })))
+		if (!(await this.has({ key, method: Method.Has, data: false, path: [] })).data)
 			await this.set({ key, value: payload.defaultValue, method: Method.Set, path: [] });
 
-		Reflect.set(payload, 'data', await this.get({ key, method: Method.Get, path: [] }));
+		payload.data = (await this.get({ key, method: Method.Get, path: [] })).data as StoredValue;
 
 		return payload;
 	}
@@ -190,6 +193,11 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	public async [Method.Every](payload: EveryByHookPayload<StoredValue>): Promise<EveryByHookPayload<StoredValue>>;
 	public async [Method.Every](payload: EveryByValuePayload): Promise<EveryByValuePayload>;
 	public async [Method.Every](payload: EveryPayload<StoredValue>): Promise<EveryPayload<StoredValue>> {
+		if ((await this.size({ method: Method.Size, data: 0 })).data === 0) {
+			payload.data = true;
+
+			return payload;
+		}
 		if (isEveryByHookPayload(payload)) {
 			const { hook } = payload;
 
@@ -329,14 +337,15 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 	public async [Method.Has](payload: HasPayload): Promise<HasPayload> {
 		const { key, path } = payload;
+		let isThere;
 
-		const isThere = await this.collection.exists({ key });
-
-		if (isThere) {
-			payload.data = true;
-
-			if (path.length !== 0) payload.data = hasFromObject(await this.get({ key, method: Method.Get, path: [] }), path);
+		if (path.length === 0) {
+			isThere = await this.collection.exists({ key });
+		} else {
+			isThere = await this.collection.exists({ key, [`value.${path.join('.')}`]: { $exists: true } });
 		}
+
+		payload.data = isThere;
 
 		return payload;
 	}
@@ -533,7 +542,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	public async [Method.Random](payload: RandomPayload<StoredValue>): Promise<RandomPayload<StoredValue>> {
 		const docs = (await this.collection.aggregate([{ $sample: { size: 1 } }])) || [];
 
-		payload.data = docs.length > 0 ? docs[0].value : '';
+		payload.data = docs.length > 0 ? docs[0].value : undefined;
 
 		return payload;
 	}
@@ -541,7 +550,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	public async [Method.RandomKey](payload: RandomKeyPayload): Promise<RandomKeyPayload> {
 		const docs = (await this.collection.aggregate([{ $sample: { size: 1 } }])) || [];
 
-		payload.data = docs.length > 0 ? docs[0].key : '';
+		payload.data = docs.length > 0 ? docs[0].key : undefined;
 
 		return payload;
 	}
@@ -616,7 +625,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 				key: { $eq: key }
 			},
 			{
-				$set: { key, [`${path.length > 0 ? `value.${path.join('.')}` : 'value'}`]: value }
+				$set: { [`${path.length > 0 ? `value.${path.join('.')}` : 'value'}`]: value }
 			},
 			{
 				upsert: true
@@ -635,7 +644,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	}
 
 	public async [Method.Size](payload: SizePayload): Promise<SizePayload> {
-		payload.data = (await this.collection.countDocuments({})) || 0;
+		payload.data = (await this.collection.countDocuments({})) ?? payload.data;
 
 		return payload;
 	}
@@ -704,7 +713,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 		return this._client;
 	}
 
-	private get collection(): ReturnModelType<typeof MongoDoc, Record<string, any>> {
+	private get collection(): Model<MongoDocType> {
 		if (isNullOrUndefined(this._collection))
 			throw new JoshError({
 				message: 'Client is not connected, most likely due to `init` not being called.',
