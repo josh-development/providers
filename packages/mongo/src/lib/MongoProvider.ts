@@ -62,63 +62,50 @@ import {
 import { deleteFromObject, getFromObject, hasFromObject } from '@realware/utilities';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
 import { getModelForClass, ReturnModelType, Severity } from '@typegoose/typegoose';
-import type { BeAnObject } from '@typegoose/typegoose/lib/types';
 import mongoose, { Mongoose } from 'mongoose';
 import { v4 } from 'uuid';
-import { MongoDocType } from './MongoDoc';
+import { MongoDoc } from './MongoDoc';
 import { MongoProviderError } from './MongoProviderError';
 
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
-	private connectionURI: string;
+	public declare options: MongoProvider.Options;
+
+	private connectionURI?: string;
 
 	private _client?: Mongoose;
 
-	private get client(): Mongoose {
-		if (isNullOrUndefined(this._client)) {
-			throw new JoshError({
-				message: 'Client is not connected, most likely due to init not being called',
-				identifier: MongoProvider.Identifiers.NotConnected
-			});
-		}
-
-		return this._client;
-	}
-
-	private collection: ReturnModelType<typeof MongoDocType, BeAnObject>;
-
-	public constructor(options: MongoProvider.Options) {
-		super(options);
-
-		let { collection, auth, enforceCollectionName } = options;
-
-		if (!collection.length) {
-			throw new JoshError({
-				identifier: MongoProvider.Identifiers.InvalidCollectionName,
-				message: 'Collection name must be provided and be a valid string'
-			});
-		}
-
-		if (enforceCollectionName !== false) {
-			collection = collection.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-		}
-
-		this.collection = getModelForClass(MongoDocType, { schemaOptions: { collection }, options: { allowMixed: Severity.ALLOW } });
-
-		if (auth?.url) {
-			this.connectionURI = auth.url;
-		} else {
-			const authUser = auth?.user && auth.password ? `${auth.user}:${auth.password}@` : '';
-			const dbName = auth?.dbName || 'josh';
-			const host = auth?.host || 'localhost';
-			const port = auth?.port || 27017;
-
-			this.connectionURI = `mongodb://${authUser}${host}:${port}/${dbName}`;
-		}
-	}
+	private _collection?: ReturnModelType<typeof MongoDoc, Record<string, any>>;
 
 	public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
-		this._client = await mongoose.connect(this.connectionURI);
 		context = await super.init(context);
+
+		const { collectionName = this.instance?.name, enforceCollectionName, authentication = MongoProvider.defaultAuthentication } = this.options;
+
+		if (collectionName === undefined)
+			throw new JoshError({
+				message: 'A collection name must be provided if using this class without Josh.',
+				identifier: MongoProvider.Identifiers.InitMissingCollectionName
+			});
+
+		this._collection = getModelForClass(MongoDoc, {
+			schemaOptions: { collection: enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName },
+			options: { allowMixed: Severity.ALLOW }
+		});
+
+		if (typeof authentication === 'string') this.connectionURI = authentication;
+		else {
+			const { user, password, dbName, host, port }: MongoProvider.Authentication = {
+				user: authentication.user ?? MongoProvider.defaultAuthentication.user,
+				password: authentication.password ?? MongoProvider.defaultAuthentication.password,
+				dbName: authentication.dbName ?? MongoProvider.defaultAuthentication.dbName,
+				host: authentication.host ?? MongoProvider.defaultAuthentication.host,
+				port: authentication.port ?? MongoProvider.defaultAuthentication.port
+			};
+
+			this.connectionURI = `mongodb://${user?.length && password?.length ? `${user}:${password}@` : ''}${host}:${port}/${dbName}`;
+		}
+
+		this._client = await mongoose.connect(this.connectionURI);
 
 		return context;
 	}
@@ -141,9 +128,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 	public async [Method.Dec](payload: DecPayload): Promise<DecPayload> {
 		const { key, path } = payload;
-		const { data: value } = (await this.get({ key, method: Method.Get, path })) as { data: any };
+		const { data } = await this.get<StoredValue>({ key, method: Method.Get, path });
 
-		if (value === undefined) {
+		if (data === undefined) {
 			payload.error = new MongoProviderError({
 				identifier: MongoProvider.Identifiers.DecInvalidType,
 				message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
@@ -153,7 +140,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 			return payload;
 		}
 
-		if (!isNumber(value)) {
+		if (!isNumber(data)) {
 			payload.error = new MongoProviderError({
 				identifier: MongoProvider.Identifiers.DecInvalidType,
 				message:
@@ -164,7 +151,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 			return payload;
 		}
 
-		await this.set({ method: Method.Set, key, path, value: value - 1 });
+		await this.set({ method: Method.Set, key, path, value: data - 1 });
 
 		return payload;
 	}
@@ -311,7 +298,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 			return payload;
 		}
 
-		payload.data = doc.value;
+		Reflect.set(payload, 'data', doc.value);
 
 		if (path.length > 0) payload.data = getFromObject(payload.data, path);
 
@@ -321,9 +308,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	public async [Method.GetAll](payload: GetAllPayload<StoredValue>): Promise<GetAllPayload<StoredValue>> {
 		const docs = (await this.collection.find({})) || [];
 
-		for (const doc of docs) {
-			payload.data[doc.key] = doc.value;
-		}
+		for (const doc of docs) Reflect.set(payload.data, doc.key, doc.value);
 
 		return payload;
 	}
@@ -333,9 +318,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 		const docs = (await this.collection.find({ key: { $in: keys } })) || [];
 
-		for (const doc of docs) {
-			payload.data[doc.key] = doc.value;
-		}
+		for (const doc of docs) Reflect.set(payload.data, doc.key, doc.value);
 
 		return payload;
 	}
@@ -701,37 +684,57 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	public async [Method.Values](payload: ValuesPayload<StoredValue>): Promise<ValuesPayload<StoredValue>> {
 		const docs = (await this.collection.find({})) || [];
 
+		// @ts-expect-error 2345
 		for (const doc of docs) payload.data.push(doc.value);
 
 		return payload;
 	}
+
+	private get client(): Mongoose {
+		if (isNullOrUndefined(this._client))
+			throw new JoshError({
+				message: 'Client is not connected, most likely due to `init` not being called.',
+				identifier: MongoProvider.Identifiers.NotConnected
+			});
+
+		return this._client;
+	}
+
+	private get collection(): ReturnModelType<typeof MongoDoc, Record<string, any>> {
+		if (isNullOrUndefined(this._collection))
+			throw new JoshError({
+				message: 'Client is not connected, most likely due to `init` not being called.',
+				identifier: MongoProvider.Identifiers.NotConnected
+			});
+
+		return this._collection;
+	}
+
+	public static defaultAuthentication: MongoProvider.Authentication = { dbName: 'josh', host: 'localhost', port: 27017 };
 }
 
 export namespace MongoProvider {
 	export interface Options {
-		collection: string;
+		collectionName?: string;
 
 		enforceCollectionName?: boolean;
 
-		auth?: {
-			user?: string;
-
-			password?: string;
-
-			dbName?: string;
-
-			port?: number;
-
-			host?: string;
-
-			url?: string;
-		};
+		authentication?: Partial<Authentication> | string;
 	}
+
+	export interface Authentication {
+		user?: string;
+
+		password?: string;
+
+		dbName: string;
+
+		port: number;
+
+		host: string;
+	}
+
 	export enum Identifiers {
-		InvalidCollectionName = 'invalidCollectionName',
-
-		NotConnected = 'notConnected',
-
 		DecInvalidType = 'decInvalidType',
 
 		DecMissingData = 'decMissingData',
@@ -743,6 +746,10 @@ export namespace MongoProvider {
 		IncInvalidType = 'incInvalidType',
 
 		IncMissingData = 'incMissingData',
+
+		InitMissingCollectionName = 'initMissingCollectionName',
+
+		NotConnected = 'notConnected',
 
 		MathInvalidType = 'mathInvalidType',
 
