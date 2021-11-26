@@ -60,6 +60,7 @@ Here is a list of full options this provider supports:
 | [providerOptions.port] | <code>string</code> | Optional, defaults to `27017`. The port where mongodb is hosted. |
 | [providerOptions.host] | <code>string</code> | Optional, defaults to `localhost`. The host/machine/URL where the mongodb connection is located. Should never be an HTTP address! |
 | [providerOptions.url] | <code>string</code> | Optional, single-line configuration. If used, ignores all other options except `options.collection`, and requires the full connection string to access the database, *including the database name* |
+| [providerOptions.maxConnections] | <code>number</code> | Optional. The maximum amount of connections Josh may concurrently make to your database. *Setting a very low value may prevent Josh from writing to your database at all.* |
 
 ## Mongo Atlas Configuration
 
