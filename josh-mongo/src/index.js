@@ -22,6 +22,7 @@ class JoshProvider {
     this.dbName = options.dbName || 'josh';
     this.port = options.port || 27017;
     this.host = options.host || 'localhost';
+    this.maxConnections = options.maxConnections || undefined;
     this.url =
       options.url ||
       `mongodb://${this.auth}${this.host}:${this.port}/${this.dbName}`;
@@ -36,6 +37,7 @@ class JoshProvider {
     this.client = await MongoClient.connect(this.url, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      maxPoolSize: this.maxConnections,
     }).catch((err) => console.error(err));
     this.db = this.client.db(this.dbName).collection(this.collection);
     return this.client.isConnected();
