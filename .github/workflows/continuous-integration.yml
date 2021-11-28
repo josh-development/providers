@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 16
       - name: Restore CI Cache
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         id: cache-restore
         with:
           path: node_modules
@@ -46,7 +46,7 @@ jobs:
         with:
           mongodb-version: 5.0
       - name: Restore CI Cache
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         id: cache-restore
         with:
           path: node_modules
@@ -75,7 +75,7 @@ jobs:
         with:
           node-version: 16
       - name: Restore CI Cache
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         id: cache-restore
         with:
           path: node_modules
