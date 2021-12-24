@@ -3,9 +3,8 @@
 ## Workflow
 
 1. Fork and clone this repository.
-2. Create a new branch in your fork based off the **main** branch.
-3. Make your changes, and push them.
-4. Submit a Pull Request [here](https://github.com/eslachance/josh-providers/pulls)!
+2. Create a new branch in your fork based off the **main** branch. Please make sure your branch's name is relative to what the PR is for (e.g. `feat/implement-myprovider`).
+3. Submit a Pull Request [here](https://github.com/eslachance/josh-providers/pulls)!
 
 ## Contributing to the code
 
