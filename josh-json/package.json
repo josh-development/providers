@@ -1,6 +1,6 @@
 {
   "name": "@joshdb/json",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "JSON Provider for JOSH",
   "main": "src/index.js",
   "scripts": {
@@ -22,9 +22,9 @@
   "homepage": "https://github.com/eslachance/josh#readme",
   "dependencies": {
     "atomically": "^1.7.0",
+    "on-change": "^2.2.2",
     "serialize-javascript": "^5.0.1",
-    "uuid": "^8.3.2",
-    "on-change": "^2.2.2"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/jest": "^26.0.15",

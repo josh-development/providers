@@ -9,10 +9,10 @@ class JoshProvider {
     this.options = options;
     this.dir = this.options.dataDir
       ? path.resolve(this.options.dataDir)
-      : './data';
+      : './data/' + (this.options.name || 'default');
     this.files = new FileManager(this.dir, options.providerOptions);
-    this.indexAll = this.options.indexAll ?? false
-    this.cleanupEmpty = this.options.cleanupEmpty ?? false
+    this.indexAll = this.options.indexAll ?? false;
+    this.cleanupEmpty = this.options.cleanupEmpty ?? false;
   }
   /**
    * Internal method called on persistent joshs to load data from the underlying database.
