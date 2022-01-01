@@ -49,7 +49,7 @@ jobs:
       - name: Install Dependencies
         run: yarn --ignore-scripts --frozen-lockfile
       - name: Build Code
-        run: yarn prepublishOnly
+        run: yarn build
       - name: Push Code
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
