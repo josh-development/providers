@@ -64,7 +64,6 @@ jobs:
 
           echo -e "\n# Move the generated files to the newly-checked-out repo, to be committed and pushed"
           rsync -vaI packages/mongo/package.json out/
-          rsync -vaI packages/mongo/README.md out/
           rsync -vaI packages/mongo/dist/ out/dist
 
           echo -e "\n# Removing TSC incremental file"
