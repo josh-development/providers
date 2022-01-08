@@ -58,6 +58,8 @@ jobs:
           echo -e "\n# Switch to the target branch as an orphan to ensure it exists"
           TARGET_BRANCH="build-mongo"
           git switch --orphan $TARGET_BRANCH
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_EMAIL}"
           git commit --allow-empty -m "chore(mongo): setup branch"
 
           echo -e "\n# Checkout the repo in the target branch"
@@ -76,8 +78,6 @@ jobs:
           echo -e "\n# Commit and push"
           cd out
           git add --all .
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_EMAIL}"
           git commit -m "build(mongo): tsc build for ${GITHUB_SHA}" || true
           git push origin $TARGET_BRANCH
         env:
@@ -114,6 +114,8 @@ jobs:
           echo -e "\n# Switch to the target branch as an orphan to ensure it exists"
           TARGET_BRANCH="build-json"
           git switch --orphan $TARGET_BRANCH
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_EMAIL}"
           git commit --allow-empty -m "chore(json): setup branch"
 
           echo -e "\n# Checkout the repo in the target branch"
@@ -132,8 +134,6 @@ jobs:
           echo -e "\n# Commit and push"
           cd out
           git add --all .
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_EMAIL}"
           git commit -m "build(json): tsc build for ${GITHUB_SHA}" || true
           git push origin $TARGET_BRANCH
         env:
