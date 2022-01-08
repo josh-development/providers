@@ -1,0 +1,46 @@
+{
+	"name": "@joshdb/json",
+	"version": "2.0.0",
+	"author": "@joshdb",
+	"license": "Apache-2.0",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		"import": "./dist/index.mjs",
+		"require": "./dist/index.js"
+	},
+	"scripts": {
+		"test": "jest --verbose",
+		"lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
+		"build": "tsc -b src && rollup -c ../../scripts/rollup.bundle.ts && gen-esm-wrapper dist/index.js dist/index.mjs",
+		"prepublishOnly": "rollup-type-bundler && gen-esm-wrapper dist/index.js dist/index.mjs"
+	},
+	"dependencies": {
+		"@joshdb/core": "RealShadowNova/joshdb-core#build",
+		"@realware/utilities": "^2.0.2",
+		"@sapphire/async-queue": "^1.1.9",
+		"@sapphire/pieces": "^3.1.1",
+		"@sapphire/snowflake": "^2.1.4",
+		"@sapphire/utilities": "^3.0.7"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/eslachance/josh-providers"
+	},
+	"files": [
+		"dist",
+		"!dist/*tsbuildinfo"
+	],
+	"engines": {
+		"node": ">=16",
+		"npm": ">=6"
+	},
+	"keywords": [],
+	"bugs": {
+		"url": "https://github.com/eslachance/josh-providers/issues"
+	},
+	"homepage": "https://github.com/eslachance/josh-providers",
+	"publishConfig": {
+		"access": "public"
+	}
+}

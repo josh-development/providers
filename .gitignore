@@ -23,3 +23,6 @@ package-lock.json
 
 # Ignore the GH cli downloaded by workflows
 gh
+
+# Ignore data from tests
+**/.tests

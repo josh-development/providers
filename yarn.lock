@@ -1565,6 +1565,11 @@
   resolved "https://registry.yarnpkg.com/@realware/utilities/-/utilities-2.0.2.tgz#bb3192284218162825c2faf3772f5494aed5301b"
   integrity sha512-d3OgIbSLiUBwfs4P0IQDLEqF58S4j8mZXZ3XwBAJSg+uKIzhGZ8X4Pa+ksfTJaVwnwRq2mlpLQdCGi2PYxzzQw==
 
+"@sapphire/async-queue@^1.1.9":
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/@sapphire/async-queue/-/async-queue-1.1.9.tgz#ce69611c8753c4affd905a7ef43061c7eb95c01b"
+  integrity sha512-CbXaGwwlEMq+l1TRu01FJCvySJ1CEFKFclHT48nIfNeZXaAAmmwwy7scUKmYHPUa3GhoMp6Qr1B3eAJux6XgOQ==
+
 "@sapphire/eslint-config@^4.0.2":
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/@sapphire/eslint-config/-/eslint-config-4.0.8.tgz#666ca1da0e916628e9cd7bb31843faddb43bfd49"
@@ -1586,6 +1591,11 @@
     "@discordjs/collection" "^0.3.2"
     "@sapphire/utilities" "^3.1.0"
     tslib "^2.3.1"
+
+"@sapphire/snowflake@^2.1.4":
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/@sapphire/snowflake/-/snowflake-2.1.4.tgz#2579021bebada0208b2bb4fd51d31a9c036725ba"
+  integrity sha512-34hSz2Z0kbmZIDvWpVeauCRDpL7tCYY7/pzINlpLO7Uq63PdZFNhO3RkRw4Fffa86EGsYb57Lb039zT4gPefnQ==
 
 "@sapphire/ts-config@^3.1.0":
   version "3.1.6"
@@ -2076,6 +2086,14 @@ assert-plus@1.0.0, assert-plus@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/assert-plus/-/assert-plus-1.0.0.tgz#f12e0f3c5d77b0b1cdd9146942e4e96c1e4dd525"
   integrity sha1-8S4PPF13sLHN2RRpQuTpbB5N1SU=
+
+assert@^1.4.1:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/assert/-/assert-1.5.0.tgz#55c109aaf6e0aefdb3dc4b71240c70bf574b18eb"
+  integrity sha512-EDsgawzwoun2CZkCgtxJbv392v4nbk9XDD06zI+kQYoBM/3RBWLlEyJARDOmhAAosBjWACEkKL6S+lIZtcAubA==
+  dependencies:
+    object-assign "^4.1.1"
+    util "0.10.3"
 
 astral-regex@^2.0.0:
   version "2.0.0"
@@ -3432,6 +3450,13 @@ gauge@~2.7.3:
     strip-ansi "^3.0.1"
     wide-align "^1.1.0"
 
+gen-esm-wrapper@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/gen-esm-wrapper/-/gen-esm-wrapper-1.1.3.tgz#f0dd910ea1e36d46e708eb0e9fb74ac4bc2f9c76"
+  integrity sha512-LNHZ+QpaCW/0VhABIbXn45V+P8kFvjjwuue9hbV23eOjuFVz6c0FE3z1XpLX9pSjLW7UmtCkXo5F9vhZWVs8oQ==
+  dependencies:
+    is-valid-identifier "^2.0.2"
+
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
   resolved "https://registry.yarnpkg.com/gensync/-/gensync-1.0.0-beta.2.tgz#32a6ee76c3d7f52d46b2b1ae5d93fea8580a25e0"
@@ -3840,6 +3865,11 @@ inherits@2, inherits@^2.0.3, inherits@~2.0.3:
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.4.tgz#0fa2c64f932917c3433a0ded55363aae37416b7c"
   integrity sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
 
+inherits@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.1.tgz#b17d08d326b4423e568eff719f91b0b1cbdf69f1"
+  integrity sha1-sX0I0ya0Qj5Wjv9xn5GwscvfafE=
+
 ini@^1.3.2, ini@^1.3.4:
   version "1.3.8"
   resolved "https://registry.yarnpkg.com/ini/-/ini-1.3.8.tgz#a29da425b48806f34767a4efce397269af28432c"
@@ -4080,6 +4110,13 @@ is-typedarray@^1.0.0, is-typedarray@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/is-typedarray/-/is-typedarray-1.0.0.tgz#e479c80858df0c1b11ddda6940f96011fcda4a9a"
   integrity sha1-5HnICFjfDBsR3dppQPlgEfzaSpo=
+
+is-valid-identifier@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/is-valid-identifier/-/is-valid-identifier-2.0.2.tgz#146d9dbf29821b8118580b039d2203aa4bd1da4b"
+  integrity sha512-mpS5EGqXOwzXtKAg6I44jIAqeBfntFLxpAth1rrKbxtKyI6LPktyDYpHBI+tHlduhhX/SF26mFXmxQu995QVqg==
+  dependencies:
+    assert "^1.4.1"
 
 is-weakref@^1.0.1:
   version "1.0.2"
@@ -5512,7 +5549,7 @@ oauth-sign@~0.9.0:
   resolved "https://registry.yarnpkg.com/oauth-sign/-/oauth-sign-0.9.0.tgz#47a7b016baa68b5fa0ecf3dee08a85c679ac6455"
   integrity sha512-fexhUFFPTGV8ybAtSIGbV6gOkSv8UtRbDBnAyLQw4QPKkgNlsH2ByPGtMUqdWkos6YCRmAqViwgZrJc/mRDzZQ==
 
-object-assign@^4.1.0:
+object-assign@^4.1.0, object-assign@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/object-assign/-/object-assign-4.1.1.tgz#2109adc7965887cfc05cbbd442cac8bfbb360863"
   integrity sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM=
@@ -7152,6 +7189,13 @@ util-promisify@^2.1.0:
   integrity sha1-PCI2R2xNMsX/PEcAKt18E7moKlM=
   dependencies:
     object.getownpropertydescriptors "^2.0.3"
+
+util@0.10.3:
+  version "0.10.3"
+  resolved "https://registry.yarnpkg.com/util/-/util-0.10.3.tgz#7afb1afe50805246489e3db7fe0ed379336ac0f9"
+  integrity sha1-evsa/lCAUkZInj23/g7TeTNqwPk=
+  dependencies:
+    inherits "2.0.1"
 
 uuid@^3.3.2:
   version "3.4.0"
