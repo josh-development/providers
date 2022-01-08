@@ -55,8 +55,13 @@ jobs:
         run: |
           REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 
-          echo -e "\n# Checkout the repo in the target branch"
+          echo -e "\n# Create the build branch if it doesn't exist"
           TARGET_BRANCH="build-mongo"
+          git switch --orphan $TARGET_BRANCH
+          git push origin $TARGET_BRANCH
+          git checkout main
+
+          echo -e "\n# Checkout the repo in the target branch"
           git clone $REPO out -b $TARGET_BRANCH
 
           echo -e "\n# Remove any old files in the dist folder"
@@ -110,6 +115,7 @@ jobs:
           echo -e "\n# Create the build branch if it doesn't exist"
           TARGET_BRANCH="build-json"
           git switch --orphan $TARGET_BRANCH
+          git push origin $TARGET_BRANCH
           git checkout main
 
           echo -e "\n# Checkout the repo in the target branch"
