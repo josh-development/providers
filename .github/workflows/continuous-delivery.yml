@@ -55,8 +55,12 @@ jobs:
         run: |
           REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 
-          echo -e "\n# Checkout the repo in the target branch"
+          echo -e "\n# Switch to the target branch as an orphan to ensure it exists"
           TARGET_BRANCH="build-mongo"
+          git switch --orphan $TARGET_BRANCH
+          git commit --allow-empty -m "chore(mongo): setup branch"
+
+          echo -e "\n# Checkout the repo in the target branch"
           git clone $REPO out -b $TARGET_BRANCH
 
           echo -e "\n# Remove any old files in the dist folder"
@@ -107,8 +111,12 @@ jobs:
         run: |
           REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 
-          echo -e "\n# Checkout the repo in the target branch"
+          echo -e "\n# Switch to the target branch as an orphan to ensure it exists"
           TARGET_BRANCH="build-json"
+          git switch --orphan $TARGET_BRANCH
+          git commit --allow-empty -m "chore(json): setup branch"
+
+          echo -e "\n# Checkout the repo in the target branch"
           git clone $REPO out -b $TARGET_BRANCH
 
           echo -e "\n# Remove any old files in the dist folder"
