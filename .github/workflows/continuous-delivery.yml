@@ -61,6 +61,7 @@ jobs:
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_EMAIL}"
           git commit --allow-empty -m "chore(mongo): setup branch"
+          git checkout main
 
           echo -e "\n# Checkout the repo in the target branch"
           git clone $REPO out -b $TARGET_BRANCH
@@ -117,6 +118,7 @@ jobs:
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_EMAIL}"
           git commit --allow-empty -m "chore(json): setup branch"
+          git checkout main
 
           echo -e "\n# Checkout the repo in the target branch"
           git clone $REPO out -b $TARGET_BRANCH
