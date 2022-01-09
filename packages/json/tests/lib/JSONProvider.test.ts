@@ -97,7 +97,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Dec);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.DecMissingData);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.DecMissingData);
 				expect(key).toBe('test:dec');
 				expect(path).toEqual([]);
 			});
@@ -112,7 +112,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Dec);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.DecMissingData);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.DecMissingData);
 				expect(key).toBe('test:dec');
 				expect(path).toEqual(['path']);
 			});
@@ -129,7 +129,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Dec);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.DecInvalidType);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.DecInvalidType);
 				expect(key).toBe('test:dec');
 				expect(path).toEqual([]);
 			});
@@ -146,7 +146,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Dec);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.DecInvalidType);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.DecInvalidType);
 				expect(key).toBe('test:dec');
 				expect(path).toEqual(['path']);
 			});
@@ -690,7 +690,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Inc);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.IncMissingData);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.IncMissingData);
 				expect(key).toBe('test:inc');
 				expect(path).toEqual([]);
 			});
@@ -705,7 +705,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Inc);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.IncMissingData);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.IncMissingData);
 				expect(key).toBe('test:inc');
 				expect(path).toEqual(['path']);
 			});
@@ -722,7 +722,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Inc);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.IncInvalidType);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.IncInvalidType);
 				expect(key).toBe('test:inc');
 				expect(path).toEqual([]);
 			});
@@ -739,7 +739,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Inc);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.IncInvalidType);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.IncInvalidType);
 				expect(key).toBe('test:inc');
 				expect(path).toEqual(['path']);
 			});
@@ -900,7 +900,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Math);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.MathMissingData);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.MathMissingData);
 				expect(key).toBe('test:math');
 				expect(path).toEqual([]);
 				expect(operator).toBe(MathOperator.Addition);
@@ -919,7 +919,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Math);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.MathMissingData);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.MathMissingData);
 				expect(key).toBe('test:math');
 				expect(path).toEqual(['path']);
 				expect(operator).toBe(MathOperator.Addition);
@@ -938,7 +938,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Math);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.MathInvalidType);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.MathInvalidType);
 				expect(key).toBe('test:math');
 				expect(path).toEqual([]);
 				expect(operator).toBe(MathOperator.Addition);
@@ -957,7 +957,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Math);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.MathInvalidType);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.MathInvalidType);
 				expect(key).toBe('test:math');
 				expect(path).toEqual(['path']);
 				expect(operator).toBe(MathOperator.Addition);
@@ -1122,7 +1122,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Push);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.PushMissingData);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.PushMissingData);
 				expect(key).toBe('test:push');
 				expect(path).toEqual([]);
 				expect(value).toBe('value');
@@ -1140,7 +1140,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Push);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.PushMissingData);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.PushMissingData);
 				expect(key).toBe('test:push');
 				expect(path).toEqual(['path']);
 				expect(value).toBe('value');
@@ -1158,7 +1158,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Push);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.PushInvalidType);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.PushInvalidType);
 				expect(key).toBe('test:push');
 				expect(path).toEqual([]);
 				expect(value).toBe('value');
@@ -1176,7 +1176,7 @@ describe('JSONProvider', () => {
 				expect(method).toBe(Method.Push);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(JSONProviderError);
-				expect(error?.identifier).toBe(JSONProvider.Identifiers.PushInvalidType);
+				expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.PushInvalidType);
 				expect(key).toBe('test:push');
 				expect(path).toEqual(['path']);
 				expect(value).toBe('value');
@@ -1295,7 +1295,7 @@ describe('JSONProvider', () => {
 					expect(method).toBe(Method.Remove);
 					expect(trigger).toBeUndefined();
 					expect(error).toBeInstanceOf(JSONProviderError);
-					expect(error?.identifier).toBe(JSONProvider.Identifiers.RemoveMissingData);
+					expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.RemoveMissingData);
 					expect(type).toBe(Payload.Type.Hook);
 					expect(key).toBe('test:remove');
 					expect(path).toEqual([]);
@@ -1320,7 +1320,7 @@ describe('JSONProvider', () => {
 					expect(method).toBe(Method.Remove);
 					expect(trigger).toBeUndefined();
 					expect(error).toBeInstanceOf(JSONProviderError);
-					expect(error?.identifier).toBe(JSONProvider.Identifiers.RemoveInvalidType);
+					expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.RemoveInvalidType);
 					expect(type).toBe(Payload.Type.Hook);
 					expect(key).toBe('test:remove');
 					expect(path).toEqual([]);
@@ -1371,7 +1371,7 @@ describe('JSONProvider', () => {
 					expect(method).toBe(Method.Remove);
 					expect(trigger).toBeUndefined();
 					expect(error).toBeInstanceOf(JSONProviderError);
-					expect(error?.identifier).toBe(JSONProvider.Identifiers.RemoveMissingData);
+					expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.RemoveMissingData);
 					expect(type).toBe(Payload.Type.Value);
 					expect(key).toBe('test:remove');
 					expect(path).toEqual([]);
@@ -1390,7 +1390,7 @@ describe('JSONProvider', () => {
 					expect(method).toBe(Method.Remove);
 					expect(trigger).toBeUndefined();
 					expect(error).toBeInstanceOf(JSONProviderError);
-					expect(error?.identifier).toBe(JSONProvider.Identifiers.RemoveInvalidType);
+					expect(error?.identifier).toBe(JSONProvider.CommonIdentifiers.RemoveInvalidType);
 					expect(type).toBe(Payload.Type.Value);
 					expect(key).toBe('test:remove');
 					expect(path).toEqual([]);

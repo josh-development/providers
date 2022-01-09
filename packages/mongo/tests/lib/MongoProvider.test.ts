@@ -98,7 +98,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Dec);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.DecMissingData);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.DecMissingData);
 				expect(key).toBe('test:dec');
 				expect(path).toEqual([]);
 			});
@@ -113,7 +113,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Dec);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.DecMissingData);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.DecMissingData);
 				expect(key).toBe('test:dec');
 				expect(path).toEqual(['path']);
 			});
@@ -130,7 +130,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Dec);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.DecInvalidType);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.DecInvalidType);
 				expect(key).toBe('test:dec');
 				expect(path).toEqual([]);
 			});
@@ -147,7 +147,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Dec);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.DecInvalidType);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.DecInvalidType);
 				expect(key).toBe('test:dec');
 				expect(path).toEqual(['path']);
 			});
@@ -713,7 +713,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Inc);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.IncMissingData);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.IncMissingData);
 				expect(key).toBe('test:inc');
 				expect(path).toEqual([]);
 			});
@@ -728,7 +728,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Inc);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.IncMissingData);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.IncMissingData);
 				expect(key).toBe('test:inc');
 				expect(path).toEqual(['path']);
 			});
@@ -745,7 +745,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Inc);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.IncInvalidType);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.IncInvalidType);
 				expect(key).toBe('test:inc');
 				expect(path).toEqual([]);
 			});
@@ -762,7 +762,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Inc);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.IncInvalidType);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.IncInvalidType);
 				expect(key).toBe('test:inc');
 				expect(path).toEqual(['path']);
 			});
@@ -923,7 +923,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Math);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.MathMissingData);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.MathMissingData);
 				expect(key).toBe('test:math');
 				expect(path).toEqual([]);
 				expect(operator).toBe(MathOperator.Addition);
@@ -942,7 +942,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Math);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.MathMissingData);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.MathMissingData);
 				expect(key).toBe('test:math');
 				expect(path).toEqual(['path']);
 				expect(operator).toBe(MathOperator.Addition);
@@ -961,7 +961,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Math);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.MathInvalidType);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.MathInvalidType);
 				expect(key).toBe('test:math');
 				expect(path).toEqual([]);
 				expect(operator).toBe(MathOperator.Addition);
@@ -980,7 +980,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Math);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.MathInvalidType);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.MathInvalidType);
 				expect(key).toBe('test:math');
 				expect(path).toEqual(['path']);
 				expect(operator).toBe(MathOperator.Addition);
@@ -1145,7 +1145,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Push);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.PushMissingData);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.PushMissingData);
 				expect(key).toBe('test:push');
 				expect(path).toEqual([]);
 				expect(value).toBe('value');
@@ -1163,7 +1163,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Push);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.PushMissingData);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.PushMissingData);
 				expect(key).toBe('test:push');
 				expect(path).toEqual(['path']);
 				expect(value).toBe('value');
@@ -1181,7 +1181,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Push);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.PushInvalidType);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.PushInvalidType);
 				expect(key).toBe('test:push');
 				expect(path).toEqual([]);
 				expect(value).toBe('value');
@@ -1199,7 +1199,7 @@ describe('MongoProvider', () => {
 				expect(method).toBe(Method.Push);
 				expect(trigger).toBeUndefined();
 				expect(error).toBeInstanceOf(MongoProviderError);
-				expect(error?.identifier).toBe(MongoProvider.Identifiers.PushInvalidType);
+				expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.PushInvalidType);
 				expect(key).toBe('test:push');
 				expect(path).toEqual(['path']);
 				expect(value).toBe('value');
@@ -1318,7 +1318,7 @@ describe('MongoProvider', () => {
 					expect(method).toBe(Method.Remove);
 					expect(trigger).toBeUndefined();
 					expect(error).toBeInstanceOf(MongoProviderError);
-					expect(error?.identifier).toBe(MongoProvider.Identifiers.RemoveMissingData);
+					expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.RemoveMissingData);
 					expect(type).toBe(Payload.Type.Hook);
 					expect(key).toBe('test:remove');
 					expect(path).toEqual([]);
@@ -1343,7 +1343,7 @@ describe('MongoProvider', () => {
 					expect(method).toBe(Method.Remove);
 					expect(trigger).toBeUndefined();
 					expect(error).toBeInstanceOf(MongoProviderError);
-					expect(error?.identifier).toBe(MongoProvider.Identifiers.RemoveInvalidType);
+					expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.RemoveInvalidType);
 					expect(type).toBe(Payload.Type.Hook);
 					expect(key).toBe('test:remove');
 					expect(path).toEqual([]);
@@ -1400,7 +1400,7 @@ describe('MongoProvider', () => {
 					expect(method).toBe(Method.Remove);
 					expect(trigger).toBeUndefined();
 					expect(error).toBeInstanceOf(MongoProviderError);
-					expect(error?.identifier).toBe(MongoProvider.Identifiers.RemoveMissingData);
+					expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.RemoveMissingData);
 					expect(type).toBe(Payload.Type.Value);
 					expect(key).toBe('test:remove');
 					expect(path).toEqual([]);
@@ -1425,7 +1425,7 @@ describe('MongoProvider', () => {
 					expect(method).toBe(Method.Remove);
 					expect(trigger).toBeUndefined();
 					expect(error).toBeInstanceOf(MongoProviderError);
-					expect(error?.identifier).toBe(MongoProvider.Identifiers.RemoveInvalidType);
+					expect(error?.identifier).toBe(MongoProvider.CommonIdentifiers.RemoveInvalidType);
 					expect(type).toBe(Payload.Type.Value);
 					expect(key).toBe('test:remove');
 					expect(path).toEqual([]);

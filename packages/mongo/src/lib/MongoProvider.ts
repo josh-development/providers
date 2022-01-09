@@ -82,7 +82,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
 		context = await super.init(context);
 
-		const { collectionName = this.instance?.name, enforceCollectionName, authentication = MongoProvider.defaultAuthentication } = this.options;
+		const { collectionName = context.name, enforceCollectionName, authentication = MongoProvider.defaultAuthentication } = this.options;
 
 		if (collectionName === undefined)
 			throw new JoshError({
