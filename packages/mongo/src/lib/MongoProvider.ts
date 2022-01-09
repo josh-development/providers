@@ -62,7 +62,6 @@ import {
 import { deleteFromObject, getFromObject } from '@realware/utilities';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
 import mongoose, { Model, Mongoose } from 'mongoose';
-import { v4 } from 'uuid';
 import { generateMongoDoc } from './MongoDoc';
 import type { MongoDocType } from './MongoDocType';
 import { MongoProviderError } from './MongoProviderError';
@@ -116,7 +115,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 	}
 
 	public [Method.AutoKey](payload: AutoKeyPayload): AutoKeyPayload {
-		payload.data = v4();
+		payload.data = new mongoose.Types.ObjectId().toString();
 
 		return payload;
 	}

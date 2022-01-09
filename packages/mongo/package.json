@@ -15,8 +15,7 @@
 		"@joshdb/core": "RealShadowNova/joshdb-core#build",
 		"@realware/utilities": "^2.0.2",
 		"@sapphire/utilities": "^3.0.5",
-		"mongoose": "^6.0.12",
-		"uuid": "^8.3.2"
+		"mongoose": "^6.0.12"
 	},
 	"repository": {
 		"type": "git",
