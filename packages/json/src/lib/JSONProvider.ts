@@ -178,7 +178,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
 	public async [Method.Every](payload: EveryByValuePayload): Promise<EveryByValuePayload>;
 	public async [Method.Every](payload: EveryPayload<StoredValue>): Promise<EveryPayload<StoredValue>> {
 		if ((await this.handler.size()) === 0) {
-			payload.data = false;
+			payload.data = true;
 
 			return payload;
 		}
