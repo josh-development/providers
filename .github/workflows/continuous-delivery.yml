@@ -29,8 +29,8 @@ jobs:
     outputs:
       commit_message: $( [ -z "${{ steps.pr_get_commit_message.outputs.pr_commit_message }}" ] && echo "${{ steps.push_get_commit_message.outputs.push_commit_message }}" || echo "${{ steps.pr_get_commit_message.outputs.pr_commit_message }}" )
 
-  Build_Mongo:
-    name: Publish Mongo Build
+  Build_Packages:
+    name: Publish Package Builds
     runs-on: ubuntu-latest
     if: "!contains(needs.pre_ci.outputs.commit_message, '[skip ci]')"
     needs: pre_ci
@@ -48,23 +48,26 @@ jobs:
           key: ${{ runner.os }}-16-${{ hashFiles('**/yarn.lock') }}
       - name: Install Dependencies
         run: yarn --ignore-scripts --frozen-lockfile
-      - name: Build Code
-        run: yarn build
-      - name: Push Code
+      - name: Build Packages
+        run: yarn prepublishOnly
+      - name: Push Mongo Build
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com${GITHUB_REPOSITORY}.git"
 
-          echo -e "\n# Switch to the target branch as an orphan to ensure it exists"
+          echo -e "\n# Switch to the target as an orphan to ensure it exists"
           TARGET_BRANCH="build-mongo"
           git switch --orphan $TARGET_BRANCH
+
+          echo -e "\n# Set git config"
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_EMAIL}"
-          git commit --allow-empty -m "chore(mongo): setup branch"
-          git checkout main
 
-          echo -e "\n# Checkout the repo in the target branch"
-          git clone $REPO out -b $TARGET_BRANCH
+          echo -e "\n# Commit an empty workspace"
+          git commit --allow-empty -m "chore(mongo): setup"
+
+          echo -e "\n# Checkout to main branch"
+          git checkout main
 
           echo -e "\n# Remove any old files in the dist folder"
           rm -rfv out/dist/*
@@ -76,7 +79,7 @@ jobs:
           echo -e "\n# Removing TSC incremental file"
           rm -rfv out/dist/**/*.tsbuildinfo
 
-          echo -e "\n# Commit and push"
+          echo -e "\n# Commit & Push"
           cd out
           git add --all .
           git commit -m "build(mongo): tsc build for ${GITHUB_SHA}" || true
@@ -85,43 +88,24 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: 'github-actions[bot]'
           GITHUB_EMAIL: '41898282+github-actions[bot]@users.noreply.github.com'
-
-  Build_JSON:
-    name: Publish JSON Build
-    runs-on: ubuntu-latest
-    if: "!contains(needs.pre_ci.outputs.commit_message, '[skip ci]')"
-    needs: pre_ci
-    steps:
-      - name: Checkout Project
-        uses: actions/checkout@v2
-      - name: Use Node.js 16
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
-      - name: Restore CI Cache
-        uses: actions/cache@v2.1.7
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-16-${{ hashFiles('**/yarn.lock') }}
-      - name: Install Dependencies
-        run: yarn --ignore-scripts --frozen-lockfile
-      - name: Build Code
-        run: yarn build
-      - name: Push Code
+      - name: Push JSON Build
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com${GITHUB_REPOSITORY}.git"
 
-          echo -e "\n# Switch to the target branch as an orphan to ensure it exists"
+          echo -e "\n# Switch to the target as an orphan to ensure it exists"
           TARGET_BRANCH="build-json"
           git switch --orphan $TARGET_BRANCH
+
+          echo -e "\n# Set git config"
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_EMAIL}"
-          git commit --allow-empty -m "chore(json): setup branch"
-          git checkout main
 
-          echo -e "\n# Checkout the repo in the target branch"
-          git clone $REPO out -b $TARGET_BRANCH
+          echo -e "\n# Commit an empty workspace"
+          git commit --allow-empty -m "chore(json): setup"
+
+          echo -e "\n# Checkout to main branch"
+          git checkout main
 
           echo -e "\n# Remove any old files in the dist folder"
           rm -rfv out/dist/*
@@ -133,7 +117,7 @@ jobs:
           echo -e "\n# Removing TSC incremental file"
           rm -rfv out/dist/**/*.tsbuildinfo
 
-          echo -e "\n# Commit and push"
+          echo -e "\n# Commit & Push"
           cd out
           git add --all .
           git commit -m "build(json): tsc build for ${GITHUB_SHA}" || true

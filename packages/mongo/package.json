@@ -8,7 +8,7 @@
 	"scripts": {
 		"test": "jest --verbose",
 		"lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
-		"build": "tsc -b src && rollup -c ../../scripts/rollup.bundle.ts",
+		"build": "rollup -c rollup.bundle.ts",
 		"prepublishOnly": "rollup-type-bundler"
 	},
 	"dependencies": {

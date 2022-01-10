@@ -12,8 +12,8 @@
 	"scripts": {
 		"test": "jest --verbose",
 		"lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
-		"build": "tsc -b src && rollup -c ../../scripts/rollup.bundle.ts && gen-esm-wrapper dist/index.js dist/index.mjs",
-		"prepublishOnly": "rollup-type-bundler && gen-esm-wrapper dist/index.js dist/index.mjs"
+		"build": "rollup -c rollup.bundle.ts",
+		"prepublishOnly": "rollup-type-bundler"
 	},
 	"dependencies": {
 		"@joshdb/core": "RealShadowNova/joshdb-core#build",
