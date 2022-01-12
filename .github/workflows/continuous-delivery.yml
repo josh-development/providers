@@ -69,6 +69,9 @@ jobs:
           echo -e "\n# Checkout to main branch"
           git checkout main
 
+          echo -e "\n# Checkout the repo in the target branch"
+          git clone $REPO out -b $TARGET_BRANCH
+
           echo -e "\n# Remove any old files in the dist folder"
           rm -rfv out/dist/*
 
@@ -106,6 +109,9 @@ jobs:
 
           echo -e "\n# Checkout to main branch"
           git checkout main
+
+          echo -e "\n# Checkout the repo in the target branch"
+          git clone $REPO out -b $TARGET_BRANCH
 
           echo -e "\n# Remove any old files in the dist folder"
           rm -rfv out/dist/*
