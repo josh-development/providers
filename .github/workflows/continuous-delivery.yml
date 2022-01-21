@@ -50,30 +50,28 @@ jobs:
         run: yarn --ignore-scripts --frozen-lockfile
       - name: Build Packages
         run: yarn prepublishOnly
-      - name: Push Mongo Build
+      - name: Prepare Git Environment
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 
-          echo -e "\n# Switch to the target as an orphan to ensure it exists"
+          echo -e "\n# Checkout the repo in the out/ directory"
+          git clone $REPO out
+      - name: Push Mongo Build
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "\n# Navigate to the out/ directory"
+          cd out
+
+          echo "\n# Checkout into the target branch"
           TARGET_BRANCH="build-mongo"
-          git switch --orphan $TARGET_BRANCH
-
-          echo -e "\n# Set git config"
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_EMAIL}"
-
-          echo -e "\n# Commit an empty workspace"
-          git commit --allow-empty -m "chore(mongo): setup"
-
-          echo -e "\n# Checkout to main branch"
-          git checkout main
-
-          echo -e "\n# Checkout the repo in the target branch"
-          git clone $REPO out -b $TARGET_BRANCH
+          git checkout $TARGET_BRANCH || git switch --orphan $TARGET_BRANCH
 
           echo -e "\n# Remove any old files in the dist folder"
-          rm -rfv out/dist/*
+          rm -rfv dist/*
+
+          echo "\n# Navigate back to the previous directory"
+          cd ..
 
           echo -e "\n# Move the generated files to the newly-checked-out repo, to be committed and pushed"
           rsync -vaI packages/mongo/package.json out/
@@ -84,9 +82,14 @@ jobs:
 
           echo -e "\n# Commit & Push"
           cd out
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_EMAIL}"
           git add --all .
           git commit -m "build(mongo): tsc build for ${GITHUB_SHA}" || true
           git push origin $TARGET_BRANCH
+
+          echo -e "\n Navigate back to the previous directory"
+          cd ..
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: 'github-actions[bot]'
@@ -94,27 +97,18 @@ jobs:
       - name: Push JSON Build
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          echo "\n Navigate to the out/ directory"
+          cd out
 
-          echo -e "\n# Switch to the target as an orphan to ensure it exists"
+          echo "\n# Checkout into the target branch"
           TARGET_BRANCH="build-json"
-          git switch --orphan $TARGET_BRANCH
-
-          echo -e "\n# Set git config"
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_EMAIL}"
-
-          echo -e "\n# Commit an empty workspace"
-          git commit --allow-empty -m "chore(json): setup"
-
-          echo -e "\n# Checkout to main branch"
-          git checkout main
-
-          echo -e "\n# Checkout the repo in the target branch"
-          git clone $REPO out -b $TARGET_BRANCH
+          git checkout $TARGET_BRANCH || git switch --orphan $TARGET_BRANCH
 
           echo -e "\n# Remove any old files in the dist folder"
-          rm -rfv out/dist/*
+          rm -rfv dist/*
+
+          echo -e "\n# Navigate back to the previous directory"
+          cd ..
 
           echo -e "\n# Move the generated files to the newly-checked-out repo, to be committed and pushed"
           rsync -vaI packages/json/package.json out/
@@ -125,9 +119,14 @@ jobs:
 
           echo -e "\n# Commit & Push"
           cd out
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_EMAIL}"
           git add --all .
           git commit -m "build(json): tsc build for ${GITHUB_SHA}" || true
           git push origin $TARGET_BRANCH
+
+          echo -e "\n# Navigate back to the previous directory"
+          cd ..
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: 'github-actions[bot]'
