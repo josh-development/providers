@@ -72,9 +72,9 @@ jobs:
           echo -e "\n# Commit & Push"
           cd out
           git add --all .
-          git commit -m "build(mongo): tsc build for ${GITHUB_SHA}" || true
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_EMAIL}"
+          git commit -m "build(mongo): tsc build for ${GITHUB_SHA}" || true
           git push origin $TARGET_BRANCH
 
           echo -e "\n# Cleanup"
@@ -102,9 +102,9 @@ jobs:
           echo -e "\n# Commit & Push"
           cd out
           git add --all .
-          git commit -m "build(json): tsc build for ${GITHUB_SHA}" || true
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_EMAIL}"
+          git commit -m "build(json): tsc build for ${GITHUB_SHA}" || true
           git push origin $TARGET_BRANCH
 
           echo -e "\n# Cleanup"
