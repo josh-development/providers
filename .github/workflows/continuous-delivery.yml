@@ -80,6 +80,10 @@ jobs:
           echo -e "\n# Cleanup"
           cd ..
           rm -rfv out/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: 'github-actions[bot]'
+          GITHUB_EMAIL: '41898282+github-actions[bot]@users.noreply.github.com'
       - name: Push JSON Build
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
@@ -110,3 +114,7 @@ jobs:
           echo -e "\n# Cleanup"
           cd ..
           rm -rfv out/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: 'github-actions[bot]'
+          GITHUB_EMAIL: '41898282+github-actions[bot]@users.noreply.github.com'
