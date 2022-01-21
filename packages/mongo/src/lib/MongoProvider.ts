@@ -634,10 +634,10 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 		return payload;
 	}
 
-	public async [Method.SetMany](payload: SetManyPayload<StoredValue>): Promise<SetManyPayload<StoredValue>> {
-		const { keys, value } = payload;
+	public async [Method.SetMany]<Value = StoredValue>(payload: SetManyPayload<Value>): Promise<SetManyPayload<Value>> {
+		const { data } = payload;
 
-		for (const key of keys) await this.set({ key, value, path: [], method: Method.Set });
+		for (const [{ key, path }, value] of data) await this.set<Value>({ method: Method.Set, key, path, value });
 
 		return payload;
 	}
