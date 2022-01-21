@@ -50,30 +50,19 @@ jobs:
         run: yarn --ignore-scripts --frozen-lockfile
       - name: Build Packages
         run: yarn prepublishOnly
-      - name: Prepare Git Environment
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-
-          echo -e "\n# Checkout the repo in the out/ directory"
-          git clone $REPO out
       - name: Push Mongo Build
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          echo "\n# Navigate to the out/ directory"
-          cd out
-
-          echo "\n# Checkout into the target branch"
+          REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           TARGET_BRANCH="build-mongo"
-          git checkout $TARGET_BRANCH || git switch --orphan $TARGET_BRANCH
+
+          echo -e "\n# Checkout the repo in the target branch"
+          git clone $REPO out -b $TARGET_BRANCH
 
           echo -e "\n# Remove any old files in the dist folder"
-          rm -rfv dist/*
+          rm -rfv out/dist/*
 
-          echo "\n# Navigate back to the previous directory"
-          cd ..
-
-          echo -e "\n# Move the generated files to the newly-checked-out repo, to be committed and pushed"
+          echo - "\n# Move the generated files to the newly-checked-out repo, to be committed and pushed"
           rsync -vaI packages/mongo/package.json out/
           rsync -vaI packages/mongo/dist/ out/dist
 
@@ -82,52 +71,42 @@ jobs:
 
           echo -e "\n# Commit & Push"
           cd out
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_EMAIL}"
           git add --all .
           git commit -m "build(mongo): tsc build for ${GITHUB_SHA}" || true
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_EMAIL}"
           git push origin $TARGET_BRANCH
 
-          echo -e "\n Navigate back to the previous directory"
+          echo -e "\n# Cleanup"
           cd ..
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: 'github-actions[bot]'
-          GITHUB_EMAIL: '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -rfv out/*
       - name: Push JSON Build
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          echo "\n Navigate to the out/ directory"
-          cd out
-
-          echo "\n# Checkout into the target branch"
+          REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           TARGET_BRANCH="build-json"
-          git checkout $TARGET_BRANCH || git switch --orphan $TARGET_BRANCH
+
+          echo -e "\n# Checkout the repo in the target branch"
+          git clone $REPO out -b $TARGET_BRANCH
 
           echo -e "\n# Remove any old files in the dist folder"
-          rm -rfv dist/*
+          rm -rfv out/dist/*
 
-          echo -e "\n# Navigate back to the previous directory"
-          cd ..
-
-          echo -e "\n# Move the generated files to the newly-checked-out repo, to be committed and pushed"
-          rsync -vaI packages/json/package.json out/
-          rsync -vaI packages/json/dist/ out/dist
+          echo - "\n# Move the generated files to the newly-checked-out repo, to be committed and pushed"
+          rsync -vaI packages/mongo/package.json out/
+          rsync -vaI packages/mongo/dist/ out/dist
 
           echo -e "\n# Removing TSC incremental file"
           rm -rfv out/dist/**/*.tsbuildinfo
 
           echo -e "\n# Commit & Push"
           cd out
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_EMAIL}"
           git add --all .
           git commit -m "build(json): tsc build for ${GITHUB_SHA}" || true
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_EMAIL}"
           git push origin $TARGET_BRANCH
 
-          echo -e "\n# Navigate back to the previous directory"
+          echo -e "\n# Cleanup"
           cd ..
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: 'github-actions[bot]'
-          GITHUB_EMAIL: '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -rfv out/*
