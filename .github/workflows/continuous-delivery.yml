@@ -57,7 +57,7 @@ jobs:
           TARGET_BRANCH="build-mongo"
 
           echo -e "\n# Preparation Cleanup"
-          rm -rfv out/*
+          rm -rfv out
 
           echo -e "\n# Checkout the repo in the target branch"
           git clone $REPO out -b $TARGET_BRANCH
@@ -90,7 +90,7 @@ jobs:
           TARGET_BRANCH="build-json"
 
           echo -e "\n# Preparation Cleanup"
-          rm -rfv out/*
+          rm -rfv out
 
           echo -e "\n# Checkout the repo in the target branch"
           git clone $REPO out -b $TARGET_BRANCH
