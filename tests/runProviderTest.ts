@@ -378,8 +378,8 @@ export function runProviderTest<
 						await provider.setMany({
 							method: Method.SetMany,
 							data: [
-								[{ key: 'firstKey', path: [] }, 'value'],
-								[{ key: 'secondKey', path: [] }, 'value']
+								[{ key: 'firstKey', path: ['path'] }, 'value'],
+								[{ key: 'secondKey', path: ['path'] }, 'value']
 							]
 						});
 
