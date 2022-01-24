@@ -20,8 +20,8 @@
 		"@realware/utilities": "^2.0.2",
 		"@sapphire/async-queue": "^1.1.9",
 		"@sapphire/pieces": "^3.1.1",
-		"@sapphire/snowflake": "^2.1.4",
-		"@sapphire/utilities": "^3.0.7"
+		"@sapphire/snowflake": "^3.0.1",
+		"@sapphire/utilities": "^3.2.1"
 	},
 	"repository": {
 		"type": "git",

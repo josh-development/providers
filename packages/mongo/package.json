@@ -14,8 +14,8 @@
 	"dependencies": {
 		"@joshdb/core": "RealShadowNova/joshdb-core#build",
 		"@realware/utilities": "^2.0.2",
-		"@sapphire/utilities": "^3.0.5",
-		"mongoose": "^6.0.12"
+		"@sapphire/utilities": "^3.2.1",
+		"mongoose": "^6.1.7"
 	},
 	"repository": {
 		"type": "git",
