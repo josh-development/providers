@@ -378,7 +378,7 @@ class JoshProvider {
       default:
         throw new Err('Please provide a valid operand', 'JoshTypeError');
     }
-    if (result) {
+    if (!isNil(result)) {
       await this.set(key, path, result);
     }
     return this;
