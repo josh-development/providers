@@ -12,7 +12,7 @@ dist/
 **/*.d.ts
 !packages/**/*.d.ts
 **/*.tsbuildinfo
-!packages/**/scripts/*.mjs
+!**/scripts/**/*.mjs
 
 # Ignore heapsnapshot and log files
 *.heapsnapshot

@@ -1,38 +1,48 @@
-# Writing your provider for Josh
+# Contributing your own provider for Josh
 
-This page will guide you through the development process of creating your provider.
+This page will help guide you through the process of creating and contributing your own provider to the Josh database wrapper project. We are glad that you would like to contribute to our amazing project. Please follow these instructions carefully to help ensure your contributions are accepted.
 
 ## Prerequisites
 
-You should have already read the previous [Getting Started](GettingStarted.md) page. If you haven't read it please go back and do so.
+To be able to contribute your own provider for this project you are required to have extensive knowledge with [TypeScript](https://www.typescriptlang.org). In order to get your workspace ready you will need to follow the steps in [`CONTRIBUTING.md`](.github/CONTRIBUTING.md).
+
+## Getting Started
+
+Please notice that this repository uses Yarn Workspaces to manage our packages and code-space. This makes it a requirement to contribute and use this repository.
+
+```sh
+# Initiate Yarn in this repository.
+yarn
+```
+
+We have created a script to create your provider workspace for you so you don't have too much trouble getting started.
+
+```sh
+# Follow the prompts carefully using this script.
+yarn generate
+```
 
 ## Creating your provider
 
-First, before we create any files let's create a sub-directory in `src/` called `lib` using the following command.
-
-```sh
-mkdir lib
-```
-
-Now in this directory create the file for your provider. Here we are going to call the provider `MyProvider`, so replace `My` with your provider name (e.g. `MongoProvider`). Here we can use the exported `JoshProvider` class from `@joshdb/core`.
-
-### `src/lib/MyProvider.ts`
+Once the generation script has finished you will notice a new directory in the `packages/` folder which will be the same name you passed to the script generation tool. Let's navigate to your provider TypeScript file in `packages/mydb/lib/MyDBProvider.ts`. The file should look like:
 
 ```typescript
-// Import the JoshProvider class.
 import { JoshProvider } from '@joshdb/core';
 
-// Create your provider class.
-export class MyProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {}
+export class MyDBProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {}
+
+export namespace MyDBProvider {
+	export interface Options {}
+}
 ```
 
-Now that you have created your provider, you will notice there are many errors regarding certain methods not being declared. The way you will create each method will be using an enum called `Method` exported from `@joshdb/core`.
+Now that you are in your provider class' file, you will notice there are many errors regarding certain methods not being defined. The way you will create each method will be using an enum called `Method` exported from `@joshdb/core`.
 
 ```typescript
 import { Method } from '@joshdb/core';
 ```
 
-Each method will passes a `payload` which has all the information for your provider to execute and modify and return back to `Josh`. For a full list of payloads, please reference the [`src/lib/payloads/`](https://github.com/RealShadowNova/joshdb-core/tree/main/src/lib/payloads) directory.
+Each method passes a `payload` which has all the information and data for provider to process and modify, which will then be returned back to `Josh`. For a full list of payloads, please reference the [`src/lib/payloads/`](https://github.com/RealShadowNova/joshdb-core/tree/main/src/lib/payloads) directory.
 
 ```typescript
 import { Payload } from '@joshdb/core';
@@ -124,10 +134,3 @@ export namespace MyProvider {
 ```
 
 That's it! You have learned everything you need to know to create a provider. Please make sure to reference other providers if you are having trouble referencing these docs.
-
-## Previously - [Getting Started](GettingStarted.md)
-
-## References
-
-- [`src/lib/payloads/`](https://github.com/RealShadowNova/joshdb-core/tree/main/src/lib/payloads)
-- [`MapProvider`](https://github.com/RealShadowNova/joshdb-core/blob/main/src/lib/structures/defaultProvider/MapProvider.ts)
