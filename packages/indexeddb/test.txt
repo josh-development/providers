@@ -1,0 +1,1187 @@
+Debugger attached.
+Debugger attached.
+Debugger attached.
+Debugger attached.
+Debugger attached.
+Debugger attached.
+Debugger attached.
+Debugger attached.
+Debugger attached.
+Debugger attached.
+Debugger attached.
+Debugger attached.
+Debugger attached.
+Debugger attached.
+PASS unit test tests/lib/DbHandler.test.ts
+  DbHandler
+    is a class
+      ✓ GIVEN typeof DbHandler THEN returns function (1 ms)
+      ✓ GIVEN typeof ...prototype THEN returns object
+    Can manipulate data.
+      ✓ Can set and subsequently get data (5 ms)
+      ✓ Can get all data (2 ms)
+      ✓ Can get all keys (2 ms)
+      ✓ Can delete data (1 ms)
+      ✓ Can has data (1 ms)
+      ✓ Can count data (4 ms)
+      ✓ Can clear data
+
+FAIL unit test tests/lib/IndexedDBProvider.test.ts
+  IndexedDBProvider - Serialization Enabled
+    is a class
+      ✓ GIVEN typeof IndexedDBProvider THEN returns function (1 ms)
+      ✓ GIVEN typeof ...prototype THEN returns object (1 ms)
+    can manipulate provider data
+      autoKey
+        ✓ GIVEN ... THEN returns payload w/ generated key as data AND increments autoKeyCount (1 ms)
+        ✓ each value of autoKey should be unique (1 ms)
+      clear
+        ✓ GIVEN provider w/o data THEN provider data cleared (2 ms)
+        ✓ GIVEN provider w/ data THEN provider data cleared (2 ms)
+      dec
+        ✓ GIVEN provider w/o data at key THEN returns payload w/ missing data error (2 ms)
+        ✓ GIVEN provider w/o data at path THEN returns payload w/ missing data error
+        ✓ GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error (1 ms)
+        ✓ GIVEN provider w/ invalid type at path THEN returns payload w/ invalid type error (1 ms)
+        ✓ GIVEN provider w/ number at key THEN decremented number at key (2 ms)
+        ✓ GIVEN provider w/ number at path THEN decremented number at path (2 ms)
+      delete
+        ✓ GIVEN provider w/ value at key THEN deletes value at key (1 ms)
+        ✓ GIVEN provider w/ value at path THEN deletes value at path (1 ms)
+        ✓ GIVEN provider w/ value at nested path THEN deletes value at nested path (2 ms)
+      ensure
+        ✕ GIVEN provider w/o data at key THEN returns payload w/ data as defaultValue AND sets default value at key (1 ms)
+        ✕ GIVEN provider w/ value at key THEN returns payload w/ data as value at key
+      entries
+        ✓ GIVEN provider w/o data THEN returns payload w/o data from getAll
+        ✓ GIVEN provider w/ data THEN returns payload w/ data from getAll (1 ms)
+      every
+        0
+          ✕ GIVEN provider w/o data THEN returns payload(true) (2 ms)
+          ✕ GIVEN provider w/ data THEN returns payload(true) (1 ms)
+        1
+          ✕ GIVEN provider w/o data THEN returns payload(true)
+          ✕ GIVEN provider w/ data THEN returns payload(true) (1 ms)
+          ✕ GIVEN provider w/o data w/o path THEN returns payload(true)
+          ✕ GIVEN provider w/ data w/o path THEN returns payload(true) (1 ms)
+      filter
+        0
+          ✕ GIVEN provider w/o data THEN returns payload w/o data from filter (1 ms)
+          ✕ GIVEN provider w/ data THEN returns payload w/ data from filter (1 ms)
+        1
+          ✕ GIVEN provider w/o data THEN returns payload w/o data from filter (1 ms)
+          ✕ GIVEN provider w/ data THEN returns payload w/ data from filter (1 ms)
+      find
+        0
+          ✕ GIVEN provider w/o data THEN returns payload w/o data from find (2 ms)
+          ✕ GIVEN provider w/ data THEN returns payload w/ data from find (1 ms)
+        1
+          ✕ GIVEN provider w/o data THEN returns payload w/o data from find (1 ms)
+          ✕ GIVEN provider w/ data THEN returns payload w/o data from find
+      get
+        ✓ GIVEN provider w/o data THEN returns payload w/o data from get
+        ✓ GIVEN provider w/ value at key THEN returns payload w/ data from get at key (1 ms)
+        ✓ GIVEN provider w/ value at path THEN returns payload w/ data from get at path (1 ms)
+      getMany
+        ✓ GIVEN provider w/o data THEN returns payload w/o data from getMany
+        ✓ GIVEN provider w/ data THEN returns payload w/ data from getMany (1 ms)
+      has
+        ✓ GIVEN provider w/o data at key THEN returns payload(false) (1 ms)
+        ✓ GIVEN provider w/o data at path THEN returns payload(false) (1 ms)
+        ✓ GIVEN provider w/ data at key THEN returns payload(true) (1 ms)
+        ✓ GIVEN provider w/ data at path THEN returns payload(true) (1 ms)
+      inc
+        ✓ GIVEN provider w/o data at key THEN returns payload w/ missing data error (1 ms)
+        ✓ GIVEN provider w/o data at path THEN returns payload w/ missing data error
+        ✓ GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error
+        ✓ GIVEN provider w/ invalid type at path THEN returns payload w/ invalid type error (1 ms)
+        ✓ GIVEN provider w/ number at key THEN incremented number at key (1 ms)
+        ✓ GIVEN provider w/ number at path THEN incremented number at key and path (1 ms)
+      keys
+        ✓ GIVEN provider w/o data THEN returns payload w/o data from keys (1 ms)
+        ✓ GIVEN provider w/ data THEN returns payload w/ data from keys
+      map
+        0
+          ✕ GIVEN provider w/o data THEN returns payload w/o data from map (1 ms)
+          ✕ GIVEN provider w/ data THEN returns payload w/ data from map (2 ms)
+        2
+          ✕ GIVEN provider w/o data THEN returns payload w/o data from map
+          ✕ GIVEN provider w/ data THEN returns payload w/ data from map (1 ms)
+          ✕ GIVEN provider w/ data at path THEN returns payload w/ data from map (1 ms)
+      math
+        ✓ GIVEN provider w/o data THEN returns payload w/ error (1 ms)
+        ✓ GIVEN provider w/o data at path THEN returns payload w/ error (1 ms)
+        ✓ GIVEN provider w/ invalid type at key THEN returns payload w/ error (1 ms)
+        ✓ GIVEN provider w/ invalid type at path THEN returns payload w/ error (1 ms)
+      partition
+        0
+          ✕ GIVEN provider w/o data THEN returns payload w/o data
+          ✕ GIVEN provider w/ data THEN returns payload w/ data (1 ms)
+          ✕ GIVEN provider w/ data THEN returns payload w/ data (2 ms)
+        1
+          ✕ GIVEN provider w/o data THEN returns payload w/o data
+          ✕ GIVEN provider w/ data THEN returns payload w/ data (1 ms)
+          ✕ GIVEN provider w/ data THEN returns payload w/ data (1 ms)
+      push
+        ✕ GIVEN provider w/o data THEN returns payload w/ missing data error (1 ms)
+        ✕ GIVEN provider w/o data at path THEN returns payload w/ missing data error (1 ms)
+        ✕ GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error
+        ✕ GIVEN provider w/ invalid type at path THEN returns payload w/ invalid type error (1 ms)
+        ✓ GIVEN provider w/ array at key THEN returns payload AND pushes value to array at key (1 ms)
+        ✓ GIVEN provider w/ array at path THEN returns payload AND pushes value to array at path (1 ms)
+      random
+        ✓ GIVEN provider w/o data THEN returns payload w/o data from random
+        ✓ GIVEN provider w/ data THEN returns payload w/ data from random (1 ms)
+      randomKey
+        ✓ GIVEN provider w/o data THEN returns payload w/o data from randomKey (1 ms)
+        ✓ GIVEN provider w/ data THEN returns payload w/ data from randomKey (1 ms)
+      remove
+        0
+          ✕ GIVEN provider w/o data at key THEN returns payload w/ missing data error (1 ms)
+          ✕ GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error
+          ✕ GIVEN provider w/ array at key THEN returns payload AND removes value from array at key (3 ms)
+        1
+          ✕ GIVEN provider w/o data at key THEN returns payload w/ missing data error
+          ✕ GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error (1 ms)
+          ✕ GIVEN provider w/ array at key THEN returns payload AND removes value from array at key (1 ms)
+      set
+        ✓ GIVEN provider w/o data THEN returns payload AND sets value at key
+        ✓ GIVEN provider w/o data THEN returns payload AND sets value at key and path (2 ms)
+      setMany
+        ✓ GIVEN provider w/o data THEN returns payload AND sets value at key
+        ✓ GIVEN provider w/ data THEN returns payload AND does not set value at key (2 ms)
+      size
+        ✓ GIVEN provider w/o data THEN returns payload(0) (1 ms)
+        ✓ GIVEN provider w/ data THEN returns payload(1)
+      some
+        0
+          ✕ GIVEN provider w/o data THEN returns payload(false) (1 ms)
+          ✕ GIVEN provider w/ data THEN returns payload(true) (1 ms)
+        1
+          ✕ GIVEN provider w/o data THEN returns payload(false)
+          ✕ GIVEN provider w/ data THEN returns payload(true) (1 ms)
+          ✕ GIVEN provider w/o data w/o path THEN returns payload(false) (1 ms)
+          ✕ GIVEN provider w/ data w/o path THEN returns payload(true) (1 ms)
+      update
+        ✕ GIVEN provider w/o data THEN returns payload w/ missing data error
+        ✓ GIVEN provider w/ data at key THEN returns payload w/ data AND updates value at key (1 ms)
+        ✓ GIVEN provider w/ data at path THEN returns payload w/ data AND updates value at path
+      values
+        ✓ GIVEN provider w/o data THEN returns payload w/o data (2 ms)
+        ✓ GIVEN provider w/ data THEN returns payload w/ data
+      each
+        ✓ GIVEN provider w/o data THEN loops 0 times (1 ms)
+        ✓ GIVEN provider w/ data THEN loops x times THEN clears (1 ms)
+  IndexedDBProvider - Serialization Disabled
+    is a class
+      ✓ GIVEN typeof IndexedDBProvider THEN returns function
+      ✓ GIVEN typeof ...prototype THEN returns object
+    can manipulate provider data
+      autoKey
+        ✓ GIVEN ... THEN returns payload w/ generated key as data AND increments autoKeyCount
+        ✓ each value of autoKey should be unique (1 ms)
+      clear
+        ✓ GIVEN provider w/o data THEN provider data cleared
+        ✓ GIVEN provider w/ data THEN provider data cleared (1 ms)
+      dec
+        ✓ GIVEN provider w/o data at key THEN returns payload w/ missing data error (1 ms)
+        ✓ GIVEN provider w/o data at path THEN returns payload w/ missing data error
+        ✓ GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error (1 ms)
+        ✓ GIVEN provider w/ invalid type at path THEN returns payload w/ invalid type error (1 ms)
+        ✓ GIVEN provider w/ number at key THEN decremented number at key
+        ✓ GIVEN provider w/ number at path THEN decremented number at path (1 ms)
+      delete
+        ✓ GIVEN provider w/ value at key THEN deletes value at key (1 ms)
+        ✓ GIVEN provider w/ value at path THEN deletes value at path (1 ms)
+        ✓ GIVEN provider w/ value at nested path THEN deletes value at nested path (1 ms)
+      ensure
+        ✕ GIVEN provider w/o data at key THEN returns payload w/ data as defaultValue AND sets default value at key (1 ms)
+        ✕ GIVEN provider w/ value at key THEN returns payload w/ data as value at key
+      entries
+        ✓ GIVEN provider w/o data THEN returns payload w/o data from getAll (1 ms)
+        ✓ GIVEN provider w/ data THEN returns payload w/ data from getAll
+      every
+        0
+          ✕ GIVEN provider w/o data THEN returns payload(true)
+          ✕ GIVEN provider w/ data THEN returns payload(true) (1 ms)
+        1
+          ✕ GIVEN provider w/o data THEN returns payload(true) (1 ms)
+          ✕ GIVEN provider w/ data THEN returns payload(true) (1 ms)
+          ✕ GIVEN provider w/o data w/o path THEN returns payload(true) (1 ms)
+          ✕ GIVEN provider w/ data w/o path THEN returns payload(true) (1 ms)
+      filter
+        0
+          ✕ GIVEN provider w/o data THEN returns payload w/o data from filter
+          ✕ GIVEN provider w/ data THEN returns payload w/ data from filter (1 ms)
+        1
+          ✕ GIVEN provider w/o data THEN returns payload w/o data from filter (1 ms)
+          ✕ GIVEN provider w/ data THEN returns payload w/ data from filter (1 ms)
+      find
+        0
+          ✕ GIVEN provider w/o data THEN returns payload w/o data from find
+          ✕ GIVEN provider w/ data THEN returns payload w/ data from find (1 ms)
+        1
+          ✕ GIVEN provider w/o data THEN returns payload w/o data from find (1 ms)
+          ✕ GIVEN provider w/ data THEN returns payload w/o data from find
+      get
+        ✓ GIVEN provider w/o data THEN returns payload w/o data from get (1 ms)
+        ✓ GIVEN provider w/ value at key THEN returns payload w/ data from get at key (2 ms)
+        ✓ GIVEN provider w/ value at path THEN returns payload w/ data from get at path
+      getMany
+        ✓ GIVEN provider w/o data THEN returns payload w/o data from getMany (1 ms)
+        ✓ GIVEN provider w/ data THEN returns payload w/ data from getMany (1 ms)
+      has
+        ✓ GIVEN provider w/o data at key THEN returns payload(false)
+        ✓ GIVEN provider w/o data at path THEN returns payload(false) (1 ms)
+        ✓ GIVEN provider w/ data at key THEN returns payload(true) (1 ms)
+        ✓ GIVEN provider w/ data at path THEN returns payload(true) (1 ms)
+      inc
+        ✓ GIVEN provider w/o data at key THEN returns payload w/ missing data error
+        ✓ GIVEN provider w/o data at path THEN returns payload w/ missing data error (1 ms)
+        ✓ GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error (1 ms)
+        ✓ GIVEN provider w/ invalid type at path THEN returns payload w/ invalid type error (1 ms)
+        ✓ GIVEN provider w/ number at key THEN incremented number at key (1 ms)
+        ✓ GIVEN provider w/ number at path THEN incremented number at key and path (1 ms)
+      keys
+        ✓ GIVEN provider w/o data THEN returns payload w/o data from keys
+        ✓ GIVEN provider w/ data THEN returns payload w/ data from keys (1 ms)
+      map
+        0
+          ✕ GIVEN provider w/o data THEN returns payload w/o data from map
+          ✕ GIVEN provider w/ data THEN returns payload w/ data from map (1 ms)
+        2
+          ✕ GIVEN provider w/o data THEN returns payload w/o data from map (1 ms)
+          ✕ GIVEN provider w/ data THEN returns payload w/ data from map
+          ✕ GIVEN provider w/ data at path THEN returns payload w/ data from map (1 ms)
+      math
+        ✓ GIVEN provider w/o data THEN returns payload w/ error (1 ms)
+        ✓ GIVEN provider w/o data at path THEN returns payload w/ error (1 ms)
+        ✓ GIVEN provider w/ invalid type at key THEN returns payload w/ error (1 ms)
+        ✓ GIVEN provider w/ invalid type at path THEN returns payload w/ error (1 ms)
+      partition
+        0
+          ✕ GIVEN provider w/o data THEN returns payload w/o data
+          ✕ GIVEN provider w/ data THEN returns payload w/ data (1 ms)
+          ✕ GIVEN provider w/ data THEN returns payload w/ data (1 ms)
+        1
+          ✕ GIVEN provider w/o data THEN returns payload w/o data
+          ✕ GIVEN provider w/ data THEN returns payload w/ data (1 ms)
+          ✕ GIVEN provider w/ data THEN returns payload w/ data (1 ms)
+      push
+        ✕ GIVEN provider w/o data THEN returns payload w/ missing data error (1 ms)
+        ✕ GIVEN provider w/o data at path THEN returns payload w/ missing data error (1 ms)
+        ✕ GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error
+        ✕ GIVEN provider w/ invalid type at path THEN returns payload w/ invalid type error (1 ms)
+        ✓ GIVEN provider w/ array at key THEN returns payload AND pushes value to array at key
+        ✓ GIVEN provider w/ array at path THEN returns payload AND pushes value to array at path (1 ms)
+      random
+        ✓ GIVEN provider w/o data THEN returns payload w/o data from random (1 ms)
+        ✓ GIVEN provider w/ data THEN returns payload w/ data from random
+      randomKey
+        ✓ GIVEN provider w/o data THEN returns payload w/o data from randomKey (1 ms)
+        ✓ GIVEN provider w/ data THEN returns payload w/ data from randomKey
+      remove
+        0
+          ✕ GIVEN provider w/o data at key THEN returns payload w/ missing data error (1 ms)
+          ✕ GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error
+          ✕ GIVEN provider w/ array at key THEN returns payload AND removes value from array at key (2 ms)
+        1
+          ✕ GIVEN provider w/o data at key THEN returns payload w/ missing data error (1 ms)
+          ✕ GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error
+          ✕ GIVEN provider w/ array at key THEN returns payload AND removes value from array at key (2 ms)
+      set
+        ✓ GIVEN provider w/o data THEN returns payload AND sets value at key
+        ✓ GIVEN provider w/o data THEN returns payload AND sets value at key and path
+      setMany
+        ✓ GIVEN provider w/o data THEN returns payload AND sets value at key (1 ms)
+        ✓ GIVEN provider w/ data THEN returns payload AND does not set value at key (1 ms)
+      size
+        ✓ GIVEN provider w/o data THEN returns payload(0)
+        ✓ GIVEN provider w/ data THEN returns payload(1) (1 ms)
+      some
+        0
+          ✕ GIVEN provider w/o data THEN returns payload(false) (1 ms)
+          ✕ GIVEN provider w/ data THEN returns payload(true) (1 ms)
+        1
+          ✕ GIVEN provider w/o data THEN returns payload(false)
+          ✕ GIVEN provider w/ data THEN returns payload(true) (1 ms)
+          ✕ GIVEN provider w/o data w/o path THEN returns payload(false) (1 ms)
+          ✕ GIVEN provider w/ data w/o path THEN returns payload(true)
+      update
+        ✕ GIVEN provider w/o data THEN returns payload w/ missing data error (1 ms)
+        ✓ GIVEN provider w/ data at key THEN returns payload w/ data AND updates value at key
+        ✓ GIVEN provider w/ data at path THEN returns payload w/ data AND updates value at path (1 ms)
+      values
+        ✓ GIVEN provider w/o data THEN returns payload w/o data
+        ✓ GIVEN provider w/ data THEN returns payload w/ data (1 ms)
+      each
+        ✓ GIVEN provider w/o data THEN loops 0 times
+        ✓ GIVEN provider w/ data THEN loops x times THEN clears (1 ms)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › ensure › GIVEN provider w/o data at key THEN returns payload w/ data as defaultValue AND sets default value at key
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "defaultValue"
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:290:26)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › ensure › GIVEN provider w/ value at key THEN returns payload w/ data as value at key
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "value"
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:311:26)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › every › 0 › GIVEN provider w/o data THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:358:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › every › 0 › GIVEN provider w/ data THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:381:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › every › 1 › GIVEN provider w/o data THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:398:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › every › 1 › GIVEN provider w/ data THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:422:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › every › 1 › GIVEN provider w/o data w/o path THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:437:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › every › 1 › GIVEN provider w/ data w/o path THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:461:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › filter › 0 › GIVEN provider w/o data THEN returns payload w/o data from filter
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:479:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › filter › 0 › GIVEN provider w/ data THEN returns payload w/ data from filter
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {"test:filter": "value"}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:495:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › filter › 1 › GIVEN provider w/o data THEN returns payload w/o data from filter
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:512:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › filter › 1 › GIVEN provider w/ data THEN returns payload w/ data from filter
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {"test:filter": {"path": "value"}}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:529:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › find › 0 › GIVEN provider w/o data THEN returns payload w/o data from find
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: [null, null]
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:548:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › find › 0 › GIVEN provider w/ data THEN returns payload w/ data from find
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: ["test:find", "value"]
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:564:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › find › 1 › GIVEN provider w/o data THEN returns payload w/o data from find
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: [null, null]
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:581:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › find › 1 › GIVEN provider w/ data THEN returns payload w/o data from find
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: ["test:find", {"path": "value"}]
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:598:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › map › 0 › GIVEN provider w/o data THEN returns payload w/o data from map
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: []
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:897:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › map › 0 › GIVEN provider w/ data THEN returns payload w/ data from map
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: ["value"]
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:913:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › map › 2 › GIVEN provider w/o data THEN returns payload w/o data from map
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: []
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:929:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › map › 2 › GIVEN provider w/ data THEN returns payload w/ data from map
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: ["value"]
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:945:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › map › 2 › GIVEN provider w/ data at path THEN returns payload w/ data from map
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: ["value"]
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:961:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › partition › 0 › GIVEN provider w/o data THEN returns payload w/o data
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1084:36)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › partition › 0 › GIVEN provider w/ data THEN returns payload w/ data
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {"test:partition": "value"}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1106:36)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › partition › 0 › GIVEN provider w/ data THEN returns payload w/ data
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1128:36)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › partition › 1 › GIVEN provider w/o data THEN returns payload w/o data
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1152:36)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › partition › 1 › GIVEN provider w/ data THEN returns payload w/ data
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {"test:partition": "value"}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1176:36)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › partition › 1 › GIVEN provider w/ data THEN returns payload w/ data
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1200:36)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › push › GIVEN provider w/o data THEN returns payload w/ missing data error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1216:27)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › push › GIVEN provider w/o data at path THEN returns payload w/ missing data error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1234:27)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › push › GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1252:27)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › push › GIVEN provider w/ invalid type at path THEN returns payload w/ invalid type error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1270:27)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › remove › 0 › GIVEN provider w/o data at key THEN returns payload w/ missing data error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1389:29)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › remove › 0 › GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1414:29)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › remove › 0 › GIVEN provider w/ array at key THEN returns payload AND removes value from array at key
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "value",
+    + ]
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1451:37)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › remove › 1 › GIVEN provider w/o data at key THEN returns payload w/ missing data error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1471:29)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › remove › 1 › GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1496:29)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › remove › 1 › GIVEN provider w/ array at key THEN returns payload AND removes value from array at key
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "value",
+    + ]
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1533:37)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › some › 0 › GIVEN provider w/o data THEN returns payload(false)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1683:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › some › 0 › GIVEN provider w/ data THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1703:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › some › 1 › GIVEN provider w/o data THEN returns payload(false)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1720:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › some › 1 › GIVEN provider w/ data THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1737:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › some › 1 › GIVEN provider w/o data w/o path THEN returns payload(false)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1757:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › some › 1 › GIVEN provider w/ data w/o path THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1779:28)
+
+  ● IndexedDBProvider - Serialization Enabled › can manipulate provider data › update › GIVEN provider w/o data THEN returns payload w/ missing data error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1794:27)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › ensure › GIVEN provider w/o data at key THEN returns payload w/ data as defaultValue AND sets default value at key
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "defaultValue"
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:290:26)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › ensure › GIVEN provider w/ value at key THEN returns payload w/ data as value at key
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "value"
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:311:26)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › every › 0 › GIVEN provider w/o data THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:358:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › every › 0 › GIVEN provider w/ data THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:381:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › every › 1 › GIVEN provider w/o data THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:398:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › every › 1 › GIVEN provider w/ data THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:422:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › every › 1 › GIVEN provider w/o data w/o path THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:437:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › every › 1 › GIVEN provider w/ data w/o path THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:461:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › filter › 0 › GIVEN provider w/o data THEN returns payload w/o data from filter
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:479:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › filter › 0 › GIVEN provider w/ data THEN returns payload w/ data from filter
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {"test:filter": "value"}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:495:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › filter › 1 › GIVEN provider w/o data THEN returns payload w/o data from filter
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:512:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › filter › 1 › GIVEN provider w/ data THEN returns payload w/ data from filter
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {"test:filter": {"path": "value"}}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:529:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › find › 0 › GIVEN provider w/o data THEN returns payload w/o data from find
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: [null, null]
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:548:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › find › 0 › GIVEN provider w/ data THEN returns payload w/ data from find
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: ["test:find", "value"]
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:564:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › find › 1 › GIVEN provider w/o data THEN returns payload w/o data from find
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: [null, null]
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:581:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › find › 1 › GIVEN provider w/ data THEN returns payload w/o data from find
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: ["test:find", {"path": "value"}]
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:598:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › map › 0 › GIVEN provider w/o data THEN returns payload w/o data from map
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: []
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:897:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › map › 0 › GIVEN provider w/ data THEN returns payload w/ data from map
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: ["value"]
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:913:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › map › 2 › GIVEN provider w/o data THEN returns payload w/o data from map
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: []
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:929:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › map › 2 › GIVEN provider w/ data THEN returns payload w/ data from map
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: ["value"]
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:945:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › map › 2 › GIVEN provider w/ data at path THEN returns payload w/ data from map
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: ["value"]
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:961:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › partition › 0 › GIVEN provider w/o data THEN returns payload w/o data
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1084:36)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › partition › 0 › GIVEN provider w/ data THEN returns payload w/ data
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {"test:partition": "value"}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1106:36)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › partition › 0 › GIVEN provider w/ data THEN returns payload w/ data
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1128:36)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › partition › 1 › GIVEN provider w/o data THEN returns payload w/o data
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1152:36)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › partition › 1 › GIVEN provider w/ data THEN returns payload w/ data
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {"test:partition": "value"}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1176:36)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › partition › 1 › GIVEN provider w/ data THEN returns payload w/ data
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: {}
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1200:36)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › push › GIVEN provider w/o data THEN returns payload w/ missing data error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1216:27)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › push › GIVEN provider w/o data at path THEN returns payload w/ missing data error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1234:27)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › push › GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1252:27)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › push › GIVEN provider w/ invalid type at path THEN returns payload w/ invalid type error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1270:27)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › remove › 0 › GIVEN provider w/o data at key THEN returns payload w/ missing data error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1389:29)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › remove › 0 › GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1414:29)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › remove › 0 › GIVEN provider w/ array at key THEN returns payload AND removes value from array at key
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "value",
+    + ]
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1451:37)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › remove › 1 › GIVEN provider w/o data at key THEN returns payload w/ missing data error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1471:29)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › remove › 1 › GIVEN provider w/ invalid type at key THEN returns payload w/ invalid type error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1496:29)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › remove › 1 › GIVEN provider w/ array at key THEN returns payload AND removes value from array at key
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "value",
+    + ]
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1533:37)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › some › 0 › GIVEN provider w/o data THEN returns payload(false)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1683:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › some › 0 › GIVEN provider w/ data THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1703:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › some › 1 › GIVEN provider w/o data THEN returns payload(false)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1720:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › some › 1 › GIVEN provider w/ data THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1737:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › some › 1 › GIVEN provider w/o data w/o path THEN returns payload(false)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1757:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › some › 1 › GIVEN provider w/ data w/o path THEN returns payload(true)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1779:28)
+
+  ● IndexedDBProvider - Serialization Disabled › can manipulate provider data › update › GIVEN provider w/o data THEN returns payload w/ missing data error
+
+    expect(received).toBeInstanceOf(expected)
+
+    Expected constructor: Error
+
+    Received value has no prototype
+    Received value: undefined
+
+      at Object.<anonymous> (node_modules/@joshdb/provider/src/tests/runProviderTest.ts:1794:27)
+
+Waiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...
+Test Suites: 1 failed, 1 passed, 2 total
+Tests:       88 failed, 121 passed, 209 total
+Snapshots:   0 total
+Time:        3.043 s
+Ran all test suites.
+Waiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...
