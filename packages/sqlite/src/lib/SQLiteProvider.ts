@@ -63,15 +63,14 @@ import {
 	ValuesPayload
 } from '@joshdb/core';
 
-import { deleteFromObject, getFromObject } from '@realware/utilities'; // , hasFromObject, setToObject
-import { isNullOrUndefined, isNumber, isPrimitive, isObject } from '@sapphire/utilities';
+import { deleteFromObject, getFromObject, setToObject } from '@realware/utilities';
+import { isNullOrUndefined, isNumber, isPrimitive, isObject, deepClone } from '@sapphire/utilities';
 import serialize from 'serialize-javascript';
 import onChange from 'on-change';
 
 import Database from 'better-sqlite3';
 
 import { SQLiteProviderError } from './SQLiteProviderError';
-import type { SQLiteDocType } from './SQLiteDocType';
 
 export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
 	public declare options: SQLiteProvider.Options;
@@ -156,22 +155,22 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 		let { lastnum } = this.db!.prepare("SELECT lastnum FROM 'internal::autonum' WHERE josh = ?").get(this.name);
 
 		lastnum++;
-		this.db!.prepare("INSERT OR REPLACE INTO 'internal::autonum' (josh, lastnum) VALUES (?, ?)").run(this.name, lastnum);
+		this.db.prepare("INSERT OR REPLACE INTO 'internal::autonum' (josh, lastnum) VALUES (?, ?)").run(this.name, lastnum);
 
 		payload.data = lastnum.toString();
 
 		return payload;
 	}
 
-	public [Method.Clear](payload: ClearPayload): Promise<ClearPayload> {
-		this.db!.exec(`DELETE FROM '${this.name}'`);
+	public [Method.Clear](payload: ClearPayload): ClearPayload {
+		this.db.exec(`DELETE FROM '${this.name}'`);
 
-		return Promise.resolve(payload);
+		return payload;
 	}
 
-	public async [Method.Dec](payload: DecPayload): Promise<DecPayload> {
+	public [Method.Dec](payload: DecPayload): DecPayload {
 		const { key, path } = payload;
-		const { data } = await this.get<StoredValue>({ key, method: Method.Get, path });
+		const { data } = this.get<StoredValue>({ key, method: Method.Get, path });
 
 		if (data === undefined) {
 			payload.error = new SQLiteProviderError({
@@ -194,12 +193,12 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 			return payload;
 		}
 
-		await this.set({ method: Method.Set, key, path, value: data - 1 });
+		this.set({ method: Method.Set, key, path, value: data - 1 });
 
 		return payload;
 	}
 
-	public async [Method.Delete](payload: DeletePayload): Promise<DeletePayload> {
+	public [Method.Delete](payload: DeletePayload): DeletePayload {
 		const { key, path } = payload;
 
 		if (path.length === 0) {
@@ -208,12 +207,12 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 			return payload;
 		}
 
-		if ((await this.has({ method: Method.Has, key, path, data: false })).data) {
-			const { data } = await this.get({ method: Method.Get, key, path: [] });
+		if (this.has({ method: Method.Has, key, path, data: false }).data) {
+			const { data } = this.get({ method: Method.Get, key, path: [] });
 
 			deleteFromObject(data, path);
 
-			await this.set({ method: Method.Set, key, path: [], value: data });
+			this.set({ method: Method.Set, key, path: [], value: data });
 
 			return payload;
 		}
@@ -221,21 +220,21 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 		return payload;
 	}
 
-	public async [Method.Ensure](payload: EnsurePayload<StoredValue>): Promise<EnsurePayload<StoredValue>> {
+	public [Method.Ensure](payload: EnsurePayload<StoredValue>): EnsurePayload<StoredValue> {
 		const { key } = payload;
 
-		if (!(await this.has({ key, method: Method.Has, data: false, path: [] })).data)
-			await this.set({ key, value: payload.defaultValue, method: Method.Set, path: [] });
+		if (!this.has({ key, method: Method.Has, data: false, path: [] }).data)
+			this.set({ key, value: payload.defaultValue, method: Method.Set, path: [] });
 
-		payload.data = (await this.get({ key, method: Method.Get, path: [] })).data as StoredValue;
+		payload.data = this.get({ key, method: Method.Get, path: [] }).data as StoredValue;
 
 		return payload;
 	}
 
-	public async [Method.Every](payload: EveryByHookPayload<StoredValue>): Promise<EveryByHookPayload<StoredValue>>;
-	public async [Method.Every](payload: EveryByValuePayload): Promise<EveryByValuePayload>;
-	public async [Method.Every](payload: EveryPayload<StoredValue>): Promise<EveryPayload<StoredValue>> {
-		if ((await this.size({ method: Method.Size, data: 0 })).data === 0) {
+	public [Method.Every](payload: EveryByHookPayload<StoredValue>): EveryByHookPayload<StoredValue>;
+	public [Method.Every](payload: EveryByValuePayload): EveryByValuePayload;
+	public [Method.Every](payload: EveryPayload<StoredValue>): EveryPayload<StoredValue> {
+		if (this.size({ method: Method.Size, data: 0 }).data === 0) {
 			payload.data = true;
 
 			return payload;
@@ -243,8 +242,8 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 		if (isEveryByHookPayload(payload)) {
 			const { hook } = payload;
 
-			for (const value of (await this.values({ method: Method.Values, data: [] })).data) {
-				const everyValue = await hook(value);
+			for (const value of this.values({ method: Method.Values, data: [] }).data) {
+				const everyValue = hook(value);
 
 				if (everyValue) continue;
 
@@ -255,8 +254,8 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 		if (isEveryByValuePayload(payload)) {
 			const { path, value } = payload;
 
-			for (const key of (await this.keys({ method: Method.Keys, data: [] })).data) {
-				const { data } = await this.get({ method: Method.Get, key, path });
+			for (const key of this.keys({ method: Method.Keys, data: [] }).data) {
+				const { data } = this.get({ method: Method.Get, key, path });
 
 				if (value === data) continue;
 
@@ -267,14 +266,14 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 		return payload;
 	}
 
-	public async [Method.Filter](payload: FilterByHookPayload<StoredValue>): Promise<FilterByHookPayload<StoredValue>>;
-	public async [Method.Filter](payload: FilterByValuePayload<StoredValue>): Promise<FilterByValuePayload<StoredValue>>;
-	public async [Method.Filter](payload: FilterPayload<StoredValue>): Promise<FilterPayload<StoredValue>> {
+	public [Method.Filter](payload: FilterByHookPayload<StoredValue>): FilterByHookPayload<StoredValue>;
+	public [Method.Filter](payload: FilterByValuePayload<StoredValue>): FilterByValuePayload<StoredValue>;
+	public [Method.Filter](payload: FilterPayload<StoredValue>): FilterPayload<StoredValue> {
 		if (isFilterByHookPayload(payload)) {
 			const { hook } = payload;
 
-			for (const [key, value] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data)) {
-				const filterValue = await hook(value);
+			for (const [key, value] of Object.entries(this.getAll({ method: Method.GetAll, data: {} }).data)) {
+				const filterValue = hook(value);
 
 				if (!filterValue) continue;
 
@@ -295,21 +294,21 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 				return payload;
 			}
 
-			for (const [key, storedValue] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data))
+			for (const [key, storedValue] of Object.entries(this.getAll({ method: Method.GetAll, data: {} }).data))
 				if (value === (path.length === 0 ? storedValue : getFromObject(storedValue, path))) payload.data[key] = storedValue;
 		}
 
 		return payload;
 	}
 
-	public async [Method.Find](payload: FindByHookPayload<StoredValue>): Promise<FindByHookPayload<StoredValue>>;
-	public async [Method.Find](payload: FindByValuePayload<StoredValue>): Promise<FindByValuePayload<StoredValue>>;
-	public async [Method.Find](payload: FindPayload<StoredValue>): Promise<FindPayload<StoredValue>> {
+	public [Method.Find](payload: FindByHookPayload<StoredValue>): FindByHookPayload<StoredValue>;
+	public [Method.Find](payload: FindByValuePayload<StoredValue>): FindByValuePayload<StoredValue>;
+	public [Method.Find](payload: FindPayload<StoredValue>): FindPayload<StoredValue> {
 		if (isFindByHookPayload(payload)) {
 			const { hook } = payload;
 
-			for (const value of (await this.values({ method: Method.Values, data: [] })).data) {
-				const foundValue = await hook(value);
+			for (const value of this.values({ method: Method.Values, data: [] }).data) {
+				const foundValue = hook(value);
 
 				if (!foundValue) continue;
 
@@ -332,7 +331,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 				return payload;
 			}
 
-			for (const storedValue of (await this.values({ method: Method.Values, data: [] })).data) {
+			for (const storedValue of this.values({ method: Method.Values, data: [] }).data) {
 				if (payload.data !== undefined) break;
 				if (value === (path.length === 0 ? storedValue : getFromObject(storedValue, path))) payload.data = storedValue;
 			}
@@ -341,10 +340,11 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 		return payload;
 	}
 
-	public async [Method.Get]<StoredValue>(payload: GetPayload<StoredValue>): Promise<GetPayload<StoredValue>> {
+	public [Method.Get]<StoredValue>(payload: GetPayload<StoredValue>): GetPayload<StoredValue> {
 		const { key, path } = payload;
 
-		const doc = await this.collection.findOne({ key });
+		const query = this.db.prepare(`SELECT * FROM '${this.name}' WHERE key = ?${path ? ' AND path = ?' : " AND path='::NULL::'"};`);
+		const doc = path ? query.get(key, path) : query.get(key);
 
 		if (!doc) {
 			payload.data = undefined;
@@ -359,42 +359,52 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 		return payload;
 	}
 
-	public async [Method.GetAll](payload: GetAllPayload<StoredValue>): Promise<GetAllPayload<StoredValue>> {
-		const docs = (await this.collection.find({})) || [];
+	public [Method.GetAll](payload: GetAllPayload<StoredValue>): GetAllPayload<StoredValue> {
+		const docs = this.db
+			.prepare(`SELECT * FROM '${this.name}' WHERE path='::NULL::';`)
+			.all()
+			.reduce((acc, row) => {
+				acc[row.key] = this.parseData(row.value);
+
+				return acc;
+			}, {});
 
 		for (const doc of docs) Reflect.set(payload.data, doc.key, doc.value);
 
 		return payload;
 	}
 
-	public async [Method.GetMany](payload: GetManyPayload<StoredValue>): Promise<GetManyPayload<StoredValue>> {
+	public [Method.GetMany](payload: GetManyPayload<StoredValue>): GetManyPayload<StoredValue> {
 		const { keys } = payload;
 
-		const docs = (await this.collection.find({ key: { $in: keys } })) || [];
+		const docs = this.db
+			.prepare(`SELECT * FROM '${this.name}' WHERE key IN (${'?, '.repeat(keys.length).slice(0, -2)}) AND path='::NULL::';`)
+			.all(keys)
+			.reduce((acc, row) => {
+				acc[row.key] = this.parseData(row.value);
+
+				return acc;
+			}, {});
 
 		for (const doc of docs) Reflect.set(payload.data, doc.key, doc.value);
 
 		return payload;
 	}
 
-	public async [Method.Has](payload: HasPayload): Promise<HasPayload> {
+	public [Method.Has](payload: HasPayload): HasPayload {
 		const { key, path } = payload;
-		let isThere;
 
-		if (path.length === 0) {
-			isThere = await this.collection.exists({ key });
-		} else {
-			isThere = await this.collection.exists({ key, [`value.${path.join('.')}`]: { $exists: true } });
-		}
+		const query = this.db.prepare(`SELECT count(*) FROM '${this.name}' WHERE key = ?${path ? ' AND path = ?' : "AND path='::NULL::'"};`);
+		const doc = path ? query.get(key, path) : query.get(key);
 
-		payload.data = isThere;
+		payload.data = doc['count(*)'] === 1;
 
 		return payload;
 	}
 
-	public async [Method.Inc](payload: IncPayload): Promise<IncPayload> {
+	public [Method.Inc](payload: IncPayload): IncPayload {
 		const { key, path } = payload;
-		const { data } = await this.get<StoredValue>({ method: Method.Get, key, path });
+		const { data } = this.get<StoredValue>({ method: Method.Get, key, path });
 
 		if (data === undefined) {
 			payload.error = new SQLiteProviderError({
@@ -416,47 +426,45 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 			return payload;
 		}
 
-		await this.set({ method: Method.Set, key, path, value: data + 1 });
+		this.set({ method: Method.Set, key, path, value: data + 1 });
 
 		return payload;
 	}
 
-	public async [Method.Keys](payload: KeysPayload): Promise<KeysPayload> {
-		const docs = (await this.collection.find({})) || [];
+	public [Method.Keys](payload: KeysPayload): KeysPayload {
+		const docs = this.db.prepare(`SELECT key FROM '${this.name}' WHERE path='::NULL::';`).all();
 
 		for (const doc of docs) payload.data.push(doc.key);
 
 		return payload;
 	}
 
-	public async [Method.Map]<DataValue = StoredValue, HookValue = DataValue>(
+	public [Method.Map]<DataValue = StoredValue, HookValue = DataValue>(
 		payload: MapByHookPayload<DataValue, HookValue>
-	): Promise<MapByHookPayload<DataValue, HookValue>>;
+	): MapByHookPayload<DataValue, HookValue>;
 
-	public async [Method.Map]<DataValue = StoredValue>(payload: MapByPathPayload<DataValue>): Promise<MapByPathPayload<DataValue>>;
-	public async [Method.Map]<DataValue = StoredValue, HookValue = DataValue>(
-		payload: MapPayload<DataValue, HookValue>
-	): Promise<MapPayload<DataValue, HookValue>> {
+	public [Method.Map]<DataValue = StoredValue>(payload: MapByPathPayload<DataValue>): MapByPathPayload<DataValue>;
+	public [Method.Map]<DataValue = StoredValue, HookValue = DataValue>(payload: MapPayload<DataValue, HookValue>): MapPayload<DataValue, HookValue> {
 		if (isMapByHookPayload(payload)) {
 			const { hook } = payload;
 
 			// @ts-expect-error 2345
-			for (const value of (await this.values({ method: Method.Values, data: [] })).data) payload.data.push(await hook(value));
+			for (const value of this.values({ method: Method.Values, data: [] }).data) payload.data.push(hook(value));
 		}
 
 		if (isMapByPathPayload(payload)) {
 			const { path } = payload;
 
-			for (const value of (await this.values({ method: Method.Values, data: [] })).data)
+			for (const value of this.values({ method: Method.Values, data: [] }).data)
 				payload.data.push((path.length === 0 ? value : getFromObject(value, path)) as DataValue);
 		}
 
 		return payload;
 	}
 
-	public async [Method.Math](payload: MathPayload): Promise<MathPayload> {
+	public [Method.Math](payload: MathPayload): MathPayload {
 		const { key, path, operator, operand } = payload;
-		let { data } = await this.get<number>({ method: Method.Get, key, path });
+		let { data } = this.get<number>({ method: Method.Get, key, path });
 
 		if (data === undefined) {
 			payload.error = new SQLiteProviderError({
@@ -510,19 +518,19 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 				break;
 		}
 
-		await this.set({ method: Method.Set, key, path, value: data });
+		this.set({ method: Method.Set, key, path, value: data });
 
 		return payload;
 	}
 
-	public async [Method.Partition](payload: PartitionByHookPayload<StoredValue>): Promise<PartitionByHookPayload<StoredValue>>;
-	public async [Method.Partition](payload: PartitionByValuePayload<StoredValue>): Promise<PartitionByValuePayload<StoredValue>>;
-	public async [Method.Partition](payload: PartitionPayload<StoredValue>): Promise<PartitionPayload<StoredValue>> {
+	public [Method.Partition](payload: PartitionByHookPayload<StoredValue>): PartitionByHookPayload<StoredValue>;
+	public [Method.Partition](payload: PartitionByValuePayload<StoredValue>): PartitionByValuePayload<StoredValue>;
+	public [Method.Partition](payload: PartitionPayload<StoredValue>): PartitionPayload<StoredValue> {
 		if (isPartitionByHookPayload(payload)) {
 			const { hook } = payload;
 
-			for (const [key, value] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data)) {
-				const filterValue = await hook(value);
+			for (const [key, value] of Object.entries(this.getAll({ method: Method.GetAll, data: {} }).data)) {
+				const filterValue = hook(value);
 
 				if (filterValue) payload.data.truthy[key] = value;
 				else payload.data.falsy[key] = value;
@@ -542,7 +550,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 				return payload;
 			}
 
-			for (const [key, storedValue] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data))
+			for (const [key, storedValue] of Object.entries(this.getAll({ method: Method.GetAll, data: {} }).data))
 				if (value === (path.length === 0 ? storedValue : getFromObject(storedValue, path))) payload.data.truthy[key] = storedValue;
 				else payload.data.falsy[key] = storedValue;
 		}
@@ -550,9 +558,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 		return payload;
 	}
 
-	public async [Method.Push]<Value = StoredValue>(payload: PushPayload<Value>): Promise<PushPayload<Value>> {
+	public [Method.Push]<Value = StoredValue>(payload: PushPayload<Value>): PushPayload<Value> {
 		const { key, path, value } = payload;
-		const { data } = await this.get({ method: Method.Get, key, path });
+		const { data } = this.get({ method: Method.Get, key, path });
 
 		if (data === undefined) {
 			payload.error = new SQLiteProviderError({
@@ -576,33 +584,45 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 
 		data.push(value);
 
-		await this.set({ method: Method.Set, key, path, value: data });
+		this.set({ method: Method.Set, key, path, value: data });
 
 		return payload;
 	}
 
-	public async [Method.Random](payload: RandomPayload<StoredValue>): Promise<RandomPayload<StoredValue>> {
-		const docs = (await this.collection.aggregate([{ $sample: { size: 1 } }])) || [];
+	public [Method.Random](payload: RandomPayload<StoredValue>): RandomPayload<StoredValue> {
+		// TODO : This should be configurable in josh/core. Fix after that's done.
+		const count = 1;
+		const docs = this.db.prepare(`SELECT * FROM '${this.name}' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${Number(count)};`).all();
 
 		payload.data = docs.length > 0 ? docs[0].value : undefined;
+		/*
+		TODO: Enable when more than one random value is possible:
+		return data.reduce((acc, row) => {
+      acc[row.key] = this.parseData(row.value);
+      return acc;
+    }, {});
+		*/
 
 		return payload;
 	}
 
-	public async [Method.RandomKey](payload: RandomKeyPayload): Promise<RandomKeyPayload> {
-		const docs = (await this.collection.aggregate([{ $sample: { size: 1 } }])) || [];
+	public [Method.RandomKey](payload: RandomKeyPayload): RandomKeyPayload {
+		// TODO: Don't forget me when fixing random() above.
+		const count = 1;
+		const docs = this.db.prepare(`SELECT key FROM '${this.name}' WHERE path='::NULL::' ORDER BY RANDOM() LIMIT ${Number(count)};`).all();
 
 		payload.data = docs.length > 0 ? docs[0].key : undefined;
+		// data.map((row) => row.key);
 
 		return payload;
 	}
 
-	public async [Method.Remove]<HookValue = StoredValue>(payload: RemoveByHookPayload<HookValue>): Promise<RemoveByHookPayload<HookValue>>;
-	public async [Method.Remove](payload: RemoveByValuePayload): Promise<RemoveByValuePayload>;
-	public async [Method.Remove]<HookValue = StoredValue>(payload: RemovePayload<HookValue>): Promise<RemovePayload<HookValue>> {
+	public [Method.Remove]<HookValue = StoredValue>(payload: RemoveByHookPayload<HookValue>): RemoveByHookPayload<HookValue>;
+	public [Method.Remove](payload: RemoveByValuePayload): RemoveByValuePayload;
+	public [Method.Remove]<HookValue = StoredValue>(payload: RemovePayload<HookValue>): RemovePayload<HookValue> {
 		if (isRemoveByHookPayload(payload)) {
 			const { key, path, hook } = payload;
-			const { data } = await this.get<unknown[]>({ method: Method.Get, key, path });
+			const { data } = this.get<unknown[]>({ method: Method.Get, key, path });
 
 			if (data === undefined) {
 				payload.error = new SQLiteProviderError({
@@ -624,14 +644,14 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 				return payload;
 			}
 
-			const filterValues = await Promise.all(data.map(hook));
+			const filterValues = Promise.all(data.map(hook));
 
-			await this.set({ method: Method.Set, key, path, value: data.filter((_, index) => !filterValues[index]) });
+			this.set({ method: Method.Set, key, path, value: data.filter((_, index) => !filterValues[index]) });
 		}
 
 		if (isRemoveByValuePayload(payload)) {
 			const { key, path, value } = payload;
-			const { data } = await this.get({ method: Method.Get, key, path });
+			const { data } = this.get({ method: Method.Get, key, path });
 
 			if (data === undefined) {
 				payload.error = new SQLiteProviderError({
@@ -653,52 +673,53 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 				return payload;
 			}
 
-			await this.set({ method: Method.Set, key, path, value: data.filter((storedValue) => value !== storedValue) });
+			this.set({ method: Method.Set, key, path, value: data.filter((storedValue) => value !== storedValue) });
 		}
 
 		return payload;
 	}
 
-	public async [Method.Set]<Value = StoredValue>(payload: SetPayload<Value>): Promise<SetPayload<Value>> {
-		const { key, path, value } = payload;
+	public [Method.Set]<Value = StoredValue>(payload: SetPayload<Value>): SetPayload<Value> {
+		const executions = this.compareData(payload);
 
-		await this.collection.findOneAndUpdate(
-			{
-				key: { $eq: key }
-			},
-			{
-				$set: { [`${path.length > 0 ? `value.${path.join('.')}` : 'value'}`]: value }
-			},
-			{
-				upsert: true
-			}
-		);
+		this.runMany(executions);
 
 		return payload;
 	}
 
-	public async [Method.SetMany]<Value = StoredValue>(payload: SetManyPayload<Value>): Promise<SetManyPayload<Value>> {
+	public [Method.SetMany]<Value = StoredValue>(payload: SetManyPayload<Value>): SetManyPayload<Value> {
 		const { data } = payload;
+		const overwrite = false;
 
-		for (const [{ key, path }, value] of data) await this.set<Value>({ method: Method.Set, key, path, value });
+		const existingKeys = this.keys({ method: Method.Keys, data: [] }).data;
+
+		this.runMany(
+			Object.entries(data)
+				.flat()
+				.filter(([key]) => overwrite || !existingKeys.includes(key))
+				.map(([key, value]) => this.compareData({ key, value, path: null }))
+		);
+		// for (const [{ key, path }, value] of data) await this.set<Value>({ method: Method.Set, key, path, value });
 
 		return payload;
 	}
 
-	public async [Method.Size](payload: SizePayload): Promise<SizePayload> {
-		payload.data = (await this.collection.countDocuments({})) ?? payload.data;
+	public [Method.Size](payload: SizePayload): SizePayload {
+		const data = this.db.prepare(`SELECT count(*) FROM '${this.name}' WHERE path='::NULL::';`).get();
+
+		payload.data = data['count(*)'];
 
 		return payload;
 	}
 
-	public async [Method.Some](payload: SomeByHookPayload<StoredValue>): Promise<SomeByHookPayload<StoredValue>>;
-	public async [Method.Some](payload: SomeByValuePayload): Promise<SomeByValuePayload>;
-	public async [Method.Some](payload: SomePayload<StoredValue>): Promise<SomePayload<StoredValue>> {
+	public [Method.Some](payload: SomeByHookPayload<StoredValue>): SomeByHookPayload<StoredValue>;
+	public [Method.Some](payload: SomeByValuePayload): SomeByValuePayload;
+	public [Method.Some](payload: SomePayload<StoredValue>): SomePayload<StoredValue> {
 		if (isSomeByHookPayload(payload)) {
 			const { hook } = payload;
 
-			for (const value of (await this.values({ method: Method.Values, data: [] })).data) {
-				const someValue = await hook(value);
+			for (const value of this.values({ method: Method.Values, data: [] }).data) {
+				const someValue = hook(value);
 
 				if (!someValue) continue;
 
@@ -711,7 +732,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 		if (isSomeByValuePayload(payload)) {
 			const { path, value } = payload;
 
-			for (const storedValue of (await this.values({ method: Method.Values, data: [] })).data) {
+			for (const storedValue of this.values({ method: Method.Values, data: [] }).data) {
 				if (path.length !== 0 && value !== getFromObject(storedValue, path)) continue;
 				if (isPrimitive(storedValue) && value === storedValue) continue;
 
@@ -722,25 +743,25 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 		return payload;
 	}
 
-	public async [Method.Update]<HookValue = StoredValue, Value = HookValue>(
+	public [Method.Update]<HookValue = StoredValue, Value = HookValue>(
 		payload: UpdatePayload<StoredValue, HookValue, Value>
-	): Promise<UpdatePayload<StoredValue, HookValue, Value>> {
+	): UpdatePayload<StoredValue, HookValue, Value> {
 		const { key, path, hook } = payload;
-		const { data } = await this.get<HookValue>({ method: Method.Get, key, path });
+		const { data } = this.get<HookValue>({ method: Method.Get, key, path });
 
 		if (data === undefined) return payload;
 
-		Reflect.set(payload, 'data', await hook(data));
-		await this.set({ method: Method.Set, key, path, value: payload.data });
+		Reflect.set(payload, 'data', hook(data));
+		this.set({ method: Method.Set, key, path, value: payload.data });
 
 		return payload;
 	}
 
-	public async [Method.Values](payload: ValuesPayload<StoredValue>): Promise<ValuesPayload<StoredValue>> {
-		const docs = (await this.collection.find({})) || [];
+	public [Method.Values](payload: ValuesPayload<StoredValue>): ValuesPayload<StoredValue> {
+		const docs = this.db.prepare(`SELECT value FROM '${this.name}' WHERE path='::NULL::';`).all();
 
 		// @ts-expect-error 2345
-		for (const doc of docs) payload.data.push(doc.value);
+		for (const doc of docs) payload.data.push(this.parseData(doc.value));
 
 		return payload;
 	}
@@ -760,12 +781,12 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 	}
 
 	// public async [Method.Set]<Value = StoredValue>(payload: SetPayload<Value>): Promise<SetPayload<Value>> {
-	private compareData<Value = StoredValue>(payload: SetPayload<Value>): Promise<any[]> {
+	private compareData(payload: SQLiteProvider.compareDataPayload): any[] {
 		const { key, path, value } = payload;
 		const executions = [];
-		const currentData = this.has(key) ? this.get(key) : '::NULL::';
-		const currentPaths = getPaths(currentData);
-		const paths = path ? getPaths(_set(cloneDeep(currentData), path, value)) : getPaths(value);
+		const currentData = this.has({ method: Method.Has, key, path, data: false }).data ? this.get({ method: Method.Get, key, path }) : '::NULL::';
+		const currentPaths = this.getPaths(currentData);
+		const paths = path ? this.getPaths(setToObject(deepClone(currentData), path, value)) : this.getPaths(value);
 
 		for (const [currentPath, value] of Object.entries(currentPaths)) {
 			if (isNullOrUndefined(paths[currentPath]) || paths[currentPath] !== value) {
@@ -782,7 +803,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 			executions.push([this.insertStmt, { key, path: currentPath, value }]);
 		}
 
-		return Promise.resolve(executions);
+		return executions;
 	}
 
 	private serializeData(data: any) {
@@ -822,6 +843,16 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 
 		return basePath ? returnPaths : { ...returnPaths, '::NULL::': this.serializeData(data) };
 	}
+
+	private parseData(data: string) {
+		try {
+			return eval(`(${data})`);
+		} catch (err) {
+			console.log('Error parsing data : ', err);
+
+			return null;
+		}
+	}
 }
 
 export namespace SQLiteProvider {
@@ -835,5 +866,10 @@ export namespace SQLiteProvider {
 		InitFileNotFound = 'initFileNotFound',
 
 		NotInitialized = 'notInitialized'
+	}
+	export interface compareDataPayload {
+		key: string;
+		value: unknown;
+		path: string[] | null;
 	}
 }
