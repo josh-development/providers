@@ -44,7 +44,7 @@ export const jobs = [
 								dependencies: {},
 								repository: {
 									type: 'git',
-									url: 'git+https://github.com/eslachance/jsoh-providers'
+									url: 'git+https://github.com/josh-development/providers.git'
 								},
 								files: ['dist', '!dist/*.tsbuildinfo'],
 								engines: {
@@ -52,8 +52,8 @@ export const jobs = [
 									npm: '>=6'
 								},
 								keywords: [],
-								bugs: { url: 'https://github.com/eslachance/josh-providers/issues' },
-								homepage: 'https://github.com/eslachance/josh-providers',
+								bugs: { url: 'https://github.com/josh-development/providers/issues' },
+								homepage: 'https://github.com/josh-development/providers',
 								publishConfig: { access: 'public' }
 						  }
 						: {
@@ -79,7 +79,7 @@ export const jobs = [
 								dependencies: {},
 								repository: {
 									type: 'git',
-									url: 'git+https://github.com/eslachance/jsoh-providers'
+									url: 'git+https://github.com/josh-development/providers.git'
 								},
 								files: ['dist', '!dist/*.tsbuildinfo'],
 								engines: {
@@ -87,8 +87,8 @@ export const jobs = [
 									npm: '>=6'
 								},
 								keywords: [],
-								bugs: { url: 'https://github.com/eslachance/josh-providers/issues' },
-								homepage: 'https://github.com/eslachance/josh-providers',
+								bugs: { url: 'https://github.com/josh-development/providers/issues' },
+								homepage: 'https://github.com/josh-development/providers',
 								publishConfig: { access: 'public' }
 						  },
 					null,

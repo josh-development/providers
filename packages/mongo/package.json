@@ -1,7 +1,8 @@
 {
 	"name": "@joshdb/mongo",
 	"version": "2.0.0",
-	"author": "@joshdb",
+	"description": "A provider for @joshdb/core which uses MongoDB",
+	"author": "Evelyne Lachance <eslachance@gmail.com> (https://evie.codes/)",
 	"license": "Apache-2.0",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -19,7 +20,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/eslachance/josh-providers"
+		"url": "git+https://github.com/josh-development/providers"
 	},
 	"files": [
 		"dist",
@@ -31,9 +32,9 @@
 	},
 	"keywords": [],
 	"bugs": {
-		"url": "https://github.com/eslachance/josh-providers/issues"
+		"url": "https://github.com/josh-development/providers/issues"
 	},
-	"homepage": "https://github.com/eslachance/josh-providers",
+	"homepage": "https://github.com/josh-development",
 	"publishConfig": {
 		"access": "public"
 	}
