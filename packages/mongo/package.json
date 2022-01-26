@@ -1,45 +1,45 @@
 {
-	"name": "@joshdb/mongo",
-	"version": "2.0.0",
-	"description": "A provider for @joshdb/core which uses MongoDB",
-	"author": "Évelyne Lachance <eslachance@gmail.com> (https://evie.codes/)",
-	"contributors": [
-		"DanCodes <dan@dancodes.online> (https://dancodes.online/)",
-		"RealShadowNova <real.shadow.nova@gmail.com>"
-	],
-	"license": "Apache-2.0",
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"scripts": {
-		"test": "jest --verbose",
-		"lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
-		"build": "rollup -c rollup.bundle.ts",
-		"prepublishOnly": "rollup-type-bundler"
-	},
-	"dependencies": {
-		"@joshdb/core": "RealShadowNova/joshdb-core#build",
-		"@realware/utilities": "^2.0.2",
-		"@sapphire/utilities": "^3.2.1",
-		"mongoose": "^6.1.7"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/josh-development/providers"
-	},
-	"files": [
-		"dist",
-		"!dist/*tsbuildinfo"
-	],
-	"engines": {
-		"node": ">=16",
-		"npm": ">=6"
-	},
-	"keywords": [],
-	"bugs": {
-		"url": "https://github.com/josh-development/providers/issues"
-	},
-	"homepage": "https://github.com/josh-development",
-	"publishConfig": {
-		"access": "public"
-	}
+  "name": "@joshdb/mongo",
+  "version": "2.0.0",
+  "description": "A provider for @joshdb/core which uses MongoDB",
+  "author": "Évelyne Lachance <eslachance@gmail.com> (https://evie.codes/)",
+  "contributors": [
+    "DanCodes <dan@dancodes.online> (https://dancodes.online/)",
+    "RealShadowNova <real.shadow.nova@gmail.com>"
+  ],
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "jest --verbose",
+    "lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
+    "build": "rollup -c rollup.bundle.ts",
+    "prepublishOnly": "rollup-type-bundler"
+  },
+  "dependencies": {
+    "@joshdb/core": "RealShadowNova/joshdb-core#build",
+    "@realware/utilities": "^2.0.2",
+    "@sapphire/utilities": "^3.2.1",
+    "mongoose": "^6.1.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josh-development/providers"
+  },
+  "files": [
+    "dist",
+    "!dist/*tsbuildinfo"
+  ],
+  "engines": {
+    "node": ">=16",
+    "npm": ">=6"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/josh-development/providers/issues"
+  },
+  "homepage": "https://github.com/josh-development",
+  "publishConfig": {
+    "access": "public"
+  }
 }

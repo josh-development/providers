@@ -32,7 +32,7 @@ import { JoshProvider } from '@joshdb/core';
 export class MyDBProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {}
 
 export namespace MyDBProvider {
-	export interface Options {}
+  export interface Options {}
 }
 ```
 
@@ -59,16 +59,16 @@ import { JoshProvider } from '@joshdb/core';
 
 // This is your provider you've been creating.
 export class MyProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
-	// Methods...
+  // Methods...
 }
 
 // Create a namespace which has the same name as your provider class.
 export namespace MyProvider {
-	// Create an interface called "Options" extending "JoshProvider.Options".
-	export interface Options extends JoshProvider.Options {
-		// Add your types, in our case "name" with a type of "string".
-		name: string;
-	}
+  // Create an interface called "Options" extending "JoshProvider.Options".
+  export interface Options extends JoshProvider.Options {
+    // Add your types, in our case "name" with a type of "string".
+    name: string;
+  }
 }
 ```
 
@@ -78,25 +78,25 @@ Once you have added the typings for your options, let's implement them. By defau
 import { JoshProvider } from '@joshdb/core';
 
 export class MyProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
-	// Declare the "name" property.
-	public name: string;
+  // Declare the "name" property.
+  public name: string;
 
-	// Create the constructor.
-	public constructor(options: MyProvider.Options) {
-		// Pass the options to the super.
-		super(options);
+  // Create the constructor.
+  public constructor(options: MyProvider.Options) {
+    // Pass the options to the super.
+    super(options);
 
-		// Set "name" to "this".
-		this.name = options.name;
-	}
+    // Set "name" to "this".
+    this.name = options.name;
+  }
 
-	// Methods...
+  // Methods...
 }
 
 export namespace MyProvider {
-	export interface Options extends JoshProvider.Options {
-		name: string;
-	}
+  export interface Options extends JoshProvider.Options {
+    name: string;
+  }
 }
 ```
 
@@ -106,30 +106,30 @@ If you need to run asynchronous functions when your provider is initiated, then 
 import { JoshProvider } from '@joshdb/core';
 
 export class MyProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
-	public name: string;
+  public name: string;
 
-	public constructor(options: MyProvider.Options) {
-		super(options);
+  public constructor(options: MyProvider.Options) {
+    super(options);
 
-		this.name = options.name;
-	}
+    this.name = options.name;
+  }
 
-	public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
-		// Run the "init()" method on the super to get other properties set.
-		context = await super.init(context);
+  public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
+    // Run the "init()" method on the super to get other properties set.
+    context = await super.init(context);
 
-		// Make asynchronous functions here.
+    // Make asynchronous functions here.
 
-		return context;
-	}
+    return context;
+  }
 
-	// Methods...
+  // Methods...
 }
 
 export namespace MyProvider {
-	export interface Options extends JoshProvider.Options {
-		name: string;
-	}
+  export interface Options extends JoshProvider.Options {
+    name: string;
+  }
 }
 ```
 

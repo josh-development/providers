@@ -1,51 +1,51 @@
 {
-	"name": "@joshdb/json",
-	"version": "2.0.0",
-	"description": "A provider for @joshdb/core which uses JSON",
-	"author": "Évelyne Lachance <eslachance@gmail.com> (https://evie.codes/)",
-	"contributors": [
-		"RealShadowNova <real.shadow.nova@gmail.com>",
-		"DanCodes <dan@dancodes.online> (https://dancodes.online/)"
-	],
-	"license": "Apache-2.0",
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"exports": {
-		"import": "./dist/index.mjs",
-		"require": "./dist/index.js"
-	},
-	"scripts": {
-		"test": "jest --verbose",
-		"lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
-		"build": "rollup -c rollup.bundle.ts",
-		"prepublishOnly": "rollup-type-bundler"
-	},
-	"dependencies": {
-		"@joshdb/core": "RealShadowNova/joshdb-core#build",
-		"@realware/utilities": "^2.0.2",
-		"@sapphire/async-queue": "^1.1.9",
-		"@sapphire/pieces": "^3.1.1",
-		"@sapphire/snowflake": "^3.0.1",
-		"@sapphire/utilities": "^3.2.1"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/josh-development/providers"
-	},
-	"files": [
-		"dist",
-		"!dist/*tsbuildinfo"
-	],
-	"engines": {
-		"node": ">=16",
-		"npm": ">=6"
-	},
-	"keywords": [],
-	"bugs": {
-		"url": "https://github.com/josh-development/providers/issues"
-	},
-	"homepage": "https://github.com/josh-deverlopment",
-	"publishConfig": {
-		"access": "public"
-	}
+  "name": "@joshdb/json",
+  "version": "2.0.0",
+  "description": "A provider for @joshdb/core which uses JSON",
+  "author": "Évelyne Lachance <eslachance@gmail.com> (https://evie.codes/)",
+  "contributors": [
+    "RealShadowNova <real.shadow.nova@gmail.com>",
+    "DanCodes <dan@dancodes.online> (https://dancodes.online/)"
+  ],
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.js"
+  },
+  "scripts": {
+    "test": "jest --verbose",
+    "lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
+    "build": "rollup -c rollup.bundle.ts",
+    "prepublishOnly": "rollup-type-bundler"
+  },
+  "dependencies": {
+    "@joshdb/core": "RealShadowNova/joshdb-core#build",
+    "@realware/utilities": "^2.0.2",
+    "@sapphire/async-queue": "^1.1.9",
+    "@sapphire/pieces": "^3.1.1",
+    "@sapphire/snowflake": "^3.0.1",
+    "@sapphire/utilities": "^3.2.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josh-development/providers"
+  },
+  "files": [
+    "dist",
+    "!dist/*tsbuildinfo"
+  ],
+  "engines": {
+    "node": ">=16",
+    "npm": ">=6"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/josh-development/providers/issues"
+  },
+  "homepage": "https://github.com/josh-deverlopment",
+  "publishConfig": {
+    "access": "public"
+  }
 }

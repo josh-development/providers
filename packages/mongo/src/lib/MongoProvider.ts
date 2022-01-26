@@ -1,63 +1,63 @@
 import {
-	AutoKeyPayload,
-	ClearPayload,
-	DecPayload,
-	DeletePayload,
-	EnsurePayload,
-	EveryByHookPayload,
-	EveryByValuePayload,
-	EveryPayload,
-	FilterByHookPayload,
-	FilterByValuePayload,
-	FilterPayload,
-	FindByHookPayload,
-	FindByValuePayload,
-	FindPayload,
-	GetAllPayload,
-	GetManyPayload,
-	GetPayload,
-	HasPayload,
-	IncPayload,
-	isEveryByHookPayload,
-	isEveryByValuePayload,
-	isFilterByHookPayload,
-	isFilterByValuePayload,
-	isFindByHookPayload,
-	isFindByValuePayload,
-	isMapByHookPayload,
-	isMapByPathPayload,
-	isPartitionByHookPayload,
-	isPartitionByValuePayload,
-	isRemoveByHookPayload,
-	isRemoveByValuePayload,
-	isSomeByHookPayload,
-	isSomeByValuePayload,
-	JoshError,
-	JoshProvider,
-	KeysPayload,
-	MapByHookPayload,
-	MapByPathPayload,
-	MapPayload,
-	MathOperator,
-	MathPayload,
-	Method,
-	PartitionByHookPayload,
-	PartitionByValuePayload,
-	PartitionPayload,
-	PushPayload,
-	RandomKeyPayload,
-	RandomPayload,
-	RemoveByHookPayload,
-	RemoveByValuePayload,
-	RemovePayload,
-	SetManyPayload,
-	SetPayload,
-	SizePayload,
-	SomeByHookPayload,
-	SomeByValuePayload,
-	SomePayload,
-	UpdatePayload,
-	ValuesPayload
+  AutoKeyPayload,
+  ClearPayload,
+  DecPayload,
+  DeletePayload,
+  EnsurePayload,
+  EveryByHookPayload,
+  EveryByValuePayload,
+  EveryPayload,
+  FilterByHookPayload,
+  FilterByValuePayload,
+  FilterPayload,
+  FindByHookPayload,
+  FindByValuePayload,
+  FindPayload,
+  GetAllPayload,
+  GetManyPayload,
+  GetPayload,
+  HasPayload,
+  IncPayload,
+  isEveryByHookPayload,
+  isEveryByValuePayload,
+  isFilterByHookPayload,
+  isFilterByValuePayload,
+  isFindByHookPayload,
+  isFindByValuePayload,
+  isMapByHookPayload,
+  isMapByPathPayload,
+  isPartitionByHookPayload,
+  isPartitionByValuePayload,
+  isRemoveByHookPayload,
+  isRemoveByValuePayload,
+  isSomeByHookPayload,
+  isSomeByValuePayload,
+  JoshError,
+  JoshProvider,
+  KeysPayload,
+  MapByHookPayload,
+  MapByPathPayload,
+  MapPayload,
+  MathOperator,
+  MathPayload,
+  Method,
+  PartitionByHookPayload,
+  PartitionByValuePayload,
+  PartitionPayload,
+  PushPayload,
+  RandomKeyPayload,
+  RandomPayload,
+  RemoveByHookPayload,
+  RemoveByValuePayload,
+  RemovePayload,
+  SetManyPayload,
+  SetPayload,
+  SizePayload,
+  SomeByHookPayload,
+  SomeByValuePayload,
+  SomePayload,
+  UpdatePayload,
+  ValuesPayload
 } from '@joshdb/core';
 import { deleteFromObject, getFromObject } from '@realware/utilities';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
@@ -67,688 +67,688 @@ import type { MongoDocType } from './MongoDocType';
 import { MongoProviderError } from './MongoProviderError';
 
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
-	public declare options: MongoProvider.Options;
+  public declare options: MongoProvider.Options;
 
-	private connectionURI?: string;
+  private connectionURI?: string;
 
-	private _client?: Mongoose;
+  private _client?: Mongoose;
 
-	private _collection?: Model<MongoDocType>;
+  private _collection?: Model<MongoDocType>;
 
-	public constructor(options: MongoProvider.Options) {
-		super(options);
-	}
+  public constructor(options: MongoProvider.Options) {
+    super(options);
+  }
 
-	public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
-		context = await super.init(context);
+  public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
+    context = await super.init(context);
 
-		const { collectionName = context.name, enforceCollectionName, authentication = MongoProvider.defaultAuthentication } = this.options;
+    const { collectionName = context.name, enforceCollectionName, authentication = MongoProvider.defaultAuthentication } = this.options;
 
-		if (collectionName === undefined)
-			throw new JoshError({
-				message: 'A collection name must be provided if using this class without Josh.',
-				identifier: MongoProvider.Identifiers.InitMissingCollectionName
-			});
+    if (collectionName === undefined)
+      throw new JoshError({
+        message: 'A collection name must be provided if using this class without Josh.',
+        identifier: MongoProvider.Identifiers.InitMissingCollectionName
+      });
 
-		this._collection = generateMongoDoc(enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName);
+    this._collection = generateMongoDoc(enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName);
 
-		if (typeof authentication === 'string') this.connectionURI = authentication;
-		else {
-			const { user, password, dbName, host, port }: MongoProvider.Authentication = {
-				user: authentication.user ?? MongoProvider.defaultAuthentication.user,
-				password: authentication.password ?? MongoProvider.defaultAuthentication.password,
-				dbName: authentication.dbName ?? MongoProvider.defaultAuthentication.dbName,
-				host: authentication.host ?? MongoProvider.defaultAuthentication.host,
-				port: authentication.port ?? MongoProvider.defaultAuthentication.port
-			};
+    if (typeof authentication === 'string') this.connectionURI = authentication;
+    else {
+      const { user, password, dbName, host, port }: MongoProvider.Authentication = {
+        user: authentication.user ?? MongoProvider.defaultAuthentication.user,
+        password: authentication.password ?? MongoProvider.defaultAuthentication.password,
+        dbName: authentication.dbName ?? MongoProvider.defaultAuthentication.dbName,
+        host: authentication.host ?? MongoProvider.defaultAuthentication.host,
+        port: authentication.port ?? MongoProvider.defaultAuthentication.port
+      };
 
-			this.connectionURI = `mongodb://${user?.length && password?.length ? `${user}:${password}@` : ''}${host}:${port}/${dbName}`;
-		}
+      this.connectionURI = `mongodb://${user?.length && password?.length ? `${user}:${password}@` : ''}${host}:${port}/${dbName}`;
+    }
 
-		this._client = await mongoose.connect(this.connectionURI);
+    this._client = await mongoose.connect(this.connectionURI);
 
-		return context;
-	}
+    return context;
+  }
 
-	public async close() {
-		return this.client.disconnect();
-	}
+  public async close() {
+    return this.client.disconnect();
+  }
 
-	public [Method.AutoKey](payload: AutoKeyPayload): AutoKeyPayload {
-		payload.data = new mongoose.Types.ObjectId().toString();
+  public [Method.AutoKey](payload: AutoKeyPayload): AutoKeyPayload {
+    payload.data = new mongoose.Types.ObjectId().toString();
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Clear](payload: ClearPayload): Promise<ClearPayload> {
-		await this.collection.deleteMany({});
+  public async [Method.Clear](payload: ClearPayload): Promise<ClearPayload> {
+    await this.collection.deleteMany({});
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Dec](payload: DecPayload): Promise<DecPayload> {
-		const { key, path } = payload;
-		const { data } = await this.get<StoredValue>({ key, method: Method.Get, path });
+  public async [Method.Dec](payload: DecPayload): Promise<DecPayload> {
+    const { key, path } = payload;
+    const { data } = await this.get<StoredValue>({ key, method: Method.Get, path });
 
-		if (data === undefined) {
-			payload.error = new MongoProviderError({
-				identifier: MongoProvider.CommonIdentifiers.DecMissingData,
-				message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
-				method: Method.Dec
-			});
+    if (data === undefined) {
+      payload.error = new MongoProviderError({
+        identifier: MongoProvider.CommonIdentifiers.DecMissingData,
+        message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
+        method: Method.Dec
+      });
 
-			return payload;
-		}
+      return payload;
+    }
 
-		if (!isNumber(data)) {
-			payload.error = new MongoProviderError({
-				identifier: MongoProvider.CommonIdentifiers.DecInvalidType,
-				message:
-					path.length === 0 ? `The data at "${key}" must be of type "number".` : `The data at "${key}.${path.join('.')}" must be of type "number".`,
-				method: Method.Dec
-			});
+    if (!isNumber(data)) {
+      payload.error = new MongoProviderError({
+        identifier: MongoProvider.CommonIdentifiers.DecInvalidType,
+        message:
+          path.length === 0 ? `The data at "${key}" must be of type "number".` : `The data at "${key}.${path.join('.')}" must be of type "number".`,
+        method: Method.Dec
+      });
 
-			return payload;
-		}
+      return payload;
+    }
 
-		await this.set({ method: Method.Set, key, path, value: data - 1 });
+    await this.set({ method: Method.Set, key, path, value: data - 1 });
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Delete](payload: DeletePayload): Promise<DeletePayload> {
-		const { key, path } = payload;
+  public async [Method.Delete](payload: DeletePayload): Promise<DeletePayload> {
+    const { key, path } = payload;
 
-		if (path.length === 0) {
-			await this.collection.deleteOne({ key });
+    if (path.length === 0) {
+      await this.collection.deleteOne({ key });
 
-			return payload;
-		}
+      return payload;
+    }
 
-		if ((await this.has({ method: Method.Has, key, path, data: false })).data) {
-			const { data } = await this.get({ method: Method.Get, key, path: [] });
+    if ((await this.has({ method: Method.Has, key, path, data: false })).data) {
+      const { data } = await this.get({ method: Method.Get, key, path: [] });
 
-			deleteFromObject(data, path);
+      deleteFromObject(data, path);
 
-			await this.set({ method: Method.Set, key, path: [], value: data });
+      await this.set({ method: Method.Set, key, path: [], value: data });
 
-			return payload;
-		}
+      return payload;
+    }
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Ensure](payload: EnsurePayload<StoredValue>): Promise<EnsurePayload<StoredValue>> {
-		const { key } = payload;
+  public async [Method.Ensure](payload: EnsurePayload<StoredValue>): Promise<EnsurePayload<StoredValue>> {
+    const { key } = payload;
 
-		if (!(await this.has({ key, method: Method.Has, data: false, path: [] })).data)
-			await this.set({ key, value: payload.defaultValue, method: Method.Set, path: [] });
+    if (!(await this.has({ key, method: Method.Has, data: false, path: [] })).data)
+      await this.set({ key, value: payload.defaultValue, method: Method.Set, path: [] });
 
-		payload.data = (await this.get({ key, method: Method.Get, path: [] })).data as StoredValue;
+    payload.data = (await this.get({ key, method: Method.Get, path: [] })).data as StoredValue;
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Every](payload: EveryByHookPayload<StoredValue>): Promise<EveryByHookPayload<StoredValue>>;
-	public async [Method.Every](payload: EveryByValuePayload): Promise<EveryByValuePayload>;
-	public async [Method.Every](payload: EveryPayload<StoredValue>): Promise<EveryPayload<StoredValue>> {
-		if ((await this.size({ method: Method.Size, data: 0 })).data === 0) {
-			payload.data = true;
+  public async [Method.Every](payload: EveryByHookPayload<StoredValue>): Promise<EveryByHookPayload<StoredValue>>;
+  public async [Method.Every](payload: EveryByValuePayload): Promise<EveryByValuePayload>;
+  public async [Method.Every](payload: EveryPayload<StoredValue>): Promise<EveryPayload<StoredValue>> {
+    if ((await this.size({ method: Method.Size, data: 0 })).data === 0) {
+      payload.data = true;
 
-			return payload;
-		}
-		if (isEveryByHookPayload(payload)) {
-			const { hook } = payload;
+      return payload;
+    }
+    if (isEveryByHookPayload(payload)) {
+      const { hook } = payload;
 
-			for (const value of (await this.values({ method: Method.Values, data: [] })).data) {
-				const everyValue = await hook(value);
+      for (const value of (await this.values({ method: Method.Values, data: [] })).data) {
+        const everyValue = await hook(value);
 
-				if (everyValue) continue;
+        if (everyValue) continue;
 
-				payload.data = false;
-			}
-		}
+        payload.data = false;
+      }
+    }
 
-		if (isEveryByValuePayload(payload)) {
-			const { path, value } = payload;
+    if (isEveryByValuePayload(payload)) {
+      const { path, value } = payload;
 
-			for (const key of (await this.keys({ method: Method.Keys, data: [] })).data) {
-				const { data } = await this.get({ method: Method.Get, key, path });
+      for (const key of (await this.keys({ method: Method.Keys, data: [] })).data) {
+        const { data } = await this.get({ method: Method.Get, key, path });
 
-				if (value === data) continue;
+        if (value === data) continue;
 
-				payload.data = false;
-			}
-		}
+        payload.data = false;
+      }
+    }
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Filter](payload: FilterByHookPayload<StoredValue>): Promise<FilterByHookPayload<StoredValue>>;
-	public async [Method.Filter](payload: FilterByValuePayload<StoredValue>): Promise<FilterByValuePayload<StoredValue>>;
-	public async [Method.Filter](payload: FilterPayload<StoredValue>): Promise<FilterPayload<StoredValue>> {
-		if (isFilterByHookPayload(payload)) {
-			const { hook } = payload;
+  public async [Method.Filter](payload: FilterByHookPayload<StoredValue>): Promise<FilterByHookPayload<StoredValue>>;
+  public async [Method.Filter](payload: FilterByValuePayload<StoredValue>): Promise<FilterByValuePayload<StoredValue>>;
+  public async [Method.Filter](payload: FilterPayload<StoredValue>): Promise<FilterPayload<StoredValue>> {
+    if (isFilterByHookPayload(payload)) {
+      const { hook } = payload;
 
-			for (const [key, value] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data)) {
-				const filterValue = await hook(value);
+      for (const [key, value] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data)) {
+        const filterValue = await hook(value);
 
-				if (!filterValue) continue;
+        if (!filterValue) continue;
 
-				payload.data[key] = value;
-			}
-		}
+        payload.data[key] = value;
+      }
+    }
 
-		if (isFilterByValuePayload(payload)) {
-			const { path, value } = payload;
+    if (isFilterByValuePayload(payload)) {
+      const { path, value } = payload;
 
-			if (!isPrimitive(value)) {
-				payload.error = new MongoProviderError({
-					identifier: MongoProvider.CommonIdentifiers.FilterInvalidValue,
-					message: 'The "value" must be a primitive type.',
-					method: Method.Filter
-				});
+      if (!isPrimitive(value)) {
+        payload.error = new MongoProviderError({
+          identifier: MongoProvider.CommonIdentifiers.FilterInvalidValue,
+          message: 'The "value" must be a primitive type.',
+          method: Method.Filter
+        });
 
-				return payload;
-			}
+        return payload;
+      }
 
-			for (const [key, storedValue] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data))
-				if (value === (path.length === 0 ? storedValue : getFromObject(storedValue, path))) payload.data[key] = storedValue;
-		}
+      for (const [key, storedValue] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data))
+        if (value === (path.length === 0 ? storedValue : getFromObject(storedValue, path))) payload.data[key] = storedValue;
+    }
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Find](payload: FindByHookPayload<StoredValue>): Promise<FindByHookPayload<StoredValue>>;
-	public async [Method.Find](payload: FindByValuePayload<StoredValue>): Promise<FindByValuePayload<StoredValue>>;
-	public async [Method.Find](payload: FindPayload<StoredValue>): Promise<FindPayload<StoredValue>> {
-		if (isFindByHookPayload(payload)) {
-			const { hook } = payload;
+  public async [Method.Find](payload: FindByHookPayload<StoredValue>): Promise<FindByHookPayload<StoredValue>>;
+  public async [Method.Find](payload: FindByValuePayload<StoredValue>): Promise<FindByValuePayload<StoredValue>>;
+  public async [Method.Find](payload: FindPayload<StoredValue>): Promise<FindPayload<StoredValue>> {
+    if (isFindByHookPayload(payload)) {
+      const { hook } = payload;
 
-			for (const value of (await this.values({ method: Method.Values, data: [] })).data) {
-				const foundValue = await hook(value);
+      for (const value of (await this.values({ method: Method.Values, data: [] })).data) {
+        const foundValue = await hook(value);
 
-				if (!foundValue) continue;
+        if (!foundValue) continue;
 
-				payload.data = value;
+        payload.data = value;
 
-				break;
-			}
-		}
+        break;
+      }
+    }
 
-		if (isFindByValuePayload(payload)) {
-			const { path, value } = payload;
+    if (isFindByValuePayload(payload)) {
+      const { path, value } = payload;
 
-			if (!isPrimitive(value)) {
-				payload.error = new MongoProviderError({
-					identifier: MongoProvider.CommonIdentifiers.FindInvalidValue,
-					message: 'The "value" must be of type primitive.',
-					method: Method.Find
-				});
+      if (!isPrimitive(value)) {
+        payload.error = new MongoProviderError({
+          identifier: MongoProvider.CommonIdentifiers.FindInvalidValue,
+          message: 'The "value" must be of type primitive.',
+          method: Method.Find
+        });
 
-				return payload;
-			}
+        return payload;
+      }
 
-			for (const storedValue of (await this.values({ method: Method.Values, data: [] })).data) {
-				if (payload.data !== undefined) break;
-				if (value === (path.length === 0 ? storedValue : getFromObject(storedValue, path))) payload.data = storedValue;
-			}
-		}
+      for (const storedValue of (await this.values({ method: Method.Values, data: [] })).data) {
+        if (payload.data !== undefined) break;
+        if (value === (path.length === 0 ? storedValue : getFromObject(storedValue, path))) payload.data = storedValue;
+      }
+    }
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Get]<StoredValue>(payload: GetPayload<StoredValue>): Promise<GetPayload<StoredValue>> {
-		const { key, path } = payload;
+  public async [Method.Get]<StoredValue>(payload: GetPayload<StoredValue>): Promise<GetPayload<StoredValue>> {
+    const { key, path } = payload;
 
-		const doc = await this.collection.findOne({ key });
+    const doc = await this.collection.findOne({ key });
 
-		if (!doc) {
-			payload.data = undefined;
+    if (!doc) {
+      payload.data = undefined;
 
-			return payload;
-		}
+      return payload;
+    }
 
-		Reflect.set(payload, 'data', doc.value);
+    Reflect.set(payload, 'data', doc.value);
 
-		if (path.length > 0) payload.data = getFromObject(payload.data, path);
+    if (path.length > 0) payload.data = getFromObject(payload.data, path);
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.GetAll](payload: GetAllPayload<StoredValue>): Promise<GetAllPayload<StoredValue>> {
-		const docs = (await this.collection.find({})) || [];
+  public async [Method.GetAll](payload: GetAllPayload<StoredValue>): Promise<GetAllPayload<StoredValue>> {
+    const docs = (await this.collection.find({})) || [];
 
-		for (const doc of docs) Reflect.set(payload.data, doc.key, doc.value);
+    for (const doc of docs) Reflect.set(payload.data, doc.key, doc.value);
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.GetMany](payload: GetManyPayload<StoredValue>): Promise<GetManyPayload<StoredValue>> {
-		const { keys } = payload;
+  public async [Method.GetMany](payload: GetManyPayload<StoredValue>): Promise<GetManyPayload<StoredValue>> {
+    const { keys } = payload;
 
-		const docs = (await this.collection.find({ key: { $in: keys } })) || [];
+    const docs = (await this.collection.find({ key: { $in: keys } })) || [];
 
-		for (const doc of docs) Reflect.set(payload.data, doc.key, doc.value);
+    for (const doc of docs) Reflect.set(payload.data, doc.key, doc.value);
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Has](payload: HasPayload): Promise<HasPayload> {
-		const { key, path } = payload;
-		let isThere;
+  public async [Method.Has](payload: HasPayload): Promise<HasPayload> {
+    const { key, path } = payload;
+    let isThere;
 
-		if (path.length === 0) {
-			isThere = await this.collection.exists({ key });
-		} else {
-			isThere = await this.collection.exists({ key, [`value.${path.join('.')}`]: { $exists: true } });
-		}
+    if (path.length === 0) {
+      isThere = await this.collection.exists({ key });
+    } else {
+      isThere = await this.collection.exists({ key, [`value.${path.join('.')}`]: { $exists: true } });
+    }
 
-		payload.data = isThere;
+    payload.data = isThere;
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Inc](payload: IncPayload): Promise<IncPayload> {
-		const { key, path } = payload;
-		const { data } = await this.get<StoredValue>({ method: Method.Get, key, path });
+  public async [Method.Inc](payload: IncPayload): Promise<IncPayload> {
+    const { key, path } = payload;
+    const { data } = await this.get<StoredValue>({ method: Method.Get, key, path });
 
-		if (data === undefined) {
-			payload.error = new MongoProviderError({
-				identifier: MongoProvider.CommonIdentifiers.IncMissingData,
-				message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
-				method: Method.Inc
-			});
+    if (data === undefined) {
+      payload.error = new MongoProviderError({
+        identifier: MongoProvider.CommonIdentifiers.IncMissingData,
+        message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
+        method: Method.Inc
+      });
 
-			return payload;
-		}
-		if (!isNumber(data)) {
-			payload.error = new MongoProviderError({
-				identifier: MongoProvider.CommonIdentifiers.IncInvalidType,
-				message:
-					path.length === 0 ? `The data at "${key}" must be of type "number".` : `The data at "${key}.${path.join('.')}" must be of type "number".`,
-				method: Method.Inc
-			});
+      return payload;
+    }
+    if (!isNumber(data)) {
+      payload.error = new MongoProviderError({
+        identifier: MongoProvider.CommonIdentifiers.IncInvalidType,
+        message:
+          path.length === 0 ? `The data at "${key}" must be of type "number".` : `The data at "${key}.${path.join('.')}" must be of type "number".`,
+        method: Method.Inc
+      });
 
-			return payload;
-		}
+      return payload;
+    }
 
-		await this.set({ method: Method.Set, key, path, value: data + 1 });
+    await this.set({ method: Method.Set, key, path, value: data + 1 });
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Keys](payload: KeysPayload): Promise<KeysPayload> {
-		const docs = (await this.collection.find({})) || [];
+  public async [Method.Keys](payload: KeysPayload): Promise<KeysPayload> {
+    const docs = (await this.collection.find({})) || [];
 
-		for (const doc of docs) payload.data.push(doc.key);
+    for (const doc of docs) payload.data.push(doc.key);
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Map]<DataValue = StoredValue, HookValue = DataValue>(
-		payload: MapByHookPayload<DataValue, HookValue>
-	): Promise<MapByHookPayload<DataValue, HookValue>>;
+  public async [Method.Map]<DataValue = StoredValue, HookValue = DataValue>(
+    payload: MapByHookPayload<DataValue, HookValue>
+  ): Promise<MapByHookPayload<DataValue, HookValue>>;
 
-	public async [Method.Map]<DataValue = StoredValue>(payload: MapByPathPayload<DataValue>): Promise<MapByPathPayload<DataValue>>;
-	public async [Method.Map]<DataValue = StoredValue, HookValue = DataValue>(
-		payload: MapPayload<DataValue, HookValue>
-	): Promise<MapPayload<DataValue, HookValue>> {
-		if (isMapByHookPayload(payload)) {
-			const { hook } = payload;
+  public async [Method.Map]<DataValue = StoredValue>(payload: MapByPathPayload<DataValue>): Promise<MapByPathPayload<DataValue>>;
+  public async [Method.Map]<DataValue = StoredValue, HookValue = DataValue>(
+    payload: MapPayload<DataValue, HookValue>
+  ): Promise<MapPayload<DataValue, HookValue>> {
+    if (isMapByHookPayload(payload)) {
+      const { hook } = payload;
 
-			// @ts-expect-error 2345
-			for (const value of (await this.values({ method: Method.Values, data: [] })).data) payload.data.push(await hook(value));
-		}
+      // @ts-expect-error 2345
+      for (const value of (await this.values({ method: Method.Values, data: [] })).data) payload.data.push(await hook(value));
+    }
 
-		if (isMapByPathPayload(payload)) {
-			const { path } = payload;
+    if (isMapByPathPayload(payload)) {
+      const { path } = payload;
 
-			for (const value of (await this.values({ method: Method.Values, data: [] })).data)
-				payload.data.push((path.length === 0 ? value : getFromObject(value, path)) as DataValue);
-		}
+      for (const value of (await this.values({ method: Method.Values, data: [] })).data)
+        payload.data.push((path.length === 0 ? value : getFromObject(value, path)) as DataValue);
+    }
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Math](payload: MathPayload): Promise<MathPayload> {
-		const { key, path, operator, operand } = payload;
-		let { data } = await this.get<number>({ method: Method.Get, key, path });
+  public async [Method.Math](payload: MathPayload): Promise<MathPayload> {
+    const { key, path, operator, operand } = payload;
+    let { data } = await this.get<number>({ method: Method.Get, key, path });
 
-		if (data === undefined) {
-			payload.error = new MongoProviderError({
-				identifier: MongoProvider.CommonIdentifiers.MathMissingData,
-				message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
-				method: Method.Math
-			});
+    if (data === undefined) {
+      payload.error = new MongoProviderError({
+        identifier: MongoProvider.CommonIdentifiers.MathMissingData,
+        message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
+        method: Method.Math
+      });
 
-			return payload;
-		}
+      return payload;
+    }
 
-		if (!isNumber(data)) {
-			payload.error = new MongoProviderError({
-				identifier: MongoProvider.CommonIdentifiers.MathInvalidType,
-				message: path.length === 0 ? `The data at "${key}" must be a number.` : `The data at "${key}.${path.join('.')}" must be a number.`,
-				method: Method.Math
-			});
+    if (!isNumber(data)) {
+      payload.error = new MongoProviderError({
+        identifier: MongoProvider.CommonIdentifiers.MathInvalidType,
+        message: path.length === 0 ? `The data at "${key}" must be a number.` : `The data at "${key}.${path.join('.')}" must be a number.`,
+        method: Method.Math
+      });
 
-			return payload;
-		}
+      return payload;
+    }
 
-		switch (operator) {
-			case MathOperator.Addition:
-				data += operand;
+    switch (operator) {
+      case MathOperator.Addition:
+        data += operand;
 
-				break;
+        break;
 
-			case MathOperator.Subtraction:
-				data -= operand;
+      case MathOperator.Subtraction:
+        data -= operand;
 
-				break;
+        break;
 
-			case MathOperator.Multiplication:
-				data *= operand;
+      case MathOperator.Multiplication:
+        data *= operand;
 
-				break;
+        break;
 
-			case MathOperator.Division:
-				data /= operand;
+      case MathOperator.Division:
+        data /= operand;
 
-				break;
+        break;
 
-			case MathOperator.Remainder:
-				data %= operand;
+      case MathOperator.Remainder:
+        data %= operand;
 
-				break;
+        break;
 
-			case MathOperator.Exponent:
-				data **= operand;
+      case MathOperator.Exponent:
+        data **= operand;
 
-				break;
-		}
+        break;
+    }
 
-		await this.set({ method: Method.Set, key, path, value: data });
+    await this.set({ method: Method.Set, key, path, value: data });
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Partition](payload: PartitionByHookPayload<StoredValue>): Promise<PartitionByHookPayload<StoredValue>>;
-	public async [Method.Partition](payload: PartitionByValuePayload<StoredValue>): Promise<PartitionByValuePayload<StoredValue>>;
-	public async [Method.Partition](payload: PartitionPayload<StoredValue>): Promise<PartitionPayload<StoredValue>> {
-		if (isPartitionByHookPayload(payload)) {
-			const { hook } = payload;
+  public async [Method.Partition](payload: PartitionByHookPayload<StoredValue>): Promise<PartitionByHookPayload<StoredValue>>;
+  public async [Method.Partition](payload: PartitionByValuePayload<StoredValue>): Promise<PartitionByValuePayload<StoredValue>>;
+  public async [Method.Partition](payload: PartitionPayload<StoredValue>): Promise<PartitionPayload<StoredValue>> {
+    if (isPartitionByHookPayload(payload)) {
+      const { hook } = payload;
 
-			for (const [key, value] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data)) {
-				const filterValue = await hook(value);
+      for (const [key, value] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data)) {
+        const filterValue = await hook(value);
 
-				if (filterValue) payload.data.truthy[key] = value;
-				else payload.data.falsy[key] = value;
-			}
-		}
+        if (filterValue) payload.data.truthy[key] = value;
+        else payload.data.falsy[key] = value;
+      }
+    }
 
-		if (isPartitionByValuePayload(payload)) {
-			const { path, value } = payload;
+    if (isPartitionByValuePayload(payload)) {
+      const { path, value } = payload;
 
-			if (!isPrimitive(value)) {
-				payload.error = new MongoProviderError({
-					identifier: MongoProvider.CommonIdentifiers.PartitionInvalidValue,
-					message: 'The "value" must be a primitive type.',
-					method: Method.Partition
-				});
+      if (!isPrimitive(value)) {
+        payload.error = new MongoProviderError({
+          identifier: MongoProvider.CommonIdentifiers.PartitionInvalidValue,
+          message: 'The "value" must be a primitive type.',
+          method: Method.Partition
+        });
 
-				return payload;
-			}
+        return payload;
+      }
 
-			for (const [key, storedValue] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data))
-				if (value === (path.length === 0 ? storedValue : getFromObject(storedValue, path))) payload.data.truthy[key] = storedValue;
-				else payload.data.falsy[key] = storedValue;
-		}
+      for (const [key, storedValue] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data))
+        if (value === (path.length === 0 ? storedValue : getFromObject(storedValue, path))) payload.data.truthy[key] = storedValue;
+        else payload.data.falsy[key] = storedValue;
+    }
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Push]<Value = StoredValue>(payload: PushPayload<Value>): Promise<PushPayload<Value>> {
-		const { key, path, value } = payload;
-		const { data } = await this.get({ method: Method.Get, key, path });
+  public async [Method.Push]<Value = StoredValue>(payload: PushPayload<Value>): Promise<PushPayload<Value>> {
+    const { key, path, value } = payload;
+    const { data } = await this.get({ method: Method.Get, key, path });
 
-		if (data === undefined) {
-			payload.error = new MongoProviderError({
-				identifier: MongoProvider.CommonIdentifiers.PushMissingData,
-				message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
-				method: Method.Push
-			});
+    if (data === undefined) {
+      payload.error = new MongoProviderError({
+        identifier: MongoProvider.CommonIdentifiers.PushMissingData,
+        message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
+        method: Method.Push
+      });
 
-			return payload;
-		}
+      return payload;
+    }
 
-		if (!Array.isArray(data)) {
-			payload.error = new MongoProviderError({
-				identifier: MongoProvider.CommonIdentifiers.PushInvalidType,
-				message: path.length === 0 ? `The data at "${key}" must be an array.` : `The data at "${key}.${path.join('.')}" does not exist.`,
-				method: Method.Push
-			});
+    if (!Array.isArray(data)) {
+      payload.error = new MongoProviderError({
+        identifier: MongoProvider.CommonIdentifiers.PushInvalidType,
+        message: path.length === 0 ? `The data at "${key}" must be an array.` : `The data at "${key}.${path.join('.')}" does not exist.`,
+        method: Method.Push
+      });
 
-			return payload;
-		}
+      return payload;
+    }
 
-		data.push(value);
+    data.push(value);
 
-		await this.set({ method: Method.Set, key, path, value: data });
+    await this.set({ method: Method.Set, key, path, value: data });
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Random](payload: RandomPayload<StoredValue>): Promise<RandomPayload<StoredValue>> {
-		const docs = (await this.collection.aggregate([{ $sample: { size: 1 } }])) || [];
+  public async [Method.Random](payload: RandomPayload<StoredValue>): Promise<RandomPayload<StoredValue>> {
+    const docs = (await this.collection.aggregate([{ $sample: { size: 1 } }])) || [];
 
-		payload.data = docs.length > 0 ? docs[0].value : undefined;
+    payload.data = docs.length > 0 ? docs[0].value : undefined;
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.RandomKey](payload: RandomKeyPayload): Promise<RandomKeyPayload> {
-		const docs = (await this.collection.aggregate([{ $sample: { size: 1 } }])) || [];
+  public async [Method.RandomKey](payload: RandomKeyPayload): Promise<RandomKeyPayload> {
+    const docs = (await this.collection.aggregate([{ $sample: { size: 1 } }])) || [];
 
-		payload.data = docs.length > 0 ? docs[0].key : undefined;
+    payload.data = docs.length > 0 ? docs[0].key : undefined;
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Remove]<HookValue = StoredValue>(payload: RemoveByHookPayload<HookValue>): Promise<RemoveByHookPayload<HookValue>>;
-	public async [Method.Remove](payload: RemoveByValuePayload): Promise<RemoveByValuePayload>;
-	public async [Method.Remove]<HookValue = StoredValue>(payload: RemovePayload<HookValue>): Promise<RemovePayload<HookValue>> {
-		if (isRemoveByHookPayload(payload)) {
-			const { key, path, hook } = payload;
-			const { data } = await this.get<unknown[]>({ method: Method.Get, key, path });
+  public async [Method.Remove]<HookValue = StoredValue>(payload: RemoveByHookPayload<HookValue>): Promise<RemoveByHookPayload<HookValue>>;
+  public async [Method.Remove](payload: RemoveByValuePayload): Promise<RemoveByValuePayload>;
+  public async [Method.Remove]<HookValue = StoredValue>(payload: RemovePayload<HookValue>): Promise<RemovePayload<HookValue>> {
+    if (isRemoveByHookPayload(payload)) {
+      const { key, path, hook } = payload;
+      const { data } = await this.get<unknown[]>({ method: Method.Get, key, path });
 
-			if (data === undefined) {
-				payload.error = new MongoProviderError({
-					identifier: MongoProvider.CommonIdentifiers.RemoveMissingData,
-					message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
-					method: Method.Remove
-				});
+      if (data === undefined) {
+        payload.error = new MongoProviderError({
+          identifier: MongoProvider.CommonIdentifiers.RemoveMissingData,
+          message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
+          method: Method.Remove
+        });
 
-				return payload;
-			}
+        return payload;
+      }
 
-			if (!Array.isArray(data)) {
-				payload.error = new MongoProviderError({
-					identifier: MongoProvider.CommonIdentifiers.RemoveInvalidType,
-					message: path.length === 0 ? `The data at "${key}" must be an array.` : `The data at "${key}.${path.join('.')}" must be an array.`,
-					method: Method.Remove
-				});
+      if (!Array.isArray(data)) {
+        payload.error = new MongoProviderError({
+          identifier: MongoProvider.CommonIdentifiers.RemoveInvalidType,
+          message: path.length === 0 ? `The data at "${key}" must be an array.` : `The data at "${key}.${path.join('.')}" must be an array.`,
+          method: Method.Remove
+        });
 
-				return payload;
-			}
+        return payload;
+      }
 
-			const filterValues = await Promise.all(data.map(hook));
+      const filterValues = await Promise.all(data.map(hook));
 
-			await this.set({ method: Method.Set, key, path, value: data.filter((_, index) => !filterValues[index]) });
-		}
+      await this.set({ method: Method.Set, key, path, value: data.filter((_, index) => !filterValues[index]) });
+    }
 
-		if (isRemoveByValuePayload(payload)) {
-			const { key, path, value } = payload;
-			const { data } = await this.get({ method: Method.Get, key, path });
+    if (isRemoveByValuePayload(payload)) {
+      const { key, path, value } = payload;
+      const { data } = await this.get({ method: Method.Get, key, path });
 
-			if (data === undefined) {
-				payload.error = new MongoProviderError({
-					identifier: MongoProvider.CommonIdentifiers.RemoveMissingData,
-					message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
-					method: Method.Remove
-				});
+      if (data === undefined) {
+        payload.error = new MongoProviderError({
+          identifier: MongoProvider.CommonIdentifiers.RemoveMissingData,
+          message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
+          method: Method.Remove
+        });
 
-				return payload;
-			}
+        return payload;
+      }
 
-			if (!Array.isArray(data)) {
-				payload.error = new MongoProviderError({
-					identifier: MongoProvider.CommonIdentifiers.RemoveInvalidType,
-					message: path.length === 0 ? `The data at "${key}" must be an array.` : `The data at "${key}.${path.join('.')}" must be an array.`,
-					method: Method.Remove
-				});
+      if (!Array.isArray(data)) {
+        payload.error = new MongoProviderError({
+          identifier: MongoProvider.CommonIdentifiers.RemoveInvalidType,
+          message: path.length === 0 ? `The data at "${key}" must be an array.` : `The data at "${key}.${path.join('.')}" must be an array.`,
+          method: Method.Remove
+        });
 
-				return payload;
-			}
+        return payload;
+      }
 
-			await this.set({ method: Method.Set, key, path, value: data.filter((storedValue) => value !== storedValue) });
-		}
+      await this.set({ method: Method.Set, key, path, value: data.filter((storedValue) => value !== storedValue) });
+    }
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Set]<Value = StoredValue>(payload: SetPayload<Value>): Promise<SetPayload<Value>> {
-		const { key, path, value } = payload;
+  public async [Method.Set]<Value = StoredValue>(payload: SetPayload<Value>): Promise<SetPayload<Value>> {
+    const { key, path, value } = payload;
 
-		await this.collection.findOneAndUpdate(
-			{
-				key: { $eq: key }
-			},
-			{
-				$set: { [`${path.length > 0 ? `value.${path.join('.')}` : 'value'}`]: value }
-			},
-			{
-				upsert: true
-			}
-		);
+    await this.collection.findOneAndUpdate(
+      {
+        key: { $eq: key }
+      },
+      {
+        $set: { [`${path.length > 0 ? `value.${path.join('.')}` : 'value'}`]: value }
+      },
+      {
+        upsert: true
+      }
+    );
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.SetMany]<Value = StoredValue>(payload: SetManyPayload<Value>): Promise<SetManyPayload<Value>> {
-		const { data } = payload;
+  public async [Method.SetMany]<Value = StoredValue>(payload: SetManyPayload<Value>): Promise<SetManyPayload<Value>> {
+    const { data } = payload;
 
-		for (const [{ key, path }, value] of data) await this.set<Value>({ method: Method.Set, key, path, value });
+    for (const [{ key, path }, value] of data) await this.set<Value>({ method: Method.Set, key, path, value });
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Size](payload: SizePayload): Promise<SizePayload> {
-		payload.data = (await this.collection.countDocuments({})) ?? payload.data;
+  public async [Method.Size](payload: SizePayload): Promise<SizePayload> {
+    payload.data = (await this.collection.countDocuments({})) ?? payload.data;
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Some](payload: SomeByHookPayload<StoredValue>): Promise<SomeByHookPayload<StoredValue>>;
-	public async [Method.Some](payload: SomeByValuePayload): Promise<SomeByValuePayload>;
-	public async [Method.Some](payload: SomePayload<StoredValue>): Promise<SomePayload<StoredValue>> {
-		if (isSomeByHookPayload(payload)) {
-			const { hook } = payload;
+  public async [Method.Some](payload: SomeByHookPayload<StoredValue>): Promise<SomeByHookPayload<StoredValue>>;
+  public async [Method.Some](payload: SomeByValuePayload): Promise<SomeByValuePayload>;
+  public async [Method.Some](payload: SomePayload<StoredValue>): Promise<SomePayload<StoredValue>> {
+    if (isSomeByHookPayload(payload)) {
+      const { hook } = payload;
 
-			for (const value of (await this.values({ method: Method.Values, data: [] })).data) {
-				const someValue = await hook(value);
+      for (const value of (await this.values({ method: Method.Values, data: [] })).data) {
+        const someValue = await hook(value);
 
-				if (!someValue) continue;
+        if (!someValue) continue;
 
-				payload.data = true;
+        payload.data = true;
 
-				break;
-			}
-		}
+        break;
+      }
+    }
 
-		if (isSomeByValuePayload(payload)) {
-			const { path, value } = payload;
+    if (isSomeByValuePayload(payload)) {
+      const { path, value } = payload;
 
-			for (const storedValue of (await this.values({ method: Method.Values, data: [] })).data) {
-				if (path.length !== 0 && value !== getFromObject(storedValue, path)) continue;
-				if (isPrimitive(storedValue) && value === storedValue) continue;
+      for (const storedValue of (await this.values({ method: Method.Values, data: [] })).data) {
+        if (path.length !== 0 && value !== getFromObject(storedValue, path)) continue;
+        if (isPrimitive(storedValue) && value === storedValue) continue;
 
-				payload.data = true;
-			}
-		}
+        payload.data = true;
+      }
+    }
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Update]<HookValue = StoredValue, Value = HookValue>(
-		payload: UpdatePayload<StoredValue, HookValue, Value>
-	): Promise<UpdatePayload<StoredValue, HookValue, Value>> {
-		const { key, path, hook } = payload;
-		const { data } = await this.get<HookValue>({ method: Method.Get, key, path });
+  public async [Method.Update]<HookValue = StoredValue, Value = HookValue>(
+    payload: UpdatePayload<StoredValue, HookValue, Value>
+  ): Promise<UpdatePayload<StoredValue, HookValue, Value>> {
+    const { key, path, hook } = payload;
+    const { data } = await this.get<HookValue>({ method: Method.Get, key, path });
 
-		if (data === undefined) return payload;
+    if (data === undefined) return payload;
 
-		Reflect.set(payload, 'data', await hook(data));
-		await this.set({ method: Method.Set, key, path, value: payload.data });
+    Reflect.set(payload, 'data', await hook(data));
+    await this.set({ method: Method.Set, key, path, value: payload.data });
 
-		return payload;
-	}
+    return payload;
+  }
 
-	public async [Method.Values](payload: ValuesPayload<StoredValue>): Promise<ValuesPayload<StoredValue>> {
-		const docs = (await this.collection.find({})) || [];
+  public async [Method.Values](payload: ValuesPayload<StoredValue>): Promise<ValuesPayload<StoredValue>> {
+    const docs = (await this.collection.find({})) || [];
 
-		// @ts-expect-error 2345
-		for (const doc of docs) payload.data.push(doc.value);
+    // @ts-expect-error 2345
+    for (const doc of docs) payload.data.push(doc.value);
 
-		return payload;
-	}
+    return payload;
+  }
 
-	private get client(): Mongoose {
-		if (isNullOrUndefined(this._client))
-			throw new JoshError({
-				message: 'Client is not connected, most likely due to `init` not being called.',
-				identifier: MongoProvider.Identifiers.NotConnected
-			});
+  private get client(): Mongoose {
+    if (isNullOrUndefined(this._client))
+      throw new JoshError({
+        message: 'Client is not connected, most likely due to `init` not being called.',
+        identifier: MongoProvider.Identifiers.NotConnected
+      });
 
-		return this._client;
-	}
+    return this._client;
+  }
 
-	private get collection(): Model<MongoDocType> {
-		if (isNullOrUndefined(this._collection))
-			throw new JoshError({
-				message: 'Client is not connected, most likely due to `init` not being called.',
-				identifier: MongoProvider.Identifiers.NotConnected
-			});
+  private get collection(): Model<MongoDocType> {
+    if (isNullOrUndefined(this._collection))
+      throw new JoshError({
+        message: 'Client is not connected, most likely due to `init` not being called.',
+        identifier: MongoProvider.Identifiers.NotConnected
+      });
 
-		return this._collection;
-	}
+    return this._collection;
+  }
 
-	public static defaultAuthentication: MongoProvider.Authentication = { dbName: 'josh', host: 'localhost', port: 27017 };
+  public static defaultAuthentication: MongoProvider.Authentication = { dbName: 'josh', host: 'localhost', port: 27017 };
 }
 
 export namespace MongoProvider {
-	export interface Options {
-		collectionName?: string;
+  export interface Options {
+    collectionName?: string;
 
-		enforceCollectionName?: boolean;
+    enforceCollectionName?: boolean;
 
-		authentication?: Partial<Authentication> | string;
-	}
+    authentication?: Partial<Authentication> | string;
+  }
 
-	export interface Authentication {
-		user?: string;
+  export interface Authentication {
+    user?: string;
 
-		password?: string;
+    password?: string;
 
-		dbName: string;
+    dbName: string;
 
-		port: number;
+    port: number;
 
-		host: string;
-	}
+    host: string;
+  }
 
-	export enum Identifiers {
-		InitMissingCollectionName = 'initMissingCollectionName',
+  export enum Identifiers {
+    InitMissingCollectionName = 'initMissingCollectionName',
 
-		NotConnected = 'notConnected'
-	}
+    NotConnected = 'notConnected'
+  }
 }
