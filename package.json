@@ -27,7 +27,7 @@
     "@types/prompts": "^2.0.14",
     "@types/uuid": "^8.3.1",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
-    "chalk": "^5.0.0",
+    "colorette": "^2.0.16",
     "eslint": "~8.6.0",
     "eslint-config-prettier": "^8.3.0",
     "husky": "^7.0.4",

@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { blueBright } from 'colorette';
 import ora from 'ora';
 import prompts from 'prompts';
 import { jobs } from './jobs.mjs';
@@ -34,4 +34,4 @@ for (const job of jobs) {
   spinner.succeed();
 }
 
-console.log(chalk.blueBright('Done!'));
+console.log(blueBright('Done!'));
