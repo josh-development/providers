@@ -10,6 +10,7 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "typedocMain": "src/index.ts",
   "scripts": {
     "test": "jest --verbose",
     "lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
@@ -20,7 +21,7 @@
     "@joshdb/core": "next",
     "@realware/utilities": "^2.0.2",
     "@sapphire/utilities": "^3.2.1",
-    "mongoose": "^6.1.7"
+    "mongoose": "^6.1.8"
   },
   "repository": {
     "type": "git",

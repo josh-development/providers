@@ -31,6 +31,7 @@ export const jobs = [
                 main: 'dist/index.js',
                 module: 'dist/index.mjs',
                 types: 'dist/index.d.ts',
+                typedocMain: 'src/index.ts',
                 exports: {
                   import: './dist/index.mjs',
                   require: './dist/index.js'
@@ -66,6 +67,7 @@ export const jobs = [
                 browser: 'dist/index.umd.js',
                 unpkg: 'dist/index.umd.js',
                 types: 'dist/index.d.ts',
+                typedocMain: 'src/index.ts',
                 exports: {
                   import: './dist/index.mjs',
                   require: './dist/index.js'
