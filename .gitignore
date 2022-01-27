@@ -26,3 +26,6 @@ gh
 
 # Ignore data from tests
 **/.tests
+
+# Ignore auto-generated content
+docs/api.json
