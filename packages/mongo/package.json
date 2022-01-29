@@ -18,7 +18,7 @@
     "prepublishOnly": "rollup-type-bundler"
   },
   "dependencies": {
-    "@joshdb/core": "RealShadowNova/joshdb-core#build",
+    "@joshdb/core": "next",
     "@realware/utilities": "^2.0.2",
     "@sapphire/utilities": "^3.2.1",
     "mongoose": "^6.1.8"

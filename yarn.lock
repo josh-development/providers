@@ -681,12 +681,13 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@joshdb/core@RealShadowNova/joshdb-core#build":
-  version "2.0.0"
-  resolved "https://codeload.github.com/RealShadowNova/joshdb-core/tar.gz/404afc2e087a62b3562e5828a560791d2e13eff1"
+"@joshdb/core@next":
+  version "2.0.0-beta.0"
+  resolved "https://registry.yarnpkg.com/@joshdb/core/-/core-2.0.0-beta.0.tgz#c83850cddd404f27ef8079052f21289fdb10a233"
+  integrity sha512-SQsUxqYchD187SiMOIglOjBtny8NvZeps1wDdifp55U45V15JKShVZxVrDHpfH4avuS8CwszoyIU3JUyLIKFpA==
   dependencies:
     "@realware/utilities" "^2.0.2"
-    "@sapphire/utilities" "^3.0.7"
+    "@sapphire/utilities" "^3.2.1"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -762,7 +763,7 @@
     tslib "^2.3.1"
     typescript "^4.5.4"
 
-"@sapphire/utilities@^3.0.7", "@sapphire/utilities@^3.1.0", "@sapphire/utilities@^3.2.1":
+"@sapphire/utilities@^3.1.0", "@sapphire/utilities@^3.2.1":
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/@sapphire/utilities/-/utilities-3.2.1.tgz#dbbffef1daf0fdc29481881aaac940a87341067e"
   integrity sha512-y00aaBzKNwCIVE2a444zdPvHZmStpbVXE7iRC1NsbF1USXnQtNhgAGxq0PWZkBzHxpD9boKsUNS2Z+XzTXZvvQ==
