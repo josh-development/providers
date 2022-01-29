@@ -62,8 +62,5 @@
   },
   "lint-staged": {
     "*.{mjs,ts}": "eslint --fix --ext mjs,ts"
-  },
-  "dependencies": {
-    "eslint-plugin-prettier": "^4.0.0"
   }
 }
