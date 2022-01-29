@@ -1,4 +1,3 @@
-import { JoshError } from '@joshdb/core';
 import { AsyncQueue } from '@sapphire/async-queue';
 import { Snowflake, TwitterSnowflake } from '@sapphire/snowflake';
 import { existsSync } from 'fs';
@@ -31,11 +30,6 @@ export class ChunkHandler<StoredValue = unknown> {
   }
 
   public async init(): Promise<this> {
-    if (!existsSync(resolve(process.cwd(), 'package.json')))
-      throw new JoshError({
-        identifier: ChunkHandler.Identifiers.PackageFileNotFound,
-        message: 'A "package.json" file was not found in the working directory. This is required for "ChunkHandler" to run.'
-      });
     if (!existsSync(this.directory)) {
       await this.queue.wait();
       await mkdir(this.directory, { recursive: true });
@@ -325,9 +319,5 @@ export namespace ChunkHandler {
     synchronize?: boolean;
 
     retry?: File.RetryOptions;
-  }
-
-  export enum Identifiers {
-    PackageFileNotFound = 'packageFileNotFound'
   }
 }

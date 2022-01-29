@@ -231,7 +231,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
       if (!isPrimitive(value)) {
         payload.error = new JSONProviderError({
           identifier: JSONProvider.CommonIdentifiers.FilterInvalidValue,
-          message: 'The "value',
+          message: 'The "value" must be of type primitive.',
           method: Method.Filter
         });
 
