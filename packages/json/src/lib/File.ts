@@ -1,3 +1,4 @@
+import { Serialize } from '@joshdb/serialize';
 import type { Awaitable } from '@sapphire/utilities';
 import { existsSync } from 'fs';
 import { copyFile, readFile, rename, rm, writeFile } from 'fs/promises';
@@ -18,11 +19,11 @@ export class File<StoredValue = unknown> {
   }
 
   public async read<Data = File.Data<StoredValue>>(): Promise<Data> {
-    return this.attempt<Data>(async () => JSON.parse(await readFile(this.path, { encoding: 'utf-8' })));
+    return this.attempt<Data>(async () => new Serialize({ json: JSON.parse(await readFile(this.path, { encoding: 'utf-8' })) }).toRaw<Data>());
   }
 
   public async write<Data = File.Data<StoredValue>>(data: Data): Promise<void> {
-    await this.attempt(() => writeFile(this.path, JSON.stringify(data)));
+    await this.attempt(() => writeFile(this.path, JSON.stringify(new Serialize({ raw: data }).toJSON())));
   }
 
   public async copy(to: string): Promise<void> {
