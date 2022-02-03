@@ -449,11 +449,6 @@
   dependencies:
     "@cspotcode/source-map-consumer" "0.8.0"
 
-"@discordjs/collection@^0.3.2":
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/@discordjs/collection/-/collection-0.3.2.tgz#3c271dd8a93dad89b186d330e24dbceaab58424a"
-  integrity sha512-dMjLl60b2DMqObbH1MQZKePgWhsNe49XkKBZ0W5Acl5uVV43SN414i2QfZwRI7dXAqIn8pEWD2+XXQFn9KWxqg==
-
 "@eslint/eslintrc@^1.0.5":
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-1.0.5.tgz#33f1b838dbf1f923bfa517e008362b78ddbbf318"
@@ -713,6 +708,11 @@
     "@realware/utilities" "^2.0.2"
     "@sapphire/utilities" "^3.2.1"
 
+"@joshdb/serialize@next":
+  version "1.1.0-next.be6c1212328457bb4d9db2b3ea7b9ad293b08300.0"
+  resolved "https://registry.yarnpkg.com/@joshdb/serialize/-/serialize-1.1.0-next.be6c1212328457bb4d9db2b3ea7b9ad293b08300.0.tgz#0e3f3140e8f2151200e1c5e9734090ccf6844e29"
+  integrity sha512-XC1iOsdCrB+4hYzcBXHeo2GYfc+oXfDypsRhkNoOvhVK23eHSqT6gRCa3uPWNmGJG1jGLAsKomEwKWHbJTM7gg==
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz#7619c2eb21b25483f6d167548b4cfd5a7488c3d5"
@@ -787,15 +787,6 @@
   integrity sha512-nvJcv3dYX4/UTaLFa9o+DrL+BStE+Ar68FQI31BU3kYgec8NcJ2TqdXRq6bIYlOFVjd1QbFFxVGvInAPW3uEeA==
   dependencies:
     cross-fetch "^3.1.5"
-
-"@sapphire/pieces@^3.1.1":
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/@sapphire/pieces/-/pieces-3.2.0.tgz#6ce871222d2686b95c12e04b62961897a29bf803"
-  integrity sha512-7V7R2ouluY5XBEN73cjwMuKI8O4RsSSH8VY6xzYxbMKBA+LAGo0nPTMZ/XzEgHDopIrbcYKJMVZHpjKHWhniKA==
-  dependencies:
-    "@discordjs/collection" "^0.3.2"
-    "@sapphire/utilities" "^3.1.0"
-    tslib "^2.3.1"
 
 "@sapphire/snowflake@^3.0.1":
   version "3.1.0"
