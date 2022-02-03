@@ -1,120 +1,38 @@
 name: Continuous Delivery
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
 
 jobs:
-  pre_ci:
-    name: Prepare CI environment
+  Publish:
+    name: Publish Next to npm
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Project
         uses: actions/checkout@v2
         with:
-          fetch-depth: 2
-      - name: '[Push] Get commit message'
-        if: github.event_name == 'push'
-        id: push_get_commit_message
-        run: echo ::set-output name=push_commit_message::$(git log --format=%B -n 1 HEAD)
-      - name: '[Pull Request] Get commit message'
-        if: github.event_name == 'pull_request'
-        id: pr_get_commit_message
-        run: echo ::set-output name=pr_commit_message::$(git log --format=%B -n 1 HEAD^2)
-      - name: Add problem matchers
-        run: |
-          echo "::add-matcher::.github/problemMatchers/tsc.json"
-          echo "::add-matcher::.github/problemMatchers/eslint.json"
-    outputs:
-      commit_message: $( [ -z "${{ steps.pr_get_commit_message.outputs.pr_commit_message }}" ] && echo "${{ steps.push_get_commit_message.outputs.push_commit_message }}" || echo "${{ steps.pr_get_commit_message.outputs.pr_commit_message }}" )
-
-  Build_Packages:
-    name: Publish Package Builds
-    runs-on: ubuntu-latest
-    if: "!contains(needs.pre_ci.outputs.commit_message, '[skip ci]')"
-    needs: pre_ci
-    steps:
-      - name: Checkout Project
-        uses: actions/checkout@v2
+          fetch-depth: 0
+      - name: Add TypeScript problem matcher
+        run: echo "::add-matcher::.github/problemMatchers/tsc.json"
       - name: Use Node.js 16
         uses: actions/setup-node@v2
         with:
           node-version: 16
-      - name: Restore CI Cache
-        uses: actions/cache@v2.1.7
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-16-${{ hashFiles('**/yarn.lock') }}
+          registry-url: https://registry.npmjs.org/
       - name: Install Dependencies
         run: yarn --ignore-scripts --frozen-lockfile
-      - name: Build Packages
-        run: yarn prepublishOnly
-      - name: Push Mongo Build
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Bump Version & Publish
         run: |
-          REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          TARGET_BRANCH="build-mongo"
+          echo -e"\n# Resolve the tag for publish."
+          TAG="next"
 
-          echo -e "\n# Preparation Cleanup"
-          rm -rfv out
+          echo -e "\n# Bump the version"
+          yarn workspaces run standard-version --skip.commit --skip.tag --prerelease "${TAG}.$(git rev-parse --verify --shot HEAD)"
 
-          echo -e "\n# Checkout the repo in the target branch"
-          git clone $REPO out -b $TARGET_BRANCH
-
-          echo -e "\n# Remove any old files in the dist folder"
-          rm -rfv out/dist/*
-
-          echo - "\n# Move the generated files to the newly-checked-out repo, to be committed and pushed"
-          rsync -vaI packages/mongo/package.json out/
-          rsync -vaI packages/mongo/dist/ out/dist
-
-          echo -e "\n# Removing TSC incremental file"
-          rm -rfv out/dist/**/*.tsbuildinfo
-
-          echo -e "\n# Commit & Push"
-          cd out
-          git add --all .
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_EMAIL}"
-          git commit -m "build(mongo): tsc build for ${GITHUB_SHA}" || true
-          git push origin $TARGET_BRANCH
+          echo -e "\n# Publish to NPM"
+          yarn workspaces run publish --tag ${TAG}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: 'github-actions[bot]'
-          GITHUB_EMAIL: '41898282+github-actions[bot]@users.noreply.github.com'
-      - name: Push JSON Build
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          TARGET_BRANCH="build-json"
-
-          echo -e "\n# Preparation Cleanup"
-          rm -rfv out
-
-          echo -e "\n# Checkout the repo in the target branch"
-          git clone $REPO out -b $TARGET_BRANCH
-
-          echo -e "\n# Remove any old files in the dist folder"
-          rm -rfv out/dist/*
-
-          echo -e "\n# Move the generated files to the newly-checked-out repo, to be committed and pushed"
-          rsync -vaI packages/json/package.json out/
-          rsync -vaI packages/json/README.md out/
-          rsync -vaI LICENSE out/
-          rsync -vaI packages/json/dist/ out/dist
-
-          echo -e "\n# Removing TSC incremental file"
-          rm -rfv out/dist/**/*.tsbuildinfo
-
-          echo -e "\n# Commit & Push"
-          cd out
-          git add --all .
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_EMAIL}"
-          git commit -m "build(json): tsc build for ${GITHUB_SHA}" || true
-          git push origin $TARGET_BRANCH
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: 'github-actions[bot]'
-          GITHUB_EMAIL: '41898282+github-actions[bot]@users.noreply.github.com'
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
