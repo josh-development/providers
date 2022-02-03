@@ -336,7 +336,8 @@ export function runProviderTest<
               data: [
                 [{ key: 'firstKey', path: [] }, 'value'],
                 [{ key: 'secondKey', path: [] }, 'value']
-              ]
+              ],
+              overwrite: true
             });
 
             const payload = await provider.every({
@@ -380,7 +381,8 @@ export function runProviderTest<
               data: [
                 [{ key: 'firstKey', path: ['path'] }, 'value'],
                 [{ key: 'secondKey', path: ['path'] }, 'value']
-              ]
+              ],
+              overwrite: true
             });
 
             const payload = await provider.every({ method: Method.Every, type: Payload.Type.Value, path: ['path'], value: 'value', data: true });
@@ -1268,7 +1270,7 @@ export function runProviderTest<
 
       describe('with random method', () => {
         test('GIVEN provider w/o data THEN returns payload w/o data from random', async () => {
-          const payload = await provider.random({ method: Method.Random });
+          const payload = await provider.random({ method: Method.Random, count: 1, duplicates: false });
 
           expect(typeof payload).toBe('object');
 
@@ -1283,7 +1285,7 @@ export function runProviderTest<
         test('GIVEN provider w/ data THEN returns payload w/ data from random', async () => {
           await provider.set({ method: Method.Set, key: 'test:random', path: [], value: 'value' });
 
-          const payload = await provider.random({ method: Method.Random });
+          const payload = await provider.random({ method: Method.Random, count: 1, duplicates: false });
 
           expect(typeof payload).toBe('object');
 
@@ -1292,13 +1294,13 @@ export function runProviderTest<
           expect(method).toBe(Method.Random);
           expect(trigger).toBeUndefined();
           expect(error).toBeUndefined();
-          expect(data).toBe('value');
+          expect(data).toEqual(['value']);
         });
       });
 
       describe('with randomKey', () => {
         test('GIVEN provider w/o data THEN returns payload w/o data from randomKey', async () => {
-          const payload = await provider.randomKey({ method: Method.RandomKey });
+          const payload = await provider.randomKey({ method: Method.RandomKey, count: 1, duplicates: false });
 
           expect(typeof payload).toBe('object');
 
@@ -1313,7 +1315,7 @@ export function runProviderTest<
         test('GIVEN provider w/ data THEN returns payload w/ data from randomKey', async () => {
           await provider.set({ method: Method.Set, key: 'test:randomKey', path: [], value: 'value' });
 
-          const payload = await provider.randomKey({ method: Method.RandomKey });
+          const payload = await provider.randomKey({ method: Method.RandomKey, count: 1, duplicates: false });
 
           expect(typeof payload).toBe('object');
 
@@ -1322,7 +1324,7 @@ export function runProviderTest<
           expect(method).toBe(Method.RandomKey);
           expect(trigger).toBeUndefined();
           expect(error).toBeUndefined();
-          expect(data).toBe('test:randomKey');
+          expect(data).toEqual(['test:randomKey']);
         });
       });
 
@@ -1546,7 +1548,7 @@ export function runProviderTest<
 
           expect(hasBefore.data).toBe(false);
 
-          const payload = await provider.setMany({ method: Method.SetMany, data: [[{ key: 'test:setMany', path: [] }, 'value']] });
+          const payload = await provider.setMany({ method: Method.SetMany, data: [[{ key: 'test:setMany', path: [] }, 'value']], overwrite: true });
 
           expect(typeof payload).toBe('object');
 
