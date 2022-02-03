@@ -508,17 +508,54 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
   }
 
   public async [Method.Random](payload: RandomPayload<StoredValue>): Promise<RandomPayload<StoredValue>> {
-    const values = await this.handler.values();
+    const { count, duplicates } = payload;
+    const size = await this.handler.size();
 
-    Reflect.set(payload, 'data', values[Math.floor(Math.random() * values.length)]);
+    if (size === 0) return payload;
+    if (size < count) {
+      payload.error = new JSONProviderError({
+        identifier: JoshProvider.CommonIdentifiers.RandomInvalidCount,
+        message: `The count of values to be selected must be less than or equal to the number of values in the map.`,
+        method: Method.Random
+      });
+
+      return payload;
+    }
+
+    payload.data = [];
+
+    const data: [string, StoredValue][] = [];
+    const entries = await this.handler.entries();
+
+    for (let i = 0; i < count; i++)
+      data.push(duplicates ? entries[Math.floor(Math.random() * entries.length)] : await this.randomEntriesWithDuplicates(data));
+
+    payload.data = data.map(([, value]) => value);
 
     return payload;
   }
 
   public async [Method.RandomKey](payload: RandomKeyPayload): Promise<RandomKeyPayload> {
+    const { count, duplicates } = payload;
+    const size = await this.handler.size();
+
+    if (size === 0) return payload;
+    if (size < count) {
+      payload.error = new JSONProviderError({
+        identifier: JoshProvider.CommonIdentifiers.RandomKeyInvalidCount,
+        message: `The count of keys to be selected must be less than or equal to the number of keys in the map.`,
+        method: Method.RandomKey
+      });
+
+      return payload;
+    }
+
+    payload.data = [];
+
     const keys = await this.handler.keys();
 
-    payload.data = keys[Math.floor(Math.random() * keys.length)];
+    for (let i = 0; i < count; i++)
+      payload.data.push(duplicates ? keys[Math.floor(Math.random() * keys.length)] : await this.randomKeyWithoutDuplicates(payload.data));
 
     return payload;
   }
@@ -661,6 +698,26 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     payload.data = await this.handler.values();
 
     return payload;
+  }
+
+  private async randomEntriesWithDuplicates(data: [string, StoredValue][]): Promise<[string, StoredValue]> {
+    const entries = await this.handler.entries();
+    const entry = entries[Math.floor(Math.random() * entries.length)];
+
+    if (data.length === 0) return entry;
+    if (isPrimitive(entry[1]) && data.some(([key, value]) => entry[0] === key && entry[1] === value)) return this.randomEntriesWithDuplicates(data);
+
+    return entry;
+  }
+
+  private async randomKeyWithoutDuplicates(data: string[]): Promise<string> {
+    const keys = await this.handler.keys();
+    const key = keys[Math.floor(Math.random() * keys.length)];
+
+    if (data.length === 0) return key;
+    if (data.includes(key)) return this.randomKeyWithoutDuplicates(data);
+
+    return key;
   }
 
   private get handler(): ChunkHandler<StoredValue> {
