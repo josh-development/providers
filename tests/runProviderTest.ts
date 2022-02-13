@@ -488,6 +488,7 @@ export function runProviderTest<
 
             const { method, trigger, error, hook, data } = payload;
 
+            await provider.set({ method: Method.Set, key: 'test:size', path: [], value: 'value' });
             expect(method).toBe(Method.Find);
             expect(trigger).toBeUndefined();
             expect(error).toBeUndefined();
@@ -508,7 +509,7 @@ export function runProviderTest<
             expect(trigger).toBeUndefined();
             expect(error).toBeUndefined();
             expect(typeof hook).toBe('function');
-            expect(data).toBe('value');
+            expect(data).toEqual(['test:find', 'value']);
           });
         });
 
@@ -542,7 +543,7 @@ export function runProviderTest<
             expect(error).toBeUndefined();
             expect(path).toEqual(['path']);
             expect(value).toBe('value');
-            expect(data).toEqual({ path: 'value' });
+            expect(data).toEqual(['test:find', { path: 'value' }]);
           });
         });
       });
@@ -1549,6 +1550,28 @@ export function runProviderTest<
           expect(hasBefore.data).toBe(false);
 
           const payload = await provider.setMany({ method: Method.SetMany, data: [[{ key: 'test:setMany', path: [] }, 'value']], overwrite: true });
+
+          expect(typeof payload).toBe('object');
+
+          const { method, trigger, error, data } = payload;
+
+          expect(method).toBe(Method.SetMany);
+          expect(trigger).toBeUndefined();
+          expect(error).toBeUndefined();
+          expect(data).toEqual([[{ key: 'test:setMany', path: [] }, 'value']]);
+        });
+        test('GIVEN provider w/ data THEN returns payload AND does not set value at key', async () => {
+          await provider.set({ method: Method.Set, key: 'test:setMany', path: [], value: 'value' });
+
+          const hasBefore = await provider.has({ method: Method.Has, key: 'test:setMany', path: [], data: false });
+
+          expect(hasBefore.data).toBe(true);
+
+          const payload = await provider.setMany({
+            method: Method.SetMany,
+            data: [[{ key: 'test:setMany', path: [] }, 'value-overwritten']],
+            overwrite: false
+          });
 
           expect(typeof payload).toBe('object');
 

@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@joshdb/core": "next",
+    "@joshdb/serialize": "next",
     "@realware/utilities": "^2.0.2",
     "@sapphire/utilities": "^3.2.1",
     "mongoose": "^6.1.8"
