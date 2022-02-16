@@ -2,6 +2,7 @@ import {
   AutoKeyPayload,
   ClearPayload,
   DecPayload,
+  DeleteManyPayload,
   DeletePayload,
   EnsurePayload,
   EveryByHookPayload,
@@ -164,6 +165,14 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
+  public async [Method.DeleteMany](payload: DeleteManyPayload): Promise<DeleteManyPayload> {
+    const { keys } = payload;
+
+    await this.handler.deleteMany(keys);
+
+    return payload;
+  }
+
   public async [Method.Ensure](payload: EnsurePayload<StoredValue>): Promise<EnsurePayload<StoredValue>> {
     const { key } = payload;
 
@@ -251,8 +260,8 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     if (isFindByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const value of await this.handler.values()) {
-        const foundValue = await hook(value);
+      for (const value of await this.handler.entries()) {
+        const foundValue = await hook(value[1]);
 
         if (!foundValue) continue;
 
@@ -275,9 +284,9 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
         return payload;
       }
 
-      for (const storedValue of await this.handler.values()) {
+      for (const [key, storedValue] of await this.handler.entries()) {
         if (payload.data !== undefined) break;
-        if (value === (path.length === 0 ? storedValue : getFromObject(storedValue, path))) payload.data = storedValue;
+        if (value === (path.length === 0 ? storedValue : getFromObject(storedValue, path))) payload.data = [key, storedValue];
       }
     }
 
@@ -524,13 +533,17 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
 
     payload.data = [];
 
-    const data: [string, StoredValue][] = [];
-    const entries = await this.handler.entries();
+    if (duplicates) {
+      const keys = await this.handler.keys();
 
-    for (let i = 0; i < count; i++)
-      data.push(duplicates ? entries[Math.floor(Math.random() * entries.length)] : await this.randomEntriesWithDuplicates(data));
+      payload.data.push((await this.handler.get(keys[Math.floor(Math.random() * keys.length)]))!);
+    } else {
+      const data: [string, StoredValue][] = [];
 
-    payload.data = data.map(([, value]) => value);
+      for (let i = 0; i < count; i++) data.push(await this.randomEntriesWithDuplicates(data));
+
+      payload.data = data.map(([, value]) => value);
+    }
 
     return payload;
   }
@@ -636,9 +649,19 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
   }
 
   public async [Method.SetMany]<Value = StoredValue>(payload: SetManyPayload<Value>): Promise<SetManyPayload<Value>> {
-    const { data } = payload;
+    const { data, overwrite } = payload;
 
-    for (const [{ key, path }, value] of data) await this.set<Value>({ method: Method.Set, key, path, value });
+    const withPath = data.filter(([{ path }]) => path.length > 0);
+    const withoutPath = data.filter(([{ path }]) => path.length === 0);
+
+    for (const [{ key, path }, value] of withPath)
+      if (overwrite || !(await this.handler.has(key))) await this.set<Value>({ method: Method.Set, key, path, value });
+
+    if (withoutPath.length > 0)
+      await this.handler.setMany(
+        withoutPath.map(([{ key }, value]) => [key, value] as unknown as [string, StoredValue]),
+        overwrite
+      );
 
     return payload;
   }

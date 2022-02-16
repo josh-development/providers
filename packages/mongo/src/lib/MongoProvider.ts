@@ -63,7 +63,7 @@ import {
 import { Serialize } from '@joshdb/serialize';
 import { deleteFromObject, getFromObject, hasFromObject, setToObject } from '@realware/utilities';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
-import mongoose, { Model, Mongoose } from 'mongoose';
+import mongoose, { Model, Mongoose, PipelineStage } from 'mongoose';
 import { generateMongoDoc } from './MongoDoc';
 import type { MongoDocType } from './MongoDocType';
 import { MongoProviderError } from './MongoProviderError';
@@ -549,7 +549,13 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   public async [Method.Random](payload: RandomPayload<StoredValue>): Promise<RandomPayload<StoredValue>> {
-    const docs: MongoDocType[] = (await this.collection.aggregate([{ $sample: { size: payload.count } }])) || [];
+    const aggr: PipelineStage[] = [{ $sample: { size: payload.count } }];
+
+    // if (!payload.duplicates) {
+    //   aggr.push(...[{ $group: { _id: '$key' } }]); Yet to be implemented
+    // }
+
+    const docs: MongoDocType[] = (await this.collection.aggregate(aggr)) || [];
 
     if (docs.length > 0) payload.data = docs.map((doc) => this.deserialize(doc.value));
 
@@ -646,22 +652,29 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.SetMany]<Value = StoredValue>(payload: SetManyPayload<Value>): Promise<SetManyPayload<Value>> {
     const { data } = payload;
+    const operations = [];
 
-    for (let i = 0; i < data.length; i++) {
-      const [{ key, path }, value] = data[i];
-
+    for (const [{ key, path }, value] of data) {
       if (!payload.overwrite) {
-        const original = (await this.get<Value>({ method: Method.Get, key, path })).data;
+        const found = (await this.has({ method: Method.Has, key, path, data: false })).data;
 
-        if (original !== undefined) {
-          payload.data[i][1] = original;
-
-          continue;
-        }
+        if (found) continue;
       }
 
-      await this.set<Value>({ method: Method.Set, key, path, value });
+      operations.push({
+        updateOne: {
+          filter: { key },
+          upsert: true,
+          update: {
+            $set: {
+              value: this.serialize(path.length > 0 ? setToObject((await this.get({ method: Method.Get, key, path: [] })).data, path, value) : value)
+            }
+          }
+        }
+      });
     }
+
+    await this.collection.bulkWrite(operations);
 
     return payload;
   }

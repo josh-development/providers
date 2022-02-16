@@ -1560,6 +1560,7 @@ export function runProviderTest<
           expect(error).toBeUndefined();
           expect(data).toEqual([[{ key: 'test:setMany', path: [] }, 'value']]);
         });
+
         test('GIVEN provider w/ data THEN returns payload AND does not set value at key', async () => {
           await provider.set({ method: Method.Set, key: 'test:setMany', path: [], value: 'value' });
 
@@ -1580,7 +1581,11 @@ export function runProviderTest<
           expect(method).toBe(Method.SetMany);
           expect(trigger).toBeUndefined();
           expect(error).toBeUndefined();
-          expect(data).toEqual([[{ key: 'test:setMany', path: [] }, 'value']]);
+          expect(data).toEqual([[{ key: 'test:setMany', path: [] }, 'value-overwritten']]);
+
+          const getAfter = await provider.get({ method: Method.Get, key: 'test:setMany', path: [] });
+
+          expect(getAfter.data).toBe('value');
         });
       });
 

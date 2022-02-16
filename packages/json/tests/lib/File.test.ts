@@ -1,3 +1,4 @@
+import { Serialize } from '@joshdb/serialize';
 import { TwitterSnowflake } from '@sapphire/snowflake';
 import { existsSync } from 'fs';
 import { mkdir, rm, writeFile } from 'fs/promises';
@@ -35,7 +36,7 @@ describe('File', () => {
       });
 
       test('GIVEN file present THEN returns parsed value', async () => {
-        await writeFile(file.path, JSON.stringify({ key: 'value' }));
+        await writeFile(file.path, JSON.stringify(new Serialize({ raw: { key: 'value' } })));
 
         await expect(file.read()).resolves.toEqual({ key: 'value' });
       });

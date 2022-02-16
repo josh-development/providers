@@ -26,6 +26,7 @@ gh
 
 # Ignore data from tests
 **/.tests
+**/.bench
 
 # Ignore auto-generated content
 docs/api.json
