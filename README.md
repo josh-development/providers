@@ -14,3 +14,7 @@
 [![npm](https://img.shields.io/npm/v/@joshdb/json?color=crimson&logo=npm&style=flat-square&label=@joshdb/json)](https://www.npmjs.com/package/@joshdb/json)
 
 </div>
+
+## Contributing
+
+While the documentation website is not complete, you can still view the markdown file guide [here](https://github.com/josh-development/website/tree/main/src/docs)
