@@ -37,7 +37,7 @@ export const jobs = [
                   require: './dist/index.js'
                 },
                 scripts: {
-                  test: 'jest --verbose',
+                  test: 'jest',
                   lint: 'eslint src tests --ext ts --fix -c ../../.eslintrc',
                   build: 'rollup -c rollup.bundle.ts',
                   prepublishOnly: 'rollup-type-bundler'

@@ -12,7 +12,7 @@
   "types": "dist/index.d.ts",
   "typedocMain": "src/index.ts",
   "scripts": {
-    "test": "jest --verbose",
+    "test": "jest",
     "lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
     "build": "rollup -c rollup.bundle.ts",
     "publish": "npm publish",

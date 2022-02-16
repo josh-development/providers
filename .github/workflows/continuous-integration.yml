@@ -31,37 +31,6 @@ jobs:
       - name: Run ESLint
         run: yarn lint --fix=false
 
-  Testing:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Project
-        uses: actions/checkout@v2
-      - name: Use Node.js v16
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
-      - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.7.0
-        with:
-          mongodb-version: 5.0
-      - name: Restore CI Cache
-        uses: actions/cache@v2.1.7
-        id: cache-restore
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-16-${{ hashFiles('**/yarn.lock') }}
-      - name: Install Dependencies if Cache Miss
-        if: ${{ !steps.cache-restore.outputs.cache-hit }}
-        run: yarn --frozen-lockfile
-      - name: Run tests
-        run: yarn test --coverage
-      - name: Store code coverage report
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage
-          path: coverage/
-
   Building:
     name: Compile Source Code
     runs-on: ubuntu-latest
