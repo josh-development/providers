@@ -63,10 +63,8 @@ import {
 import { Serialize } from '@joshdb/serialize';
 import { deleteFromObject, getFromObject, hasFromObject, setToObject } from '@realware/utilities';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
-import mongoose, { Model, Mongoose, PipelineStage } from 'mongoose';
-import { generateMongoDoc } from './MongoDoc';
-import type { MongoDocType } from './MongoDocType';
-import { MongoProviderError } from './MongoProviderError';
+import { connect, Model, Mongoose, PipelineStage, Schema, Types } from 'mongoose';
+import { generateMongoDoc } from './functions/generateMongoDoc';
 
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: MongoProvider.Options;
@@ -75,7 +73,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   private _client?: Mongoose;
 
-  private _collection?: Model<MongoDocType>;
+  private _collection?: Model<MongoProvider.DocType>;
 
   public constructor(options: MongoProvider.Options) {
     super(options);
@@ -107,7 +105,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       this.connectionURI = `mongodb://${user?.length && password?.length ? `${user}:${password}@` : ''}${host}:${port}/${dbName}`;
     }
 
-    this._client = await mongoose.connect(this.connectionURI);
+    this._client = await connect(this.connectionURI);
 
     return context;
   }
@@ -117,7 +115,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   public [Method.AutoKey](payload: AutoKeyPayload): AutoKeyPayload {
-    payload.data = new mongoose.Types.ObjectId().toString();
+    payload.data = new Types.ObjectId().toString();
 
     return payload;
   }
@@ -133,7 +131,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { data } = await this.get<StoredValue>({ key, method: Method.Get, path });
 
     if (data === undefined) {
-      payload.error = new MongoProviderError({
+      payload.error = this.error({
         identifier: MongoProvider.CommonIdentifiers.DecMissingData,
         message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
         method: Method.Dec
@@ -143,7 +141,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     }
 
     if (!isNumber(data)) {
-      payload.error = new MongoProviderError({
+      payload.error = this.error({
         identifier: MongoProvider.CommonIdentifiers.DecInvalidType,
         message:
           path.length === 0 ? `The data at "${key}" must be of type "number".` : `The data at "${key}.${path.join('.')}" must be of type "number".`,
@@ -253,7 +251,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       const { path, value } = payload;
 
       if (!isPrimitive(value)) {
-        payload.error = new MongoProviderError({
+        payload.error = this.error({
           identifier: MongoProvider.CommonIdentifiers.FilterInvalidValue,
           message: 'The "value" must be a primitive type.',
           method: Method.Filter
@@ -290,7 +288,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       const { path, value } = payload;
 
       if (!isPrimitive(value)) {
-        payload.error = new MongoProviderError({
+        payload.error = this.error({
           identifier: MongoProvider.CommonIdentifiers.FindInvalidValue,
           message: 'The "value" must be of type primitive.',
           method: Method.Find
@@ -364,7 +362,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { data } = await this.get<StoredValue>({ method: Method.Get, key, path });
 
     if (data === undefined) {
-      payload.error = new MongoProviderError({
+      payload.error = this.error({
         identifier: MongoProvider.CommonIdentifiers.IncMissingData,
         message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
         method: Method.Inc
@@ -373,7 +371,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       return payload;
     }
     if (!isNumber(data)) {
-      payload.error = new MongoProviderError({
+      payload.error = this.error({
         identifier: MongoProvider.CommonIdentifiers.IncInvalidType,
         message:
           path.length === 0 ? `The data at "${key}" must be of type "number".` : `The data at "${key}.${path.join('.')}" must be of type "number".`,
@@ -426,7 +424,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     let { data } = await this.get<number>({ method: Method.Get, key, path });
 
     if (data === undefined) {
-      payload.error = new MongoProviderError({
+      payload.error = this.error({
         identifier: MongoProvider.CommonIdentifiers.MathMissingData,
         message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
         method: Method.Math
@@ -436,7 +434,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     }
 
     if (!isNumber(data)) {
-      payload.error = new MongoProviderError({
+      payload.error = this.error({
         identifier: MongoProvider.CommonIdentifiers.MathInvalidType,
         message: path.length === 0 ? `The data at "${key}" must be a number.` : `The data at "${key}.${path.join('.')}" must be a number.`,
         method: Method.Math
@@ -500,7 +498,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       const { path, value } = payload;
 
       if (!isPrimitive(value)) {
-        payload.error = new MongoProviderError({
+        payload.error = this.error({
           identifier: MongoProvider.CommonIdentifiers.PartitionInvalidValue,
           message: 'The "value" must be a primitive type.',
           method: Method.Partition
@@ -522,7 +520,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { data } = await this.get({ method: Method.Get, key, path });
 
     if (data === undefined) {
-      payload.error = new MongoProviderError({
+      payload.error = this.error({
         identifier: MongoProvider.CommonIdentifiers.PushMissingData,
         message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
         method: Method.Push
@@ -532,7 +530,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     }
 
     if (!Array.isArray(data)) {
-      payload.error = new MongoProviderError({
+      payload.error = this.error({
         identifier: MongoProvider.CommonIdentifiers.PushInvalidType,
         message: path.length === 0 ? `The data at "${key}" must be an array.` : `The data at "${key}.${path.join('.')}" does not exist.`,
         method: Method.Push
@@ -555,7 +553,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     //   aggr.push(...[{ $group: { _id: '$key' } }]); Yet to be implemented
     // }
 
-    const docs: MongoDocType[] = (await this.collection.aggregate(aggr)) || [];
+    const docs: MongoProvider.DocType[] = (await this.collection.aggregate(aggr)) || [];
 
     if (docs.length > 0) payload.data = docs.map((doc) => this.deserialize(doc.value));
 
@@ -578,7 +576,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       const { data } = await this.get<unknown[]>({ method: Method.Get, key, path });
 
       if (data === undefined) {
-        payload.error = new MongoProviderError({
+        payload.error = this.error({
           identifier: MongoProvider.CommonIdentifiers.RemoveMissingData,
           message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
           method: Method.Remove
@@ -588,7 +586,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       }
 
       if (!Array.isArray(data)) {
-        payload.error = new MongoProviderError({
+        payload.error = this.error({
           identifier: MongoProvider.CommonIdentifiers.RemoveInvalidType,
           message: path.length === 0 ? `The data at "${key}" must be an array.` : `The data at "${key}.${path.join('.')}" must be an array.`,
           method: Method.Remove
@@ -607,7 +605,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       const { data } = await this.get({ method: Method.Get, key, path });
 
       if (data === undefined) {
-        payload.error = new MongoProviderError({
+        payload.error = this.error({
           identifier: MongoProvider.CommonIdentifiers.RemoveMissingData,
           message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
           method: Method.Remove
@@ -617,7 +615,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       }
 
       if (!Array.isArray(data)) {
-        payload.error = new MongoProviderError({
+        payload.error = this.error({
           identifier: MongoProvider.CommonIdentifiers.RemoveInvalidType,
           message: path.length === 0 ? `The data at "${key}" must be an array.` : `The data at "${key}.${path.join('.')}" must be an array.`,
           method: Method.Remove
@@ -748,7 +746,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return this._client;
   }
 
-  private get collection(): Model<MongoDocType> {
+  private get collection(): Model<MongoProvider.DocType> {
     if (isNullOrUndefined(this._collection))
       throw new JoshError({
         message: 'Client is not connected, most likely due to `init` not being called or the server not being available',
@@ -767,6 +765,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   public static defaultAuthentication: MongoProvider.Authentication = { dbName: 'josh', host: 'localhost', port: 27017 };
+
+  public static schema = new Schema({ key: { type: String, required: true }, value: { type: Schema.Types.Mixed, required: true } });
 }
 
 export namespace MongoProvider {
@@ -788,6 +788,12 @@ export namespace MongoProvider {
     port: number;
 
     host: string;
+  }
+
+  export interface DocType extends Document {
+    key: string;
+
+    value: string;
   }
 
   export enum Identifiers {

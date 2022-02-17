@@ -6,7 +6,7 @@ export function runProviderTest<
   Options extends JoshProvider.Options,
   CleanupProvider extends JoshProvider = JoshProvider
 >(options: ProviderTestOptions<Provider, Options, CleanupProvider>): void {
-  const { providerConstructor: Provider, errorConstructor: ProviderError, providerOptions = {}, cleanup } = options;
+  const { providerConstructor: Provider, providerOptions = {}, cleanup } = options;
 
   describe(Provider.prototype.constructor.name, () => {
     describe('is a class', () => {
@@ -111,7 +111,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Dec);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.DecMissingData);
           expect(key).toBe('test:dec');
           expect(path).toEqual([]);
@@ -126,7 +126,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Dec);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.DecMissingData);
           expect(key).toBe('test:dec');
           expect(path).toEqual(['path']);
@@ -143,7 +143,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Dec);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.DecInvalidType);
           expect(key).toBe('test:dec');
           expect(path).toEqual([]);
@@ -160,7 +160,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Dec);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.DecInvalidType);
           expect(key).toBe('test:dec');
           expect(path).toEqual(['path']);
@@ -741,7 +741,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Inc);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.IncMissingData);
           expect(key).toBe('test:inc');
           expect(path).toEqual([]);
@@ -756,7 +756,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Inc);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.IncMissingData);
           expect(key).toBe('test:inc');
           expect(path).toEqual(['path']);
@@ -773,7 +773,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Inc);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.IncInvalidType);
           expect(key).toBe('test:inc');
           expect(path).toEqual([]);
@@ -790,7 +790,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Inc);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.IncInvalidType);
           expect(key).toBe('test:inc');
           expect(path).toEqual(['path']);
@@ -951,7 +951,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Math);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.MathMissingData);
           expect(key).toBe('test:math');
           expect(path).toEqual([]);
@@ -970,7 +970,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Math);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.MathMissingData);
           expect(key).toBe('test:math');
           expect(path).toEqual(['path']);
@@ -989,7 +989,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Math);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.MathInvalidType);
           expect(key).toBe('test:math');
           expect(path).toEqual([]);
@@ -1008,7 +1008,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Math);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.MathInvalidType);
           expect(key).toBe('test:math');
           expect(path).toEqual(['path']);
@@ -1173,7 +1173,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Push);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.PushMissingData);
           expect(key).toBe('test:push');
           expect(path).toEqual([]);
@@ -1191,7 +1191,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Push);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.PushMissingData);
           expect(key).toBe('test:push');
           expect(path).toEqual(['path']);
@@ -1209,7 +1209,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Push);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.PushInvalidType);
           expect(key).toBe('test:push');
           expect(path).toEqual([]);
@@ -1227,7 +1227,7 @@ export function runProviderTest<
 
           expect(method).toBe(Method.Push);
           expect(trigger).toBeUndefined();
-          expect(error).toBeInstanceOf(ProviderError);
+          expect(error).toBeInstanceOf(JoshProviderError);
           expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.PushInvalidType);
           expect(key).toBe('test:push');
           expect(path).toEqual(['path']);
@@ -1346,7 +1346,7 @@ export function runProviderTest<
 
             expect(method).toBe(Method.Remove);
             expect(trigger).toBeUndefined();
-            expect(error).toBeInstanceOf(ProviderError);
+            expect(error).toBeInstanceOf(JoshProviderError);
             expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.RemoveMissingData);
             expect(type).toBe(Payload.Type.Hook);
             expect(key).toBe('test:remove');
@@ -1371,7 +1371,7 @@ export function runProviderTest<
 
             expect(method).toBe(Method.Remove);
             expect(trigger).toBeUndefined();
-            expect(error).toBeInstanceOf(ProviderError);
+            expect(error).toBeInstanceOf(JoshProviderError);
             expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.RemoveInvalidType);
             expect(type).toBe(Payload.Type.Hook);
             expect(key).toBe('test:remove');
@@ -1428,7 +1428,7 @@ export function runProviderTest<
 
             expect(method).toBe(Method.Remove);
             expect(trigger).toBeUndefined();
-            expect(error).toBeInstanceOf(ProviderError);
+            expect(error).toBeInstanceOf(JoshProviderError);
             expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.RemoveMissingData);
             expect(type).toBe(Payload.Type.Value);
             expect(key).toBe('test:remove');
@@ -1453,7 +1453,7 @@ export function runProviderTest<
 
             expect(method).toBe(Method.Remove);
             expect(trigger).toBeUndefined();
-            expect(error).toBeInstanceOf(ProviderError);
+            expect(error).toBeInstanceOf(JoshProviderError);
             expect(error?.identifier).toBe(JoshProvider.CommonIdentifiers.RemoveInvalidType);
             expect(type).toBe(Payload.Type.Value);
             expect(key).toBe('test:remove');
@@ -1790,8 +1790,6 @@ export interface ProviderTestOptions<
   CleanupProvider extends JoshProvider = JoshProvider
 > {
   providerConstructor: Provider;
-
-  errorConstructor: typeof JoshProviderError;
 
   providerOptions?: Options;
 

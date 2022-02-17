@@ -8,7 +8,7 @@ import { ChunkIndexFile } from './chunk-files/ChunkIndexFile';
 import type { File } from './File';
 
 export class ChunkHandler<StoredValue = unknown> {
-  public options: ChunkHandler.Options;
+  public options: ChunkHandlerOptions;
 
   public snowflake: Snowflake | typeof TwitterSnowflake;
 
@@ -20,7 +20,7 @@ export class ChunkHandler<StoredValue = unknown> {
 
   public files: Record<string, ChunkFile<StoredValue>> = {};
 
-  public constructor(options: ChunkHandler.Options) {
+  public constructor(options: ChunkHandlerOptions) {
     const { name, dataDirectoryName, epoch, retry } = options;
 
     this.options = options;
@@ -387,18 +387,16 @@ export class ChunkHandler<StoredValue = unknown> {
   }
 }
 
-export namespace ChunkHandler {
-  export interface Options {
-    name: string;
+export interface ChunkHandlerOptions {
+  name: string;
 
-    dataDirectoryName?: string;
+  dataDirectoryName?: string;
 
-    maxChunkSize: number;
+  maxChunkSize: number;
 
-    epoch?: number | bigint | Date;
+  epoch?: number | bigint | Date;
 
-    synchronize?: boolean;
+  synchronize?: boolean;
 
-    retry?: File.RetryOptions;
-  }
+  retry?: File.RetryOptions;
 }

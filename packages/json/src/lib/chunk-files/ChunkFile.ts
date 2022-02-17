@@ -4,7 +4,7 @@ import { ChunkLockFile } from './ChunkLockFile';
 export class ChunkFile<StoredValue = unknown> extends File<StoredValue> {
   public lock: ChunkLockFile;
 
-  public constructor(options: ChunkFile.Options) {
+  public constructor(options: ChunkFileOptions) {
     const { directory, id, retry } = options;
 
     super({ directory, name: `${id}.json`, retry });
@@ -30,12 +30,10 @@ export class ChunkFile<StoredValue = unknown> extends File<StoredValue> {
   }
 }
 
-export namespace ChunkFile {
-  export interface Options {
-    directory: string;
+export interface ChunkFileOptions {
+  directory: string;
 
-    id: string;
+  id: string;
 
-    retry?: File.RetryOptions;
-  }
+  retry?: File.RetryOptions;
 }

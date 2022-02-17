@@ -64,7 +64,6 @@ import { deleteFromObject, getFromObject, hasFromObject, setToObject } from '@re
 import { isNumber, isPrimitive } from '@sapphire/utilities';
 import { ChunkHandler } from './ChunkHandler';
 import type { File } from './File';
-import { JSONProviderError } from './JSONProviderError';
 
 export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: JSONProvider.Options;
@@ -119,7 +118,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     const { data } = await this.get({ method: Method.Get, key, path });
 
     if (data === undefined) {
-      payload.error = new JSONProviderError({
+      payload.error = this.error({
         identifier: JSONProvider.CommonIdentifiers.DecMissingData,
         message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')} does not exist.`,
         method: Method.Dec
@@ -129,7 +128,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     }
 
     if (typeof data !== 'number') {
-      payload.error = new JSONProviderError({
+      payload.error = this.error({
         identifier: JSONProvider.CommonIdentifiers.DecInvalidType,
         message:
           path.length === 0 ? `The data at "${key}" must be of type "number"` : `The data at "${key}.${path.join('.')}" must be of type "number".`,
@@ -238,7 +237,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
       const { path, value } = payload;
 
       if (!isPrimitive(value)) {
-        payload.error = new JSONProviderError({
+        payload.error = this.error({
           identifier: JSONProvider.CommonIdentifiers.FilterInvalidValue,
           message: 'The "value" must be of type primitive.',
           method: Method.Filter
@@ -275,7 +274,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
       const { path, value } = payload;
 
       if (!isPrimitive(value)) {
-        payload.error = new JSONProviderError({
+        payload.error = this.error({
           identifier: JSONProvider.CommonIdentifiers.FindInvalidValue,
           message: 'The "value" must be of type primitive.',
           method: Method.Find
@@ -333,7 +332,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     const { data } = await this.get({ method: Method.Get, key, path });
 
     if (data === undefined) {
-      payload.error = new JSONProviderError({
+      payload.error = this.error({
         identifier: JSONProvider.CommonIdentifiers.IncMissingData,
         message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data "${key}.${path.join('.')}" does not exist.`,
         method: Method.Inc
@@ -343,7 +342,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     }
 
     if (typeof data !== 'number') {
-      payload.error = new JSONProviderError({
+      payload.error = this.error({
         identifier: JSONProvider.CommonIdentifiers.IncInvalidType,
         message:
           path.length === 0 ? `The data at "${key}" must be of type "number".` : `The data at "${key}.${path.join('.')}" must be of type "number".`,
@@ -394,7 +393,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     let { data } = await this.get<number>({ method: Method.Get, key, path });
 
     if (data === undefined) {
-      payload.error = new JSONProviderError({
+      payload.error = this.error({
         identifier: JSONProvider.CommonIdentifiers.MathMissingData,
         message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
         method: Method.Math
@@ -404,7 +403,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     }
 
     if (!isNumber(data)) {
-      payload.error = new JSONProviderError({
+      payload.error = this.error({
         identifier: JSONProvider.CommonIdentifiers.MathInvalidType,
         message: path.length === 0 ? `The data at "${key}" must be a number.` : `The data at "${key}.${path.join('.')}" must be a number.`,
         method: Method.Math
@@ -468,7 +467,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
       const { path, value } = payload;
 
       if (!isPrimitive(value)) {
-        payload.error = new JSONProviderError({
+        payload.error = this.error({
           identifier: JSONProvider.CommonIdentifiers.PartitionInvalidValue,
           message: 'The "value" must be a primitive type.',
           method: Method.Partition
@@ -490,7 +489,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     const { data } = await this.get({ method: Method.Get, key, path });
 
     if (data === undefined) {
-      payload.error = new JSONProviderError({
+      payload.error = this.error({
         identifier: JSONProvider.CommonIdentifiers.PushMissingData,
         message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')} does not exist.`,
         method: Method.Push
@@ -500,7 +499,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     }
 
     if (!Array.isArray(data)) {
-      payload.error = new JSONProviderError({
+      payload.error = this.error({
         identifier: JSONProvider.CommonIdentifiers.PushInvalidType,
         message: path.length === 0 ? `The data at "${key}" must be an array.` : `The data at "${key}.${path.join('.')}" must be an array.`,
         method: Method.Push
@@ -522,7 +521,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
 
     if (size === 0) return payload;
     if (size < count) {
-      payload.error = new JSONProviderError({
+      payload.error = this.error({
         identifier: JoshProvider.CommonIdentifiers.RandomInvalidCount,
         message: `The count of values to be selected must be less than or equal to the number of values in the map.`,
         method: Method.Random
@@ -554,7 +553,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
 
     if (size === 0) return payload;
     if (size < count) {
-      payload.error = new JSONProviderError({
+      payload.error = this.error({
         identifier: JoshProvider.CommonIdentifiers.RandomKeyInvalidCount,
         message: `The count of keys to be selected must be less than or equal to the number of keys in the map.`,
         method: Method.RandomKey
@@ -581,7 +580,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
       const { data } = await this.get<unknown[]>({ method: Method.Get, key, path });
 
       if (data === undefined) {
-        payload.error = new JSONProviderError({
+        payload.error = this.error({
           identifier: JSONProvider.CommonIdentifiers.RemoveMissingData,
           message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
           method: Method.Remove
@@ -591,7 +590,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
       }
 
       if (!Array.isArray(data)) {
-        payload.error = new JSONProviderError({
+        payload.error = this.error({
           identifier: JSONProvider.CommonIdentifiers.RemoveInvalidType,
           message: path.length === 0 ? `The data at "${key}" must be an array.` : `The data at "${key}.${path.join('.')}" must be an array.`,
           method: Method.Remove
@@ -610,7 +609,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
       const { data } = await this.get({ method: Method.Get, key, path });
 
       if (data === undefined) {
-        payload.error = new JSONProviderError({
+        payload.error = this.error({
           identifier: JSONProvider.CommonIdentifiers.RemoveMissingData,
           message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
           method: Method.Remove
@@ -620,7 +619,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
       }
 
       if (!Array.isArray(data)) {
-        payload.error = new JSONProviderError({
+        payload.error = this.error({
           identifier: JSONProvider.CommonIdentifiers.RemoveInvalidType,
           message: path.length === 0 ? `The data at "${key}" must be an array.` : `The data at "${key}.${path.join('.')}" must be an array.`,
           method: Method.Remove
