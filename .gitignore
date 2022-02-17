@@ -3,7 +3,7 @@ node_modules/
 .vs/
 
 # Ignore tsc dist folder
-dist/
+**/dist
 
 # Ignore JavaScript files
 **/*.js
