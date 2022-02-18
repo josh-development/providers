@@ -22,9 +22,9 @@
   integrity sha512-392byTlpGWXMv4FbyWw3sAZ/FrW/DrwqLGXpy0mbyNe9Taqv1mg9yON5/o0cnr8XYCkFTZbC1eV+c+LAROgrng==
 
 "@babel/core@^7.1.0", "@babel/core@^7.12.3", "@babel/core@^7.7.2", "@babel/core@^7.8.0":
-  version "7.17.4"
-  resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.17.4.tgz#a22f1ae8999122873b3d18865e98c7a3936b8c8b"
-  integrity sha512-R9x5r4t4+hBqZTmioSnkrW+I6NmbojwjGT8p4G2Gw1thWbXIHGDnmGdLdFw0/7ljucdIrNRp7Npgb4CyBYzzJg==
+  version "7.17.5"
+  resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.17.5.tgz#6cd2e836058c28f06a4ca8ee7ed955bbf37c8225"
+  integrity sha512-/BBMw4EvjmyquN5O+t5eh0+YqB3XXJkYD2cjKpYtWOfFy4lQ4UozNSmxAcWT8r2XtZs0ewG+zrfsqeR15i1ajA==
   dependencies:
     "@ampproject/remapping" "^2.1.0"
     "@babel/code-frame" "^7.16.7"
@@ -714,9 +714,9 @@
     chalk "^4.0.0"
 
 "@joshdb/core@next":
-  version "2.1.0-next.66d885defb975a31f78caa9cf2110a5aaa129a51.0"
-  resolved "https://registry.yarnpkg.com/@joshdb/core/-/core-2.1.0-next.66d885defb975a31f78caa9cf2110a5aaa129a51.0.tgz#fd8c85d6591855a50da78a5ba8c97ebfcb26d589"
-  integrity sha512-Sq6qVwOyvXGyUYLouDxKVg0UmcPn8KuzrokpeCDyI+Y89oC/tOqUKLUMiN87Ju47GAh/hk1tEpRArpaGk1b0xw==
+  version "2.1.0-next.3532f5303ed17e9cd512ac9549b266e715636a54.0"
+  resolved "https://registry.yarnpkg.com/@joshdb/core/-/core-2.1.0-next.3532f5303ed17e9cd512ac9549b266e715636a54.0.tgz#588c1417a0b597e134de89bd873d78f5a38c3e1b"
+  integrity sha512-nlrogfdG6z5KJYtWfrYH13QbCt6is8A+D7gG/2GvvOXxKvV/hJvj6bSlotuun8KZ8ITpoH92Lb/cmn4c3yDy6w==
   dependencies:
     "@realware/utilities" "^2.0.2"
     "@sapphire/utilities" "^3.3.0"

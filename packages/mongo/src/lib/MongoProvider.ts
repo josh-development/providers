@@ -33,7 +33,6 @@ import {
   isRemoveByValuePayload,
   isSomeByHookPayload,
   isSomeByValuePayload,
-  JoshError,
   JoshProvider,
   KeysPayload,
   MapByHookPayload,
@@ -85,7 +84,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { collectionName = context.name, enforceCollectionName, authentication = MongoProvider.defaultAuthentication } = this.options;
 
     if (collectionName === undefined)
-      throw new JoshError({
+      throw this.error({
         message: 'A collection name must be provided if using this class without Josh.',
         identifier: MongoProvider.Identifiers.InitMissingCollectionName
       });
@@ -738,7 +737,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   private get client(): Mongoose {
     if (isNullOrUndefined(this._client))
-      throw new JoshError({
+      throw this.error({
         message: 'Client is not connected, most likely due to `init` not being called or the server not being available',
         identifier: MongoProvider.Identifiers.NotConnected
       });
@@ -748,7 +747,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   private get collection(): Model<MongoProvider.DocType> {
     if (isNullOrUndefined(this._collection))
-      throw new JoshError({
+      throw this.error({
         message: 'Client is not connected, most likely due to `init` not being called or the server not being available',
         identifier: MongoProvider.Identifiers.NotConnected
       });
