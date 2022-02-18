@@ -5,7 +5,9 @@
     "packages/*"
   ],
   "scripts": {
-    "benchmark": "tsc -b benchmarks/src && node benchmarks/dist/index.js",
+    "benchmark:build": "rimraf benchmarks/dist && tsc -b benchmarks/src",
+    "benchmark:start": "node benchmarks/dist/benchmarks/src/index.js",
+    "benchmark": "yarn benchmark:build && yarn benchmark:start",
     "generate": "node scripts/generate/generate.mjs",
     "clean": "rimraf benchmarks/dist packages/**/dist packages/**/node_modules/.cache",
     "docs": "typedoc",
@@ -18,12 +20,12 @@
     "prepare": "husky install"
   },
   "devDependencies": {
-    "@joshdb/core": "next",
     "@commitlint/cli": "^16.1.0",
     "@commitlint/config-conventional": "^16.0.0",
     "@faker-js/faker": "^6.0.0-alpha.6",
     "@favware/npm-deprecate": "^1.0.4",
     "@favware/rollup-type-bundler": "^1.0.5",
+    "@joshdb/core": "next",
     "@sapphire/eslint-config": "~4.0.11",
     "@sapphire/ts-config": "^3.1.8",
     "@types/jest": "^27.0.2",
@@ -39,6 +41,7 @@
     "jest-circus": "^27.2.5",
     "lint-staged": "^12.3.2",
     "ora": "^6.0.1",
+    "ora-classic": "^5.4.2",
     "prettier": "^2.4.1",
     "pretty-quick": "^3.1.1",
     "prompts": "^2.4.2",

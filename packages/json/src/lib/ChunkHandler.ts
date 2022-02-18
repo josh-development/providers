@@ -114,6 +114,29 @@ export class ChunkHandler<StoredValue = unknown> {
     return data[key];
   }
 
+  public async getMany(keys: string[]): Promise<Record<string, StoredValue | null>> {
+    await this.queue.wait();
+
+    const index = await this.index.fetch();
+
+    this.queue.shift();
+
+    const entries: Record<string, StoredValue | null> = {};
+
+    for (const chunk of index.chunks) {
+      if (chunk.keys.some((k) => keys.includes(k))) {
+        const file = this.getChunkFile(chunk.id);
+        const data = (await file.fetch()) ?? {};
+
+        for (const [key, value] of Object.entries(data)) if (keys.includes(key)) entries[key] = value;
+      }
+    }
+
+    for (const key of keys) if (!(key in entries)) entries[key] = null;
+
+    return entries;
+  }
+
   public async set<Value = StoredValue>(key: string, value: Value): Promise<void> {
     await this.queue.wait();
 
