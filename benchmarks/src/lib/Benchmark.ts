@@ -26,6 +26,7 @@ export class Benchmark {
       const josh = new Josh<Benchmark.TestCard>({ name: 'benchmark', provider });
 
       await josh.init();
+      await josh.clear();
 
       const testPerfData: [string, Benchmark.PerfData[]][] = [];
 
