@@ -20,6 +20,8 @@ export class Benchmark {
   public async run(): Promise<void> {
     console.log(magentaBright('\nRunning test benchmarks for Josh providers...\n'));
 
+    const allDatabases: { name: string; times: { test: string; time: number }[] }[] = [];
+    const scores: { [name: string]: { Score: number } } = {};
     const cards = this.generateCards();
 
     for (const [name, provider] of this.providers) {
@@ -73,6 +75,8 @@ export class Benchmark {
         testPerfData.push([test.name, perfData]);
       }
 
+      scores[name] = { Score: 0 };
+
       console.log(greenBright(`\n${name} Benchmark Results:`));
 
       console.table(
@@ -86,12 +90,43 @@ export class Benchmark {
             [gray(Benchmark.TableColumn.Total)]: this.totalTimeString(times)
           };
 
+          const dbIdx = allDatabases.findIndex((db) => db.name === name);
+
+          if (name !== 'MapProvider') {
+            if (dbIdx < 0) {
+              allDatabases.push({ name, times: [{ test: testName, time: Number(this.averageTimeString(times).split('μ')[0]) }] });
+            } else {
+              allDatabases[dbIdx].times.push({ test: testName, time: Number(this.averageTimeString(times).split('μ')[0]) });
+            }
+          }
+
           return table;
         }, {})
       );
 
       console.log('\n');
     }
+
+    for (const test of Benchmark.tests) {
+      const best = allDatabases.reduce((curr, acc) => {
+        const found = curr.times.find((x) => x.test === test.name);
+
+        if (!acc) return curr;
+
+        const foundAcc = acc.times.find((x) => x.test === test.name);
+
+        if (found && foundAcc && found.time < foundAcc.time) {
+          return curr;
+        }
+
+        return acc;
+      });
+
+      scores[best.name].Score++;
+    }
+
+    console.log(greenBright(`\nOverall Scores:`));
+    console.table(scores);
 
     process.exit(0);
   }
@@ -127,7 +162,7 @@ export class Benchmark {
     return `${times.reduce((acc, time) => acc + time, 0).toFixed(2)}μs`;
   }
 
-  public static cardCount = 100;
+  public static cardCount = 200;
 
   private static tests: Benchmark.Test[] = [
     {
