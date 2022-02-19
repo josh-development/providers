@@ -7,10 +7,12 @@ import { performance } from 'perf_hooks';
 import { toTitleCase } from './functions/toTitleCase';
 
 export class Benchmark {
-  private providers: JoshProvider<Benchmark.TestCard>[] = [];
+  private providers: [string, JoshProvider<Benchmark.TestCard>][] = [];
 
-  public add(provider: JoshProvider<Benchmark.TestCard> | (() => JoshProvider<Benchmark.TestCard>)): this {
-    this.providers.push(typeof provider === 'function' ? provider() : provider);
+  public add(provider: JoshProvider<Benchmark.TestCard> | (() => JoshProvider<Benchmark.TestCard>), name?: string): this {
+    if (typeof provider === 'function') provider = provider();
+
+    this.providers.push([name ?? provider.constructor.name, provider]);
 
     return this;
   }
@@ -20,8 +22,8 @@ export class Benchmark {
 
     const cards = this.generateCards();
 
-    for (const provider of this.providers) {
-      console.log(`${blueBright('Benchmark:')} ${cyanBright(provider.constructor.name)}\n`);
+    for (const [name, provider] of this.providers) {
+      console.log(`${blueBright('Benchmark:')} ${cyanBright(name)}\n`);
 
       const josh = new Josh<Benchmark.TestCard>({ name: 'benchmark', provider });
 
@@ -71,7 +73,7 @@ export class Benchmark {
         testPerfData.push([test.name, perfData]);
       }
 
-      console.log(greenBright(`\n${provider.constructor.name} Benchmark Results:`));
+      console.log(greenBright(`\n${name} Benchmark Results:`));
 
       console.table(
         testPerfData.reduce<Record<string, Record<string, string>>>((table, [testName, perfData]) => {
@@ -217,7 +219,7 @@ export class Benchmark {
       }
     },
     {
-      name: `${Method.Random}(!Duplicates)`,
+      name: `${Method.Random} (!Duplicates)`,
 
       beforeAll: async ({ josh, entries }) => {
         await josh.setMany(entries);
@@ -239,7 +241,7 @@ export class Benchmark {
       }
     },
     {
-      name: `${Method.RandomKey}(!Duplicates)`,
+      name: `${Method.RandomKey} (!Duplicates)`,
 
       beforeAll: async ({ josh, entries }) => {
         await josh.setMany(entries);
