@@ -714,9 +714,9 @@
     chalk "^4.0.0"
 
 "@joshdb/core@next":
-  version "2.1.0-next.2bb0b35075ad5a3174544f04c6aa03e1c54b0a5c.0"
-  resolved "https://registry.yarnpkg.com/@joshdb/core/-/core-2.1.0-next.2bb0b35075ad5a3174544f04c6aa03e1c54b0a5c.0.tgz#46188e472ebe32e44e51a585383c01e39d444dae"
-  integrity sha512-gTTm6l7Bo38Zqn0OL6GaXgImkVQmAn9Ybdodrqk1Y9jtG/NovsFA7IeIoihv4CE4ySPzbKo4aD5Hus+xQic7qQ==
+  version "3.0.0-next.235a8c1aee8a033f525213ab7495d0e0aff3d736.0"
+  resolved "https://registry.yarnpkg.com/@joshdb/core/-/core-3.0.0-next.235a8c1aee8a033f525213ab7495d0e0aff3d736.0.tgz#f1efc5f72f6a365db7cbc53a243091ca1e35c3cb"
+  integrity sha512-dnkpZNuVpLyIVPAfZnTtPh/7zQGi60Z6CL7U0+R6ja94Gn7/pP+MMew0zYB5VMoIYtsuqn+N0CfgX9bFYGRfXw==
   dependencies:
     "@realware/utilities" "^2.0.2"
     "@sapphire/utilities" "^3.3.0"
@@ -1429,9 +1429,9 @@ browser-process-hrtime@^1.0.0:
   integrity sha512-9o5UecI3GhkpM6DrXr69PblIuWxPKk9Y0jHBRhdocZ2y7YECBFCsHm79Pr3OyR2AvjhDkabFJaDJMYRazHgsow==
 
 browserslist@^4.17.5:
-  version "4.19.2"
-  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.19.2.tgz#9ba98791192a39e1242f0670bb265ceee1baf0a4"
-  integrity sha512-97XU1CTZ5TwU9Qy/Taj+RtiI6SQM1WIhZ9osT7EY0oO2aWXGABZT2OZeRL+6PfaQsiiMIjjwIoYFPq4APgspgQ==
+  version "4.19.3"
+  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.19.3.tgz#29b7caad327ecf2859485f696f9604214bedd383"
+  integrity sha512-XK3X4xtKJ+Txj8G5c30B4gsm71s69lqXlkYui4s6EkKxuv49qjYlY6oVd+IFJ73d4YymtM3+djvvt/R/iJwwDg==
   dependencies:
     caniuse-lite "^1.0.30001312"
     electron-to-chromium "^1.4.71"

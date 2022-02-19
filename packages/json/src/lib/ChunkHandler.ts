@@ -21,12 +21,12 @@ export class ChunkHandler<StoredValue = unknown> {
   public files: Record<string, ChunkFile<StoredValue>> = {};
 
   public constructor(options: ChunkHandlerOptions) {
-    const { name, dataDirectoryName, epoch, retry } = options;
+    const { name, version, dataDirectoryName, epoch, retry } = options;
 
     this.options = options;
     this.snowflake = epoch === undefined ? TwitterSnowflake : new Snowflake(epoch);
     this.directory = resolve(process.cwd(), dataDirectoryName ?? 'data', name);
-    this.index = new ChunkIndexFile({ directory: this.directory, retry });
+    this.index = new ChunkIndexFile({ directory: this.directory, version, retry });
   }
 
   public async init(): Promise<this> {
@@ -39,7 +39,7 @@ export class ChunkHandler<StoredValue = unknown> {
 
     const { name, synchronize } = this.options;
 
-    if (!this.index.exists) await this.index.save({ name, autoKeyCount: 0, chunks: [] });
+    if (!this.index.exists) await this.index.save({ name, version: this.options.version, autoKeyCount: 0, chunks: [] });
     if (synchronize) await this.synchronize();
 
     return this;
@@ -49,11 +49,11 @@ export class ChunkHandler<StoredValue = unknown> {
     await this.queue.wait();
 
     const index = await this.index.fetch();
-    const { maxChunkSize, retry } = this.options;
+    const { maxChunkSize } = this.options;
     const chunks = [];
 
     for (const chunk of index.chunks) {
-      const file = this.files[chunk.id] ?? (this.files[chunk.id] = new ChunkFile<StoredValue>({ directory: this.directory, id: chunk.id, retry }));
+      const file = this.getChunkFile(chunk.id);
 
       const data = await file.fetch();
 
@@ -77,7 +77,7 @@ export class ChunkHandler<StoredValue = unknown> {
       chunks.push(chunk);
     }
 
-    await this.index.save({ name: index.name, autoKeyCount: index.autoKeyCount, chunks });
+    await this.index.save({ name: index.name, version: index.version, autoKeyCount: index.autoKeyCount, chunks });
 
     this.queue.shift();
   }
@@ -101,8 +101,7 @@ export class ChunkHandler<StoredValue = unknown> {
 
     await this.queue.wait();
 
-    const { retry } = this.options;
-    const file = this.files[chunkId] ?? (this.files[chunkId] = new ChunkFile({ directory: this.directory, id: chunkId, retry }));
+    const file = this.getChunkFile(chunkId);
     const data = await file.fetch();
 
     if (data === undefined) return;
@@ -144,14 +143,14 @@ export class ChunkHandler<StoredValue = unknown> {
 
     this.queue.shift();
 
-    const { maxChunkSize, retry } = this.options;
+    const { maxChunkSize } = this.options;
     const chunkId = await this.locateChunkId(key);
     const chunk = index.chunks.find((chunk) => chunk.keys.length < maxChunkSize);
 
     await this.queue.wait();
 
     if (chunkId !== undefined) {
-      const file = this.files[chunkId] ?? (this.files[chunkId] = new ChunkFile({ directory: this.directory, id: chunkId, retry }));
+      const file = this.getChunkFile(chunkId);
 
       const data = (await file.fetch()) ?? {};
 
@@ -165,7 +164,7 @@ export class ChunkHandler<StoredValue = unknown> {
 
       await this.index.save(index);
       // @ts-expect-error 2345
-      await (this.files[chunkId] = new ChunkFile({ directory: this.directory, id: chunkId, retry })).save({ [key]: value });
+      await this.getChunkFile(chunkId).save({ [key]: value });
     } else {
       for (const c of index.chunks) if (c.id === chunk.id) c.keys.push(key);
 
@@ -237,8 +236,7 @@ export class ChunkHandler<StoredValue = unknown> {
 
     if (chunkId === undefined) return false;
 
-    const { retry } = this.options;
-    const file = this.files[chunkId] ?? (this.files[chunkId] = new ChunkFile({ directory: this.directory, id: chunkId, retry }));
+    const file = this.getChunkFile(chunkId);
 
     await this.queue.wait();
 
@@ -297,10 +295,9 @@ export class ChunkHandler<StoredValue = unknown> {
 
     const index = await this.index.fetch();
     const chunks = index.chunks.reduce<string[]>((chunks, chunk) => [...chunks, chunk.id], []);
-    const { retry } = this.options;
 
     for (const chunkId of chunks) {
-      const file = this.files[chunkId] ?? (this.files[chunkId] = new ChunkFile({ directory: this.directory, id: chunkId, retry }));
+      const file = this.getChunkFile(chunkId);
 
       if (file.exists) await file.delete();
 
@@ -404,14 +401,16 @@ export class ChunkHandler<StoredValue = unknown> {
   }
 
   private getChunkFile(chunkId: string): ChunkFile<StoredValue> {
-    const { retry } = this.options;
+    const { serialize, retry } = this.options;
 
-    return this.files[chunkId] ?? (this.files[chunkId] = new ChunkFile({ directory: this.directory, id: chunkId, retry }));
+    return this.files[chunkId] ?? (this.files[chunkId] = new ChunkFile({ directory: this.directory, id: chunkId, serialize, retry }));
   }
 }
 
 export interface ChunkHandlerOptions {
   name: string;
+
+  version: string | null;
 
   dataDirectoryName?: string;
 
@@ -420,6 +419,8 @@ export interface ChunkHandlerOptions {
   epoch?: number | bigint | Date;
 
   synchronize?: boolean;
+
+  serialize: boolean;
 
   retry?: File.RetryOptions;
 }

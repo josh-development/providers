@@ -77,14 +77,16 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
   public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
     context = await super.init(context);
 
-    const { dataDirectoryName, maxChunkSize, epoch, synchronize, retry } = this.options;
+    const { dataDirectoryName, maxChunkSize, epoch, synchronize, disableSerialization, retry } = this.options;
 
     this._handler = await new ChunkHandler<StoredValue>({
       name: context.name,
+      version: context.version ?? null,
       dataDirectoryName,
       maxChunkSize: maxChunkSize ?? 100,
       epoch,
       synchronize,
+      serialize: disableSerialization ? false : true,
       retry
     }).init();
 
@@ -762,6 +764,8 @@ export namespace JSONProvider {
     epoch?: number | bigint | Date;
 
     synchronize?: boolean;
+
+    disableSerialization?: boolean;
 
     retry?: File.RetryOptions;
   }

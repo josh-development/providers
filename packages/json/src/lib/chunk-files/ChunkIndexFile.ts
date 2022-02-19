@@ -3,19 +3,22 @@ import { File } from '../File';
 import { ChunkLockFile } from './ChunkLockFile';
 
 export class ChunkIndexFile extends File {
+  public version: string | null;
+
   public lock: ChunkLockFile;
 
   public constructor(options: ChunkIndexFile.Options) {
-    const { directory, retry } = options;
+    const { directory, version, retry } = options;
 
-    super({ directory, name: 'index.json', retry });
+    super({ directory, name: 'index.json', serialize: false, retry });
 
-    this.lock = new ChunkLockFile({ directory, id: 'index', retry });
+    this.version = version;
+    this.lock = new ChunkLockFile({ directory, id: 'index', serialize: false, retry });
   }
 
   public async fetch(): Promise<ChunkIndexFile.Data> {
     if (!this.exists) {
-      await this.save({ name: this.options.name, autoKeyCount: 0, chunks: [] });
+      await this.save({ name: this.options.name, version: this.version, autoKeyCount: 0, chunks: [] });
 
       return this.fetch();
     }
@@ -37,17 +40,21 @@ export class ChunkIndexFile extends File {
 
 export namespace ChunkIndexFile {
   export interface Options {
+    version: string | null;
+
     directory: string;
 
     retry?: File.RetryOptions;
   }
 
   export interface Data {
-    chunks: Chunk[];
+    name: string;
+
+    version: string | null;
 
     autoKeyCount: number;
 
-    name: string;
+    chunks: Chunk[];
   }
 
   export interface Chunk {

@@ -19,11 +19,15 @@ export class File<StoredValue = unknown> {
   }
 
   public async read<Data = File.Data<StoredValue>>(): Promise<Data> {
-    return this.attempt<Data>(async () => new Serialize({ json: JSON.parse(await readFile(this.path, { encoding: 'utf-8' })) }).toRaw<Data>());
+    return this.attempt<Data>(async () =>
+      this.options.serialize
+        ? new Serialize({ json: JSON.parse(await readFile(this.path, { encoding: 'utf-8' })) }).toRaw<Data>()
+        : JSON.parse(await readFile(this.path, { encoding: 'utf-8' }))
+    );
   }
 
   public async write<Data = File.Data<StoredValue>>(data: Data): Promise<void> {
-    await this.attempt(() => writeFile(this.path, JSON.stringify(new Serialize({ raw: data }).toJSON())));
+    await this.attempt(() => writeFile(this.path, JSON.stringify(this.options.serialize ? new Serialize({ raw: data }).toJSON() : data)));
   }
 
   public async copy(to: string): Promise<void> {
@@ -64,6 +68,8 @@ export namespace File {
     directory: string;
 
     name: string;
+
+    serialize: boolean;
 
     retry?: RetryOptions;
   }
