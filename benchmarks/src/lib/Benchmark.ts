@@ -1,4 +1,4 @@
-import faker from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 import type { Card } from '@faker-js/faker/helpers';
 import { Josh, JoshProvider, MathOperator, Method } from '@joshdb/core';
 import { blueBright, cyanBright, gray, greenBright, magentaBright } from 'colorette';
@@ -103,7 +103,7 @@ export class Benchmark {
     for (let i = 0; i < Benchmark.cardCount; i++) {
       spinner.text = `Card Generation (${i}/${Benchmark.cardCount})`;
 
-      cards[i.toString()] = { id: i.toString(), net: 0, ...faker.helpers.createCard() };
+      cards[i.toString()] = { id: i.toString(), net: 0, ids: [], ...faker.helpers.createCard() };
     }
 
     spinner.succeed('Card Generation Complete\n');
@@ -131,6 +131,13 @@ export class Benchmark {
 
   private static tests: Benchmark.Test[] = [
     {
+      name: Method.AutoKey,
+
+      run: async ({ josh }) => {
+        await josh.autoKey();
+      }
+    },
+    {
       name: Method.Clear,
 
       beforeEach: async ({ josh, entries }) => {
@@ -139,6 +146,17 @@ export class Benchmark {
 
       run: async ({ josh }) => {
         await josh.clear();
+      }
+    },
+    {
+      name: Method.Dec,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh, card }) => {
+        await josh.dec(`${card.id}.net`);
       }
     },
     {
@@ -161,6 +179,90 @@ export class Benchmark {
 
       run: async ({ josh, keys }) => {
         await josh.deleteMany(keys);
+      }
+    },
+    {
+      name: `${Method.Ensure} (${Method.Get})`,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh, card }) => {
+        await josh.ensure(card.id, card);
+      }
+    },
+    {
+      name: `${Method.Ensure} (${Method.Set})`,
+
+      run: async ({ josh, card }) => {
+        await josh.ensure(card.id, card);
+      }
+    },
+    {
+      name: `${Method.Every} (Path)`,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh }) => {
+        await josh.every('net', '0');
+      }
+    },
+    {
+      name: `${Method.Every} (Function)`,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh }) => {
+        await josh.every((card) => card.net === 0);
+      }
+    },
+    {
+      name: `${Method.Filter} (Path)`,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh }) => {
+        await josh.filter('net', '0');
+      }
+    },
+    {
+      name: `${Method.Filter} (Function)`,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh }) => {
+        await josh.filter((card) => card.net === 0);
+      }
+    },
+    {
+      name: `${Method.Find} (Path)`,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh }) => {
+        await josh.find('net', '0');
+      }
+    },
+    {
+      name: `${Method.Find} (Function)`,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh }) => {
+        await josh.find((card) => card.net === 0);
       }
     },
     {
@@ -197,6 +299,61 @@ export class Benchmark {
       }
     },
     {
+      name: Method.Has,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh, card }) => {
+        await josh.has(card.id);
+      }
+    },
+    {
+      name: Method.Inc,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh, card }) => {
+        await josh.inc(`${card.id}.net`);
+      }
+    },
+    {
+      name: Method.Keys,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh }) => {
+        await josh.keys();
+      }
+    },
+    {
+      name: `${Method.Map} (Path)`,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh }) => {
+        await josh.map('net');
+      }
+    },
+    {
+      name: `${Method.Map} (Function)`,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh }) => {
+        await josh.map((card) => card.net);
+      }
+    },
+    {
       name: Method.Math,
 
       beforeAll: async ({ josh, entries }) => {
@@ -205,6 +362,39 @@ export class Benchmark {
 
       run: async ({ josh, card }) => {
         await josh.math(`${card.id}.net`, MathOperator.Addition, 1);
+      }
+    },
+    {
+      name: `${Method.Partition} (Path)`,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh }) => {
+        await josh.partition('net', 0);
+      }
+    },
+    {
+      name: `${Method.Partition} (Function)`,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh }) => {
+        await josh.partition((card) => card.net === 0);
+      }
+    },
+    {
+      name: Method.Push,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh, card }) => {
+        await josh.push(`${card.id}.ids`, card.id);
       }
     },
     {
@@ -252,6 +442,17 @@ export class Benchmark {
       }
     },
     {
+      name: Method.Remove,
+
+      beforeAll: async ({ josh, entries, keys }) => {
+        await josh.setMany(entries.map(([id, card]) => [id, { ...card, ids: keys }]));
+      },
+
+      run: async ({ josh, card }) => {
+        await josh.remove(`${card.id}.ids`, card.id);
+      }
+    },
+    {
       name: Method.Set,
 
       beforeAll: async ({ josh }) => {
@@ -271,6 +472,60 @@ export class Benchmark {
 
       run: async ({ josh, entries }) => {
         await josh.setMany(entries);
+      }
+    },
+    {
+      name: Method.Size,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+      run: async ({ josh }) => {
+        await josh.size();
+      }
+    },
+    {
+      name: `${Method.Some} (Path)`,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh }) => {
+        await josh.some('net', 0);
+      }
+    },
+    {
+      name: `${Method.Some} (Function)`,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh }) => {
+        await josh.some((card) => card.net === 0);
+      }
+    },
+    {
+      name: Method.Update,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh, card }) => {
+        await josh.update(card.id, (card) => ({ ...card, net: card.net + 1 }));
+      }
+    },
+    {
+      name: Method.Values,
+
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
+      },
+
+      run: async ({ josh }) => {
+        await josh.values();
       }
     }
   ];
@@ -305,6 +560,8 @@ export namespace Benchmark {
     id: string;
 
     net: number;
+
+    ids: string[];
   }
 
   export interface PerfData {

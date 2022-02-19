@@ -714,9 +714,9 @@
     chalk "^4.0.0"
 
 "@joshdb/core@next":
-  version "3.0.0-next.235a8c1aee8a033f525213ab7495d0e0aff3d736.0"
-  resolved "https://registry.yarnpkg.com/@joshdb/core/-/core-3.0.0-next.235a8c1aee8a033f525213ab7495d0e0aff3d736.0.tgz#f1efc5f72f6a365db7cbc53a243091ca1e35c3cb"
-  integrity sha512-dnkpZNuVpLyIVPAfZnTtPh/7zQGi60Z6CL7U0+R6ja94Gn7/pP+MMew0zYB5VMoIYtsuqn+N0CfgX9bFYGRfXw==
+  version "3.0.0-next.74e6ac06eead64d7466121f82d29e1b145f9ed67.0"
+  resolved "https://registry.yarnpkg.com/@joshdb/core/-/core-3.0.0-next.74e6ac06eead64d7466121f82d29e1b145f9ed67.0.tgz#d0f78ccfeb01386ad4eeaac4dd0e7359a01007dd"
+  integrity sha512-rtQR2iQEzU6t27jP9upJxDHivUwcO9qqTHLvEddQI6I8aEWncIYGa7coKnlafWEaYcPSqoLVadtVZHxsdQmdCQ==
   dependencies:
     "@realware/utilities" "^2.0.2"
     "@sapphire/utilities" "^3.3.0"

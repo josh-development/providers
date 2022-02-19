@@ -1,8 +1,8 @@
 /.github/ @RealShadowNova
 /.husky/ @RealShadowNova
 /.vscode/ @RealShadowNova
-/docs/ @RealShadowNova
-/packages/example/ @RealShadowNova
+/benchmarks/ @RealShadowNova @dan-online
 /packages/mongo/ @dan-online
 /packages/json/ @RealShadowNova
+/scripts/ @RealShadowNova
 /tests/ @WilsontheWolf

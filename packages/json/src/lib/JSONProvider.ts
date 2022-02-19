@@ -208,10 +208,20 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     if (isEveryByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for (const key of (await this.keys({ method: Method.Keys, data: [] })).data) {
-        const { data } = await this.get({ method: Method.Get, key, path });
+      for (const storedValue of await this.handler.values()) {
+        if (payload.path.length === 0) {
+          if (!isPrimitive(storedValue)) {
+            payload.error = this.error({
+              identifier: JSONProvider.CommonIdentifiers.EveryInvalidType,
+              message: 'The "value" must be of type primitive.',
+              method: Method.Every
+            });
 
-        if (value === data) continue;
+            return payload;
+          }
+
+          if (storedValue === value) continue;
+        } else if (getFromObject(storedValue, path) === value) continue;
 
         payload.data = false;
       }
