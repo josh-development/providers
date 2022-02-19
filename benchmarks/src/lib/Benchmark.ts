@@ -32,36 +32,39 @@ export class Benchmark {
       for (const test of Benchmark.tests) {
         const spinner = ora(toTitleCase(test.name)).start();
         const perfData: Benchmark.PerfData[] = [];
+        const runOptions: Benchmark.TestRunOptions = {
+          josh,
+
+          keys: Object.keys(cards),
+
+          values: Object.values(cards),
+
+          entries: Object.entries(cards)
+        };
+
+        if (test.beforeAll !== undefined) await test.beforeAll(runOptions);
 
         for (const [id, card] of Object.entries(cards)) {
-          const options: Benchmark.TestRunOptions = {
-            josh,
+          const runEachOptions: Benchmark.TestRunEachOptions = {
+            ...runOptions,
 
-            card,
-
-            keys: Object.keys(cards),
-
-            values: Object.values(cards),
-
-            entries: Object.entries(cards)
+            card
           };
 
-          if (test.pre !== undefined) await test.pre(options);
+          if (test.beforeEach !== undefined) await test.beforeEach(runEachOptions);
 
           const start = performance.now();
 
-          await test.run(options);
+          await test.run(runEachOptions);
 
           const end = performance.now();
-
-          if (test.post !== undefined) await test.post(options);
 
           spinner.text = `${toTitleCase(test.name)} (${id}/${Benchmark.cardCount})`;
 
           perfData.push({ name: test.name, time: end - start });
-
-          await josh.clear();
         }
+
+        await josh.clear();
 
         spinner.succeed(toTitleCase(test.name));
         testPerfData.push([test.name, perfData]);
@@ -121,13 +124,13 @@ export class Benchmark {
     return `${times.reduce((acc, time) => acc + time, 0).toFixed(2)}μs`;
   }
 
-  public static cardCount = 1000;
+  public static cardCount = 100;
 
   private static tests: Benchmark.Test[] = [
     {
       name: Method.Clear,
 
-      pre: async ({ josh, entries }) => {
+      beforeEach: async ({ josh, entries }) => {
         await josh.setMany(entries);
       },
 
@@ -138,8 +141,8 @@ export class Benchmark {
     {
       name: Method.Delete,
 
-      pre: async ({ josh, card }) => {
-        await josh.set(card.id, card);
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
       },
 
       run: async ({ josh, card }) => {
@@ -149,7 +152,7 @@ export class Benchmark {
     {
       name: Method.DeleteMany,
 
-      pre: async ({ josh, entries }) => {
+      beforeEach: async ({ josh, entries }) => {
         await josh.setMany(entries);
       },
 
@@ -160,7 +163,7 @@ export class Benchmark {
     {
       name: Method.Get,
 
-      pre: async ({ josh, card }) => {
+      beforeEach: async ({ josh, card }) => {
         await josh.set(card.id, card);
       },
 
@@ -171,7 +174,7 @@ export class Benchmark {
     {
       name: Method.GetAll,
 
-      pre: async ({ josh, entries }) => {
+      beforeAll: async ({ josh, entries }) => {
         await josh.setMany(entries);
       },
 
@@ -182,7 +185,7 @@ export class Benchmark {
     {
       name: Method.GetMany,
 
-      pre: async ({ josh, entries }) => {
+      beforeAll: async ({ josh, entries }) => {
         await josh.setMany(entries);
       },
 
@@ -193,8 +196,8 @@ export class Benchmark {
     {
       name: Method.Math,
 
-      pre: async ({ josh, card }) => {
-        await josh.set(card.id, card);
+      beforeAll: async ({ josh, entries }) => {
+        await josh.setMany(entries);
       },
 
       run: async ({ josh, card }) => {
@@ -204,7 +207,7 @@ export class Benchmark {
     {
       name: Method.Random,
 
-      pre: async ({ josh, entries }) => {
+      beforeAll: async ({ josh, entries }) => {
         await josh.setMany(entries);
       },
 
@@ -215,7 +218,7 @@ export class Benchmark {
     {
       name: `${Method.Random}(!Duplicates)`,
 
-      pre: async ({ josh, entries }) => {
+      beforeAll: async ({ josh, entries }) => {
         await josh.setMany(entries);
       },
 
@@ -226,7 +229,7 @@ export class Benchmark {
     {
       name: Method.RandomKey,
 
-      pre: async ({ josh, entries }) => {
+      beforeAll: async ({ josh, entries }) => {
         await josh.setMany(entries);
       },
 
@@ -237,7 +240,7 @@ export class Benchmark {
     {
       name: `${Method.RandomKey}(!Duplicates)`,
 
-      pre: async ({ josh, entries }) => {
+      beforeAll: async ({ josh, entries }) => {
         await josh.setMany(entries);
       },
 
@@ -248,12 +251,20 @@ export class Benchmark {
     {
       name: Method.Set,
 
+      beforeAll: async ({ josh }) => {
+        await josh.clear();
+      },
+
       run: async ({ josh, card }) => {
         await josh.set(card.id, card);
       }
     },
     {
       name: Method.SetMany,
+
+      beforeAll: async ({ josh }) => {
+        await josh.clear();
+      },
 
       run: async ({ josh, entries }) => {
         await josh.setMany(entries);
@@ -266,23 +277,25 @@ export namespace Benchmark {
   export interface Test {
     name: string;
 
-    pre?: (options: TestRunOptions) => Awaitable<void>;
+    beforeAll?: (options: TestRunOptions) => Awaitable<void>;
 
-    run(options: TestRunOptions): Awaitable<void>;
+    beforeEach?: (options: TestRunEachOptions) => Awaitable<void>;
 
-    post?: (options: TestRunOptions) => Awaitable<void>;
+    run(options: TestRunEachOptions): Awaitable<void>;
   }
 
   export interface TestRunOptions {
     josh: Josh<TestCard>;
-
-    card: TestCard;
 
     keys: string[];
 
     values: TestCard[];
 
     entries: [string, TestCard][];
+  }
+
+  export interface TestRunEachOptions extends TestRunOptions {
+    card: TestCard;
   }
 
   export interface TestCard extends Card {

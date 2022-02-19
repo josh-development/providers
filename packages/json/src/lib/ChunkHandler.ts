@@ -268,7 +268,7 @@ export class ChunkHandler<StoredValue = unknown> {
 
     this.queue.shift();
 
-    for (const chunk of index.chunks) {
+    for (const chunk of index.chunks.filter((chunk) => chunk.keys.some((k) => keys.includes(k)))) {
       const file = this.getChunkFile(chunk.id);
       const data = (await file.fetch()) ?? {};
 

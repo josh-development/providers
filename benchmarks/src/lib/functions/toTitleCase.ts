@@ -1,7 +1,9 @@
 const TO_TITLE_CASE = /[A-Za-zÀ-ÖØ-öø-ÿ]\S*/g;
 const titleCaseVariants: Record<string, string> = {
   deletemany: 'DeleteMany',
+  getall: 'GetAll',
   getmany: 'GetMany',
+  randomkey: 'RandomKey',
   setmany: 'SetMany'
 };
 
