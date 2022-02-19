@@ -7,7 +7,7 @@ const benchmark = new Benchmark();
 
 void benchmark
   .add(new MapProvider())
-  .add(new JSONProvider({ dataDirectoryName: '.bench' }))
-  .add(new JSONProvider({ dataDirectoryName: '.bench', disableSerialization: true }), 'JSON (!Serialize)')
-  .add(new MongoProvider({ collectionName: 'benchmark' }))
+  .add(new JSONProvider({ dataDirectoryName: '.bench' }), 'JSONProvider (Serialize)')
+  .add(new JSONProvider({ dataDirectoryName: '.bench', disableSerialization: true }))
+  .add(new MongoProvider({ collectionName: 'benchmark' }), 'MongoProvider (Serialize)')
   .run();

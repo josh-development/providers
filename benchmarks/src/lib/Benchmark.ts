@@ -398,7 +398,7 @@ export class Benchmark {
       }
     },
     {
-      name: Method.Random,
+      name: `${Method.Random} (Duplicates)`,
 
       beforeAll: async ({ josh, entries }) => {
         await josh.setMany(entries);
@@ -409,7 +409,7 @@ export class Benchmark {
       }
     },
     {
-      name: `${Method.Random} (!Duplicates)`,
+      name: Method.Random,
 
       beforeAll: async ({ josh, entries }) => {
         await josh.setMany(entries);
@@ -420,7 +420,7 @@ export class Benchmark {
       }
     },
     {
-      name: Method.RandomKey,
+      name: `${Method.RandomKey} (Duplicates)`,
 
       beforeAll: async ({ josh, entries }) => {
         await josh.setMany(entries);
@@ -431,7 +431,7 @@ export class Benchmark {
       }
     },
     {
-      name: `${Method.RandomKey} (!Duplicates)`,
+      name: Method.RandomKey,
 
       beforeAll: async ({ josh, entries }) => {
         await josh.setMany(entries);
