@@ -3,6 +3,7 @@ const titleCaseVariants: Record<string, string> = {
   mapprovider: 'MapProvider',
   jsonprovider: 'JSONProvider',
   mongoprovider: 'MongoProvider',
+  autokey: 'AutoKey',
   deletemany: 'DeleteMany',
   getall: 'GetAll',
   getmany: 'GetMany',

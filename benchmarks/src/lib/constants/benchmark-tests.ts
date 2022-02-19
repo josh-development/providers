@@ -401,3 +401,19 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
     }
   }
 ];
+
+export const BASIC_BENCHMARK_TESTS = BENCHMARK_TESTS.filter((test) =>
+  [
+    Method.Clear,
+    Method.Delete,
+    Method.DeleteMany,
+    Method.Get,
+    Method.GetAll,
+    Method.GetMany,
+    Method.Math,
+    Method.Random,
+    Method.RandomKey,
+    Method.Set,
+    Method.SetMany
+  ].includes(test.name.toLowerCase() as Method)
+);
