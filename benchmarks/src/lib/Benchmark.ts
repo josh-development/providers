@@ -50,7 +50,7 @@ export class Benchmark {
 
       const result: Benchmark.PerformanceProviderResult = {
         name,
-
+        total: 0,
         tests: []
       };
 
@@ -100,6 +100,8 @@ export class Benchmark {
         result.tests.push(testResult);
       }
 
+      result.total = result.tests.reduce((acc, test) => acc + test.times.reduce((acc, time) => acc + time, 0), 0);
+
       console.log(greenBright(`\n${name} Benchmark Results:`));
 
       console.table(
@@ -121,6 +123,47 @@ export class Benchmark {
 
       results.push(result);
     }
+
+    // if (this.tests.length <= 8)
+    //   console.table(
+    //     results
+    //       .map((result) => ({
+    //         Name: result.name,
+    //         ...result.tests.reduce<{ [key: string]: string }>((table, result) => {
+    //           const { name, times } = result;
+
+    //           table[name] = this.averageTimeString(times);
+
+    //           return table;
+    //         }, {}),
+    //         total:
+    //           Math.round(result.tests.map(({ times }) => times.reduce((prev, curr) => prev + curr, 0)).reduce((prev, curr) => prev + curr, 0) * 100) /
+    //           100
+    //       }))
+    //       .sort((a, b) => a.total - b.total)
+    //   );
+
+    results.sort((a, b) => a.total - b.total);
+
+    const table: { [key: string]: any } = {};
+
+    for (const test of this.tests) {
+      table[test.name] = {};
+
+      for (const result of results) {
+        const found = result.tests.find((result) => result.name === test.name);
+
+        if (found) table[test.name][result.name] = this.averageTimeString(found.times);
+      }
+    }
+
+    table['Total'] = {};
+
+    for (const result of results) {
+      table['Total'][result.name] = this.totalTimeString(result.tests.map((result) => result.times.reduce((prev, curr) => prev + curr, 0)));
+    }
+
+    console.table(table);
 
     return results;
   }
@@ -212,6 +255,7 @@ export namespace Benchmark {
 
   export interface PerformanceProviderResult extends PerformanceResult {
     tests: PerformanceTestResult[];
+    total: number;
   }
 
   export enum TableColumn {

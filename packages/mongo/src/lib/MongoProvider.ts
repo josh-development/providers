@@ -219,10 +219,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isEveryByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for (const key of (await this.keys({ method: Method.Keys, data: [] })).data) {
-        const { data } = await this.get({ method: Method.Get, key, path });
-
-        if (value === data) continue;
+      for (const [_key, data] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data)) {
+        if (value === getFromObject(data, path)) continue;
 
         payload.data = false;
       }
@@ -316,7 +314,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       return payload;
     }
 
-    Reflect.set(payload, 'data', this.deserialize(doc.value));
+    Reflect.set(payload, 'data', this.options.disableSerialization ? doc.value : this.deserialize(doc.value));
 
     if (path.length > 0) payload.data = getFromObject(payload.data, path);
 
@@ -326,7 +324,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.GetAll](payload: GetAllPayload<StoredValue>): Promise<GetAllPayload<StoredValue>> {
     const docs = (await this.collection.find({})) || [];
 
-    for (const doc of docs) Reflect.set(payload.data, doc.key, this.deserialize(doc.value));
+    for (const doc of docs) Reflect.set(payload.data, doc.key, this.options.disableSerialization ? doc.value : this.deserialize(doc.value));
 
     return payload;
   }
@@ -336,7 +334,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     const docs = (await this.collection.find({ key: { $in: keys } })) || [];
 
-    for (const doc of docs) Reflect.set(payload.data, doc.key, this.deserialize(doc.value));
+    for (const doc of docs) Reflect.set(payload.data, doc.key, this.options.disableSerialization ? doc.value : this.deserialize(doc.value));
 
     return payload;
   }
@@ -554,7 +552,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     const docs: MongoProvider.DocType[] = (await this.collection.aggregate(aggr)) || [];
 
-    if (docs.length > 0) payload.data = docs.map((doc) => this.deserialize(doc.value));
+    if (docs.length > 0) payload.data = docs.map((doc) => (this.options.disableSerialization ? doc.value : this.deserialize(doc.value)));
 
     return payload;
   }
@@ -631,13 +629,14 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Set]<Value = StoredValue>(payload: SetPayload<Value>): Promise<SetPayload<Value>> {
     const { key, path, value } = payload;
+    const val = path.length > 0 ? setToObject((await this.get({ method: Method.Get, key, path })).data, path, value) : value;
 
     await this.collection.findOneAndUpdate(
       {
         key: { $eq: key }
       },
       {
-        $set: { value: this.serialize(path.length > 0 ? setToObject((await this.get({ method: Method.Get, key, path })).data, path, value) : value) }
+        $set: { value: this.options.disableSerialization ? val : this.serialize(val) }
       },
       {
         upsert: true
@@ -658,13 +657,15 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         if (found) continue;
       }
 
+      const val = path.length > 0 ? setToObject((await this.get({ method: Method.Get, key, path: [] })).data, path, value) : value;
+
       operations.push({
         updateOne: {
           filter: { key },
           upsert: true,
           update: {
             $set: {
-              value: this.serialize(path.length > 0 ? setToObject((await this.get({ method: Method.Get, key, path: [] })).data, path, value) : value)
+              value: this.options.disableSerialization ? val : this.serialize(val)
             }
           }
         }
@@ -730,7 +731,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Values](payload: ValuesPayload<StoredValue>): Promise<ValuesPayload<StoredValue>> {
     const docs = (await this.collection.find({})) || [];
 
-    for (const doc of docs) payload.data.push(this.deserialize(doc.value));
+    for (const doc of docs) payload.data.push(this.options.disableSerialization ? doc.value : this.deserialize(doc.value));
 
     return payload;
   }
@@ -775,6 +776,8 @@ export namespace MongoProvider {
     enforceCollectionName?: boolean;
 
     authentication?: Partial<Authentication> | string;
+
+    disableSerialization?: boolean;
   }
 
   export interface Authentication {
@@ -792,7 +795,7 @@ export namespace MongoProvider {
   export interface DocType extends Document {
     key: string;
 
-    value: string;
+    value: any;
   }
 
   export enum Identifiers {

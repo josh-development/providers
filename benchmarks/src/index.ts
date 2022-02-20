@@ -11,7 +11,8 @@ async function main() {
     .add(new MapProvider())
     .add(new JSONProvider({ dataDirectoryName: '.bench' }), 'JSONProvider (Serialize)')
     .add(new JSONProvider({ dataDirectoryName: '.bench', disableSerialization: true }))
-    .add(new MongoProvider({ collectionName: 'benchmark' }), 'MongoProvider (Serialize)');
+    .add(new MongoProvider({ collectionName: 'benchmark' }), 'MongoProvider (Serialize)')
+    .add(new MongoProvider({ collectionName: 'benchmark', disableSerialization: true }));
 
   const response = await prompts([
     { type: 'number', name: 'cardCount', message: 'How many cards do you want to test?', initial: Benchmark.defaultCardCount },
