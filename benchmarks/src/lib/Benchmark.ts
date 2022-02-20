@@ -255,6 +255,7 @@ export namespace Benchmark {
 
   export interface PerformanceProviderResult extends PerformanceResult {
     tests: PerformanceTestResult[];
+
     total: number;
   }
 
