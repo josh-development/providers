@@ -19,7 +19,7 @@ describe('File', () => {
   describe('can manipulate file', () => {
     const firstId = TwitterSnowflake.generate().toString();
     const secondPath = resolve(process.cwd(), '.tests', 'file', `${TwitterSnowflake.generate().toString()}.json`);
-    const file = new File({ directory: resolve(process.cwd(), '.tests', 'file'), name: `${firstId}.json` });
+    const file = new File({ directory: resolve(process.cwd(), '.tests', 'file'), name: `${firstId}.json`, serialize: true });
 
     beforeAll(async () => {
       await mkdir(file.options.directory, { recursive: true });
