@@ -46,9 +46,7 @@ export class ChunkHandler<StoredValue = unknown> {
   }
 
   public async synchronize(): Promise<void> {
-    await this.queue.wait();
-
-    const index = await this.index.fetch();
+    const [index, done] = await this.useQueue();
     const { maxChunkSize } = this.options;
     const chunks = [];
 
@@ -79,19 +77,111 @@ export class ChunkHandler<StoredValue = unknown> {
 
     await this.index.save({ name: index.name, version: index.version, autoKeyCount: index.autoKeyCount, chunks });
 
-    this.queue.shift();
+    done();
+  }
+
+  public async clear(): Promise<void> {
+    const [index, done] = await this.useQueue();
+    const chunks = index.chunks.reduce<string[]>((chunks, chunk) => [...chunks, chunk.id], []);
+
+    for (const chunkId of chunks) {
+      const file = this.getChunkFile(chunkId);
+
+      if (file.exists) await file.delete();
+
+      Reflect.deleteProperty(this.files, chunkId);
+    }
+
+    index.chunks = [];
+    index.autoKeyCount = 0;
+
+    await this.index.save(index);
+
+    done();
+  }
+
+  public async delete(key: string): Promise<boolean> {
+    const chunkId = await this.locateChunkId(key);
+
+    if (chunkId === undefined) return false;
+
+    const file = this.getChunkFile(chunkId);
+
+    const [index, done] = await this.useQueue();
+
+    const data = (await file.fetch()) ?? {};
+
+    Reflect.deleteProperty(data, key);
+
+    await file.save(data);
+
+    for (const chunk of index.chunks) if (chunk.keys.some((k) => k === key)) chunk.keys = chunk.keys.filter((k) => k !== key);
+
+    await this.index.save(index);
+
+    done();
+
+    await this.cleanupEmptyChunks();
+
+    return true;
+  }
+
+  public async deleteMany(keys: string[]): Promise<void> {
+    const index = await this.fetchIndex();
+
+    for (const chunk of index.chunks.filter((chunk) => chunk.keys.some((k) => keys.includes(k)))) {
+      await this.queue.wait();
+
+      const file = this.getChunkFile(chunk.id);
+      const data = (await file.fetch()) ?? {};
+
+      for (const key of keys.filter((key) => chunk.keys.includes(key))) {
+        Reflect.deleteProperty(data, key);
+
+        chunk.keys = chunk.keys.filter((k) => k !== key);
+      }
+
+      keys = keys.filter((key) => !chunk.keys.includes(key));
+
+      await file.save(data);
+      await this.index.save(index);
+
+      this.queue.shift();
+
+      await this.cleanupEmptyChunks();
+    }
+  }
+
+  public async entries(): Promise<[string, StoredValue][]> {
+    const [index, done] = await this.useQueue();
+    const entries = [];
+
+    for (const chunk of index.chunks) {
+      const file = this.getChunkFile(chunk.id);
+      const data = await file.fetch();
+
+      if (data === undefined) continue;
+
+      entries.push(...Object.entries(data));
+    }
+
+    done();
+
+    return entries;
   }
 
   public async has(key: string): Promise<boolean> {
-    await this.queue.wait();
-
-    const index = await this.index.fetch();
-
-    this.queue.shift();
+    const index = await this.fetchIndex();
 
     for (const chunk of index.chunks) if (chunk.keys.some((k) => k === key)) return true;
 
     return false;
+  }
+
+  public async keys(): Promise<string[]> {
+    const index = await this.fetchIndex();
+
+    return index.chunks.reduce<string[]>((keys, chunk) => [...keys, ...chunk.keys], []);
   }
 
   public async get(key: string): Promise<StoredValue | undefined> {
@@ -114,12 +204,7 @@ export class ChunkHandler<StoredValue = unknown> {
   }
 
   public async getMany(keys: string[]): Promise<Record<string, StoredValue | null>> {
-    await this.queue.wait();
-
-    const index = await this.index.fetch();
-
-    this.queue.shift();
-
+    const [index, done] = await this.useQueue();
     const entries: Record<string, StoredValue | null> = {};
 
     for (const chunk of index.chunks) {
@@ -131,23 +216,18 @@ export class ChunkHandler<StoredValue = unknown> {
       }
     }
 
+    done();
+
     for (const key of keys) if (!(key in entries)) entries[key] = null;
 
     return entries;
   }
 
   public async set<Value = StoredValue>(key: string, value: Value): Promise<void> {
-    await this.queue.wait();
-
-    const index = await this.index.fetch();
-
-    this.queue.shift();
-
     const { maxChunkSize } = this.options;
     const chunkId = await this.locateChunkId(key);
+    const [index, done] = await this.useQueue();
     const chunk = index.chunks.find((chunk) => chunk.keys.length < maxChunkSize);
-
-    await this.queue.wait();
 
     if (chunkId !== undefined) {
       const file = this.getChunkFile(chunkId);
@@ -178,16 +258,11 @@ export class ChunkHandler<StoredValue = unknown> {
       await file.save(data);
     }
 
-    this.queue.shift();
+    done();
   }
 
   public async setMany(entries: [string, StoredValue][], overwrite: boolean): Promise<void> {
-    await this.queue.wait();
-
-    const index = await this.index.fetch();
-
-    this.queue.shift();
-
+    const [index, done] = await this.useQueue();
     const { maxChunkSize } = this.options;
 
     for (const chunk of index.chunks) {
@@ -209,8 +284,6 @@ export class ChunkHandler<StoredValue = unknown> {
     }
 
     if (entries.length > 0) {
-      await this.queue.wait();
-
       const chunks = [];
 
       while (entries.length > 0) chunks.push(entries.splice(0, maxChunkSize));
@@ -226,106 +299,19 @@ export class ChunkHandler<StoredValue = unknown> {
 
         await file.save(chunk.reduce<Record<string, StoredValue>>((data, [key, value]) => ({ ...data, [key]: value }), {}));
       }
-
-      this.queue.shift();
-    }
-  }
-
-  public async delete(key: string): Promise<boolean> {
-    const chunkId = await this.locateChunkId(key);
-
-    if (chunkId === undefined) return false;
-
-    const file = this.getChunkFile(chunkId);
-
-    await this.queue.wait();
-
-    const data = (await file.fetch()) ?? {};
-
-    Reflect.deleteProperty(data, key);
-
-    await file.save(data);
-
-    const index = await this.index.fetch();
-
-    for (const chunk of index.chunks) if (chunk.keys.some((k) => k === key)) chunk.keys = chunk.keys.filter((k) => k !== key);
-
-    await this.index.save(index);
-
-    this.queue.shift();
-
-    await this.cleanupEmptyChunks();
-
-    return true;
-  }
-
-  public async deleteMany(keys: string[]): Promise<void> {
-    await this.queue.wait();
-
-    const index = await this.index.fetch();
-
-    this.queue.shift();
-
-    for (const chunk of index.chunks.filter((chunk) => chunk.keys.some((k) => keys.includes(k)))) {
-      const file = this.getChunkFile(chunk.id);
-      const data = (await file.fetch()) ?? {};
-
-      for (const key of keys.filter((key) => chunk.keys.includes(key))) {
-        Reflect.deleteProperty(data, key);
-
-        chunk.keys = chunk.keys.filter((k) => k !== key);
-      }
-
-      keys = keys.filter((key) => !chunk.keys.includes(key));
-
-      await file.save(data);
-
-      await this.queue.wait();
-
-      await this.index.save(index);
-
-      this.queue.shift();
-
-      await this.cleanupEmptyChunks();
-    }
-  }
-
-  public async clear(): Promise<void> {
-    await this.queue.wait();
-
-    const index = await this.index.fetch();
-    const chunks = index.chunks.reduce<string[]>((chunks, chunk) => [...chunks, chunk.id], []);
-
-    for (const chunkId of chunks) {
-      const file = this.getChunkFile(chunkId);
-
-      if (file.exists) await file.delete();
-
-      Reflect.deleteProperty(this.files, chunkId);
     }
 
-    index.chunks = [];
-    index.autoKeyCount = 0;
-
-    await this.index.save(index);
-
-    this.queue.shift();
+    done();
   }
 
   public async size(): Promise<number> {
-    await this.queue.wait();
-
-    const index = await this.index.fetch();
-
-    this.queue.shift();
+    const index = await this.fetchIndex();
 
     return index.chunks.reduce((size, chunk) => size + chunk.keys.length, 0);
   }
 
   public async values(): Promise<StoredValue[]> {
-    await this.queue.wait();
-
-    const index = await this.index.fetch();
+    const [index, done] = await this.useQueue();
     const values = [];
 
     for (const chunk of index.chunks) {
@@ -337,47 +323,29 @@ export class ChunkHandler<StoredValue = unknown> {
       values.push(...Object.values(data));
     }
 
-    this.queue.shift();
+    done();
 
     return values;
   }
 
-  public async entries(): Promise<[string, StoredValue][]> {
+  private async fetchIndex(): Promise<ChunkIndexFile.Data> {
     await this.queue.wait();
 
     const index = await this.index.fetch();
-    const entries = [];
-
-    for (const chunk of index.chunks) {
-      const file = this.getChunkFile(chunk.id);
-      const data = await file.fetch();
-
-      if (data === undefined) continue;
-
-      entries.push(...Object.entries(data));
-    }
 
     this.queue.shift();
 
-    return entries;
+    return index;
   }
 
-  public async keys(): Promise<string[]> {
+  private async useQueue(): Promise<ChunkHandlerUseQueueOptions> {
     await this.queue.wait();
 
-    const index = await this.index.fetch();
-
-    this.queue.shift();
-
-    return index.chunks.reduce<string[]>((keys, chunk) => [...keys, ...chunk.keys], []);
+    return [await this.index.fetch(), () => this.queue.shift()];
   }
 
   private async locateChunkId(key: string): Promise<string | undefined> {
-    await this.queue.wait();
-
-    const index = await this.index.fetch();
-
-    this.queue.shift();
+    const index = await this.fetchIndex();
 
     for (const chunk of index.chunks) if (chunk.keys.some((k) => k === key)) return chunk.id;
 
@@ -424,3 +392,5 @@ export interface ChunkHandlerOptions {
 
   retry?: File.RetryOptions;
 }
+
+type ChunkHandlerUseQueueOptions = [ChunkIndexFile.Data, () => void];

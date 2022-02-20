@@ -5,6 +5,7 @@
     "packages/*"
   ],
   "scripts": {
+    "benchmark:debug": "tsc -b benchmarks/src && node --inspect benchmarks/dist/benchmarks/src/index.js",
     "benchmark": "tsc -b benchmarks/src && node benchmarks/dist/benchmarks/src/index.js",
     "generate": "node scripts/generate/generate.mjs",
     "clean": "rimraf benchmarks/dist packages/**/dist packages/**/node_modules/.cache",

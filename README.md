@@ -6,7 +6,7 @@
 
 **Official providers for the Josh project.**
 
-[![GitHub](https://img.shields.io/github/license/RealShadowNova/joshdb-providers)](https://github.com/RealShadowNova/joshdb-providers/blob/main/LICENSE.md)
+[![GitHub](https://img.shields.io/github/license/josh-development/joshdb-providers)](https://github.com/josh-evelopment/joshdb-providers/blob/main/LICENSE.md)
 
 **Packages**
 

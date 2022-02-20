@@ -45,8 +45,8 @@ export class File<StoredValue = unknown> {
   protected async attempt<T = unknown>(callback: File.Callback<T>, retry = this.retryOptions): Promise<T> {
     try {
       return callback();
-    } catch {
-      if (retry.attempts === 0) throw new Error('TODO');
+    } catch (error) {
+      if (retry.attempts === 0) throw error;
 
       return wait(retry.delay, this.attempt(callback, { ...retry, attempts: retry.attempts - 1 }));
     }

@@ -124,25 +124,6 @@ export class Benchmark {
       results.push(result);
     }
 
-    // if (this.tests.length <= 8)
-    //   console.table(
-    //     results
-    //       .map((result) => ({
-    //         Name: result.name,
-    //         ...result.tests.reduce<{ [key: string]: string }>((table, result) => {
-    //           const { name, times } = result;
-
-    //           table[name] = this.averageTimeString(times);
-
-    //           return table;
-    //         }, {}),
-    //         total:
-    //           Math.round(result.tests.map(({ times }) => times.reduce((prev, curr) => prev + curr, 0)).reduce((prev, curr) => prev + curr, 0) * 100) /
-    //           100
-    //       }))
-    //       .sort((a, b) => a.total - b.total)
-    //   );
-
     results.sort((a, b) => a.total - b.total);
 
     const table: { [key: string]: any } = {};
