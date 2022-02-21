@@ -62,9 +62,7 @@ import {
 import { Serialize } from '@joshdb/serialize';
 import { deleteFromObject, getFromObject, hasFromObject, setToObject } from '@realware/utilities';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
-import { connect, Model, Mongoose, PipelineStage, Schema, Types } from 'mongoose';
-import { generateMongoDoc } from './functions/generateMongoDoc';
-
+import { connect, Model, model, Mongoose, PipelineStage, Schema, Types } from 'mongoose';
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: MongoProvider.Options;
 
@@ -89,7 +87,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         identifier: MongoProvider.Identifiers.InitMissingCollectionName
       });
 
-    this._collection = generateMongoDoc(enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName);
+    this._collection = MongoProvider.generateMongoDoc(
+      enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName
+    );
 
     if (typeof authentication === 'string') this.connectionURI = authentication;
     else {
@@ -767,6 +767,10 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public static defaultAuthentication: MongoProvider.Authentication = { dbName: 'josh', host: 'localhost', port: 27017 };
 
   public static schema = new Schema({ key: { type: String, required: true }, value: { type: Schema.Types.Mixed, required: true } });
+
+  public static generateMongoDoc(collectionName: string): Model<MongoProvider.DocType> {
+    return model('MongoDoc', MongoProvider.schema, collectionName);
+  }
 }
 
 export namespace MongoProvider {
