@@ -6,7 +6,7 @@
 
 **A provider for `@joshdb/core`**
 
-[![GitHub](https://img.shields.io/github/license/josh-development/joshdb-providers)](https://github.com/josh-development/joshdb-providers/blob/main/LICENSE)
+[![GitHub](https://img.shields.io/github/license/josh-development/providers)](https://github.com/josh-development/providers/blob/main/LICENSE)
 [![npm](https://img.shields.io/npm/v/@joshdb/mongo?color=crimson&logo=npm&style=flat-square&label=@joshdb/mongo)](https://www.npmjs.com/package/@joshdb/mongo)
 
 </div>
