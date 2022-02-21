@@ -1,0 +1,10 @@
+{
+  "extends": "@sapphire/ts-config",
+  "compilerOptions": {
+    "importHelpers": true,
+    "noEmitHelpers": true,
+    "target": "ES2021",
+    "module": "ESNext",
+    "types": ["vite/client", "jest"]
+  }
+}

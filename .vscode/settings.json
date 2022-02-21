@@ -1,0 +1,35 @@
+{
+  "eslint.validate": ["typescript"],
+  "editor.tabSize": 2,
+  "editor.useTabStops": false,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
+    "source.fixAll.eslint": true,
+    "source.organizeImports": true
+  },
+  "files.eol": "\n",
+  "cSpell.maxNumberOfProblems": 8,
+  "cSpell.numSuggestions": 24,
+  "cSpell.words": [
+    "joshdb",
+    "Évelyne",
+    "Lachance",
+    "Hendry",
+    "typedoc",
+    "realware",
+    "commitlint",
+    "favware",
+    "tsbuildinfo",
+    "mapprovider",
+    "jsonprovider",
+    "mongoprovider",
+    "autokey",
+    "deletemany",
+    "getall",
+    "getmany",
+    "randomkey",
+    "setmany"
+  ]
+}
