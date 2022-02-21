@@ -144,6 +144,8 @@ export class Benchmark {
       table['Total'][result.name] = this.totalTimeString(result.tests.map((result) => result.times.reduce((prev, curr) => prev + curr, 0)));
     }
 
+    console.log(greenBright('\nBenchmark Results:'));
+
     console.table(table);
 
     return results;
@@ -175,19 +177,39 @@ export class Benchmark {
   }
 
   private averageTimeString(times: number[]): string {
-    return `${(times.reduce((acc, time) => acc + time, 0) / times.length).toFixed(2)}μs`;
+    const average = times.reduce((acc, time) => acc + time, 0) / times.length;
+
+    if (average >= 1000) return `${(average / 1000).toFixed(2)}s`;
+    if (average >= 1) return `${average.toFixed(2)}ms`;
+
+    return `${(average * 1000).toFixed(2)}μs`;
   }
 
   private minTimeString(times: number[]): string {
-    return `${Math.min(...times).toFixed(2)}μs`;
+    const min = Math.min(...times);
+
+    if (min >= 1000) return `${(min / 1000).toFixed(2)}s`;
+    if (min >= 1) return `${min.toFixed(2)}ms`;
+
+    return `${(min * 1000).toFixed(2)}μs`;
   }
 
   private maxTimeString(times: number[]): string {
-    return `${Math.max(...times).toFixed(2)}μs`;
+    const max = Math.max(...times);
+
+    if (max >= 1000) return `${(max / 1000).toFixed(2)}s`;
+    if (max >= 1) return `${max.toFixed(2)}ms`;
+
+    return `${(max * 1000).toFixed(2)}μs`;
   }
 
   private totalTimeString(times: number[]): string {
-    return `${times.reduce((acc, time) => acc + time, 0).toFixed(2)}μs`;
+    const total = times.reduce((acc, time) => acc + time, 0);
+
+    if (total >= 1000) return `${(total / 1000).toFixed(2)}s`;
+    if (total >= 1) return `${total.toFixed(2)}ms`;
+
+    return `${(total * 1000).toFixed(2)}μs`;
   }
 
   public static defaultCardCount = 1000;
