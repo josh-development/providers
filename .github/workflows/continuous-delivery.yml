@@ -33,6 +33,6 @@ jobs:
           yarn workspaces run standard-version --skip.commit --skip.tag --prerelease "${TAG}.$(git rev-parse --verify --shot HEAD)"
 
           echo -e "\n# Publish to NPM"
-          yarn workspaces foreach npm publish --tag ${TAG}
+          yarn workspaces run publish --tag ${TAG}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
