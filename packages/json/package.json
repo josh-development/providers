@@ -46,7 +46,7 @@
   "bugs": {
     "url": "https://github.com/josh-development/providers/issues"
   },
-  "homepage": "https://github.com/josh-deverlopment",
+  "homepage": "https://josh.evie.dev",
   "publishConfig": {
     "access": "public"
   }

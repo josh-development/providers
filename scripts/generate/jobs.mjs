@@ -54,7 +54,7 @@ export const jobs = [
                 },
                 keywords: [],
                 bugs: { url: 'https://github.com/josh-development/providers/issues' },
-                homepage: 'https://github.com/josh-development/providers',
+                homepage: 'https://josh.evie.dev',
                 publishConfig: { access: 'public' }
               }
             : {
@@ -90,7 +90,7 @@ export const jobs = [
                 },
                 keywords: [],
                 bugs: { url: 'https://github.com/josh-development/providers/issues' },
-                homepage: 'https://github.com/josh-development/providers',
+                homepage: 'https://josh.evie.dev',
                 publishConfig: { access: 'public' }
               },
           null,
@@ -224,7 +224,6 @@ export const jobs = [
         resolvePath(name, 'src', 'index.ts'),
         [
           `export * from './lib/${title}Provider';`,
-          `export * from './lib/${title}ProviderError';`,
           '',
           "export const version = '[VI]{version}[/VI]';",
           ''
@@ -242,20 +241,6 @@ export const jobs = [
           '',
           `export namespace ${title}Provider {`,
           '  export interface Options {}',
-          '}',
-          ''
-        ].join('\n')
-      );
-
-      await writeFile(
-        resolvePath(name, 'src', 'lib', `${title}ProviderError.ts`),
-        [
-          "import { JoshProviderError } from '@joshdb/core';",
-          '',
-          `export class ${title}ProviderError extends JoshProviderError {`,
-          '  public get name() {',
-          `    return '${title}ProviderError';`,
-          '  }',
           '}',
           ''
         ].join('\n')
@@ -284,11 +269,10 @@ export const jobs = [
         resolvePath(name, 'tests', 'lib', `${title}Provider.test.ts`),
         [
           "import { runProviderTest } from '../../../../tests/runProviderTest';",
-          `import { ${title}Provider, ${title}ProviderError } from '../../src';`,
+          `import { ${title}Provider } from '../../src';`,
           '',
           `runProviderTest<typeof ${title}Provider, ${title}Provider.Options>({`,
           `  providerConstructor: ${title}Provider`,
-          `  errorConstructor: ${title}ProviderError`,
           "  providerOptions: { dataDirectoryName: '.tests' }",
           '});',
           ''
