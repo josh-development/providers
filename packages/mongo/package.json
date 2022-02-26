@@ -1,6 +1,6 @@
 {
   "name": "@joshdb/mongo",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "A provider for @joshdb/core which uses MongoDB",
   "author": "Évelyne Lachance <eslachance@gmail.com> (https://evie.codes/)",
   "contributors": [
@@ -12,18 +12,18 @@
   "types": "dist/index.d.ts",
   "typedocMain": "src/index.ts",
   "scripts": {
-    "test": "jest",
-    "lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
-    "build": "rollup -c rollup.bundle.ts",
-    "publish": "npm publish",
-    "prepublishOnly": "rollup-type-bundler"
+    "test": "../../node_modules/.bin/jest",
+    "lint": "../../node_modules/.bin/eslint src tests --ext ts --fix -c ../../.eslintrc",
+    "build": "../../node_modules/.bin/rollup -c rollup.bundle.ts",
+    "standard-version": "../../node_modules/.bin/standard-version",
+    "prepublishOnly": "../../node_modules/.bin/rollup-type-bundler"
   },
   "dependencies": {
     "@joshdb/core": "next",
     "@joshdb/serialize": "next",
-    "@realware/utilities": "^2.0.2",
-    "@sapphire/utilities": "^3.2.1",
-    "mongoose": "^6.1.8"
+    "@realware/utilities": "^2.1.0",
+    "@sapphire/utilities": "^3.3.0",
+    "mongoose": "^6.2.3"
   },
   "repository": {
     "type": "git",
@@ -34,8 +34,8 @@
     "!dist/*tsbuildinfo"
   ],
   "engines": {
-    "node": ">=16",
-    "npm": ">=6"
+    "node": ">=16.6.0",
+    "npm": ">=7.0.0"
   },
   "keywords": [],
   "bugs": {
