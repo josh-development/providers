@@ -1,4 +1,3 @@
-import type { StringArray } from '@joshdb/core';
 import { File } from '../File';
 import { ChunkLockFile } from './ChunkLockFile';
 
@@ -58,7 +57,7 @@ export namespace ChunkIndexFile {
   }
 
   export interface Chunk {
-    keys: StringArray;
+    keys: string[];
 
     id: string;
   }
