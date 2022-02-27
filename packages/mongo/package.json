@@ -1,6 +1,6 @@
 {
   "name": "@joshdb/mongo",
-  "version": "2.1.0",
+  "version": "2.0.0",
   "description": "A provider for @joshdb/core which uses MongoDB",
   "author": "Évelyne Lachance <eslachance@gmail.com> (https://evie.codes/)",
   "contributors": [
