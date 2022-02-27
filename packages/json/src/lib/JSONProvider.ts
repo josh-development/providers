@@ -40,7 +40,6 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
 
     this._handler = await new ChunkHandler<StoredValue>({
       name: context.name,
-      version: context.version ?? null,
       dataDirectoryName,
       maxChunkSize: maxChunkSize ?? 100,
       epoch,
@@ -720,6 +719,8 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
 
     return this._handler;
   }
+
+  public static version = '[VI]{version}[/VI]';
 }
 
 export namespace JSONProvider {
