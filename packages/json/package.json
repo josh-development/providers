@@ -18,6 +18,7 @@
   "scripts": {
     "test": "jest",
     "build": "rollup -c rollup.bundle.ts",
+    "release": "npm publish",
     "prepublishOnly": "rollup-type-bundler"
   },
   "dependencies": {

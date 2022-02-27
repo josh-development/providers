@@ -40,6 +40,7 @@ export const jobs = [
                   test: 'jest',
                   lint: 'eslint src tests --ext ts --fix -c ../../.eslintrc',
                   build: 'rollup -c rollup.bundle.ts',
+                  release: 'npm publish',
                   prepublishOnly: 'rollup-type-bundler'
                 },
                 dependencies: {},
@@ -82,9 +83,10 @@ export const jobs = [
                   require: './dist/index.js'
                 },
                 scripts: {
-                  test: 'jest --verbose',
+                  test: 'jest',
                   lint: 'eslint src tests --ext ts --fix -c ../../.eslintrc',
                   build: 'rollup -c rollup.bundle.ts',
+                  release: 'npm publish',
                   prepublishOnly: 'rollup-type-bundler'
                 },
                 dependencies: {},
