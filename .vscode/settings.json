@@ -30,6 +30,8 @@
     "getall",
     "getmany",
     "randomkey",
-    "setmany"
+    "setmany",
+    "colorette",
+    "vite"
   ]
 }
