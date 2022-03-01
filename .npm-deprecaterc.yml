@@ -1,4 +1,4 @@
 name: '*next*'
 package:
-  - name: '@joshdb/json'
-  - name: '@joshdb/mongo'
+  - '@joshdb/json'
+  - '@joshdb/mongo'
