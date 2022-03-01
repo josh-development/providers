@@ -55,7 +55,7 @@ async function main() {
 
   const results = await benchmark.run(response.cardCount);
 
-  if (response.export) await benchmark.export(results);
+  if (response.export === PickType.Yes) await benchmark.export(results);
 
   process.exit(0);
 }
