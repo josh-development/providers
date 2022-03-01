@@ -13,7 +13,6 @@
   "typedocMain": "src/index.ts",
   "scripts": {
     "test": "jest",
-    "lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
     "build": "rollup -c rollup.bundle.ts",
     "release": "npm publish",
     "prepublishOnly": "rollup-type-bundler"
