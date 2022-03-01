@@ -40,17 +40,27 @@ export const jobs = [
                   test: 'jest',
                   lint: 'eslint src tests --ext ts --fix -c ../../.eslintrc',
                   build: 'rollup -c rollup.bundle.ts',
+                  release: 'npm publish',
                   prepublishOnly: 'rollup-type-bundler'
                 },
                 dependencies: {},
+                devDependencies: {
+                  '@favware/rollup-type-bundler': '^1.0.7',
+                  jest: '^27.5.1',
+                  rollup: '^2.68.0',
+                  'rollup-plugin-cleaner': '^1.0.0',
+                  'rollup-plugin-typescript2': '^0.31.2',
+                  'rollup-plugin-version-injector': '^1.3.3',
+                  'standard-version': '^9.3.2'
+                },
                 repository: {
                   type: 'git',
                   url: 'git+https://github.com/josh-development/providers.git'
                 },
                 files: ['dist', '!dist/*.tsbuildinfo'],
                 engines: {
-                  node: '>=16',
-                  npm: '>=6'
+                  node: '>=16.6.0',
+                  npm: '>=7'
                 },
                 keywords: [],
                 bugs: { url: 'https://github.com/josh-development/providers/issues' },
@@ -73,20 +83,30 @@ export const jobs = [
                   require: './dist/index.js'
                 },
                 scripts: {
-                  test: 'jest --verbose',
+                  test: 'jest',
                   lint: 'eslint src tests --ext ts --fix -c ../../.eslintrc',
                   build: 'rollup -c rollup.bundle.ts',
+                  release: 'npm publish',
                   prepublishOnly: 'rollup-type-bundler'
                 },
                 dependencies: {},
+                devDependencies: {
+                  '@favware/rollup-type-bundler': '^1.0.7',
+                  jest: '^27.5.1',
+                  rollup: '^2.68.0',
+                  'rollup-plugin-cleaner': '^1.0.0',
+                  'rollup-plugin-typescript2': '^0.31.2',
+                  'rollup-plugin-version-injector': '^1.3.3',
+                  'standard-version': '^9.3.2'
+                },
                 repository: {
                   type: 'git',
                   url: 'git+https://github.com/josh-development/providers.git'
                 },
                 files: ['dist', '!dist/*.tsbuildinfo'],
                 engines: {
-                  node: '>=16',
-                  npm: '>=6'
+                  node: '>=16.6.0',
+                  npm: '>=7'
                 },
                 keywords: [],
                 bugs: { url: 'https://github.com/josh-development/providers/issues' },
@@ -222,12 +242,7 @@ export const jobs = [
 
       await writeFile(
         resolvePath(name, 'src', 'index.ts'),
-        [
-          `export * from './lib/${title}Provider';`,
-          '',
-          "export const version = '[VI]{version}[/VI]';",
-          ''
-        ].join('\n')
+        [`export * from './lib/${title}Provider';`, '', "export const version = '[VI]{version}[/VI]';", ''].join('\n')
       );
 
       await mkdir(resolvePath(name, 'src', 'lib'));

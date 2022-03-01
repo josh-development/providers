@@ -5,6 +5,7 @@ import { MongoProvider } from '../../packages/mongo/src';
 import { Benchmark } from './lib/Benchmark';
 import { BASIC_BENCHMARK_TESTS, BENCHMARK_TESTS } from './lib/constants/benchmark-tests';
 import { BenchmarkType } from './lib/types/BenchmarkType';
+import { PickType } from './lib/types/YesNo';
 
 async function main() {
   const benchmark = new Benchmark()
@@ -21,8 +22,8 @@ async function main() {
       name: 'type',
       message: 'What type of benchmark do you want to run?',
       choices: [
-        { title: 'Basic', description: 'Runs basic benchmark tests', value: BenchmarkType.Basic },
-        { title: 'Everything', description: 'Runs all benchmark tests available', value: BenchmarkType.All }
+        { title: 'Basic', value: BenchmarkType.Basic },
+        { title: 'All', value: BenchmarkType.All }
       ]
     },
     {
@@ -30,8 +31,8 @@ async function main() {
       name: 'export',
       message: 'Do you want to create an exported file of the benchmark test results?',
       choices: [
-        { title: 'No', description: 'No, DO NOT create a file of the results.', value: false },
-        { title: 'Yes', description: 'Yes, DO create a file of the results.', value: true }
+        { title: 'No, DO NOT create a file of the results.', value: PickType.No },
+        { title: 'Yes, DO create a file of the results.', value: PickType.Yes }
       ]
     }
   ]);
@@ -54,7 +55,7 @@ async function main() {
 
   const results = await benchmark.run(response.cardCount);
 
-  if (response.export) await benchmark.export(results);
+  if (response.export === PickType.Yes) await benchmark.export(results);
 
   process.exit(0);
 }

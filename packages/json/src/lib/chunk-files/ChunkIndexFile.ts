@@ -1,18 +1,18 @@
-import type { StringArray } from '@joshdb/core';
 import { File } from '../File';
+import { JSONProvider } from '../JSONProvider';
 import { ChunkLockFile } from './ChunkLockFile';
 
 export class ChunkIndexFile extends File {
-  public version: string | null;
+  public version: string;
 
   public lock: ChunkLockFile;
 
   public constructor(options: ChunkIndexFile.Options) {
-    const { directory, version, retry } = options;
+    const { directory, retry } = options;
 
     super({ directory, name: 'index.json', serialize: false, retry });
 
-    this.version = version;
+    this.version = JSONProvider.version;
     this.lock = new ChunkLockFile({ directory, id: 'index', serialize: false, retry });
   }
 
@@ -40,8 +40,6 @@ export class ChunkIndexFile extends File {
 
 export namespace ChunkIndexFile {
   export interface Options {
-    version: string | null;
-
     directory: string;
 
     retry?: File.RetryOptions;
@@ -50,7 +48,7 @@ export namespace ChunkIndexFile {
   export interface Data {
     name: string;
 
-    version: string | null;
+    version?: string;
 
     autoKeyCount: number;
 
@@ -58,7 +56,7 @@ export namespace ChunkIndexFile {
   }
 
   export interface Chunk {
-    keys: StringArray;
+    keys: string[];
 
     id: string;
   }

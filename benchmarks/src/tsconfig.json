@@ -5,7 +5,6 @@
     "outDir": "../dist",
     "composite": true,
     "preserveConstEnums": true,
-    "useDefineForClassFields": false,
     "module": "CommonJS",
     "target": "ESNext"
   },

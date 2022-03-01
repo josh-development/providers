@@ -32,7 +32,6 @@ gh
 # Ignore auto-generated content
 docs/api.json
 
-# Ignore yarn 2-3 files
-.yarnrc.yml
-.yarn/
-.yarnrc
+# Ignore Yarn files
+.yarn/install-state.gz
+.yarn/build-state.yml

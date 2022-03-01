@@ -1,24 +1,4 @@
 import {
-  AutoKeyPayload,
-  ClearPayload,
-  DecPayload,
-  DeleteManyPayload,
-  DeletePayload,
-  EnsurePayload,
-  EveryByHookPayload,
-  EveryByValuePayload,
-  EveryPayload,
-  FilterByHookPayload,
-  FilterByValuePayload,
-  FilterPayload,
-  FindByHookPayload,
-  FindByValuePayload,
-  FindPayload,
-  GetAllPayload,
-  GetManyPayload,
-  GetPayload,
-  HasPayload,
-  IncPayload,
   isEveryByHookPayload,
   isEveryByValuePayload,
   isFilterByHookPayload,
@@ -35,30 +15,9 @@ import {
   isSomeByValuePayload,
   JoshError,
   JoshProvider,
-  KeysPayload,
-  MapByHookPayload,
-  MapByPathPayload,
-  MapPayload,
   MathOperator,
-  MathPayload,
   Method,
-  PartitionByHookPayload,
-  PartitionByValuePayload,
-  PartitionPayload,
-  PushPayload,
-  RandomKeyPayload,
-  RandomPayload,
-  RemoveByHookPayload,
-  RemoveByValuePayload,
-  RemovePayload,
-  SetManyPayload,
-  SetPayload,
-  SizePayload,
-  SomeByHookPayload,
-  SomeByValuePayload,
-  SomePayload,
-  UpdatePayload,
-  ValuesPayload
+  Payloads
 } from '@joshdb/core';
 import { deleteFromObject, getFromObject, hasFromObject, setToObject } from '@realware/utilities';
 import { isNumber, isPrimitive } from '@sapphire/utilities';
@@ -81,7 +40,6 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
 
     this._handler = await new ChunkHandler<StoredValue>({
       name: context.name,
-      version: context.version ?? null,
       dataDirectoryName,
       maxChunkSize: maxChunkSize ?? 100,
       epoch,
@@ -93,7 +51,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return context;
   }
 
-  public async [Method.AutoKey](payload: AutoKeyPayload): Promise<AutoKeyPayload> {
+  public async [Method.AutoKey](payload: Payloads.AutoKey): Promise<Payloads.AutoKey> {
     await this.handler.queue.wait();
 
     const index = await this.handler.index.fetch();
@@ -109,13 +67,13 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Clear](payload: ClearPayload): Promise<ClearPayload> {
+  public async [Method.Clear](payload: Payloads.Clear): Promise<Payloads.Clear> {
     await this.handler.clear();
 
     return payload;
   }
 
-  public async [Method.Dec](payload: DecPayload): Promise<DecPayload> {
+  public async [Method.Dec](payload: Payloads.Dec): Promise<Payloads.Dec> {
     const { key, path } = payload;
     const { data } = await this.get({ method: Method.Get, key, path });
 
@@ -145,7 +103,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Delete](payload: DeletePayload): Promise<DeletePayload> {
+  public async [Method.Delete](payload: Payloads.Delete): Promise<Payloads.Delete> {
     const { key, path } = payload;
 
     if (path.length === 0) {
@@ -166,7 +124,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.DeleteMany](payload: DeleteManyPayload): Promise<DeleteManyPayload> {
+  public async [Method.DeleteMany](payload: Payloads.DeleteMany): Promise<Payloads.DeleteMany> {
     const { keys } = payload;
 
     await this.handler.deleteMany(keys);
@@ -174,7 +132,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Ensure](payload: EnsurePayload<StoredValue>): Promise<EnsurePayload<StoredValue>> {
+  public async [Method.Ensure](payload: Payloads.Ensure<StoredValue>): Promise<Payloads.Ensure<StoredValue>> {
     const { key } = payload;
 
     if (!(await this.handler.has(key))) await this.handler.set(key, payload.defaultValue);
@@ -184,9 +142,9 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Every](payload: EveryByHookPayload<StoredValue>): Promise<EveryByHookPayload<StoredValue>>;
-  public async [Method.Every](payload: EveryByValuePayload): Promise<EveryByValuePayload>;
-  public async [Method.Every](payload: EveryPayload<StoredValue>): Promise<EveryPayload<StoredValue>> {
+  public async [Method.Every](payload: Payloads.Every.ByHook<StoredValue>): Promise<Payloads.Every.ByHook<StoredValue>>;
+  public async [Method.Every](payload: Payloads.Every.ByValue): Promise<Payloads.Every.ByValue>;
+  public async [Method.Every](payload: Payloads.Every<StoredValue>): Promise<Payloads.Every<StoredValue>> {
     if ((await this.handler.size()) === 0) {
       payload.data = true;
 
@@ -230,9 +188,11 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Filter](payload: FilterByHookPayload<StoredValue>): Promise<FilterByHookPayload<StoredValue>>;
-  public async [Method.Filter](payload: FilterByValuePayload<StoredValue>): Promise<FilterByValuePayload<StoredValue>>;
-  public async [Method.Filter](payload: FilterPayload<StoredValue>): Promise<FilterPayload<StoredValue>> {
+  public async [Method.Filter](payload: Payloads.Filter.ByHook<StoredValue>): Promise<Payloads.Filter.ByHook<StoredValue>>;
+  public async [Method.Filter](payload: Payloads.Filter.ByValue<StoredValue>): Promise<Payloads.Filter.ByValue<StoredValue>>;
+  public async [Method.Filter](payload: Payloads.Filter<StoredValue>): Promise<Payloads.Filter<StoredValue>> {
+    payload.data = {};
+
     if (isFilterByHookPayload(payload)) {
       const { hook } = payload;
 
@@ -265,9 +225,9 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Find](payload: FindByHookPayload<StoredValue>): Promise<FindByHookPayload<StoredValue>>;
-  public async [Method.Find](payload: FindByValuePayload<StoredValue>): Promise<FindByValuePayload<StoredValue>>;
-  public async [Method.Find](payload: FindPayload<StoredValue>): Promise<FindPayload<StoredValue>> {
+  public async [Method.Find](payload: Payloads.Find.ByHook<StoredValue>): Promise<Payloads.Find.ByHook<StoredValue>>;
+  public async [Method.Find](payload: Payloads.Find.ByValue<StoredValue>): Promise<Payloads.Find.ByValue<StoredValue>>;
+  public async [Method.Find](payload: Payloads.Find<StoredValue>): Promise<Payloads.Find<StoredValue>> {
     if (isFindByHookPayload(payload)) {
       const { hook } = payload;
 
@@ -304,7 +264,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Get]<Value = StoredValue>(payload: GetPayload<Value>): Promise<GetPayload<Value>> {
+  public async [Method.Get]<Value = StoredValue>(payload: Payloads.Get<Value>): Promise<Payloads.Get<Value>> {
     const { key, path } = payload;
     const value = await this.handler.get(key);
 
@@ -313,13 +273,15 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.GetAll](payload: GetAllPayload<StoredValue>): Promise<GetAllPayload<StoredValue>> {
+  public async [Method.GetAll](payload: Payloads.GetAll<StoredValue>): Promise<Payloads.GetAll<StoredValue>> {
+    payload.data = {};
+
     for (const [key, value] of await this.handler.entries()) payload.data[key] = value;
 
     return payload;
   }
 
-  public async [Method.GetMany](payload: GetManyPayload<StoredValue>): Promise<GetManyPayload<StoredValue>> {
+  public async [Method.GetMany](payload: Payloads.GetMany<StoredValue>): Promise<Payloads.GetMany<StoredValue>> {
     const { keys } = payload;
 
     payload.data = await this.handler.getMany(keys);
@@ -327,7 +289,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Has](payload: HasPayload): Promise<HasPayload> {
+  public async [Method.Has](payload: Payloads.Has): Promise<Payloads.Has> {
     const { key, path } = payload;
 
     if (await this.handler.has(key)) {
@@ -339,7 +301,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Inc](payload: IncPayload): Promise<IncPayload> {
+  public async [Method.Inc](payload: Payloads.Inc): Promise<Payloads.Inc> {
     const { key, path } = payload;
     const { data } = await this.get({ method: Method.Get, key, path });
 
@@ -369,20 +331,15 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Keys](payload: KeysPayload): Promise<KeysPayload> {
+  public async [Method.Keys](payload: Payloads.Keys): Promise<Payloads.Keys> {
     payload.data = await this.handler.keys();
 
     return payload;
   }
 
-  public async [Method.Map]<DataValue = StoredValue, HookValue = DataValue>(
-    payload: MapByHookPayload<DataValue, HookValue>
-  ): Promise<MapByHookPayload<DataValue, HookValue>>;
-
-  public async [Method.Map]<DataValue = StoredValue>(payload: MapByPathPayload<DataValue>): Promise<MapByPathPayload<DataValue>>;
-  public async [Method.Map]<DataValue = StoredValue, HookValue = DataValue>(
-    payload: MapPayload<DataValue, HookValue>
-  ): Promise<MapPayload<DataValue, HookValue>> {
+  public async [Method.Map]<Value = StoredValue>(payload: Payloads.Map.ByHook<StoredValue, Value>): Promise<Payloads.Map.ByHook<StoredValue, Value>>;
+  public async [Method.Map]<Value = StoredValue>(payload: Payloads.Map.ByPath<Value>): Promise<Payloads.Map.ByPath<Value>>;
+  public async [Method.Map]<Value = StoredValue>(payload: Payloads.Map<StoredValue, Value>): Promise<Payloads.Map<StoredValue, Value>> {
     if (isMapByHookPayload(payload)) {
       const { hook } = payload;
 
@@ -400,7 +357,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Math](payload: MathPayload): Promise<MathPayload> {
+  public async [Method.Math](payload: Payloads.Math): Promise<Payloads.Math> {
     const { key, path, operator, operand } = payload;
     let { data } = await this.get<number>({ method: Method.Get, key, path });
 
@@ -461,9 +418,11 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Partition](payload: PartitionByHookPayload<StoredValue>): Promise<PartitionByHookPayload<StoredValue>>;
-  public async [Method.Partition](payload: PartitionByValuePayload<StoredValue>): Promise<PartitionByValuePayload<StoredValue>>;
-  public async [Method.Partition](payload: PartitionPayload<StoredValue>): Promise<PartitionPayload<StoredValue>> {
+  public async [Method.Partition](payload: Payloads.Partition.ByHook<StoredValue>): Promise<Payloads.Partition.ByHook<StoredValue>>;
+  public async [Method.Partition](payload: Payloads.Partition.ByValue<StoredValue>): Promise<Payloads.Partition.ByValue<StoredValue>>;
+  public async [Method.Partition](payload: Payloads.Partition<StoredValue>): Promise<Payloads.Partition<StoredValue>> {
+    payload.data = { truthy: {}, falsy: {} };
+
     if (isPartitionByHookPayload(payload)) {
       const { hook } = payload;
 
@@ -496,7 +455,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Push]<Value = StoredValue>(payload: PushPayload<Value>): Promise<PushPayload<Value>> {
+  public async [Method.Push]<Value = StoredValue>(payload: Payloads.Push<Value>): Promise<Payloads.Push<Value>> {
     const { key, path, value } = payload;
     const { data } = await this.get({ method: Method.Get, key, path });
 
@@ -527,7 +486,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Random](payload: RandomPayload<StoredValue>): Promise<RandomPayload<StoredValue>> {
+  public async [Method.Random](payload: Payloads.Random<StoredValue>): Promise<Payloads.Random<StoredValue>> {
     const { count, duplicates } = payload;
     const size = await this.handler.size();
 
@@ -559,7 +518,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.RandomKey](payload: RandomKeyPayload): Promise<RandomKeyPayload> {
+  public async [Method.RandomKey](payload: Payloads.RandomKey): Promise<Payloads.RandomKey> {
     const { count, duplicates } = payload;
     const size = await this.handler.size();
 
@@ -584,9 +543,9 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Remove]<HookValue = StoredValue>(payload: RemoveByHookPayload<HookValue>): Promise<RemoveByHookPayload<HookValue>>;
-  public async [Method.Remove](payload: RemoveByValuePayload): Promise<RemoveByValuePayload>;
-  public async [Method.Remove]<HookValue = StoredValue>(payload: RemovePayload<HookValue>): Promise<RemovePayload<HookValue>> {
+  public async [Method.Remove]<Value = StoredValue>(payload: Payloads.Remove.ByHook<Value>): Promise<Payloads.Remove.ByHook<Value>>;
+  public async [Method.Remove](payload: Payloads.Remove.ByValue): Promise<Payloads.Remove.ByValue>;
+  public async [Method.Remove]<Value = StoredValue>(payload: Payloads.Remove<Value>): Promise<Payloads.Remove<Value>> {
     if (isRemoveByHookPayload(payload)) {
       const { key, path, hook } = payload;
       const { data } = await this.get<unknown[]>({ method: Method.Get, key, path });
@@ -646,7 +605,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Set]<Value = StoredValue>(payload: SetPayload<Value>): Promise<SetPayload<Value>> {
+  public async [Method.Set]<Value = StoredValue>(payload: Payloads.Set<Value>): Promise<Payloads.Set<Value>> {
     const { key, path, value } = payload;
 
     if (path.length === 0) await this.handler.set<Value>(key, value);
@@ -659,11 +618,11 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.SetMany]<Value = StoredValue>(payload: SetManyPayload<Value>): Promise<SetManyPayload<Value>> {
-    const { data, overwrite } = payload;
+  public async [Method.SetMany]<Value = StoredValue>(payload: Payloads.SetMany<Value>): Promise<Payloads.SetMany<Value>> {
+    const { entries, overwrite } = payload;
 
-    const withPath = data.filter(([{ path }]) => path.length > 0);
-    const withoutPath = data.filter(([{ path }]) => path.length === 0);
+    const withPath = entries.filter(([{ path }]) => path.length > 0);
+    const withoutPath = entries.filter(([{ path }]) => path.length === 0);
 
     for (const [{ key, path }, value] of withPath)
       if (overwrite || !(await this.handler.has(key))) await this.set<Value>({ method: Method.Set, key, path, value });
@@ -677,15 +636,15 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Size](payload: SizePayload): Promise<SizePayload> {
+  public async [Method.Size](payload: Payloads.Size): Promise<Payloads.Size> {
     payload.data = await this.handler.size();
 
     return payload;
   }
 
-  public async [Method.Some](payload: SomeByHookPayload<StoredValue>): Promise<SomeByHookPayload<StoredValue>>;
-  public async [Method.Some](payload: SomeByValuePayload): Promise<SomeByValuePayload>;
-  public async [Method.Some](payload: SomePayload<StoredValue>): Promise<SomePayload<StoredValue>> {
+  public async [Method.Some](payload: Payloads.Some.ByHook<StoredValue>): Promise<Payloads.Some.ByHook<StoredValue>>;
+  public async [Method.Some](payload: Payloads.Some.ByValue): Promise<Payloads.Some.ByValue>;
+  public async [Method.Some](payload: Payloads.Some<StoredValue>): Promise<Payloads.Some<StoredValue>> {
     if (isSomeByHookPayload(payload)) {
       const { hook } = payload;
 
@@ -714,21 +673,18 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Update]<HookValue = StoredValue, Value = HookValue>(
-    payload: UpdatePayload<StoredValue, HookValue, Value>
-  ): Promise<UpdatePayload<StoredValue, HookValue, Value>> {
+  public async [Method.Update]<Value = StoredValue>(payload: Payloads.Update<StoredValue, Value>): Promise<Payloads.Update<StoredValue, Value>> {
     const { key, path, hook } = payload;
-    const { data } = await this.get<HookValue>({ method: Method.Get, key, path });
+    const { data } = await this.get({ method: Method.Get, key, path });
 
     if (data === undefined) return payload;
 
-    Reflect.set(payload, 'data', await hook(data));
-    await this.set({ method: Method.Set, key, path, value: payload.data });
+    await this.set({ method: Method.Set, key, path, value: await hook(data) });
 
     return payload;
   }
 
-  public async [Method.Values](payload: ValuesPayload<StoredValue>): Promise<ValuesPayload<StoredValue>> {
+  public async [Method.Values](payload: Payloads.Values<StoredValue>): Promise<Payloads.Values<StoredValue>> {
     payload.data = await this.handler.values();
 
     return payload;
@@ -763,6 +719,8 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
 
     return this._handler;
   }
+
+  public static version = '[VI]{version}[/VI]';
 }
 
 export namespace JSONProvider {

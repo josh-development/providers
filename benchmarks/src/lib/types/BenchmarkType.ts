@@ -1,4 +1,4 @@
 export enum BenchmarkType {
-  All,
-  Basic
+  All = 'all',
+  Basic = 'basic'
 }

@@ -21,12 +21,12 @@ export class ChunkHandler<StoredValue = unknown> {
   public files: Record<string, ChunkFile<StoredValue>> = {};
 
   public constructor(options: ChunkHandlerOptions) {
-    const { name, version, dataDirectoryName, epoch, retry } = options;
+    const { name, dataDirectoryName, epoch, retry } = options;
 
     this.options = options;
     this.snowflake = epoch === undefined ? TwitterSnowflake : new Snowflake(epoch);
     this.directory = resolve(process.cwd(), dataDirectoryName ?? 'data', name);
-    this.index = new ChunkIndexFile({ directory: this.directory, version, retry });
+    this.index = new ChunkIndexFile({ directory: this.directory, retry });
   }
 
   public async init(): Promise<this> {
@@ -39,7 +39,7 @@ export class ChunkHandler<StoredValue = unknown> {
 
     const { name, synchronize } = this.options;
 
-    if (!this.index.exists) await this.index.save({ name, version: this.options.version, autoKeyCount: 0, chunks: [] });
+    if (!this.index.exists) await this.index.save({ name, autoKeyCount: 0, chunks: [] });
     if (synchronize) await this.synchronize();
 
     return this;
@@ -377,8 +377,6 @@ export class ChunkHandler<StoredValue = unknown> {
 
 export interface ChunkHandlerOptions {
   name: string;
-
-  version: string | null;
 
   dataDirectoryName?: string;
 

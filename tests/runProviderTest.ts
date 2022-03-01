@@ -45,7 +45,7 @@ export function runProviderTest<
           expect(method).toBe(Method.AutoKey);
           expect(trigger).toBeUndefined();
           expect(error).toBeUndefined();
-          expect(data.constructor.name).toBe('String');
+          expect(typeof data).toBe('string');
         });
 
         test('each value of autoKey should be unique', async () => {
@@ -333,7 +333,7 @@ export function runProviderTest<
           test('GIVEN provider w/ data THEN returns payload(true)', async () => {
             await provider.setMany({
               method: Method.SetMany,
-              data: [
+              entries: [
                 [{ key: 'firstKey', path: [] }, 'value'],
                 [{ key: 'secondKey', path: [] }, 'value']
               ],
@@ -378,7 +378,7 @@ export function runProviderTest<
           test('GIVEN provider w/ data THEN returns payload(true)', async () => {
             await provider.setMany({
               method: Method.SetMany,
-              data: [
+              entries: [
                 [{ key: 'firstKey', path: ['path'] }, 'value'],
                 [{ key: 'secondKey', path: ['path'] }, 'value']
               ],
@@ -1036,8 +1036,8 @@ export function runProviderTest<
             expect(error).toBeUndefined();
             expect(type).toBe(Payload.Type.Hook);
             expect(typeof hook).toBe('function');
-            expect(data.truthy).toEqual({});
-            expect(data.falsy).toEqual({});
+            expect(data?.truthy).toEqual({});
+            expect(data?.falsy).toEqual({});
           });
 
           test('GIVEN provider w/ data THEN returns payload w/ data', async () => {
@@ -1059,8 +1059,8 @@ export function runProviderTest<
             expect(error).toBeUndefined();
             expect(type).toBe(Payload.Type.Hook);
             expect(typeof hook).toBe('function');
-            expect(data.truthy).toEqual({ 'test:partition': 'value' });
-            expect(data.falsy).toEqual({});
+            expect(data?.truthy).toEqual({ 'test:partition': 'value' });
+            expect(data?.falsy).toEqual({});
           });
 
           test('GIVEN provider w/ data THEN returns payload w/ data', async () => {
@@ -1082,8 +1082,8 @@ export function runProviderTest<
             expect(error).toBeUndefined();
             expect(type).toBe(Payload.Type.Hook);
             expect(typeof hook).toBe('function');
-            expect(data.truthy).toEqual({});
-            expect(data.falsy).toEqual({ 'test:partition': 'value' });
+            expect(data?.truthy).toEqual({});
+            expect(data?.falsy).toEqual({ 'test:partition': 'value' });
           });
         });
 
@@ -1107,8 +1107,8 @@ export function runProviderTest<
             expect(type).toBe(Payload.Type.Value);
             expect(path).toEqual([]);
             expect(value).toBe('value');
-            expect(data.truthy).toEqual({});
-            expect(data.falsy).toEqual({});
+            expect(data?.truthy).toEqual({});
+            expect(data?.falsy).toEqual({});
           });
 
           test('GIVEN provider w/ data THEN returns payload w/ data', async () => {
@@ -1132,8 +1132,8 @@ export function runProviderTest<
             expect(type).toBe(Payload.Type.Value);
             expect(path).toEqual([]);
             expect(value).toBe('value');
-            expect(data.truthy).toEqual({ 'test:partition': 'value' });
-            expect(data.falsy).toEqual({});
+            expect(data?.truthy).toEqual({ 'test:partition': 'value' });
+            expect(data?.falsy).toEqual({});
           });
 
           test('GIVEN provider w/ data THEN returns payload w/ data', async () => {
@@ -1157,8 +1157,8 @@ export function runProviderTest<
             expect(type).toBe(Payload.Type.Value);
             expect(path).toEqual([]);
             expect(value).toBe('anotherValue');
-            expect(data.truthy).toEqual({});
-            expect(data.falsy).toEqual({ 'test:partition': 'value' });
+            expect(data?.truthy).toEqual({});
+            expect(data?.falsy).toEqual({ 'test:partition': 'value' });
           });
         });
       });
@@ -1549,16 +1549,20 @@ export function runProviderTest<
 
           expect(hasBefore.data).toBe(false);
 
-          const payload = await provider.setMany({ method: Method.SetMany, data: [[{ key: 'test:setMany', path: [] }, 'value']], overwrite: true });
+          const payload = await provider.setMany({
+            method: Method.SetMany,
+            entries: [[{ key: 'test:setMany', path: [] }, 'value']],
+            overwrite: true
+          });
 
           expect(typeof payload).toBe('object');
 
-          const { method, trigger, error, data } = payload;
+          const { method, trigger, error, entries } = payload;
 
           expect(method).toBe(Method.SetMany);
           expect(trigger).toBeUndefined();
           expect(error).toBeUndefined();
-          expect(data).toEqual([[{ key: 'test:setMany', path: [] }, 'value']]);
+          expect(entries).toEqual([[{ key: 'test:setMany', path: [] }, 'value']]);
         });
 
         test('GIVEN provider w/ data THEN returns payload AND does not set value at key', async () => {
@@ -1570,18 +1574,18 @@ export function runProviderTest<
 
           const payload = await provider.setMany({
             method: Method.SetMany,
-            data: [[{ key: 'test:setMany', path: [] }, 'value-overwritten']],
+            entries: [[{ key: 'test:setMany', path: [] }, 'value-overwritten']],
             overwrite: false
           });
 
           expect(typeof payload).toBe('object');
 
-          const { method, trigger, error, data } = payload;
+          const { method, trigger, error, entries } = payload;
 
           expect(method).toBe(Method.SetMany);
           expect(trigger).toBeUndefined();
           expect(error).toBeUndefined();
-          expect(data).toEqual([[{ key: 'test:setMany', path: [] }, 'value-overwritten']]);
+          expect(entries).toEqual([[{ key: 'test:setMany', path: [] }, 'value-overwritten']]);
 
           const getAfter = await provider.get({ method: Method.Get, key: 'test:setMany', path: [] });
 
@@ -1703,7 +1707,7 @@ export function runProviderTest<
 
           expect(typeof payload).toBe('object');
 
-          const { method, trigger, error, key, path, hook, data } = payload;
+          const { method, trigger, error, key, path, hook } = payload;
 
           expect(method).toBe(Method.Update);
           expect(trigger).toBeUndefined();
@@ -1711,7 +1715,6 @@ export function runProviderTest<
           expect(key).toBe('test:update');
           expect(path).toEqual([]);
           expect(typeof hook).toBe('function');
-          expect(data).toBeUndefined();
         });
 
         test('GIVEN provider w/ data at key THEN returns payload w/ data AND updates value at key', async () => {
@@ -1721,7 +1724,7 @@ export function runProviderTest<
 
           expect(typeof payload).toBe('object');
 
-          const { method, trigger, error, key, path, hook, data } = payload;
+          const { method, trigger, error, key, path, hook } = payload;
 
           expect(method).toBe(Method.Update);
           expect(trigger).toBeUndefined();
@@ -1729,7 +1732,6 @@ export function runProviderTest<
           expect(key).toBe('test:update');
           expect(path).toEqual([]);
           expect(typeof hook).toBe('function');
-          expect(data).toBe('value');
         });
 
         test('GIVEN provider w/ data at path THEN returns payload w/ data AND updates value at path', async () => {
@@ -1739,7 +1741,7 @@ export function runProviderTest<
 
           expect(typeof payload).toBe('object');
 
-          const { method, trigger, error, key, path, hook, data } = payload;
+          const { method, trigger, error, key, path, hook } = payload;
 
           expect(method).toBe(Method.Update);
           expect(trigger).toBeUndefined();
@@ -1747,7 +1749,6 @@ export function runProviderTest<
           expect(key).toBe('test:update');
           expect(path).toEqual(['path']);
           expect(typeof hook).toBe('function');
-          expect(data).toBe('value');
         });
       });
 
