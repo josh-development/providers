@@ -919,12 +919,12 @@ __metadata:
   linkType: hard
 
 "@joshdb/core@npm:next":
-  version: 3.0.0-next.f8936fd7b8d4db8d772842c4e3508f5dd627889d.0
-  resolution: "@joshdb/core@npm:3.0.0-next.f8936fd7b8d4db8d772842c4e3508f5dd627889d.0"
+  version: 3.0.0-next.5f4115a36df2debf46e0027e2e6fd2d37360d2bd.0
+  resolution: "@joshdb/core@npm:3.0.0-next.5f4115a36df2debf46e0027e2e6fd2d37360d2bd.0"
   dependencies:
     "@realware/utilities": ^2.0.2
     "@sapphire/utilities": ^3.3.0
-  checksum: b1d4a5417bfd978d33b7cfd48e1a6dc20c5e9217cfd3700cc8559ec7df4374e4dcff70e0a6262eb0abad1993d0c3eb50f12d33769875b492d247efbd7b4831a3
+  checksum: 57554ca5f8173784654f7e8f143b4d9a0abe9681ab665f795a6a1e26f99b745bddb50e1cf5d40cd4e97a2fe02e84750847a5329740ec8249eb784c2a4d18ca66
   languageName: node
   linkType: hard
 
@@ -1045,7 +1045,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@realware/utilities@npm:^2.0.2, @realware/utilities@npm:^2.1.0":
+"@realware/utilities@npm:^2.0.2":
+  version: 2.1.1
+  resolution: "@realware/utilities@npm:2.1.1"
+  checksum: 1e6913c5956837b14bd4c9367db5d64fc895f8e75e11b7b67999b43b0a89dddd4ac59b2f63583a7a8c0208540d96958374e7627b1a7e7c33e53dba333e98615c
+  languageName: node
+  linkType: hard
+
+"@realware/utilities@npm:^2.1.0":
   version: 2.1.0
   resolution: "@realware/utilities@npm:2.1.0"
   checksum: 5afd6988de6a793b2b5a31c9f24a401d9d7e0873f7326a2f57c16588773b53c18e0293347b4db7f0775fa3b205697131348c712727f035792ef128932e635e6c
