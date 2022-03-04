@@ -30,7 +30,7 @@ jobs:
           TAG="next"
 
           echo -e "\n# Bump the version"
-          yarn workspaces foreach -v --no-private standard-version --skip.commit --skip.tag --skip.changelog --prerelease "${TAG}.$(git rev-parse --verify --shot HEAD)"
+          yarn workspaces foreach -v --no-private run standard-version --skip.commit --skip.tag --skip.changelog --prerelease "${TAG}.$(git rev-parse --verify --shot HEAD)"
 
           echo -e "\n# Publish to NPM"
           yarn workspaces foreach -v --no-private run release --tag ${TAG}
