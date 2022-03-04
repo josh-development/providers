@@ -25,7 +25,7 @@ jobs:
           key: ${{ runner.os }}-16-${{ hashFiles('**/yarn.lock') }}
       - name: Install Dependencies if Cache Miss
         if: ${{ !steps.cache-restore.outputs.cache-hit }}
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
       - name: Run Tests
         run: yarn workspace @joshdb/json run test
       - name: Store Code Coverage Report
