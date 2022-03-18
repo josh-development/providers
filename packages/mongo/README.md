@@ -46,6 +46,12 @@ interface Options {
   collectionName?: string;
 
   /**
+   * Mongoose connection options
+   * @since 2.0.0
+   */
+  connectOptions?: Mongoose.ConnectOptions // see https://mongoosejs.com/docs/connections.html#options
+
+  /**
    * Sanitize collection name
    * @since 2.0.0
    */
