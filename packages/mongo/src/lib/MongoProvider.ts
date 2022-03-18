@@ -21,7 +21,7 @@ import {
 import { Serialize } from '@joshdb/serialize';
 import { deleteFromObject, getFromObject, hasFromObject, setToObject } from '@realware/utilities';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
-import { connect, Model, model, Mongoose, PipelineStage, Schema, Types } from 'mongoose';
+import { connect, ConnectOptions, Model, model, Mongoose, PipelineStage, Schema, Types } from 'mongoose';
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: MongoProvider.Options;
 
@@ -38,7 +38,12 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
     context = await super.init(context);
 
-    const { collectionName = context.name, enforceCollectionName, authentication = MongoProvider.defaultAuthentication } = this.options;
+    const {
+      collectionName = context.name,
+      enforceCollectionName,
+      authentication = MongoProvider.defaultAuthentication,
+      connectOptions = {}
+    } = this.options;
 
     if (collectionName === undefined)
       throw this.error({
@@ -63,7 +68,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       this.connectionURI = `mongodb://${user?.length && password?.length ? `${user}:${password}@` : ''}${host}:${port}/${dbName}`;
     }
 
-    this._client = await connect(this.connectionURI);
+    this._client = await connect(this.connectionURI, connectOptions);
 
     return context;
   }
@@ -738,6 +743,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 export namespace MongoProvider {
   export interface Options {
     collectionName?: string;
+
+    connectOptions?: ConnectOptions;
 
     enforceCollectionName?: boolean;
 
