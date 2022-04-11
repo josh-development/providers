@@ -8,7 +8,6 @@ export class ChunkFile<StoredValue = unknown> extends File<StoredValue> {
     const { directory, id, serialize, retry } = options;
 
     super({ directory, name: `${id}.json`, serialize, retry });
-
     this.lock = new ChunkLockFile(options);
   }
 

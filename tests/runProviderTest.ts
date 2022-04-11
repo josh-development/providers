@@ -50,7 +50,6 @@ export function runProviderTest<
 
         test('each value of autoKey should be unique', async () => {
           const arr = await Promise.all([...Array(10)].map(async () => (await provider.autoKey({ method: Method.AutoKey, data: '0' })).data));
-
           const isUnique = new Set(arr).size === arr.length;
 
           expect(isUnique).toBe(true);

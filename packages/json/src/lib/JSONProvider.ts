@@ -57,11 +57,8 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     const index = await this.handler.index.fetch();
 
     index.autoKeyCount++;
-
     await this.handler.index.save(index);
-
     this.handler.queue.shift();
-
     payload.data = index.autoKeyCount.toString();
 
     return payload;
@@ -480,7 +477,6 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     }
 
     data.push(value);
-
     await this.set({ method: Method.Set, key, path, value: data });
 
     return payload;
@@ -620,7 +616,6 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
 
   public async [Method.SetMany]<Value = StoredValue>(payload: Payloads.SetMany<Value>): Promise<Payloads.SetMany<Value>> {
     const { entries, overwrite } = payload;
-
     const withPath = entries.filter(([{ path }]) => path.length > 0);
     const withoutPath = entries.filter(([{ path }]) => path.length === 0);
 

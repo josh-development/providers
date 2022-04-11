@@ -61,6 +61,7 @@ export class Benchmark {
 
           times: []
         };
+
         const runOptions: Benchmark.TestRunOptions = {
           josh,
 
@@ -89,21 +90,16 @@ export class Benchmark {
           const end = performance.now();
 
           spinner.text = `${test.name} (${id}/${cardCount})`;
-
           testResult.times.push(end - start);
         }
 
         await josh.clear();
-
         spinner.succeed(test.name);
-
         result.tests.push(testResult);
       }
 
       result.total = result.tests.reduce((acc, test) => acc + test.times.reduce((acc, time) => acc + time, 0), 0);
-
       console.log(greenBright(`\n${name} Benchmark Results:`));
-
       console.table(
         result.tests.reduce<Record<string, Record<string, string>>>((table, result) => {
           const { name, times } = result;
@@ -120,7 +116,6 @@ export class Benchmark {
       );
 
       console.log('\n');
-
       results.push(result);
     }
 
@@ -145,7 +140,6 @@ export class Benchmark {
     }
 
     console.log(greenBright('\nBenchmark Results:'));
-
     console.table(table);
 
     return results;
@@ -167,7 +161,6 @@ export class Benchmark {
 
     for (let i = 0; i < cardCount; i++) {
       spinner.text = `Card Generation (${i}/${cardCount})`;
-
       cards[i.toString()] = { id: i.toString(), net: 0, ids: [], ...faker.helpers.createCard() };
     }
 

@@ -11,7 +11,6 @@ export class ChunkIndexFile extends File {
     const { directory, retry } = options;
 
     super({ directory, name: 'index.json', serialize: false, retry });
-
     this.version = JSONProvider.version;
     this.lock = new ChunkLockFile({ directory, id: 'index', serialize: false, retry });
   }
