@@ -18,7 +18,6 @@ export const jobs = [
     description: 'Workspace Folder Creation',
     callback: async ({ name, description, umd }) => {
       await mkdir(resolvePath(name));
-
       await writeFile(
         resolvePath(name, 'package.json'),
         JSON.stringify(
@@ -209,7 +208,6 @@ export const jobs = [
       );
 
       await writeFile(resolvePath(name, 'tsconfig.base.json'), JSON.stringify({ extends: '../../tsconfig.base.json' }, null, 2));
-
       await writeFile(
         resolvePath(name, 'tsconfig.eslint.json'),
         JSON.stringify({ extends: './tsconfig.base.json', compilerOptions: { allowJs: true, checkJs: true }, include: ['src', 'tests'] }, null, 2)
@@ -220,7 +218,6 @@ export const jobs = [
     description: 'Generate Source Folder',
     callback: async ({ name, title }) => {
       await mkdir(resolvePath(name, 'src'));
-
       await writeFile(
         resolvePath(name, 'src', 'tsconfig.json'),
         JSON.stringify(
@@ -246,7 +243,6 @@ export const jobs = [
       );
 
       await mkdir(resolvePath(name, 'src', 'lib'));
-
       await writeFile(
         resolvePath(name, 'src', 'lib', `${title}Provider.ts`),
         [
@@ -266,7 +262,6 @@ export const jobs = [
     description: 'Generate Tests Folder',
     callback: async ({ name, title }) => {
       await mkdir(resolvePath(name, 'tests'));
-
       await writeFile(
         resolvePath(name, 'tests', 'tsconfig.json'),
         JSON.stringify(
@@ -279,7 +274,6 @@ export const jobs = [
       );
 
       await mkdir(resolvePath(name, 'tests', 'lib'));
-
       await writeFile(
         resolvePath(name, 'tests', 'lib', `${title}Provider.test.ts`),
         [

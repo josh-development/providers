@@ -35,7 +35,6 @@ describe('ChunkHandler', () => {
 
       test('GIVEN chunks THEN returns true', async () => {
         await handler.set('test:has', 'value');
-
         await expect(handler.has('test:has')).resolves.toBe(true);
       });
     });
@@ -47,7 +46,6 @@ describe('ChunkHandler', () => {
 
       test('GIVEN chunks THEN returns value', async () => {
         await handler.set('test:get', 'value');
-
         await expect(handler.get('test:get')).resolves.toBe('value');
       });
     });

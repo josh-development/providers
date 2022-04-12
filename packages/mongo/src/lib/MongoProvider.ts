@@ -132,7 +132,6 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       const { data } = await this.get({ method: Method.Get, key, path: [] });
 
       deleteFromObject(data, path);
-
       await this.set({ method: Method.Set, key, path: [], value: data });
 
       return payload;
@@ -168,6 +167,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
       return payload;
     }
+
     if (isEveryByHookPayload(payload)) {
       const { hook } = payload;
 
@@ -271,7 +271,6 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Get]<StoredValue>(payload: Payloads.Get<StoredValue>): Promise<Payloads.Get<StoredValue>> {
     const { key, path } = payload;
-
     const doc = await this.collection.findOne({ key }, { value: 1 });
 
     if (!doc) {
@@ -301,7 +300,6 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     payload.data = {};
 
     const { keys } = payload;
-
     const docs = (await this.collection.find({ key: { $in: keys } })) || [];
 
     for (const doc of docs) payload.data[doc.key] = this.options.disableSerialization ? doc.value : this.deserialize(doc.value);
@@ -337,6 +335,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
       return payload;
     }
+
     if (!isNumber(data)) {
       payload.error = this.error({
         identifier: MongoProvider.CommonIdentifiers.IncInvalidType,
@@ -506,7 +505,6 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     }
 
     data.push(value);
-
     await this.set({ method: Method.Set, key, path, value: data });
 
     return payload;
@@ -514,11 +512,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Random](payload: Payloads.Random<StoredValue>): Promise<Payloads.Random<StoredValue>> {
     const aggr: PipelineStage[] = [{ $sample: { size: payload.count } }];
-
     // if (!payload.duplicates) {
     //   aggr.push(...[{ $group: { _id: '$key' } }]); Yet to be implemented
     // }
-
     const docs: MongoProvider.DocType[] = (await this.collection.aggregate(aggr)) || [];
 
     if (docs.length > 0) payload.data = docs.map((doc) => (this.options.disableSerialization ? doc.value : this.deserialize(doc.value)));
