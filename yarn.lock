@@ -948,7 +948,6 @@ __metadata:
     "@joshdb/core": next
     "@joshdb/serialize": next
     "@joshdb/tests": next
-    "@realware/utilities": ^2.1.1
     "@sapphire/utilities": ^3.6.2
     jest: ^27.5.1
     mongoose: ^6.2.10
