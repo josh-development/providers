@@ -1,5 +1,8 @@
 import {
   CommonIdentifiers,
+  deleteProperty,
+  getProperty,
+  hasProperty,
   isEveryByHookPayload,
   isEveryByValuePayload,
   isFilterByHookPayload,
@@ -18,12 +21,13 @@ import {
   JoshProvider,
   MathOperator,
   Method,
-  Payloads
+  Payloads,
+  PROPERTY_NOT_FOUND,
+  setProperty
 } from '@joshdb/core';
 import { Serialize } from '@joshdb/serialize';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
 import { connect, ConnectOptions, Model, model, Mongoose, PipelineStage, ProjectionType, Schema, Types } from 'mongoose';
-import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: MongoProvider.Options;
 
