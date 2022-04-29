@@ -162,16 +162,6 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Entries](payload: Payloads.Entries<StoredValue>): Promise<Payloads.Entries<StoredValue>> {
-    payload.data = {};
-
-    const docs = await this._getAll();
-
-    for (const doc of docs) payload.data[doc.key] = this.deserialize(doc.value);
-
-    return payload;
-  }
-
   public async [Method.Every](payload: Payloads.Every.ByHook<StoredValue>): Promise<Payloads.Every.ByHook<StoredValue>>;
   public async [Method.Every](payload: Payloads.Every.ByValue): Promise<Payloads.Every.ByValue>;
   public async [Method.Every](payload: Payloads.Every<StoredValue>): Promise<Payloads.Every<StoredValue>> {
@@ -320,6 +310,16 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
       if (data !== PROPERTY_NOT_FOUND) payload.data = data;
     }
+
+    return payload;
+  }
+
+  public async [Method.GetAll](payload: Payloads.GetAll<StoredValue>): Promise<Payloads.GetAll<StoredValue>> {
+    payload.data = {};
+
+    const docs = await this._getAll();
+
+    for (const doc of docs) payload.data[doc.key] = this.deserialize(doc.value);
 
     return payload;
   }
