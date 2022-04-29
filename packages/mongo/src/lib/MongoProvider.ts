@@ -1,4 +1,5 @@
 import {
+  CommonIdentifiers,
   isEveryByHookPayload,
   isEveryByValuePayload,
   isFilterByHookPayload,
@@ -9,6 +10,7 @@ import {
   isMapByPathPayload,
   isPartitionByHookPayload,
   isPartitionByValuePayload,
+  isPayloadWithData,
   isRemoveByHookPayload,
   isRemoveByValuePayload,
   isSomeByHookPayload,
@@ -19,9 +21,9 @@ import {
   Payloads
 } from '@joshdb/core';
 import { Serialize } from '@joshdb/serialize';
-import { deleteFromObject, getFromObject, hasFromObject, setToObject } from '@realware/utilities';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
-import { connect, ConnectOptions, Model, model, Mongoose, PipelineStage, Schema, Types } from 'mongoose';
+import { connect, ConnectOptions, Model, model, Mongoose, PipelineStage, ProjectionType, Schema, Types } from 'mongoose';
+import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: MongoProvider.Options;
 
@@ -29,9 +31,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   private _client?: Mongoose;
 
-  private _collection?: Model<MongoProvider.DocType>;
+  private _collection?: Model<MongoProvider.DocType<StoredValue>>;
 
-  public constructor(options: MongoProvider.Options) {
+  public constructor(options?: MongoProvider.Options) {
     super(options);
   }
 
@@ -91,30 +93,17 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Dec](payload: Payloads.Dec): Promise<Payloads.Dec> {
     const { key, path } = payload;
-    const { data } = await this.get<StoredValue>({ key, method: Method.Get, path });
+    const getPayload = await this[Method.Get]<StoredValue>({ key, method: Method.Get, path });
 
-    if (data === undefined) {
-      payload.error = this.error({
-        identifier: MongoProvider.CommonIdentifiers.DecMissingData,
-        message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
-        method: Method.Dec
-      });
+    if (!isPayloadWithData(getPayload))
+      return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Dec }, { key, path }) };
 
-      return payload;
-    }
+    const { data } = getPayload;
 
-    if (!isNumber(data)) {
-      payload.error = this.error({
-        identifier: MongoProvider.CommonIdentifiers.DecInvalidType,
-        message:
-          path.length === 0 ? `The data at "${key}" must be of type "number".` : `The data at "${key}.${path.join('.')}" must be of type "number".`,
-        method: Method.Dec
-      });
+    if (!isNumber(data))
+      return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Dec }, { key, path, type: 'number' }) };
 
-      return payload;
-    }
-
-    await this.set({ method: Method.Set, key, path, value: data - 1 });
+    await this[Method.Set]({ method: Method.Set, key, path, value: data - 1 });
 
     return payload;
   }
@@ -129,10 +118,10 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     }
 
     if ((await this.has({ method: Method.Has, key, path, data: false })).data) {
-      const { data } = await this.get({ method: Method.Get, key, path: [] });
+      const { data } = await this[Method.Get]({ method: Method.Get, key, path: [] });
 
-      deleteFromObject(data, path);
-      await this.set({ method: Method.Set, key, path: [], value: data });
+      deleteProperty(data, path);
+      await this[Method.Set]({ method: Method.Set, key, path: [], value: data });
 
       return payload;
     }
@@ -148,13 +137,24 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
+  public async [Method.Each](payload: Payloads.Each<StoredValue>): Promise<Payloads.Each<StoredValue>> {
+    const { hook } = payload;
+    const all = await this._getAll();
+
+    for (const { key, value } of all) {
+      await hook(this.deserialize(value), key);
+    }
+
+    return payload;
+  }
+
   public async [Method.Ensure](payload: Payloads.Ensure<StoredValue>): Promise<Payloads.Ensure<StoredValue>> {
     const { key } = payload;
 
     if (!(await this.has({ key, method: Method.Has, data: false, path: [] })).data)
-      await this.set({ key, value: payload.defaultValue, method: Method.Set, path: [] });
+      await this[Method.Set]({ key, value: payload.defaultValue, method: Method.Set, path: [] });
 
-    payload.data = (await this.get({ key, method: Method.Get, path: [] })).data as StoredValue;
+    payload.data = (await this[Method.Get]({ key, method: Method.Get, path: [] })).data as StoredValue;
 
     return payload;
   }
@@ -162,19 +162,17 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Every](payload: Payloads.Every.ByHook<StoredValue>): Promise<Payloads.Every.ByHook<StoredValue>>;
   public async [Method.Every](payload: Payloads.Every.ByValue): Promise<Payloads.Every.ByValue>;
   public async [Method.Every](payload: Payloads.Every<StoredValue>): Promise<Payloads.Every<StoredValue>> {
-    if ((await this.size({ method: Method.Size, data: 0 })).data === 0) {
-      payload.data = true;
+    payload.data = true;
 
-      return payload;
-    }
-
+    if ((await this[Method.Size]({ method: Method.Size })).data === 0) return payload;
     if (isEveryByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const value of (await this.values({ method: Method.Values, data: [] })).data || []) {
-        const everyValue = await hook(value);
+      for (const { value } of await this._getAll({ value: 1 })) {
+        const deserialized = this.deserialize(value);
+        const result = await hook(deserialized);
 
-        if (everyValue) continue;
+        if (result) continue;
 
         payload.data = false;
       }
@@ -183,8 +181,18 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isEveryByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for (const [_key, data] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data || {})) {
-        if (value === getFromObject(data, path)) continue;
+      for (const { key, value: storedValue } of await this._getAll()) {
+        const deserialized = this.deserialize(storedValue);
+        const data = getProperty(deserialized, path, false);
+
+        if (data === PROPERTY_NOT_FOUND)
+          return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Every }, { key, path }) };
+        if (!isPrimitive(data))
+          return {
+            ...payload,
+            error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Every }, { key, path, type: 'primitive' })
+          };
+        if (data === value) continue;
 
         payload.data = false;
       }
@@ -201,30 +209,32 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isFilterByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const [key, value] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data || {})) {
-        const filterValue = await hook(value);
+      for (const { key, value } of await this._getAll()) {
+        const deserialized = this.deserialize(value);
+        const filterValue = await hook(deserialized);
 
         if (!filterValue) continue;
 
-        payload.data[key] = value;
+        payload.data[key] = deserialized;
       }
     }
 
     if (isFilterByValuePayload(payload)) {
       const { path, value } = payload;
 
-      if (!isPrimitive(value)) {
-        payload.error = this.error({
-          identifier: MongoProvider.CommonIdentifiers.FilterInvalidValue,
-          message: 'The "value" must be a primitive type.',
-          method: Method.Filter
-        });
+      for (const { key, value: storedValue } of await this._getAll()) {
+        const deserialized = this.deserialize(storedValue);
+        const data = getProperty(deserialized, path, false);
 
-        return payload;
+        if (data === PROPERTY_NOT_FOUND)
+          return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Filter }, { key, path }) };
+        if (!isPrimitive(data))
+          return {
+            ...payload,
+            error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Filter }, { key, path, type: 'primitive' })
+          };
+        if (data === value) payload.data[key] = deserialized;
       }
-
-      for (const [key, storedValue] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data || {}))
-        if (value === (path.length === 0 ? storedValue : getFromObject(storedValue, path))) payload.data[key] = storedValue;
     }
 
     return payload;
@@ -233,15 +243,18 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Find](payload: Payloads.Find.ByHook<StoredValue>): Promise<Payloads.Find.ByHook<StoredValue>>;
   public async [Method.Find](payload: Payloads.Find.ByValue<StoredValue>): Promise<Payloads.Find.ByValue<StoredValue>>;
   public async [Method.Find](payload: Payloads.Find<StoredValue>): Promise<Payloads.Find<StoredValue>> {
+    payload.data = [null, null];
+
     if (isFindByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const [key, storedValue] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data || {})) {
-        const foundValue = await hook(storedValue);
+      for (const { key, value } of await this._getAll()) {
+        const deserialized = this.deserialize(value);
+        const result = await hook(deserialized);
 
-        if (!foundValue) continue;
+        if (!result) continue;
 
-        payload.data = [key, storedValue];
+        payload.data = [key, deserialized];
 
         break;
       }
@@ -251,18 +264,29 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       const { path, value } = payload;
 
       if (!isPrimitive(value)) {
-        payload.error = this.error({
-          identifier: MongoProvider.CommonIdentifiers.FindInvalidValue,
-          message: 'The "value" must be of type primitive.',
-          method: Method.Find
-        });
+        payload.error = this.error({ identifier: CommonIdentifiers.InvalidValueType, method: Method.Find }, { type: 'primitive' });
 
         return payload;
       }
 
-      for (const [key, storedValue] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data || {})) {
-        if (payload.data !== undefined) break;
-        if (value === (path.length === 0 ? storedValue : getFromObject(storedValue, path))) payload.data = [key, storedValue];
+      for (const { key, value: storedValue } of await this._getAll()) {
+        const deserialized = this.deserialize(storedValue);
+        if (payload.data[0] !== null && payload.data[1] !== null) break;
+
+        const data = getProperty(deserialized, path, false);
+
+        if (data === PROPERTY_NOT_FOUND)
+          return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Find }, { key, path }) };
+        if (!isPrimitive(data))
+          return {
+            ...payload,
+            error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Find }, { key, path, type: 'primitive' })
+          };
+        if (data !== value) continue;
+
+        payload.data = [key, deserialized];
+
+        break;
       }
     }
 
@@ -274,14 +298,16 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const doc = await this.collection.findOne({ key }, { value: 1 });
 
     if (!doc) {
-      payload.data = undefined;
-
       return payload;
     }
 
-    Reflect.set(payload, 'data', this.options.disableSerialization ? doc.value : this.deserialize(doc.value));
+    if (path.length === 0) {
+      payload.data = this.deserialize(doc.value) as unknown as StoredValue;
+    } else {
+      const data = getProperty<StoredValue>(this.deserialize(doc.value), path);
 
-    if (path.length > 0) payload.data = getFromObject(payload.data, path);
+      if (data !== PROPERTY_NOT_FOUND) payload.data = data;
+    }
 
     return payload;
   }
@@ -291,7 +317,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     const docs = (await this.collection.find({})) || [];
 
-    for (const doc of docs) payload.data[doc.key] = this.options.disableSerialization ? doc.value : this.deserialize(doc.value);
+    for (const doc of docs) payload.data[doc.key] = this.deserialize(doc.value);
 
     return payload;
   }
@@ -302,7 +328,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { keys } = payload;
     const docs = (await this.collection.find({ key: { $in: keys } })) || [];
 
-    for (const doc of docs) payload.data[doc.key] = this.options.disableSerialization ? doc.value : this.deserialize(doc.value);
+    for (const doc of docs) payload.data[doc.key] = this.deserialize(doc.value);
 
     return payload;
   }
@@ -312,9 +338,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     let isThere = (await this.collection.exists({ key })) !== null;
 
     if (path.length !== 0 && isThere) {
-      const value = await this.get({ method: Method.Get, key, path: [] });
+      const value = await this[Method.Get]({ method: Method.Get, key, path: [] });
 
-      isThere = hasFromObject(value.data, path);
+      isThere = hasProperty(value.data, path);
     }
 
     payload.data = isThere;
@@ -324,30 +350,17 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Inc](payload: Payloads.Inc): Promise<Payloads.Inc> {
     const { key, path } = payload;
-    const { data } = await this.get<StoredValue>({ method: Method.Get, key, path });
+    const getPayload = await this[Method.Get]<StoredValue>({ method: Method.Get, key, path });
 
-    if (data === undefined) {
-      payload.error = this.error({
-        identifier: MongoProvider.CommonIdentifiers.IncMissingData,
-        message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
-        method: Method.Inc
-      });
+    if (!isPayloadWithData(getPayload))
+      return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Inc }, { key, path }) };
 
-      return payload;
-    }
+    const { data } = getPayload;
 
-    if (!isNumber(data)) {
-      payload.error = this.error({
-        identifier: MongoProvider.CommonIdentifiers.IncInvalidType,
-        message:
-          path.length === 0 ? `The data at "${key}" must be of type "number".` : `The data at "${key}.${path.join('.')}" must be of type "number".`,
-        method: Method.Inc
-      });
+    if (typeof data !== 'number')
+      return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Inc }, { key, path, type: 'number' }) };
 
-      return payload;
-    }
-
-    await this.set({ method: Method.Set, key, path, value: data + 1 });
+    await this[Method.Set]({ method: Method.Set, key, path, value: data + 1 });
 
     return payload;
   }
@@ -363,20 +376,23 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Map]<Value = StoredValue>(payload: Payloads.Map.ByHook<StoredValue, Value>): Promise<Payloads.Map.ByHook<StoredValue, Value>>;
   public async [Method.Map]<Value = StoredValue>(payload: Payloads.Map.ByPath<Value>): Promise<Payloads.Map.ByPath<Value>>;
   public async [Method.Map]<Value = StoredValue>(payload: Payloads.Map<StoredValue, Value>): Promise<Payloads.Map<StoredValue, Value>> {
+    payload.data = [];
+
     if (isMapByHookPayload(payload)) {
       const { hook } = payload;
 
-      // @ts-expect-error 2345
-      for (const value of (await this.values({ method: Method.Values, data: [] })).data) payload.data.push(await hook(value));
+      for (const { value } of await this._getAll({ value: 1 })) payload.data.push(await hook(this.deserialize(value)));
     }
 
     if (isMapByPathPayload(payload)) {
       const { path } = payload;
 
-      payload.data = [];
+      for (const { value } of await this._getAll({ value: 1 })) {
+        const deserialized = this.deserialize(value);
+        const data = getProperty<Value>(deserialized, path);
 
-      for (const value of (await this.values({ method: Method.Values, data: [] })).data || [])
-        payload.data.push((path.length === 0 ? value : getFromObject(value, path)) as Value);
+        if (data !== PROPERTY_NOT_FOUND) payload.data.push(data);
+      }
     }
 
     return payload;
@@ -384,27 +400,15 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Math](payload: Payloads.Math): Promise<Payloads.Math> {
     const { key, path, operator, operand } = payload;
-    let { data } = await this.get<number>({ method: Method.Get, key, path });
+    const getPayload = await this[Method.Get]<number>({ method: Method.Get, key, path });
 
-    if (data === undefined) {
-      payload.error = this.error({
-        identifier: MongoProvider.CommonIdentifiers.MathMissingData,
-        message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
-        method: Method.Math
-      });
+    if (!isPayloadWithData(getPayload))
+      return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Math }, { key, path }) };
 
-      return payload;
-    }
+    let { data } = getPayload;
 
-    if (!isNumber(data)) {
-      payload.error = this.error({
-        identifier: MongoProvider.CommonIdentifiers.MathInvalidType,
-        message: path.length === 0 ? `The data at "${key}" must be a number.` : `The data at "${key}.${path.join('.')}" must be a number.`,
-        method: Method.Math
-      });
-
-      return payload;
-    }
+    if (typeof data !== 'number')
+      return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Math }, { key, path, type: 'number' }) };
 
     switch (operator) {
       case MathOperator.Addition:
@@ -438,7 +442,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         break;
     }
 
-    await this.set({ method: Method.Set, key, path, value: data });
+    await this[Method.Set]({ method: Method.Set, key, path, value: data });
 
     return payload;
   }
@@ -451,30 +455,32 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isPartitionByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const [key, value] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data || {})) {
-        const filterValue = await hook(value);
+      for (const { key, value } of await this._getAll()) {
+        const deserialized = this.deserialize(value);
+        const result = await hook(deserialized);
 
-        if (filterValue) payload.data.truthy[key] = value;
-        else payload.data.falsy[key] = value;
+        if (result) payload.data.truthy[key] = deserialized;
+        else payload.data.falsy[key] = deserialized;
       }
     }
 
     if (isPartitionByValuePayload(payload)) {
       const { path, value } = payload;
 
-      if (!isPrimitive(value)) {
-        payload.error = this.error({
-          identifier: MongoProvider.CommonIdentifiers.PartitionInvalidValue,
-          message: 'The "value" must be a primitive type.',
-          method: Method.Partition
-        });
+      for (const { key, value: storedValue } of await this._getAll()) {
+        const deserialized = this.deserialize(storedValue);
+        const data = getProperty<StoredValue>(deserialized, path);
 
-        return payload;
+        if (data === PROPERTY_NOT_FOUND)
+          return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Partition }, { key, path }) };
+        if (!isPrimitive(data))
+          return {
+            ...payload,
+            error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Partition }, { key, path, type: 'primitive' })
+          };
+        if (value === data) payload.data.truthy[key] = deserialized;
+        else payload.data.falsy[key] = deserialized;
       }
-
-      for (const [key, storedValue] of Object.entries((await this.getAll({ method: Method.GetAll, data: {} })).data || {}))
-        if (value === (path.length === 0 ? storedValue : getFromObject(storedValue, path))) payload.data.truthy[key] = storedValue;
-        else payload.data.falsy[key] = storedValue;
     }
 
     return payload;
@@ -482,48 +488,49 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Push]<Value = StoredValue>(payload: Payloads.Push<Value>): Promise<Payloads.Push<Value>> {
     const { key, path, value } = payload;
-    const { data } = await this.get({ method: Method.Get, key, path });
+    const getPayload = await this[Method.Get]({ method: Method.Get, key, path });
 
-    if (data === undefined) {
-      payload.error = this.error({
-        identifier: MongoProvider.CommonIdentifiers.PushMissingData,
-        message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
-        method: Method.Push
-      });
+    if (!isPayloadWithData(getPayload))
+      return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Push }, { key, path }) };
 
-      return payload;
-    }
+    const { data } = getPayload;
 
-    if (!Array.isArray(data)) {
-      payload.error = this.error({
-        identifier: MongoProvider.CommonIdentifiers.PushInvalidType,
-        message: path.length === 0 ? `The data at "${key}" must be an array.` : `The data at "${key}.${path.join('.')}" does not exist.`,
-        method: Method.Push
-      });
-
-      return payload;
-    }
+    if (!Array.isArray(data))
+      return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Push }, { key, path, type: 'array' }) };
 
     data.push(value);
-    await this.set({ method: Method.Set, key, path, value: data });
+    await this[Method.Set]({ method: Method.Set, key, path, value: data });
 
     return payload;
   }
 
+  // Due to the use of $sample, the output will never have duplicates
   public async [Method.Random](payload: Payloads.Random<StoredValue>): Promise<Payloads.Random<StoredValue>> {
-    const aggr: PipelineStage[] = [{ $sample: { size: payload.count } }];
-    // if (!payload.duplicates) {
-    //   aggr.push(...[{ $group: { _id: '$key' } }]); Yet to be implemented
-    // }
-    const docs: MongoProvider.DocType[] = (await this.collection.aggregate(aggr)) || [];
+    const docCount = await this.collection.countDocuments({});
+    if (docCount < payload.count)
+      return {
+        ...payload,
+        error: this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random })
+      };
 
-    if (docs.length > 0) payload.data = docs.map((doc) => (this.options.disableSerialization ? doc.value : this.deserialize(doc.value)));
+    const aggr: PipelineStage[] = [{ $sample: { size: payload.count } }];
+    const docs = (await this.collection.aggregate(aggr)) || [];
+
+    if (docs.length > 0) payload.data = docs.map((doc) => this.deserialize(doc.value));
 
     return payload;
   }
 
   public async [Method.RandomKey](payload: Payloads.RandomKey): Promise<Payloads.RandomKey> {
-    const docs = (await this.collection.aggregate([{ $sample: { size: payload.count } }])) || [];
+    const docCount = await this.collection.countDocuments({});
+    if (docCount < payload.count)
+      return {
+        ...payload,
+        error: this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random })
+      };
+
+    const aggr: PipelineStage[] = [{ $sample: { size: payload.count } }];
+    const docs: MongoProvider.DocType<StoredValue>[] = (await this.collection.aggregate(aggr)) || [];
 
     if (docs.length > 0) payload.data = docs.map((doc) => doc.key);
 
@@ -535,58 +542,40 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Remove]<HookValue = StoredValue>(payload: Payloads.Remove<HookValue>): Promise<Payloads.Remove<HookValue>> {
     if (isRemoveByHookPayload(payload)) {
       const { key, path, hook } = payload;
-      const { data } = await this.get<unknown[]>({ method: Method.Get, key, path });
+      const getPayload = await this[Method.Get]<HookValue[]>({ method: Method.Get, key, path });
 
-      if (data === undefined) {
-        payload.error = this.error({
-          identifier: MongoProvider.CommonIdentifiers.RemoveMissingData,
-          message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
-          method: Method.Remove
-        });
+      if (!isPayloadWithData(getPayload))
+        return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Remove }, { key, path }) };
 
-        return payload;
-      }
+      const { data } = getPayload;
 
-      if (!Array.isArray(data)) {
-        payload.error = this.error({
-          identifier: MongoProvider.CommonIdentifiers.RemoveInvalidType,
-          message: path.length === 0 ? `The data at "${key}" must be an array.` : `The data at "${key}.${path.join('.')}" must be an array.`,
-          method: Method.Remove
-        });
-
-        return payload;
-      }
+      if (!Array.isArray(data))
+        return {
+          ...payload,
+          error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Remove }, { key, path, type: 'array' })
+        };
 
       const filterValues = await Promise.all(data.map(hook));
 
-      await this.set({ method: Method.Set, key, path, value: data.filter((_, index) => !filterValues[index]) });
+      await this[Method.Set]({ method: Method.Set, key, path, value: data.filter((_, index) => !filterValues[index]) });
     }
 
     if (isRemoveByValuePayload(payload)) {
       const { key, path, value } = payload;
-      const { data } = await this.get({ method: Method.Get, key, path });
+      const getPayload = await this[Method.Get]({ method: Method.Get, key, path });
 
-      if (data === undefined) {
-        payload.error = this.error({
-          identifier: MongoProvider.CommonIdentifiers.RemoveMissingData,
-          message: path.length === 0 ? `The data at "${key}" does not exist.` : `The data at "${key}.${path.join('.')}" does not exist.`,
-          method: Method.Remove
-        });
+      if (!isPayloadWithData(getPayload))
+        return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Remove }, { key, path }) };
 
-        return payload;
-      }
+      const { data } = getPayload;
 
-      if (!Array.isArray(data)) {
-        payload.error = this.error({
-          identifier: MongoProvider.CommonIdentifiers.RemoveInvalidType,
-          message: path.length === 0 ? `The data at "${key}" must be an array.` : `The data at "${key}.${path.join('.')}" must be an array.`,
-          method: Method.Remove
-        });
+      if (!Array.isArray(data))
+        return {
+          ...payload,
+          error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Remove }, { key, path, type: 'array' })
+        };
 
-        return payload;
-      }
-
-      await this.set({ method: Method.Set, key, path, value: data.filter((storedValue) => value !== storedValue) });
+      await this[Method.Set]({ method: Method.Set, key, path, value: data.filter((storedValue) => value !== storedValue) });
     }
 
     return payload;
@@ -594,14 +583,14 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Set]<Value = StoredValue>(payload: Payloads.Set<Value>): Promise<Payloads.Set<Value>> {
     const { key, path, value } = payload;
-    const val = path.length > 0 ? setToObject((await this.get({ method: Method.Get, key, path })).data, path, value) : value;
+    const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, key, path })).data, path, value) : value;
 
     await this.collection.findOneAndUpdate(
       {
         key: { $eq: key }
       },
       {
-        $set: { value: this.options.disableSerialization ? val : this.serialize(val) }
+        $set: { value: this.serialize(val) }
       },
       {
         upsert: true
@@ -611,7 +600,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.SetMany]<Value = StoredValue>(payload: Payloads.SetMany<Value>): Promise<Payloads.SetMany<Value>> {
+  public async [Method.SetMany](payload: Payloads.SetMany): Promise<Payloads.SetMany> {
     const { entries } = payload;
     const operations = [];
 
@@ -622,7 +611,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         if (found) continue;
       }
 
-      const val = path.length > 0 ? setToObject((await this.get({ method: Method.Get, key, path: [] })).data, path, value) : value;
+      const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, key, path: [] })).data, path, value) : value;
 
       operations.push({
         updateOne: {
@@ -630,7 +619,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           upsert: true,
           update: {
             $set: {
-              value: this.options.disableSerialization ? val : this.serialize(val)
+              value: this.serialize(val)
             }
           }
         }
@@ -651,11 +640,13 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Some](payload: Payloads.Some.ByHook<StoredValue>): Promise<Payloads.Some.ByHook<StoredValue>>;
   public async [Method.Some](payload: Payloads.Some.ByValue): Promise<Payloads.Some.ByValue>;
   public async [Method.Some](payload: Payloads.Some<StoredValue>): Promise<Payloads.Some<StoredValue>> {
+    payload.data = false;
     if (isSomeByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const value of (await this.values({ method: Method.Values, data: [] })).data || []) {
-        const someValue = await hook(value);
+      for (const { value } of await this._getAll({ value: 1 })) {
+        const deserialized = this.deserialize(value);
+        const someValue = await hook(deserialized);
 
         if (!someValue) continue;
 
@@ -668,11 +659,22 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isSomeByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for (const storedValue of (await this.values({ method: Method.Values, data: [] })).data || []) {
-        if (path.length !== 0 && value !== getFromObject(storedValue, path)) continue;
-        if (isPrimitive(storedValue) && value === storedValue) continue;
+      for (const { key, value: storedValue } of await this._getAll()) {
+        const deserialized = this.deserialize(storedValue);
+        const data = getProperty(deserialized, path, false);
+
+        if (data === PROPERTY_NOT_FOUND)
+          return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Some }, { key, path }) };
+        if (!isPrimitive(data))
+          return {
+            ...payload,
+            error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Some }, { key, path, type: 'primitive' })
+          };
+        if (data !== value) continue;
 
         payload.data = true;
+
+        break;
       }
     }
 
@@ -680,21 +682,23 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   public async [Method.Update]<Value = StoredValue>(payload: Payloads.Update<StoredValue, Value>): Promise<Payloads.Update<StoredValue, Value>> {
-    const { key, path, hook } = payload;
-    const { data } = await this.get<StoredValue>({ method: Method.Get, key, path });
+    const { key, hook } = payload;
+    const getPayload = await this[Method.Get]({ method: Method.Get, key, path: [] });
 
-    if (data === undefined) return payload;
+    if (!isPayloadWithData<StoredValue>(getPayload))
+      return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Update }, { key }) };
 
-    Reflect.set(payload, 'data', await hook(data));
-    await this.set({ method: Method.Set, key, path, value: await hook(data) });
+    const { data } = getPayload;
+
+    await this[Method.Set]({ method: Method.Set, key, path: [], value: await hook(data) });
 
     return payload;
   }
 
   public async [Method.Values](payload: Payloads.Values<StoredValue>): Promise<Payloads.Values<StoredValue>> {
-    const docs = (await this.collection.find({}, { value: 1 })) || [];
+    const docs = await this._getAll({ value: 1 });
 
-    payload.data = docs.map((doc) => (this.options.disableSerialization ? doc.value : this.deserialize(doc.value)));
+    payload.data = docs.map((doc) => this.deserialize(doc.value));
 
     return payload;
   }
@@ -709,7 +713,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return this._client;
   }
 
-  private get collection(): Model<MongoProvider.DocType> {
+  private get collection(): Model<MongoProvider.DocType<StoredValue>> {
     if (isNullOrUndefined(this._collection))
       throw this.error({
         message: 'Client is not connected, most likely due to `init` not being called or the server not being available',
@@ -719,11 +723,17 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return this._collection;
   }
 
-  private deserialize(value: string): StoredValue {
-    return new Serialize({ json: JSON.parse(value) }).toRaw<StoredValue>();
+  private _getAll(projection: ProjectionType<MongoProvider.DocType<StoredValue>> = { key: 1, value: 1 }) {
+    return this.collection.find<MongoProvider.DocType<StoredValue>>({}, projection);
+  }
+
+  private deserialize(value: string | StoredValue): StoredValue {
+    if (this.options.disableSerialization) return value as StoredValue;
+    return new Serialize({ json: JSON.parse(value as string) }).toRaw<StoredValue>();
   }
 
   private serialize<Value = StoredValue>(value: StoredValue | Value) {
+    if (this.options.disableSerialization) return value;
     return JSON.stringify(new Serialize({ raw: value }).toJSON());
   }
 
@@ -731,7 +741,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public static schema = new Schema({ key: { type: String, required: true }, value: { type: Schema.Types.Mixed, required: true } });
 
-  public static generateMongoDoc(collectionName: string): Model<MongoProvider.DocType> {
+  public static generateMongoDoc<StoredValue>(collectionName: string): Model<MongoProvider.DocType<StoredValue>> {
     return model('MongoDoc', MongoProvider.schema, collectionName);
   }
 }
@@ -761,10 +771,10 @@ export namespace MongoProvider {
     host: string;
   }
 
-  export interface DocType extends Document {
+  export interface DocType<StoredValue> extends Document {
     key: string;
 
-    value: any;
+    value: string | StoredValue;
   }
 
   export enum Identifiers {

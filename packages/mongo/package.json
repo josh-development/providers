@@ -22,10 +22,12 @@
     "@joshdb/serialize": "next",
     "@realware/utilities": "^2.1.1",
     "@sapphire/utilities": "^3.6.2",
-    "mongoose": "^6.3.1"
+    "mongoose": "^6.2.10",
+    "property-helpers": "^1.1.0"
   },
   "devDependencies": {
     "@favware/rollup-type-bundler": "^1.0.7",
+    "@joshdb/tests": "next",
     "jest": "^27.5.1",
     "rollup": "^2.70.2",
     "rollup-plugin-cleaner": "^1.0.0",
