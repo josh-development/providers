@@ -511,6 +511,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   // Due to the use of $sample, the output will never have duplicates
   public async [Method.Random](payload: Payloads.Random<StoredValue>): Promise<Payloads.Random<StoredValue>> {
     const docCount = await this.collection.countDocuments({});
+    if (docCount === 0) return payload;
     if (docCount < payload.count)
       return {
         ...payload,
@@ -527,6 +528,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.RandomKey](payload: Payloads.RandomKey): Promise<Payloads.RandomKey> {
     const docCount = await this.collection.countDocuments({});
+    if (docCount === 0) return payload;
     if (docCount < payload.count)
       return {
         ...payload,
