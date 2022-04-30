@@ -946,7 +946,6 @@ __metadata:
     "@favware/rollup-type-bundler": ^1.0.7
     "@joshdb/core": next
     "@joshdb/serialize": next
-    "@joshdb/tests": next
     "@sapphire/utilities": ^3.6.2
     jest: ^27.5.1
     mongoose: ^6.2.10
@@ -971,15 +970,6 @@ __metadata:
   dependencies:
     "@joshdb/core": next
   checksum: 08235190f48f0b9c3a08ea1ee14f650db534e0784e296e7f7f9962209e8381052aa14b922ae071d5653f5005610ecf9d017db666e98df2255263b313baa69190
-  languageName: node
-  linkType: hard
-
-"@joshdb/tests@npm:next":
-  version: 1.1.0-next.a4b0525d7919b96ec60e0c95d06142919657f9ba.0
-  resolution: "@joshdb/tests@npm:1.1.0-next.a4b0525d7919b96ec60e0c95d06142919657f9ba.0"
-  dependencies:
-    "@joshdb/core": next
-  checksum: 6b5bd3f8fbf7629af7dccd0fbf1375b03f035d4b977e5603d6bcff2c8a01865a745995e9a381de074cfdc5f692325efd00a9643826a44ca6ae119315260d7b74
   languageName: node
   linkType: hard
 
