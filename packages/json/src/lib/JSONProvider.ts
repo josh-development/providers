@@ -134,12 +134,6 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  public async [Method.Entries](payload: Payloads.Entries<StoredValue>): Promise<Payloads.Entries<StoredValue>> {
-    payload.data = (await this.handler.entries()).reduce((data, [key, value]) => ({ ...data, [key]: value }), {});
-
-    return payload;
-  }
-
   public async [Method.Every](payload: Payloads.Every.ByHook<StoredValue>): Promise<Payloads.Every.ByHook<StoredValue>>;
   public async [Method.Every](payload: Payloads.Every.ByValue): Promise<Payloads.Every.ByValue>;
   public async [Method.Every](payload: Payloads.Every<StoredValue>): Promise<Payloads.Every<StoredValue>> {
@@ -273,10 +267,18 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
+  public async [Method.GetAll](payload: Payloads.GetAll<StoredValue>): Promise<Payloads.GetAll<StoredValue>> {
+    payload.data = (await this.handler.entries()).reduce((data, [key, value]) => ({ ...data, [key]: value }), {});
+
+    return payload;
+  }
+
   public async [Method.GetMany](payload: Payloads.GetMany<StoredValue>): Promise<Payloads.GetMany<StoredValue>> {
     const { keys } = payload;
 
-    payload.data = await this.handler.getMany(keys);
+    payload.data = {};
+
+    for (const key of keys) payload.data[key] = (await this.handler.has(key)) ? (await this.handler.get(key))! : null;
 
     return payload;
   }
