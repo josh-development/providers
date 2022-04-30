@@ -950,7 +950,6 @@ __metadata:
     "@sapphire/utilities": ^3.6.2
     jest: ^27.5.1
     mongoose: ^6.2.10
-    property-helpers: ^1.1.0
     rollup: ^2.70.2
     rollup-plugin-cleaner: ^1.0.0
     rollup-plugin-typescript2: ^0.31.2
@@ -963,6 +962,15 @@ __metadata:
   version: 1.1.0-next.a1c39906f46e2c6aa91491b8a9ed1afb0ab5fcc7.0
   resolution: "@joshdb/serialize@npm:1.1.0-next.a1c39906f46e2c6aa91491b8a9ed1afb0ab5fcc7.0"
   checksum: 384e34bc22d58c9cf94e7398d02eed53da048eaacd00c0a42a4901d4922e29bd696530d57b38df0cdf56aecf81ac099f6ffbf5ba1cecc0ff8a9105dcde054404
+  languageName: node
+  linkType: hard
+
+"@joshdb/tests@npm:^1.1.0-next.798c560b5c83fef8f03d5ef552668c952ecc85ad.0":
+  version: 1.1.0-pr-12.e708e7d6f59e991ff7d4bbbfcdfa5e6811c83f2a.0
+  resolution: "@joshdb/tests@npm:1.1.0-pr-12.e708e7d6f59e991ff7d4bbbfcdfa5e6811c83f2a.0"
+  dependencies:
+    "@joshdb/core": next
+  checksum: 08235190f48f0b9c3a08ea1ee14f650db534e0784e296e7f7f9962209e8381052aa14b922ae071d5653f5005610ecf9d017db666e98df2255263b313baa69190
   languageName: node
   linkType: hard
 
@@ -1100,7 +1108,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/eslint-config@npm:^4.3.4":
+"@sapphire/eslint-config@npm:^4.3.3":
   version: 4.3.4
   resolution: "@sapphire/eslint-config@npm:4.3.4"
   dependencies:
@@ -6682,7 +6690,8 @@ __metadata:
     "@faker-js/faker": ^6.2.0
     "@favware/npm-deprecate": ^1.0.4
     "@joshdb/core": next
-    "@sapphire/eslint-config": ^4.3.4
+    "@joshdb/tests": ^1.1.0-next.798c560b5c83fef8f03d5ef552668c952ecc85ad.0
+    "@sapphire/eslint-config": ^4.3.3
     "@sapphire/ts-config": ^3.3.4
     "@types/jest": ^27.4.1
     "@types/node": 17.0.23
