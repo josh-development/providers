@@ -1381,13 +1381,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/uuid@npm:^8.3.4":
-  version: 8.3.4
-  resolution: "@types/uuid@npm:8.3.4"
-  checksum: 6f11f3ff70f30210edaa8071422d405e9c1d4e53abbe50fdce365150d3c698fe7bbff65c1e71ae080cbfb8fded860dbb5e174da96fdbbdfcaa3fb3daa474d20f
-  languageName: node
-  linkType: hard
-
 "@types/webidl-conversions@npm:*":
   version: 6.1.1
   resolution: "@types/webidl-conversions@npm:6.1.1"
@@ -1421,7 +1414,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:^5.20.0":
+"@typescript-eslint/eslint-plugin@npm:^5.19.0, @typescript-eslint/eslint-plugin@npm:^5.20.0":
   version: 5.22.0
   resolution: "@typescript-eslint/eslint-plugin@npm:5.22.0"
   dependencies:
@@ -6687,8 +6680,7 @@ __metadata:
     "@types/node": 17.0.23
     "@types/prompts": ^2.4.0
     "@types/rimraf": ^3.0.2
-    "@types/uuid": ^8.3.4
-    "@typescript-eslint/eslint-plugin": ^5.20.0
+    "@typescript-eslint/eslint-plugin": ^5.19.0
     colorette: ^2.0.16
     eslint: ^8.14.0
     eslint-config-prettier: ^8.5.0
