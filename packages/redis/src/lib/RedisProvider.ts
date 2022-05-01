@@ -690,6 +690,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 export namespace RedisProvider {
   export interface Options {
     uri?: string;
+
     disableSerialization?: boolean;
   }
 
