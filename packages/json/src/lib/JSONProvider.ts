@@ -52,7 +52,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
       maxChunkSize: maxChunkSize ?? 100,
       retry,
       synchronize
-    });
+    }).init();
 
     return context;
   }
