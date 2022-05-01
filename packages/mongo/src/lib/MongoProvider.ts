@@ -27,15 +27,15 @@ import {
 } from '@joshdb/core';
 import { Serialize } from '@joshdb/serialize';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
-import { connect, ConnectOptions, FilterQuery, Model, model, Mongoose, PipelineStage, ProjectionType, Schema, Types } from 'mongoose';
+import { Collection, Document, Filter, MongoClient, MongoClientOptions, ObjectId } from 'mongodb';
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: MongoProvider.Options;
 
   private connectionURI?: string;
 
-  private _client?: Mongoose;
+  private _client?: MongoClient;
 
-  private _collection?: Model<MongoProvider.DocType<StoredValue>>;
+  private _collection?: Collection<MongoProvider.DocType<StoredValue>>;
 
   public constructor(options?: MongoProvider.Options) {
     super(options);
@@ -56,11 +56,6 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         message: 'A collection name must be provided if using this class without Josh.',
         identifier: MongoProvider.Identifiers.InitMissingCollectionName
       });
-
-    this._collection = MongoProvider.generateMongoDoc(
-      enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName
-    );
-
     if (typeof authentication === 'string') this.connectionURI = authentication;
     else {
       const { user, password, dbName, host, port }: MongoProvider.Authentication = {
@@ -74,17 +69,20 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       this.connectionURI = `mongodb://${user?.length && password?.length ? `${user}:${password}@` : ''}${host}:${port}/${dbName}`;
     }
 
-    this._client = await connect(this.connectionURI, connectOptions);
+    const client = new MongoClient(this.connectionURI, connectOptions);
+    this._client = await client.connect();
+    this._collection = this.generateMongoDoc(enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName);
+    // this._client = await connect(this.connectionURI, connectOptions);
 
     return context;
   }
 
   public async close() {
-    return this.client.disconnect();
+    return this.client.close();
   }
 
   public [Method.AutoKey](payload: Payloads.AutoKey): Payloads.AutoKey {
-    payload.data = new Types.ObjectId().toString();
+    payload.data = new ObjectId().toString();
 
     return payload;
   }
@@ -299,7 +297,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Get]<StoredValue>(payload: Payloads.Get<StoredValue>): Promise<Payloads.Get<StoredValue>> {
     const { key, path } = payload;
-    const doc = await this.collection.findOne({ key }, { value: 1 }).lean();
+    const doc = await this.collection.findOne({ key }, { projection: { value: 1 } });
 
     if (!doc) {
       return payload;
@@ -330,7 +328,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     payload.data = {};
 
     const { keys } = payload;
-    const docs = (await this.collection.find({ key: { $in: keys } }).lean()) || [];
+    const docs = await this.collection.find({ key: { $in: keys } }).toArray();
 
     for (const doc of docs) payload.data[doc.key] = this.deserialize(doc.value);
 
@@ -339,7 +337,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Has](payload: Payloads.Has): Promise<Payloads.Has> {
     const { key, path } = payload;
-    let isThere = (await this.collection.exists({ key })) !== null;
+    let isThere = (await this.collection.countDocuments({ key })) !== 0;
 
     if (path.length !== 0 && isThere) {
       const value = await this[Method.Get]({ method: Method.Get, key, path: [] });
@@ -518,8 +516,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         error: this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random })
       };
 
-    const aggr: PipelineStage[] = [{ $sample: { size: payload.count } }];
-    const docs = (await this.collection.aggregate(aggr)) || [];
+    const aggr: Document[] = [{ $sample: { size: payload.count } }];
+    const docs = (await this.collection.aggregate(aggr).toArray()) || [];
 
     if (docs.length > 0) payload.data = docs.map((doc) => this.deserialize(doc.value));
 
@@ -535,8 +533,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         error: this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random })
       };
 
-    const aggr: PipelineStage[] = [{ $sample: { size: payload.count } }];
-    const docs: MongoProvider.DocType<StoredValue>[] = (await this.collection.aggregate(aggr)) || [];
+    const aggr: Document[] = [{ $sample: { size: payload.count } }];
+    const docs = (await this.collection.aggregate(aggr).toArray()) || [];
 
     if (docs.length > 0) payload.data = docs.map((doc) => doc.key);
 
@@ -596,7 +594,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         key: { $eq: key }
       },
       {
-        $set: { value: this.serialize(val) }
+        $set: { value: this.serialize(val) as StoredValue }
       },
       {
         upsert: true
@@ -617,7 +615,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         if (found) continue;
       }
 
-      const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, key, path: [] })).data, path, value) : value;
+      const val =
+        path.length > 0 ? setProperty<StoredValue>((await this[Method.Get]({ method: Method.Get, key, path: [] })).data, path, value) : value;
 
       operations.push({
         updateOne: {
@@ -625,14 +624,14 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           upsert: true,
           update: {
             $set: {
-              value: this.serialize(val)
+              value: this.serialize(val) as StoredValue
             }
           }
         }
       });
     }
 
-    await this.collection.bulkWrite(operations);
+    if (operations.length > 0) await this.collection.bulkWrite(operations);
 
     return payload;
   }
@@ -709,7 +708,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  private get client(): Mongoose {
+  private get client(): MongoClient {
     if (isNullOrUndefined(this._client))
       throw this.error({
         message: 'Client is not connected, most likely due to `init` not being called or the server not being available',
@@ -719,7 +718,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return this._client;
   }
 
-  private get collection(): Model<MongoProvider.DocType<StoredValue>> {
+  private get collection(): Collection<MongoProvider.DocType<StoredValue>> {
     if (isNullOrUndefined(this._collection))
       throw this.error({
         message: 'Client is not connected, most likely due to `init` not being called or the server not being available',
@@ -729,15 +728,12 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return this._collection;
   }
 
-  private _getAll(projection: ProjectionType<MongoProvider.DocType<StoredValue>> = { key: 1, value: 1 }) {
-    return this.collection.find<MongoProvider.DocType<StoredValue>>({}, projection).lean();
+  private _getAll(projection: { [key: string]: 1 | 0 } = { key: 1, value: 1 }) {
+    return this.collection.find<MongoProvider.DocType<StoredValue>>({}, { projection }).toArray();
   }
 
-  private _iterate(
-    filter: FilterQuery<MongoProvider.DocType<StoredValue>>,
-    projection: ProjectionType<MongoProvider.DocType<StoredValue>> = { key: 1, value: 1 }
-  ) {
-    const agg = this.collection.aggregate([{ $match: filter }, { $project: projection as { [field: string]: any } }]);
+  private _iterate(filter: Filter<MongoProvider.DocType<StoredValue>>, projection: { [key: string]: 1 | 0 } = { key: 1, value: 1 }) {
+    const agg = this.collection.aggregate([{ $match: filter }, { $project: projection }]);
     return agg;
   }
 
@@ -751,21 +747,22 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return new Serialize({ raw: value }).toJSON();
   }
 
+  private generateMongoDoc<StoredValue>(collectionName: string): Collection<MongoProvider.DocType<StoredValue>> {
+    const db = this.client.db();
+
+    return db.collection(collectionName);
+  }
+
   public static defaultAuthentication: MongoProvider.Authentication = { dbName: 'josh', host: 'localhost', port: 27017 };
 
-  public static schema = new Schema({ key: { type: String, required: true }, value: { type: Schema.Types.Mixed, required: true } });
-
-  public static generateMongoDoc<StoredValue>(collectionName: string): Model<MongoProvider.DocType<StoredValue>> {
-    MongoProvider.schema.index({ key: 1 }, { unique: true });
-    return model('MongoDoc', MongoProvider.schema, collectionName);
-  }
+  // public static schema = new Schema({ key: { type: String, required: true }, value: { type: Schema.Types.Mixed, required: true } });
 }
 
 export namespace MongoProvider {
   export interface Options {
     collectionName?: string;
 
-    connectOptions?: ConnectOptions;
+    connectOptions?: MongoClientOptions;
 
     enforceCollectionName?: boolean;
 

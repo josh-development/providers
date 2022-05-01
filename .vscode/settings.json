@@ -33,5 +33,6 @@
     "setmany",
     "colorette",
     "vite"
-  ]
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

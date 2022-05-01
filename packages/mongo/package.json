@@ -21,7 +21,7 @@
     "@joshdb/core": "next",
     "@joshdb/serialize": "next",
     "@sapphire/utilities": "^3.6.2",
-    "mongoose": "^6.3.1"
+    "mongodb": "^4.5.0"
   },
   "devDependencies": {
     "@favware/rollup-type-bundler": "^1.0.7",
