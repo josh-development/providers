@@ -276,9 +276,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
   public async [Method.GetMany](payload: Payloads.GetMany<StoredValue>): Promise<Payloads.GetMany<StoredValue>> {
     const { keys } = payload;
 
-    payload.data = {};
-
-    for (const key of keys) payload.data[key] = (await this.handler.has(key)) ? (await this.handler.get(key))! : null;
+    payload.data = await this.handler.getMany(keys);
 
     return payload;
   }
