@@ -2,6 +2,7 @@ import { MapProvider } from '@joshdb/core';
 import prompts from 'prompts';
 import { JSONProvider } from '../../packages/json/src';
 import { MongoProvider } from '../../packages/mongo/src';
+import { RedisProvider } from '../../packages/redis/src';
 import { Benchmark } from './lib/Benchmark';
 import { BASIC_BENCHMARK_TESTS, BENCHMARK_TESTS } from './lib/constants/benchmark-tests';
 import { BenchmarkType } from './lib/types/BenchmarkType';
@@ -12,6 +13,8 @@ async function main() {
     .add(new MapProvider())
     .add(new JSONProvider({ dataDirectoryName: '.bench' }), 'JSONProvider (Serialize)')
     .add(new JSONProvider({ dataDirectoryName: '.bench', disableSerialization: true }))
+    .add(new RedisProvider({ disableSerialization: true }))
+    .add(new RedisProvider({}), 'RedisProvider (Serialize)')
     .add(new MongoProvider({ collectionName: 'benchmark' }), 'MongoProvider (Serialize)')
     .add(new MongoProvider({ collectionName: 'benchmark', disableSerialization: true }));
 
