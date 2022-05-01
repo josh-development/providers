@@ -948,7 +948,7 @@ __metadata:
     "@joshdb/serialize": next
     "@sapphire/utilities": ^3.6.2
     jest: ^27.5.1
-    mongoose: ^6.2.10
+    mongoose: ^6.3.1
     rollup: ^2.70.2
     rollup-plugin-cleaner: ^1.0.0
     rollup-plugin-typescript2: ^0.31.2
@@ -5614,7 +5614,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongoose@npm:^6.2.10":
+"mongoose@npm:^6.3.1":
   version: 6.3.2
   resolution: "mongoose@npm:6.3.2"
   dependencies:
