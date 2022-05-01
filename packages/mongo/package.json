@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@favware/rollup-type-bundler": "^1.0.7",
-    "jest": "^27.5.1",
+    "jest": "^28.0.3",
     "rollup": "^2.70.1",
     "rollup-plugin-cleaner": "^1.0.0",
     "rollup-plugin-typescript2": "^0.31.2",
