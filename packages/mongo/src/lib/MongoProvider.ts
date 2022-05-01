@@ -27,7 +27,7 @@ import {
 } from '@joshdb/core';
 import { Serialize } from '@joshdb/serialize';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
-import { connect, ConnectOptions, Model, model, Mongoose, PipelineStage, ProjectionType, Schema, Types } from 'mongoose';
+import { connect, ConnectOptions, FilterQuery, Model, model, Mongoose, PipelineStage, ProjectionType, Schema, Types } from 'mongoose';
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: MongoProvider.Options;
 
@@ -91,6 +91,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Clear](payload: Payloads.Clear): Promise<Payloads.Clear> {
     await this.collection.deleteMany({});
+    // await this.client.connection.db.dropCollection(this.collection.collection.collectionName); <- would probably be faster but disconnects the collection, requires a new init
+    // this._collection = undefined;
 
     return payload;
   }
@@ -143,9 +145,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Each](payload: Payloads.Each<StoredValue>): Promise<Payloads.Each<StoredValue>> {
     const { hook } = payload;
-    const all = await this._getAll();
 
-    for (const { key, value } of all) {
+    for await (const { key, value } of this._iterate({})) {
       await hook(this.deserialize(value), key);
     }
 
@@ -172,7 +173,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isEveryByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const { value } of await this._getAll({ value: 1 })) {
+      for await (const { value } of this._iterate({}, { value: 1 })) {
         const deserialized = this.deserialize(value);
         const result = await hook(deserialized);
 
@@ -184,8 +185,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     if (isEveryByValuePayload(payload)) {
       const { path, value } = payload;
-
-      for (const { key, value: storedValue } of await this._getAll()) {
+      for await (const { key, value: storedValue } of this._iterate({})) {
         const deserialized = this.deserialize(storedValue);
         const data = getProperty(deserialized, path, false);
 
@@ -213,7 +213,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isFilterByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const { key, value } of await this._getAll()) {
+      for await (const { key, value } of this._iterate({})) {
         const deserialized = this.deserialize(value);
         const filterValue = await hook(deserialized);
 
@@ -226,7 +226,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isFilterByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for (const { key, value: storedValue } of await this._getAll()) {
+      for await (const { key, value: storedValue } of this._iterate({})) {
         const deserialized = this.deserialize(storedValue);
         const data = getProperty(deserialized, path, false);
 
@@ -252,7 +252,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isFindByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const { key, value } of await this._getAll()) {
+      for await (const { key, value } of this._iterate({})) {
         const deserialized = this.deserialize(value);
         const result = await hook(deserialized);
 
@@ -273,7 +273,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         return payload;
       }
 
-      for (const { key, value: storedValue } of await this._getAll()) {
+      for await (const { key, value: storedValue } of this._iterate({})) {
         const deserialized = this.deserialize(storedValue);
         if (payload.data[0] !== null && payload.data[1] !== null) break;
 
@@ -299,7 +299,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Get]<StoredValue>(payload: Payloads.Get<StoredValue>): Promise<Payloads.Get<StoredValue>> {
     const { key, path } = payload;
-    const doc = await this.collection.findOne({ key }, { value: 1 });
+    const doc = await this.collection.findOne({ key }, { value: 1 }).lean();
 
     if (!doc) {
       return payload;
@@ -319,7 +319,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.GetAll](payload: Payloads.GetAll<StoredValue>): Promise<Payloads.GetAll<StoredValue>> {
     payload.data = {};
 
-    const docs = (await this.collection.find({})) || [];
+    const docs = await this._getAll();
 
     for (const doc of docs) payload.data[doc.key] = this.deserialize(doc.value);
 
@@ -330,7 +330,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     payload.data = {};
 
     const { keys } = payload;
-    const docs = (await this.collection.find({ key: { $in: keys } })) || [];
+    const docs = (await this.collection.find({ key: { $in: keys } }).lean()) || [];
 
     for (const doc of docs) payload.data[doc.key] = this.deserialize(doc.value);
 
@@ -370,7 +370,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   public async [Method.Keys](payload: Payloads.Keys): Promise<Payloads.Keys> {
-    const docs = (await this.collection.find({}, { key: 1 })) || [];
+    const docs = await this._getAll({ key: 1 });
 
     payload.data = docs.map((doc) => doc.key);
 
@@ -385,13 +385,13 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isMapByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const { value } of await this._getAll({ value: 1 })) payload.data.push(await hook(this.deserialize(value)));
+      for await (const { value } of this._iterate({}, { value: 1 })) payload.data.push(await hook(this.deserialize(value)));
     }
 
     if (isMapByPathPayload(payload)) {
       const { path } = payload;
 
-      for (const { value } of await this._getAll({ value: 1 })) {
+      for await (const { value } of this._iterate({}, { value: 1 })) {
         const deserialized = this.deserialize(value);
         const data = getProperty<Value>(deserialized, path);
 
@@ -459,7 +459,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isPartitionByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const { key, value } of await this._getAll()) {
+      for await (const { key, value } of this._iterate({})) {
         const deserialized = this.deserialize(value);
         const result = await hook(deserialized);
 
@@ -471,7 +471,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isPartitionByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for (const { key, value: storedValue } of await this._getAll()) {
+      for await (const { key, value: storedValue } of this._iterate({})) {
         const deserialized = this.deserialize(storedValue);
         const data = getProperty<StoredValue>(deserialized, path);
 
@@ -650,7 +650,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isSomeByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const { value } of await this._getAll({ value: 1 })) {
+      for await (const { value } of this._iterate({}, { value: 1 })) {
         const deserialized = this.deserialize(value);
         const someValue = await hook(deserialized);
 
@@ -665,7 +665,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isSomeByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for (const { key, value: storedValue } of await this._getAll()) {
+      for await (const { key, value: storedValue } of this._iterate({})) {
         const deserialized = this.deserialize(storedValue);
         const data = getProperty(deserialized, path, false);
 
@@ -730,17 +730,25 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   private _getAll(projection: ProjectionType<MongoProvider.DocType<StoredValue>> = { key: 1, value: 1 }) {
-    return this.collection.find<MongoProvider.DocType<StoredValue>>({}, projection);
+    return this.collection.find<MongoProvider.DocType<StoredValue>>({}, projection).lean();
   }
 
-  private deserialize(value: string | StoredValue): StoredValue {
+  private _iterate(
+    filter: FilterQuery<MongoProvider.DocType<StoredValue>>,
+    projection: ProjectionType<MongoProvider.DocType<StoredValue>> = { key: 1, value: 1 }
+  ) {
+    const agg = this.collection.aggregate([{ $match: filter }, { $project: projection as { [field: string]: any } }]);
+    return agg;
+  }
+
+  private deserialize(value: Serialize.JSON | StoredValue): StoredValue {
     if (this.options.disableSerialization) return value as StoredValue;
-    return new Serialize({ json: JSON.parse(value as string) }).toRaw<StoredValue>();
+    return new Serialize({ json: value as Serialize.JSON }).toRaw<StoredValue>();
   }
 
   private serialize<Value = StoredValue>(value: StoredValue | Value) {
     if (this.options.disableSerialization) return value;
-    return JSON.stringify(new Serialize({ raw: value }).toJSON());
+    return new Serialize({ raw: value }).toJSON();
   }
 
   public static defaultAuthentication: MongoProvider.Authentication = { dbName: 'josh', host: 'localhost', port: 27017 };
@@ -748,6 +756,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public static schema = new Schema({ key: { type: String, required: true }, value: { type: Schema.Types.Mixed, required: true } });
 
   public static generateMongoDoc<StoredValue>(collectionName: string): Model<MongoProvider.DocType<StoredValue>> {
+    MongoProvider.schema.index({ key: 1 }, { unique: true });
     return model('MongoDoc', MongoProvider.schema, collectionName);
   }
 }
@@ -780,7 +789,7 @@ export namespace MongoProvider {
   export interface DocType<StoredValue> extends Document {
     key: string;
 
-    value: string | StoredValue;
+    value: Serialize.JSON | StoredValue;
   }
 
   export enum Identifiers {
