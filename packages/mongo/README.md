@@ -62,6 +62,13 @@ interface Options {
    * @since 2.0.0
    */
   authentication?: Partial<Authentication> | string;
+
+  /**
+   * Disable using ``@joshdb/serialize`` for document serialization
+   * This can be faster in some cases, but may cause issues with complex data types
+   * @since 2.0.0
+   */
+  disableSerialization?: boolean;
 }
 
 interface Authentication {
