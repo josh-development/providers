@@ -972,7 +972,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@joshdb/tests@npm:1.1.0-pr-12.e708e7d6f59e991ff7d4bbbfcdfa5e6811c83f2a.0":
+"@joshdb/tests@npm:^1.1.0-next.798c560b5c83fef8f03d5ef552668c952ecc85ad.0":
   version: 1.1.0-pr-12.e708e7d6f59e991ff7d4bbbfcdfa5e6811c83f2a.0
   resolution: "@joshdb/tests@npm:1.1.0-pr-12.e708e7d6f59e991ff7d4bbbfcdfa5e6811c83f2a.0"
   dependencies:
@@ -6540,7 +6540,7 @@ __metadata:
     "@faker-js/faker": ^6.2.0
     "@favware/npm-deprecate": ^1.0.4
     "@joshdb/core": next
-    "@joshdb/tests": 1.1.0-pr-12.e708e7d6f59e991ff7d4bbbfcdfa5e6811c83f2a.0
+    "@joshdb/tests": ^1.1.0-next.798c560b5c83fef8f03d5ef552668c952ecc85ad.0
     "@sapphire/eslint-config": ^4.3.3
     "@sapphire/ts-config": ^3.3.4
     "@types/jest": ^27.4.1
