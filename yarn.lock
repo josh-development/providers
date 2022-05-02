@@ -610,9 +610,9 @@ __metadata:
   linkType: hard
 
 "@faker-js/faker@npm:^6.2.0":
-  version: 6.3.1
-  resolution: "@faker-js/faker@npm:6.3.1"
-  checksum: 05071e952248f4565218a95b089ef8f616130c6ff914bb416ba7c891f81d123b637c2abe8aa2eb7b207b5d4b8bd9c75c8c2133019d2d11db4176948737a95813
+  version: 6.2.0
+  resolution: "@faker-js/faker@npm:6.2.0"
+  checksum: 8caffc9e55c9eb5bc5ee8824366338cb81469ed9cb591c38f06be73e8e4366d48eb6ced78e9f4c3530d0ed5f4c63bf50edf45c514cb25151a9567a7ebe45a4b1
   languageName: node
   linkType: hard
 
@@ -929,6 +929,9 @@ __metadata:
     "@sapphire/utilities": ^3.6.2
     jest: ^27.5.1
     rollup: ^2.70.2
+    rollup-plugin-cleaner: ^1.0.0
+    rollup-plugin-typescript2: ^0.31.2
+    rollup-plugin-version-injector: ^1.3.3
     standard-version: ^9.3.2
   languageName: unknown
   linkType: soft
@@ -942,8 +945,11 @@ __metadata:
     "@joshdb/serialize": next
     "@sapphire/utilities": ^3.6.2
     jest: ^27.5.1
-    mongodb: ^4.5.0
+    mongoose: ^6.3.1
     rollup: ^2.70.2
+    rollup-plugin-cleaner: ^1.0.0
+    rollup-plugin-typescript2: ^0.31.2
+    rollup-plugin-version-injector: ^1.3.3
     standard-version: ^9.3.2
   languageName: unknown
   linkType: soft
@@ -969,15 +975,6 @@ __metadata:
   version: 1.1.0-next.88e82c1165ca213bedff6f2dbe43cfb2238f58ae.0
   resolution: "@joshdb/serialize@npm:1.1.0-next.88e82c1165ca213bedff6f2dbe43cfb2238f58ae.0"
   checksum: 1a12b59fc8e6154f749ecbd92a23c6b922adc08312029828812c88d22042f6dec5e9172c076c47698f1b05ca5a9eecc7915dfd74ea547d81a2339a150f002282
-  languageName: node
-  linkType: hard
-
-"@joshdb/tests@npm:^1.1.0-next.798c560b5c83fef8f03d5ef552668c952ecc85ad.0":
-  version: 1.1.0-pr-12.e708e7d6f59e991ff7d4bbbfcdfa5e6811c83f2a.0
-  resolution: "@joshdb/tests@npm:1.1.0-pr-12.e708e7d6f59e991ff7d4bbbfcdfa5e6811c83f2a.0"
-  dependencies:
-    "@joshdb/core": next
-  checksum: 08235190f48f0b9c3a08ea1ee14f650db534e0784e296e7f7f9962209e8381052aa14b922ae071d5653f5005610ecf9d017db666e98df2255263b313baa69190
   languageName: node
   linkType: hard
 
@@ -1172,7 +1169,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/eslint-config@npm:^4.3.3":
+"@sapphire/eslint-config@npm:^4.3.4":
   version: 4.3.4
   resolution: "@sapphire/eslint-config@npm:4.3.4"
   dependencies:
@@ -1455,7 +1452,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/uuid@npm:^8":
+"@types/uuid@npm:^8, @types/uuid@npm:^8.3.4":
   version: 8.3.4
   resolution: "@types/uuid@npm:8.3.4"
   checksum: 6f11f3ff70f30210edaa8071422d405e9c1d4e53abbe50fdce365150d3c698fe7bbff65c1e71ae080cbfb8fded860dbb5e174da96fdbbdfcaa3fb3daa474d20f
@@ -1492,6 +1489,29 @@ __metadata:
   dependencies:
     "@types/yargs-parser": "*"
   checksum: caa21d2c957592fe2184a8368c8cbe5a82a6c2e2f2893722e489f842dc5963293d2f3120bc06fe3933d60a3a0d1e2eb269649fd6b1947fe1820f8841ba611dd9
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/eslint-plugin@npm:^5.20.0":
+  version: 5.21.0
+  resolution: "@typescript-eslint/eslint-plugin@npm:5.21.0"
+  dependencies:
+    "@typescript-eslint/scope-manager": 5.22.0
+    "@typescript-eslint/type-utils": 5.22.0
+    "@typescript-eslint/utils": 5.22.0
+    debug: ^4.3.2
+    functional-red-black-tree: ^1.0.1
+    ignore: ^5.1.8
+    regexpp: ^3.2.0
+    semver: ^7.3.5
+    tsutils: ^3.21.0
+  peerDependencies:
+    "@typescript-eslint/parser": ^5.0.0
+    eslint: ^6.0.0 || ^7.0.0 || ^8.0.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 3b083f7003f091c3ef7b3970dca9cfd507ab8c52a9b8a52259c630010adf765e9766f0e6fd9c901fc0e807319a4e8c003e12287b1f12a4b9eb4d7222e8d6db83
   languageName: node
   linkType: hard
 
@@ -5468,6 +5488,37 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mongoose@npm:^6.3.1":
+  version: 6.3.1
+  resolution: "mongoose@npm:6.3.1"
+  dependencies:
+    bson: ^4.6.2
+    kareem: 2.3.5
+    mongodb: 4.5.0
+    mpath: 0.8.4
+    mquery: 4.0.2
+    ms: 2.1.3
+    sift: 16.0.0
+  checksum: 5a9da91a79b0443c2c787c93cb1f06c1f8ee20a81330116a104730b1e1c5b2b378c89848b50d039c0dbe366a2d67650bcb48c0690aa28176d5c0c8b3f38048ec
+  languageName: node
+  linkType: hard
+
+"mpath@npm:0.8.4":
+  version: 0.8.4
+  resolution: "mpath@npm:0.8.4"
+  checksum: 06ad1d443766626fa361b67a4eca9cd4c36a71e475e92e8a5c242dbbc9a911adac00ce971177843b48475356df609f847342548da7701a976a2ab4116135caf0
+  languageName: node
+  linkType: hard
+
+"mquery@npm:4.0.2":
+  version: 4.0.2
+  resolution: "mquery@npm:4.0.2"
+  dependencies:
+    debug: 4.x
+  checksum: 39ac308294fe26fe214fd117a9a2e92f754ee00193d3d8602b23c13cf677688faf8417fc74fa18940d51358bf04105ce279364a396b35fd23d73d452f860a098
+  languageName: node
+  linkType: hard
+
 "mri@npm:^1.1.5":
   version: 1.2.0
   resolution: "mri@npm:1.2.0"
@@ -6503,7 +6554,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rollup@npm:^2.59.0, rollup@npm:^2.63.0, rollup@npm:^2.68.0, rollup@npm:^2.70.1":
+"rollup@npm:^2.59.0, rollup@npm:^2.63.0, rollup@npm:^2.68.0, rollup@npm:^2.70.2":
   version: 2.71.1
   resolution: "rollup@npm:2.71.1"
   dependencies:
@@ -6540,14 +6591,15 @@ __metadata:
     "@faker-js/faker": ^6.2.0
     "@favware/npm-deprecate": ^1.0.4
     "@joshdb/core": next
-    "@joshdb/tests": ^1.1.0-next.798c560b5c83fef8f03d5ef552668c952ecc85ad.0
-    "@sapphire/eslint-config": ^4.3.3
+    "@joshdb/tests": next
+    "@sapphire/eslint-config": ^4.3.4
     "@sapphire/ts-config": ^3.3.4
     "@types/jest": ^27.4.1
     "@types/node": 17.0.23
     "@types/prompts": ^2.4.0
     "@types/rimraf": ^3.0.2
-    "@typescript-eslint/eslint-plugin": ^5.19.0
+    "@types/uuid": ^8.3.4
+    "@typescript-eslint/eslint-plugin": ^5.20.0
     colorette: ^2.0.16
     eslint: ^8.14.0
     eslint-config-prettier: ^8.5.0
@@ -6568,6 +6620,7 @@ __metadata:
     ts-jest: ^27.1.4
     ts-node: ^10.7.0
     typescript: ^4.6.3
+    vite: ^2.9.5
   languageName: unknown
   linkType: soft
 
@@ -7549,6 +7602,49 @@ __metadata:
   dependencies:
     builtins: ^1.0.3
   checksum: ce4c68207abfb22c05eedb09ff97adbcedc80304a235a0844f5344f1fd5086aa80e4dbec5684d6094e26e35065277b765c1caef68bcea66b9056761eddb22967
+  languageName: node
+  linkType: hard
+
+"vite@npm:^2.9.5":
+  version: 2.9.6
+  resolution: "vite@npm:2.9.6"
+  dependencies:
+    esbuild: ^0.14.27
+    fsevents: ~2.3.2
+    postcss: ^8.4.12
+    resolve: ^1.22.0
+    rollup: ^2.59.0
+  peerDependencies:
+    less: "*"
+    sass: "*"
+    stylus: "*"
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  peerDependenciesMeta:
+    less:
+      optional: true
+    sass:
+      optional: true
+    stylus:
+      optional: true
+  bin:
+    vite: bin/vite.js
+  checksum: 79bbf516547f4adb1a297ac8648f8818b3e2a7bb113a7e12acc2355498d247556f58fc50d39eec4891c07250e7420e72773e358eeb8dc62af62fc1ff32c70877
+  languageName: node
+  linkType: hard
+
+"vscode-oniguruma@npm:^1.6.1":
+  version: 1.6.2
+  resolution: "vscode-oniguruma@npm:1.6.2"
+  checksum: 6b754acdafd5b68242ea5938bb00a32effc16c77f471d4f0f337d879d0e8e592622998e2441f42d9a7ff799c1593f31c11f26ca8d9bf9917e3ca881d3c1f3e19
+  languageName: node
+  linkType: hard
+
+"vscode-textmate@npm:5.2.0":
+  version: 5.2.0
+  resolution: "vscode-textmate@npm:5.2.0"
+  checksum: 5449b42d451080f6f3649b66948f4b5ee4643c4e88cfe3558a3b31c84c78060cfdd288c4958c1690eaa5cd65d09992fa6b7c3bef9d4aa72b3651054a04624d20
   languageName: node
   linkType: hard
 
