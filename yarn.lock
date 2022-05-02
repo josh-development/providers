@@ -972,12 +972,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@joshdb/tests@npm:^1.1.0-next.798c560b5c83fef8f03d5ef552668c952ecc85ad.0":
-  version: 1.1.0-next.aed65dd5ce3d189228ab0b5f1711432925f18e97.0
-  resolution: "@joshdb/tests@npm:1.1.0-next.aed65dd5ce3d189228ab0b5f1711432925f18e97.0"
+"@joshdb/tests@npm:1.1.0-pr-12.e708e7d6f59e991ff7d4bbbfcdfa5e6811c83f2a.0":
+  version: 1.1.0-pr-12.e708e7d6f59e991ff7d4bbbfcdfa5e6811c83f2a.0
+  resolution: "@joshdb/tests@npm:1.1.0-pr-12.e708e7d6f59e991ff7d4bbbfcdfa5e6811c83f2a.0"
   dependencies:
     "@joshdb/core": next
-  checksum: 4e696b437c6680eb9290f51ffa325157319788bcfa9a7770b0f47c64f014e5eda0e34719fdb0b4e7ac2fa5e4817208ae0f777bd0f28b79685e8ba3f347f95c54
+  checksum: 08235190f48f0b9c3a08ea1ee14f650db534e0784e296e7f7f9962209e8381052aa14b922ae071d5653f5005610ecf9d017db666e98df2255263b313baa69190
   languageName: node
   linkType: hard
 
@@ -6540,7 +6540,7 @@ __metadata:
     "@faker-js/faker": ^6.2.0
     "@favware/npm-deprecate": ^1.0.4
     "@joshdb/core": next
-    "@joshdb/tests": next
+    "@joshdb/tests": 1.1.0-pr-12.e708e7d6f59e991ff7d4bbbfcdfa5e6811c83f2a.0
     "@sapphire/eslint-config": ^4.3.3
     "@sapphire/ts-config": ^3.3.4
     "@types/jest": ^27.4.1

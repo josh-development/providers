@@ -45,7 +45,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return context;
   }
 
-  public async close() {
+  public close() {
     return this.client.quit();
   }
 
