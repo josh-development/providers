@@ -27,7 +27,7 @@ import {
 } from '@joshdb/core';
 import { Serialize } from '@joshdb/serialize';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
-import { createClient, RedisClientType } from 'redis';
+import { createClient, RedisClientOptions, RedisClientType } from 'redis';
 import { v4 } from 'uuid';
 
 export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
@@ -40,7 +40,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
     context = await super.init(context);
-    this._client = createClient({ url: this.options.uri, name: context.name });
+    this._client = createClient(this.options.connectOptions);
     await this._client.connect();
     return context;
   }
@@ -557,7 +557,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { key, path, value } = payload;
     const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, key, path })).data, path, value) : value;
 
-    await this.client.set(key, this.serialize(val) as string);
+    await this.client.set(key, this.serialize(val) as string, { EX: this.options.expiry });
 
     return payload;
   }
@@ -575,7 +575,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
       const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, key, path: [] })).data, path, value) : value;
 
-      operations.push(this.client.set(key, this.serialize(val) as string));
+      operations.push(this.client.set(key, this.serialize(val) as string, { EX: this.options.expiry }));
     }
 
     await Promise.all(operations);
@@ -691,10 +691,15 @@ export namespace RedisProvider {
   export interface Options {
     uri?: string;
 
+    connectOptions?: RedisClientOptions;
+
+    expiry?: number;
+
     disableSerialization?: boolean;
   }
 
   export type DocType<StoredValue> = string | StoredValue;
+
   export enum Identifiers {
     NotConnected = 'notConnected'
   }
