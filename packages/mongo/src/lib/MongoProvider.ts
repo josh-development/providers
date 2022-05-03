@@ -97,7 +97,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Dec](payload: Payloads.Dec): Promise<Payloads.Dec> {
     const { key, path } = payload;
-    const getPayload = await this[Method.Get]<StoredValue>({ key, method: Method.Get, path });
+    const getPayload = await this[Method.Get]({ key, method: Method.Get, path });
 
     if (!isPayloadWithData(getPayload))
       return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Dec }, { key, path }) };

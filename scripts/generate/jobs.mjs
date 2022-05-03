@@ -282,7 +282,7 @@ export const jobs = [
           '',
           `runProviderTest<typeof ${title}Provider, ${title}Provider.Options>({`,
           `  providerConstructor: ${title}Provider,`,
-          "  providerOptions: { dataDirectoryName: '.tests' }",
+          '  providerOptions: {}',
           '});',
           ''
         ].join('\n')
