@@ -10,29 +10,5 @@
     "source.organizeImports": true
   },
   "files.eol": "\n",
-  "cSpell.maxNumberOfProblems": 8,
-  "cSpell.numSuggestions": 24,
-  "cSpell.words": [
-    "joshdb",
-    "Évelyne",
-    "Lachance",
-    "Hendry",
-    "typedoc",
-    "realware",
-    "commitlint",
-    "favware",
-    "tsbuildinfo",
-    "mapprovider",
-    "jsonprovider",
-    "mongoprovider",
-    "autokey",
-    "deletemany",
-    "getall",
-    "getmany",
-    "randomkey",
-    "setmany",
-    "colorette",
-    "vite"
-  ],
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules\\typescript\\lib"
 }
