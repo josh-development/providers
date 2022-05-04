@@ -281,8 +281,8 @@ export const jobs = [
           `import { ${title}Provider } from '../../src';`,
           '',
           `runProviderTest<typeof ${title}Provider, ${title}Provider.Options>({`,
-          `  providerConstructor: ${title}Provider`,
-          "  providerOptions: { dataDirectoryName: '.tests' }",
+          `  providerConstructor: ${title}Provider,`,
+          '  providerOptions: {}',
           '});',
           ''
         ].join('\n')

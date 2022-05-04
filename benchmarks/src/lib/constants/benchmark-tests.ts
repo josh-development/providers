@@ -28,7 +28,7 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
     },
 
     run: async ({ josh, card }) => {
-      await josh.dec(`${card.id}.net`);
+      await josh.dec(card.id, 'net');
     }
   },
   {
@@ -189,7 +189,7 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
     },
 
     run: async ({ josh, card }) => {
-      await josh.inc(`${card.id}.net`);
+      await josh.inc(card.id, 'net');
     }
   },
   {
@@ -233,7 +233,7 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
     },
 
     run: async ({ josh, card }) => {
-      await josh.math(`${card.id}.net`, MathOperator.Addition, 1);
+      await josh.math(card.id, MathOperator.Addition, 1, 'net');
     }
   },
   {
@@ -266,7 +266,7 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
     },
 
     run: async ({ josh, card }) => {
-      await josh.push(`${card.id}.ids`, card.id);
+      await josh.push(card.id, card.id, 'ids');
     }
   },
   {
@@ -321,7 +321,7 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
     },
 
     run: async ({ josh, card }) => {
-      await josh.remove(`${card.id}.ids`, card.id);
+      await josh.remove(card.id, card.id, 'ids');
     }
   },
   {

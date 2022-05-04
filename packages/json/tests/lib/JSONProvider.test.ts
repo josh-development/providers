@@ -1,4 +1,4 @@
-import { runProviderTest } from '../../../../tests/runProviderTest';
+import { runProviderTest } from '@joshdb/tests';
 import { JSONProvider } from '../../src';
 
 runProviderTest<typeof JSONProvider, JSONProvider.Options>({

@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import type { Card } from '@faker-js/faker/helpers';
 import { Josh, JoshProvider } from '@joshdb/core';
 import { blueBright, cyanBright, gray, greenBright, magentaBright } from 'colorette';
@@ -7,6 +6,7 @@ import { mkdir, writeFile } from 'fs/promises';
 import ora from 'ora-classic';
 import { resolve } from 'path';
 import { performance } from 'perf_hooks';
+import { createCard } from './functions/createCard';
 import { toTitleCase } from './functions/toTitleCase';
 
 export class Benchmark {
@@ -161,7 +161,8 @@ export class Benchmark {
 
     for (let i = 0; i < cardCount; i++) {
       spinner.text = `Card Generation (${i}/${cardCount})`;
-      cards[i.toString()] = { id: i.toString(), net: 0, ids: [], ...faker.helpers.createCard() };
+      const card = createCard(i);
+      cards[i.toString()] = card;
     }
 
     spinner.succeed('Card Generation Complete\n');
