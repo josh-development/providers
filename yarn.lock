@@ -951,18 +951,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/mydb@workspace:packages/mydb":
-  version: 0.0.0-use.local
-  resolution: "@joshdb/mydb@workspace:packages/mydb"
-  dependencies:
-    "@favware/rollup-type-bundler": ^1.0.7
-    "@joshdb/core": next
-    jest: ^27.5.1
-    rollup: ^2.70.2
-    standard-version: ^9.3.2
-  languageName: unknown
-  linkType: soft
-
 "@joshdb/serialize@npm:next":
   version: 1.1.0-next.a1c39906f46e2c6aa91491b8a9ed1afb0ab5fcc7.0
   resolution: "@joshdb/serialize@npm:1.1.0-next.a1c39906f46e2c6aa91491b8a9ed1afb0ab5fcc7.0"
