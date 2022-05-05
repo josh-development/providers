@@ -9,7 +9,7 @@ on:
 
 jobs:
   json:
-    name: Package /json
+    name: JSONProvider
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Project
@@ -30,7 +30,7 @@ jobs:
           name: coverage
           path: coverage/
   mongo:
-    name: Package /mongo
+    name: MongoProvider
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Project
