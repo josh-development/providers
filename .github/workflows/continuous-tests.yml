@@ -1,4 +1,4 @@
-name: Continuous Unit testing
+name: Continuous Unit Tests
 
 on:
   push:
