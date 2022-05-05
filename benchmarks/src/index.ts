@@ -1,6 +1,6 @@
-import { MapProvider } from '@joshdb/core';
 import prompts from 'prompts';
 import { JSONProvider } from '../../packages/json/src';
+import { MapProvider } from '../../packages/map/src';
 import { MongoProvider } from '../../packages/mongo/src';
 import { RedisProvider } from '../../packages/redis/src';
 import { Benchmark } from './lib/Benchmark';

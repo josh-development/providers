@@ -982,6 +982,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@joshdb/map@workspace:packages/map":
+  version: 0.0.0-use.local
+  resolution: "@joshdb/map@workspace:packages/map"
+  dependencies:
+    "@favware/rollup-type-bundler": ^1.0.7
+    "@joshdb/core": next
+    "@sapphire/utilities": ^3.6.2
+    jest: ^27.5.1
+    rollup: ^2.70.2
+    standard-version: ^9.3.2
+  languageName: unknown
+  linkType: soft
+
 "@joshdb/mongo@workspace:packages/mongo":
   version: 0.0.0-use.local
   resolution: "@joshdb/mongo@workspace:packages/mongo"
