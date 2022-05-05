@@ -4,7 +4,7 @@ import prompts from 'prompts';
 import { jobs } from './jobs.mjs';
 
 const response = await prompts([
-  { type: 'text', name: 'name', message: "What's the name of your provider?", initial: 'mydb' },
+  { type: 'text', name: 'name', message: "What's the name of your provider?", initial: 'my-db' },
   { type: 'text', name: 'title', message: "What's the title case name of your provider?", initial: 'MyDB' },
   { type: 'text', name: 'description', message: 'Write a short description of your provider', initial: 'A Josh provider' },
   {
