@@ -49,7 +49,7 @@ interface Options {
    * Mongoose connection options
    * @since 2.0.0
    */
-  connectOptions?: Mongoose.ConnectOptions // see https://mongoosejs.com/docs/connections.html#options
+  connectOptions?: Mongodb.ConnectOptions; // see https://mongodb.github.io/node-mongodb-native/4.5/interfaces/MongoClientOptions.html
 
   /**
    * Sanitize collection name
@@ -62,6 +62,13 @@ interface Options {
    * @since 2.0.0
    */
   authentication?: Partial<Authentication> | string;
+
+  /**
+   * Disable using ``@joshdb/serialize`` for document serialization
+   * This can be faster in some cases, but may cause issues with complex data types
+   * @since 2.0.0
+   */
+  disableSerialization?: boolean;
 }
 
 interface Authentication {
