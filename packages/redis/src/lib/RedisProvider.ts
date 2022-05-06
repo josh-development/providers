@@ -40,7 +40,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
     context = await super.init(context);
-    this._client = createClient(this.options.connectOptions);
+    this._client = createClient(this.options.connectOptions) as RedisClientType;
     await this._client.connect();
     return context;
   }
@@ -125,6 +125,14 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       await this[Method.Set]({ key, value: payload.defaultValue, method: Method.Set, path: [] });
 
     payload.data = (await this[Method.Get]({ key, method: Method.Get, path: [] })).data as StoredValue;
+
+    return payload;
+  }
+
+  public async [Method.Entries](payload: Payloads.Entries<StoredValue>): Promise<Payloads.Entries<StoredValue>> {
+    payload.data = {};
+
+    for await (const doc of this._iterate()) payload.data[doc.key] = doc.value;
 
     return payload;
   }
@@ -271,14 +279,6 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
       if (data !== PROPERTY_NOT_FOUND) payload.data = data;
     }
-
-    return payload;
-  }
-
-  public async [Method.GetAll](payload: Payloads.GetAll<StoredValue>): Promise<Payloads.GetAll<StoredValue>> {
-    payload.data = {};
-
-    for await (const doc of this._iterate()) payload.data[doc.key] = doc.value;
 
     return payload;
   }
