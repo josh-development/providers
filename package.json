@@ -12,7 +12,6 @@
     "format": "prettier --write \"{benchmarks,packages,scripts}/**/*.{mjs,ts}\"",
     "build": "yarn workspaces foreach -v --no-private run build",
     "update": "yarn upgrade-interactive",
-    "publish": "yarn workspaces foreach -v --no-private npm publish",
     "prepublishOnly": "yarn workspaces foreach -v --no-private run prepublishOnly",
     "prepare": "husky install"
   },
@@ -29,10 +28,12 @@
     "@types/node": "17.0.23",
     "@types/prompts": "^2.4.0",
     "@types/rimraf": "^3.0.2",
-    "@typescript-eslint/eslint-plugin": "^5.19.0",
+    "@typescript-eslint/eslint-plugin": "^5.22.0",
+    "@typescript-eslint/parser": "^5.22.0",
     "colorette": "^2.0.16",
     "eslint": "^8.14.0",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "husky": "^7.0.4",
     "jest": "^27.5.1",
     "jest-circus": "^27.5.1",
@@ -57,11 +58,6 @@
   "engines": {
     "node": ">=16.6.0",
     "npm": ">=7.0.0"
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
   },
   "lint-staged": {
     "*.{mjs,ts}": "eslint --fix --ext mjs,ts"
