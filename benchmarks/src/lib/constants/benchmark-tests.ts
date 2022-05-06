@@ -72,6 +72,17 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
     }
   },
   {
+    name: Method.Entries,
+
+    beforeAll: async ({ josh, entries }) => {
+      await josh.setMany(entries);
+    },
+
+    run: async ({ josh }) => {
+      await josh.entries();
+    }
+  },
+  {
     name: `${Method.Every} (Path)`,
 
     beforeAll: async ({ josh, entries }) => {
@@ -146,17 +157,6 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
 
     run: async ({ josh, card }) => {
       await josh.get(card.id);
-    }
-  },
-  {
-    name: Method.GetAll,
-
-    beforeAll: async ({ josh, entries }) => {
-      await josh.setMany(entries);
-    },
-
-    run: async ({ josh }) => {
-      await josh.getAll();
     }
   },
   {
@@ -407,8 +407,8 @@ export const BASIC_BENCHMARK_TESTS = BENCHMARK_TESTS.filter((test) =>
     Method.Clear,
     Method.Delete,
     Method.DeleteMany,
+    Method.Entries,
     Method.Get,
-    Method.GetAll,
     Method.GetMany,
     Method.Math,
     Method.Random,
