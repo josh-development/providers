@@ -10,13 +10,13 @@ import { PickType } from './lib/types/YesNo';
 
 async function main() {
   const benchmark = new Benchmark()
-    .add(new MapProvider())
     .add(new JSONProvider({ dataDirectoryName: '.bench' }), 'JSONProvider (Serialize)')
     .add(new JSONProvider({ dataDirectoryName: '.bench', disableSerialization: true }))
-    .add(new RedisProvider({ disableSerialization: true }))
-    .add(new RedisProvider({}), 'RedisProvider (Serialize)')
+    .add(new MapProvider())
     .add(new MongoProvider({ collectionName: 'benchmark' }), 'MongoProvider (Serialize)')
-    .add(new MongoProvider({ collectionName: 'benchmark', disableSerialization: true }));
+    .add(new MongoProvider({ collectionName: 'benchmark', disableSerialization: true }))
+    .add(new RedisProvider({ disableSerialization: true }))
+    .add(new RedisProvider({}), 'RedisProvider (Serialize)');
 
   const response = await prompts([
     { type: 'number', name: 'cardCount', message: 'How many cards do you want to test?', initial: Benchmark.defaultCardCount },
