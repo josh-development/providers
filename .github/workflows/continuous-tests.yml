@@ -65,7 +65,7 @@ jobs:
         with:
           node-version: 16
       - name: Start Redis Instance
-        uses: supercharge/redis-github-action@1.4.0
+        uses: supercharge/redis-github-action@4b67a313c69bc7a90f162e8d810392fffe10d3b5 # tag=1.4.0
         with:
           redis-version: 6
       - name: Install Dependencies
