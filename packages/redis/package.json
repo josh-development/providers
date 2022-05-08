@@ -23,7 +23,7 @@
   "devDependencies": {
     "@favware/rollup-type-bundler": "^1.0.7",
     "@types/uuid": "^8",
-    "jest": "^27.5.1",
+    "jest": "^28.1.0",
     "rollup": "^2.72.1",
     "rollup-plugin-cleaner": "^1.0.0",
     "rollup-plugin-typescript2": "^0.31.2",

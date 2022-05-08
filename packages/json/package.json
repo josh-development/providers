@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@favware/rollup-type-bundler": "^1.0.7",
-    "jest": "^27.5.1",
+    "jest": "^28.1.0",
     "rollup": "^2.72.1",
     "standard-version": "^9.3.2"
   },
