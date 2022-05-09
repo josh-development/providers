@@ -29,6 +29,27 @@ jobs:
         with:
           name: coverage
           path: coverage/
+  map:
+    name: MapProvider
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
+      - name: Use Node.js v16
+        uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # tag=v3
+        with:
+          node-version: 16
+          cache: yarn
+          registry-url: https://registry.yarnpkg.com/
+      - name: Install Dependencies
+        run: yarn --immutable
+      - name: Run Tests
+        run: yarn workspace @joshdb/map run test
+      - name: Store Code Coverage Report
+        uses: actions/upload-artifact@6673cd052c4cd6fcf4b4e6e60ea986c889389535 # tag=v3
+        with:
+          name: coverage
+          path: coverage/
   mongo:
     name: MongoProvider
     runs-on: ubuntu-latest

@@ -130,7 +130,7 @@ export const jobs = [
   },
   {
     description: 'Generate Configuration Files',
-    callback: async ({ name, umd }) => {
+    callback: async ({ name, title, umd }) => {
       await writeFile(
         resolvePath(name, 'jest.config.ts'),
         `import type { Config } from '@jest/types';
@@ -177,12 +177,15 @@ export default {
     {
       file: './dist/index.umd.js',
       format: 'umd',
+      name: 'Josh${title}',
       exports: 'named',
       sourcemap: true,
-      globals: {}
+      globals: {
+        '@joshdb/core': 'JoshCore'
+      }
     }
   ],
-  external: [],
+  external: ['@joshdb/core'],
   plugins: [cleaner({ targets: ['./dist'] }), typescript({ tsconfig: resolve(process.cwd(), 'src', 'tsconfig.json') }), versionInjector()]
 };`
           : `import { resolve } from 'path';
