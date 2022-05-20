@@ -27,6 +27,10 @@ jobs:
         uses: supercharge/redis-github-action@4b67a313c69bc7a90f162e8d810392fffe10d3b5 # tag=1.4.0
         with:
           redis-version: 6
+      - name: Install Dependencies
+        run: yarn --immutable
+      - name: Run benchmark
+        run: yarn benchmark
       - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1
         with:
