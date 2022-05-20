@@ -18,27 +18,37 @@ async function main() {
     .add(new RedisProvider({ disableSerialization: true }))
     .add(new RedisProvider({}), 'RedisProvider (Serialize)');
 
-  const response = await prompts([
-    { type: 'number', name: 'cardCount', message: 'How many cards do you want to test?', initial: Benchmark.defaultCardCount },
-    {
-      type: 'select',
-      name: 'type',
-      message: 'What type of benchmark do you want to run?',
-      choices: [
-        { title: 'Basic', value: BenchmarkType.Basic },
-        { title: 'All', value: BenchmarkType.All }
-      ]
-    },
-    {
-      type: 'select',
-      name: 'export',
-      message: 'Do you want to create an exported file of the benchmark test results?',
-      choices: [
-        { title: 'No, DO NOT create a file of the results.', value: PickType.No },
-        { title: 'Yes, DO create a file of the results.', value: PickType.Yes }
-      ]
-    }
-  ]);
+  let response: { cardCount: number; type: string; export: PickType };
+
+  if (process.env.CI === 'true') {
+    response = {
+      cardCount: 100,
+      type: 'All',
+      export: PickType.Yes
+    };
+  } else {
+    response = await prompts([
+      { type: 'number', name: 'cardCount', message: 'How many cards do you want to test?', initial: Benchmark.defaultCardCount },
+      {
+        type: 'select',
+        name: 'type',
+        message: 'What type of benchmark do you want to run?',
+        choices: [
+          { title: 'Basic', value: BenchmarkType.Basic },
+          { title: 'All', value: BenchmarkType.All }
+        ]
+      },
+      {
+        type: 'select',
+        name: 'export',
+        message: 'Do you want to create an exported file of the benchmark test results?',
+        choices: [
+          { title: 'No, DO NOT create a file of the results.', value: PickType.No },
+          { title: 'Yes, DO create a file of the results.', value: PickType.Yes }
+        ]
+      }
+    ]);
+  }
 
   if (response.cardCount === undefined) process.exit(1);
   if (response.type === undefined) process.exit(1);
