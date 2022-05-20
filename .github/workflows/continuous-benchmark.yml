@@ -36,6 +36,7 @@ jobs:
         with:
           tool: 'customSmallerIsBetter'
           output-file-path: benchmarks/results/output.json
+          save-data-file: false # Please don't try to push to gh-pages
           skip-fetch-gh-pages: true # Don't fetch either
           fail-on-alert: true # Comment on the commit if something is bad
           auto-push: false # Don't attempt to push generated pages
