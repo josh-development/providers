@@ -22,8 +22,8 @@ async function main() {
 
   if (process.env.CI === 'true') {
     response = {
-      cardCount: 100,
-      type: 'All',
+      cardCount: 50, // Note: 50 might be a lot, 100 was definitely too much and so I halved it.
+      type: 'all',
       export: PickType.Yes
     };
   } else {

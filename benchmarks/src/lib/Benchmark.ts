@@ -2,7 +2,7 @@ import type { Card } from '@faker-js/faker/helpers';
 import { Josh, JoshProvider } from '@joshdb/core';
 import { blueBright, cyanBright, gray, greenBright, magentaBright } from 'colorette';
 import { existsSync } from 'fs';
-import { mkdir, writeFile } from 'fs/promises';
+import { mkdir, unlink, writeFile } from 'fs/promises';
 import ora from 'ora-classic';
 import { resolve } from 'path';
 import { performance } from 'perf_hooks';
@@ -151,8 +151,18 @@ export class Benchmark {
     if (!existsSync(directory)) await mkdir(directory, { recursive: true });
 
     const path = resolve(directory, `${Date.now()}.json`);
+    const finalPath = resolve(directory, 'output.json');
 
     await writeFile(path, JSON.stringify(results, null, 2), { encoding: 'utf8' });
+
+    try {
+      await unlink(finalPath);
+    } catch {}
+
+    /*
+      Note: Range is set to 5, that means a variance of 5ms is allowed, this might be way to small or way too large, feel free to comment your thoughts
+    */
+    await writeFile(finalPath, JSON.stringify(results.map((x) => ({ name: x.name, unit: 'Milliseconds', value: x.total, range: '5' }))));
   }
 
   private generateCards(cardCount: number): Record<string, Benchmark.TestCard> {
