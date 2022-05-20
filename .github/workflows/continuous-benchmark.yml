@@ -36,3 +36,4 @@ jobs:
         with:
           tool: 'customSmallerIsBetter'
           output-file-path: benchmarks/results/output.json
+          auto-push: false # Don't attempt to push generated pages
