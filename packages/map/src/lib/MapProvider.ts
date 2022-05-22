@@ -1,8 +1,5 @@
 import {
   CommonIdentifiers,
-  deleteProperty,
-  getProperty,
-  hasProperty,
   isEveryByHookPayload,
   isEveryByValuePayload,
   isFilterByHookPayload,
@@ -21,17 +18,22 @@ import {
   JoshProvider,
   MathOperator,
   Method,
-  Payloads,
-  PROPERTY_NOT_FOUND,
-  setProperty
-} from '@joshdb/core';
+  Payloads
+} from '@joshdb/provider';
 import { isPrimitive } from '@sapphire/utilities';
+import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 
 /**
  * A provider that uses the Node.js native [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) class.
  * @since 2.0.0
  */
 export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
+  public version = {
+    major: 2,
+    minor: 0,
+    patch: 0
+  };
+
   /**
    * The [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) cache to store data.
    * @since 2.0.0
@@ -614,5 +616,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
     payload.data = Array.from(this.cache.values());
 
     return payload;
+  }
+
+  protected fetchVersion() {
+    return this.version;
   }
 }
