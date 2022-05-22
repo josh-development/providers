@@ -996,9 +996,10 @@ __metadata:
   resolution: "@joshdb/map@workspace:packages/map"
   dependencies:
     "@favware/rollup-type-bundler": ^1.0.7
-    "@joshdb/core": 3.0.0-next.4613706cda66569b2d1dc99f06665eecec2505ce.0
+    "@joshdb/provider": next
     "@sapphire/utilities": ^3.6.2
     jest: ^28.1.0
+    property-helpers: ^1.1.0
     rollup: ^2.74.1
     standard-version: ^9.3.2
   languageName: unknown
@@ -1019,6 +1020,15 @@ __metadata:
     standard-version: ^9.3.2
   languageName: unknown
   linkType: soft
+
+"@joshdb/provider@npm:next":
+  version: 1.1.0-next.de81f9f.0
+  resolution: "@joshdb/provider@npm:1.1.0-next.de81f9f.0"
+  dependencies:
+    "@sapphire/utilities": ^3.6.2
+  checksum: 9fc5e4e2315ca2c66d3ee2200121635b33ae3f8ffb462dfc7e693bc7842b807eb9d6f8c3d54eb02d82ff6779794c6e09ec552b0acfa7fe0bf24cabc4edfa9c6b
+  languageName: node
+  linkType: hard
 
 "@joshdb/redis@workspace:packages/redis":
   version: 0.0.0-use.local
