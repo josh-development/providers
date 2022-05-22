@@ -20,6 +20,12 @@
     "release": "npm publish",
     "prepublishOnly": "rollup-type-bundler"
   },
+  "dependencies": {
+    "@joshdb/core": "3.0.0-next.4613706cda66569b2d1dc99f06665eecec2505ce.0",
+    "@joshdb/serialize": "1.1.0-next.d14f7112c7b9d23bbb0a05c7b0deb12ea9c5033b.0",
+    "redis": "^4.1.0",
+    "uuid": "^8.3.2"
+  },
   "devDependencies": {
     "@favware/rollup-type-bundler": "^1.0.7",
     "@types/uuid": "^8",
@@ -49,9 +55,5 @@
   "homepage": "https://josh.evie.dev",
   "publishConfig": {
     "access": "public"
-  },
-  "dependencies": {
-    "redis": "^4.1.0",
-    "uuid": "^8.3.2"
   }
 }
