@@ -19,6 +19,17 @@ export default {
       sourcemap: true
     }
   ],
-  external: [],
+  external: [
+    '@joshdb/provider',
+    '@joshdb/serialize',
+    '@sapphire/async-queue',
+    '@sapphire/snowflake',
+    '@sapphire/utilities',
+    'fs',
+    'fs/promises',
+    'path',
+    'property-helpers',
+    'timers/promises'
+  ],
   plugins: [cleaner({ targets: ['./dist'] }), typescript({ tsconfig: resolve(process.cwd(), 'src', 'tsconfig.json') }), versionInjector()]
 };

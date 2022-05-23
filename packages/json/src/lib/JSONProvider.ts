@@ -1,8 +1,5 @@
 import {
   CommonIdentifiers,
-  deleteProperty,
-  getProperty,
-  hasProperty,
   isEveryByHookPayload,
   isEveryByValuePayload,
   isFilterByHookPayload,
@@ -22,16 +19,21 @@ import {
   MathOperator,
   Method,
   Payloads,
-  PROPERTY_NOT_FOUND,
-  resolveCommonIdentifier,
-  setProperty
-} from '@joshdb/core';
+  resolveCommonIdentifier
+} from '@joshdb/provider';
 import { isPrimitive } from '@sapphire/utilities';
+import { resolve } from 'node:path';
+import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
+import { ChunkIndexFile } from './chunk-files/ChunkIndexFile';
 import { ChunkHandler } from './ChunkHandler';
 import type { File } from './File';
 
 export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: JSONProvider.Options;
+
+  public get version(): JoshProvider.Semver {
+    return this.resolveVersion('[VI]{version}[/VI]');
+  }
 
   private _handler?: ChunkHandler<StoredValue>;
 
@@ -39,13 +41,14 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     super(options);
   }
 
-  public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
+  public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
     context = await super.init(context);
 
     const { dataDirectoryName, disableSerialization, epoch, maxChunkSize, retry, synchronize } = this.options;
 
     this._handler = await new ChunkHandler<StoredValue>({
       name: context.name,
+      version: this.version,
       dataDirectoryName,
       serialize: disableSerialization ? false : true,
       epoch,
@@ -681,13 +684,26 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     throw new Error(`Unknown identifier: ${identifier}`);
   }
 
+  protected async fetchVersion(context: JoshProvider.Context) {
+    const { name } = context;
+    const { dataDirectoryName } = this.options;
+    const index = new ChunkIndexFile({ directory: resolve(process.cwd(), dataDirectoryName ?? 'data', name), version: this.version });
+    const data = await index.fetch();
+
+    return this.isLegacyIndexData(data) ? { major: 1, minor: 0, patch: 0 } : data.version;
+  }
+
+  private isLegacyIndexData(data: unknown): data is { files: { key: string; location: string }[] } {
+    return (
+      Array.isArray(data) && data.every((entry) => typeof entry === 'object' && typeof entry.key === 'string' && typeof entry.location === 'string')
+    );
+  }
+
   private get handler(): ChunkHandler<StoredValue> {
     if (this._handler instanceof ChunkHandler) return this._handler;
 
     throw this.error(JSONProvider.Identifiers.ChunkHandlerNotFound);
   }
-
-  public static version = '[VI]{version}[/VI]';
 }
 
 export namespace JSONProvider {

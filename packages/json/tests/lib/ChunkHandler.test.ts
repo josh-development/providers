@@ -12,7 +12,13 @@ describe('ChunkHandler', () => {
   });
 
   describe('can manipulate chunk data', () => {
-    const handler = new ChunkHandler({ name: 'chunkHandler', maxChunkSize: 100, dataDirectoryName: '.tests', serialize: false });
+    const handler = new ChunkHandler({
+      name: 'chunkHandler',
+      version: { major: 0, minor: 0, patch: 0 },
+      maxChunkSize: 100,
+      dataDirectoryName: '.tests',
+      serialize: false
+    });
 
     beforeAll(async () => {
       await handler.init();

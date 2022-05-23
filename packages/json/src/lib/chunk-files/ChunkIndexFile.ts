@@ -1,17 +1,17 @@
+import type { JoshProvider } from '@joshdb/provider';
 import { File } from '../File';
-import { JSONProvider } from '../JSONProvider';
 import { ChunkLockFile } from './ChunkLockFile';
 
 export class ChunkIndexFile extends File {
-  public version: string;
+  public version: JoshProvider.Semver;
 
   public lock: ChunkLockFile;
 
   public constructor(options: ChunkIndexFile.Options) {
-    const { directory, retry } = options;
+    const { version, directory, retry } = options;
 
     super({ directory, name: 'index.json', serialize: false, retry });
-    this.version = JSONProvider.version;
+    this.version = version;
     this.lock = new ChunkLockFile({ directory, id: 'index', serialize: false, retry });
   }
 
@@ -39,6 +39,8 @@ export class ChunkIndexFile extends File {
 
 export namespace ChunkIndexFile {
   export interface Options {
+    version: JoshProvider.Semver;
+
     directory: string;
 
     retry?: File.RetryOptions;
@@ -47,7 +49,7 @@ export namespace ChunkIndexFile {
   export interface Data {
     name: string;
 
-    version?: string;
+    version: JoshProvider.Semver;
 
     autoKeyCount: number;
 
