@@ -23,16 +23,10 @@ Want to safely store your data in a mongo database? This is the package for you.
 
 ## Installation
 
-### Using Yarn
+You can use the following command to install this package, or replace `npm install` with your package manager of choice.
 
-```bash
-yarn add @joshdb/mongo@next
-```
-
-### Using NPM
-
-```bash
-npm i @joshdb/mongo@next
+```sh
+npm install @joshdb/mongo
 ```
 
 ## Provider Options
