@@ -1,0 +1,3 @@
+name: mongo
+org: joshdb
+packagePath: packages/mongo
