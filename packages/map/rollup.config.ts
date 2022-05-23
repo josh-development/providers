@@ -25,11 +25,12 @@ export default {
       exports: 'named',
       sourcemap: true,
       globals: {
-        '@joshdb/core': 'JoshCore',
-        '@sapphire/utilities': 'SapphireUtilities'
+        '@joshdb/provider': 'JoshProvider',
+        '@sapphire/utilities': 'SapphireUtilities',
+        'property-helpers': 'PropertyHelpers'
       }
     }
   ],
-  external: ['@joshdb/core', '@sapphire/utilities'],
+  external: ['@joshdb/provider', '@sapphire/utilities', 'property-helpers'],
   plugins: [cleaner({ targets: ['./dist'] }), typescript({ tsconfig: resolve(process.cwd(), 'src', 'tsconfig.json') }), versionInjector()]
 };
