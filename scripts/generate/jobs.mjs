@@ -102,7 +102,7 @@ export const jobs = [
                   'check-update': 'cliff-jumper --dry-run'
                 },
                 dependencies: {
-                  '@joshdb/core': 'next'
+                  '@joshdb/provider': 'next'
                 },
                 devDependencies: {
                   '@favware/rollup-type-bundler': '^1.0.7',
