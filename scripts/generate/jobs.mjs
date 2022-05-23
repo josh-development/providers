@@ -172,6 +172,110 @@ npm install @joshdb/${name}
     description: 'Generate Configuration Files',
     callback: async ({ name, title, umd }) => {
       await writeFile(
+        resolvePath(name, '.cliff-jumperrc.yml'),
+        `name: ${name}
+org: joshdb
+packagePath: packages/${name}
+`
+      );
+
+      await writeFile(
+        resolvePath(name, 'CHANGELOG.md'),
+        `# Changelog
+
+All notable changes to this project will be documented in this file.
+`
+      );
+
+      await writeFile(
+        resolvePath(name, 'cliff.toml'),
+        `[changelog]
+header = """
+# Changelog
+
+All notable changes to this project will be documented in this file.\n
+"""
+body = """
+{% if version %}\
+    # [{{ version | trim_start_matches(pat="v") }}]\
+    {% if previous %}\
+        {% if previous.version %}\
+            (https://github.com/josh-development/utilities/compare/{{ previous.version }}...{{ version }})\
+        {% else %}
+            (https://github.com/josh-development/utilities/tree/{{ version }})\
+        {% endif %}\
+    {% endif %} \
+    - ({{ timestamp | date(format="%Y-%m-%d") }})
+{% else %}\
+    # [unreleased]
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+    ## {{ group | upper_first }}
+    {% for commit in commits %}
+    - {% if commit.scope %}\
+      **{{commit.scope}}:** \
+      {% endif %}\
+            {{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/josh-development/utilities/commit/{{ commit.id }}))\
+    {% if commit.breaking %}\
+      \n\n {% raw %}  {% endraw %} ### 💥 Breaking Changes:\n \
+      {% for breakingChange in commit.footers %}\
+        {% raw %}  {% endraw %} - {{ breakingChange }}\n\
+      {% endfor %}\
+    {% endif %}\
+    {% endfor %}
+{% endfor %}\n
+"""
+trim = true
+footer = ""
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+commit_parsers = [
+    { message = "^feat", group = "🚀 Features"},
+    { message = "^fix", group = "🐛 Bug Fixes"},
+    { message = "^docs", group = "📝 Documentation"},
+    { message = "^perf", group = "🏃 Performance"},
+    { message = "^refactor", group = "🏠 Refactor"},
+    { message = ".*deprecated", body = ".*deprecated", group = "🚨 Deprecation"},
+    { message = "^revert", skip = true},
+    { message = "^style", group = "🪞 Styling"},
+    { message = "^test", group = "🧪 Testing"},
+    { message = "^chore", skip = true},
+    { message = "^ci", skip = true},
+    { body = ".*security", group = "🛡️ Security"},
+]
+filter_commits = true
+tag_pattern = "@joshdb/${name}@[0-9]*"
+ignore_tags = ""
+topo_order = false
+sort_commits = "newest"
+`
+      );
+
+      await writeFile(
+        resolvePath(name, 'jest.config.mjs'),
+        `/** @type {import('@jest/types').Config.InitialOptions} */
+const config = {
+  displayName: 'unit test',
+  preset: 'ts-jest',
+  testMatch: ['<rootDir>/tests/**/*.test.ts'],
+  collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
+  setupFilesAfterEnv: ['jest-extended/all'],
+  globals: {
+    'ts-jest': {
+      tsconfig: '<rootDir>/tests/tsconfig.json'
+    }
+  },
+  coveragePathIgnorePatterns: []
+};
+
+export default config;
+
+`
+      );
+
+      await writeFile(
         resolvePath(name, 'jest.config.mjs'),
         `/** @type {import('@jest/types').Config.InitialOptions} */
 const config = {
