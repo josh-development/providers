@@ -56,7 +56,8 @@ export const jobs = [
                   '@joshdb/provider': 'next'
                 },
                 devDependencies: {
-                  '@favware/rollup-type-bundler': '^1.0.7'
+                  '@favware/rollup-type-bundler': '^1.0.7',
+                  jest: '^28.1.0'
                 },
                 repository: {
                   type: 'git',
@@ -105,9 +106,7 @@ export const jobs = [
                 },
                 devDependencies: {
                   '@favware/rollup-type-bundler': '^1.0.7',
-                  jest: '^27.5.1',
-                  rollup: '^2.70.2',
-                  'standard-version': '^9.3.2'
+                  jest: '^28.1.0'
                 },
                 repository: {
                   type: 'git',
@@ -149,7 +148,7 @@ export const jobs = [
 
 ## Description
 
-Want to safely store your data in JSON files? This is the package for you.
+${description}
 
 ## Features
 
