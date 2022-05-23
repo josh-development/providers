@@ -25,9 +25,9 @@ export default {
     '@sapphire/async-queue',
     '@sapphire/snowflake',
     '@sapphire/utilities',
-    'fs',
-    'fs/promises',
-    'path',
+    'node:fs',
+    'node:fs/promises',
+    'node:path',
     'property-helpers',
     'timers/promises'
   ],
