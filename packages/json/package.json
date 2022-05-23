@@ -33,7 +33,8 @@
     "@sapphire/utilities": "^3.6.2"
   },
   "devDependencies": {
-    "@favware/rollup-type-bundler": "^1.0.7"
+    "@favware/rollup-type-bundler": "^1.0.7",
+    "jest": "^28.1.0"
   },
   "repository": {
     "type": "git",
