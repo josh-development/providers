@@ -18,6 +18,7 @@ jobs:
   publish:
     name: Publish Next to NPM
     runs-on: ubuntu-latest
+    if: github.repository_owner == 'josh-development'
     steps:
       - name: Checkout Project
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
@@ -34,15 +35,22 @@ jobs:
           registry-url: https://registry.yarnpkg.com/
       - name: Install Dependencies
         run: yarn --immutable
-      - name: Bump Version & Publish
+      - name: Bump Versions & Publish
         run: |
-          echo -e"\n# Resolve the tag for publish. \"next\" for push events, \"pr-{prNumber}\" for dispatch events."
+          # Resolve the tag to be used. "next" for push events, "pr-{prNumber}" for dispatch events.
           TAG=$([[ ${{ github.event_name }} == 'push' ]] && echo 'next' || echo 'pr-${{ github.event.inputs.prNumber }}')
 
-          echo -e "\n# Bump the version"
-          yarn workspaces foreach -v --no-private run standard-version --skip.commit --skip.tag --prerelease "${TAG}.$(git rev-parse --verify --shot HEAD)"
+          yarn config set npmAuthToken ${NODE_AUTH_TOKEN}
+          yarn config set npmPublishRegistry "https://registry.yarnpkg.com"
 
-          echo -e "\n# Publish to NPM"
-          yarn workspaces foreach -v --no-private run release --tag ${TAG}
+          yarn turbo run bump --concurrency=1 -- --preid "${TAG}.$(git rev-parse --verify --short HEAD)"
+
+          for d in packages/*; do
+            pushd $d
+
+            yarn npm publish --tag ${TAG}
+
+            popd
+          done
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}

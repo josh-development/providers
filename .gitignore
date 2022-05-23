@@ -2,17 +2,14 @@
 node_modules/
 .vs/
 
-# Ignore tsc dist folder
-**/dist
+# Ignore build artifacts
+dist/
+build/
+.turbo/
+**/.tests
+**/.bench
+**/benchmarks/results
 
-# Ignore JavaScript files
-**/*.js
-**/*.mjs
-**/*.js.map
-**/*.d.ts
-!packages/**/*.d.ts
-**/*.tsbuildinfo
-!**/scripts/**/*.mjs
 
 # Ignore heapsnapshot and log files
 *.heapsnapshot
@@ -23,14 +20,6 @@ package-lock.json
 
 # Ignore the GH cli downloaded by workflows
 gh
-
-# Ignore data from tests
-**/.tests
-**/.bench
-**/benchmarks/results
-
-# Ignore auto-generated content
-docs/api.json
 
 # Ignore Yarn files
 .yarn/install-state.gz

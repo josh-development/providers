@@ -1,4 +1,6 @@
 name: '*next*'
 package:
   - '@joshdb/json'
+  - '@joshdb/map'
   - '@joshdb/mongo'
+  - '@joshdb/redis'
