@@ -8,17 +8,19 @@
   "browser": "dist/index.umd.js",
   "unpkg": "dist/index.umd.js",
   "types": "dist/index.d.ts",
-  "typedocMain": "src/index.ts",
   "exports": {
     "import": "./dist/index.mjs",
-    "require": "./dist/index.js"
+    "require": "./dist/index.js",
+    "types": "./dist/index.d.ts"
   },
+  "sideEffects": false,
   "scripts": {
     "test": "jest",
     "lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
-    "build": "rollup -c rollup.bundle.ts",
-    "release": "npm publish",
-    "prepublishOnly": "rollup-type-bundler"
+    "build": "rollup -c rollup.config.ts",
+    "prepack": "rollup-type-bundler",
+    "bump": "cliff-jumper",
+    "check-update": "cliff-jumper --dry-run"
   },
   "dependencies": {
     "@joshdb/core": "3.0.0-next.4613706cda66569b2d1dc99f06665eecec2505ce.0",

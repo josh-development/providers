@@ -7,18 +7,20 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
-  "browser": "dist/index.umd.js",
-  "unpkg": "dist/index.umd.js",
   "types": "dist/index.d.ts",
   "exports": {
     "import": "./dist/index.mjs",
-    "require": "./dist/index.js"
+    "require": "./dist/index.js",
+    "types": "./dist/index.d.ts"
   },
+  "sideEffects": false,
   "scripts": {
     "test": "jest",
-    "build": "rollup -c rollup.bundle.ts",
-    "release": "npm publish",
-    "prepublishOnly": "rollup-type-bundler"
+    "lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
+    "build": "rollup -c rollup.config.ts",
+    "prepack": "rollup-type-bundler",
+    "bump": "cliff-jumper",
+    "check-update": "cliff-jumper --dry-run"
   },
   "dependencies": {
     "@joshdb/provider": "1.1.0-next.de81f9f.0",
@@ -26,10 +28,7 @@
     "property-helpers": "^1.1.0"
   },
   "devDependencies": {
-    "@favware/rollup-type-bundler": "^1.0.7",
-    "jest": "^28.1.0",
-    "rollup": "^2.75.5",
-    "standard-version": "^9.3.2"
+    "@favware/rollup-type-bundler": "^1.0.7"
   },
   "repository": {
     "type": "git",
