@@ -28,11 +28,9 @@ import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProper
  * @since 2.0.0
  */
 export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
-  public version = {
-    major: 2,
-    minor: 0,
-    patch: 0
-  };
+  public get version(): JoshProvider.Semver {
+    return this.resolveVersion('[VI]{version}[/VI]');
+  }
 
   /**
    * The [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) cache to store data.
