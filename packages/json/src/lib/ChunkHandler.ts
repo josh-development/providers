@@ -255,13 +255,14 @@ export class ChunkHandler<StoredValue = unknown> {
 
       entries = entries.filter(([key]) => !chunk.keys.includes(key));
 
-      if (Object.keys(data).length < maxChunkSize)
+      if (Object.keys(data).length < maxChunkSize) {
         for (const [key, value] of entries) {
           if (Object.keys(data).length >= maxChunkSize) break;
 
           data[key] = value;
           entries = entries.filter(([k]) => k !== key);
         }
+      }
     }
 
     if (entries.length > 0) {

@@ -8,5 +8,5 @@
     "module": "CommonJS",
     "target": "ESNext"
   },
-  "include": [".", "../../packages/json/src", "../../packages/map/src/", "../../packages/mongo/src", "../../packages/redis/src"]
+  "include": [".", "../../packages/**/src"]
 }

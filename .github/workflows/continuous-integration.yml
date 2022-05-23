@@ -43,5 +43,5 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - name: Install Dependencies
         run: yarn --immutable
-      - name: Build Code
+      - name: Compile Packages
         run: yarn build

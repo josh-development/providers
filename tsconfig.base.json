@@ -1,6 +1,8 @@
 {
   "extends": "@sapphire/ts-config",
   "compilerOptions": {
+    "emitDecoratorMetadata": false,
+    "experimentalDecorators": false,
     "importHelpers": true,
     "noEmitHelpers": true,
     "target": "ES2021",
