@@ -1,4 +1,4 @@
-import { Serialize } from '@joshdb/serialize';
+import { toJSON } from '@joshdb/serialize';
 import { TwitterSnowflake } from '@sapphire/snowflake';
 import { existsSync } from 'fs';
 import { mkdir, rm, writeFile } from 'fs/promises';
@@ -17,9 +17,9 @@ describe('File', () => {
   });
 
   describe('can manipulate file', () => {
-    const firstId = TwitterSnowflake.generate().toString();
-    const secondPath = resolve(process.cwd(), '.tests', 'file', `${TwitterSnowflake.generate().toString()}.json`);
-    const file = new File({ directory: resolve(process.cwd(), '.tests', 'file'), name: `${firstId}.json`, serialize: true });
+    const id = TwitterSnowflake.generate().toString();
+    const path = resolve(process.cwd(), '.tests', 'file', `${TwitterSnowflake.generate().toString()}.json`);
+    const file = new File({ directory: resolve(process.cwd(), '.tests', 'file'), name: `${id}.json`, serialize: true });
 
     beforeAll(async () => {
       await mkdir(file.options.directory, { recursive: true });
@@ -27,7 +27,7 @@ describe('File', () => {
 
     beforeEach(async () => {
       if (existsSync(file.path)) await rm(file.path);
-      if (existsSync(secondPath)) await rm(secondPath);
+      if (existsSync(path)) await rm(path);
     });
 
     describe('with read method', () => {
@@ -36,8 +36,8 @@ describe('File', () => {
       });
 
       test('GIVEN file present THEN returns parsed value', async () => {
-        await writeFile(file.path, JSON.stringify(new Serialize({ raw: { key: 'value' } })));
-        await expect(file.read()).resolves.toEqual({ key: 'value' });
+        await writeFile(file.path, JSON.stringify(toJSON({ key: 'value' })));
+        await expect(file.read()).resolves.toStrictEqual({ key: 'value' });
       });
     });
 
@@ -49,23 +49,23 @@ describe('File', () => {
 
     describe('with copy method', () => {
       test('GIVEN no file present THEN throws error', async () => {
-        await expect(file.copy(secondPath)).rejects.toThrow();
+        await expect(file.copy(path)).rejects.toThrow();
       });
 
       test('GIVEN file present THEN copies file', async () => {
         await writeFile(file.path, JSON.stringify({ key: 'value' }));
-        await expect(file.copy(secondPath)).resolves.toBeUndefined();
+        await expect(file.copy(path)).resolves.toBeUndefined();
       });
     });
 
     describe('with rename method', () => {
       test('GIVEN no file present THEN throws error', async () => {
-        await expect(file.rename(secondPath)).rejects.toThrow();
+        await expect(file.rename(path)).rejects.toThrow();
       });
 
       test('GIVEN file present THEN renames file', async () => {
         await writeFile(file.path, JSON.stringify({ key: 'value' }));
-        await expect(file.rename(secondPath)).resolves.toBeUndefined();
+        await expect(file.rename(path)).resolves.toBeUndefined();
       });
     });
 

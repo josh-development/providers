@@ -1,8 +1,8 @@
-import { Serialize } from '@joshdb/serialize';
+import { toJSON, toRaw } from '@joshdb/serialize';
 import type { Awaitable } from '@sapphire/utilities';
-import { existsSync } from 'fs';
-import { copyFile, readFile, rename, rm, writeFile } from 'fs/promises';
-import { resolve } from 'path';
+import { existsSync } from 'node:fs';
+import { copyFile, readFile, rename, rm, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { setTimeout as wait } from 'timers/promises';
 
 export class File<StoredValue = unknown> {
@@ -21,13 +21,13 @@ export class File<StoredValue = unknown> {
   public async read<Data = File.Data<StoredValue>>(): Promise<Data> {
     return this.attempt<Data>(async () =>
       this.options.serialize
-        ? new Serialize({ json: JSON.parse(await readFile(this.path, { encoding: 'utf-8' })) }).toRaw<Data>()
+        ? toRaw(JSON.parse(await readFile(this.path, { encoding: 'utf-8' })))
         : JSON.parse(await readFile(this.path, { encoding: 'utf-8' }))
     );
   }
 
   public async write<Data = File.Data<StoredValue>>(data: Data): Promise<void> {
-    await this.attempt(() => writeFile(this.path, JSON.stringify(this.options.serialize ? new Serialize({ raw: data }).toJSON() : data)));
+    await this.attempt(() => writeFile(this.path, JSON.stringify(this.options.serialize ? toJSON(data) : data)));
   }
 
   public async copy(to: string): Promise<void> {
