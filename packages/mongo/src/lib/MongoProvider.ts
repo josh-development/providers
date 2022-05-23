@@ -1,8 +1,5 @@
 import {
   CommonIdentifiers,
-  deleteProperty,
-  getProperty,
-  hasProperty,
   isEveryByHookPayload,
   isEveryByValuePayload,
   isFilterByHookPayload,
@@ -21,15 +18,34 @@ import {
   JoshProvider,
   MathOperator,
   Method,
-  Payloads,
-  PROPERTY_NOT_FOUND,
-  setProperty
-} from '@joshdb/core';
+  Payloads
+} from '@joshdb/provider';
 import { Serialize } from '@joshdb/serialize';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
 import { Collection, Document, Filter, MongoClient, MongoClientOptions, ObjectId } from 'mongodb';
+import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
+
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: MongoProvider.Options;
+
+  public version: JoshProvider.Semver = { major: 2, minor: 0, patch: 0 };
+
+  protected migrations: JoshProvider.Migration[] = [
+    {
+      version: { major: 2, minor: 0, patch: 0 },
+      run: async (context: JoshProvider.Context) => {
+        const { collectionName = context.name, enforceCollectionName } = this.options;
+        const collection = this.generateMongoDoc(enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName);
+
+        for await (const doc of collection.aggregate([{ $match: {} }])) {
+          const { key, value, _id } = doc;
+
+          await collection.insertOne({ key, value: this.serialize(value), version: this.version });
+          await collection.deleteOne({ _id });
+        }
+      }
+    }
+  ];
 
   private connectionURI?: string;
 
@@ -41,9 +57,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     super(options);
   }
 
-  public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
-    context = await super.init(context);
-
+  public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
     const {
       collectionName = context.name,
       enforceCollectionName,
@@ -72,8 +86,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const client = new MongoClient(this.connectionURI, connectOptions);
     this._client = await client.connect();
     this._collection = this.generateMongoDoc(enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName);
-    // this._client = await connect(this.connectionURI, connectOptions);
-
+    context = await super.init(context);
     return context;
   }
 
@@ -594,7 +607,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         key: { $eq: key }
       },
       {
-        $set: { value: this.serialize(val) as StoredValue }
+        $set: { value: this.serialize(val) as StoredValue, version: this.version }
       },
       {
         upsert: true
@@ -624,7 +637,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           upsert: true,
           update: {
             $set: {
-              value: this.serialize(val) as StoredValue
+              value: this.serialize(val) as StoredValue,
+              version: this.version
             }
           }
         }
@@ -708,6 +722,12 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
+  protected fetchVersion(): Promise<JoshProvider.Semver> {
+    return this.collection
+      .findOne({}, { projection: { version: 1 } })
+      .then((doc) => (doc ? doc.version : { major: 1, minor: 0, patch: 0 }) as JoshProvider.Semver);
+  }
+
   private get client(): MongoClient {
     if (isNullOrUndefined(this._client))
       throw this.error({
@@ -759,7 +779,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 }
 
 export namespace MongoProvider {
-  export interface Options {
+  export interface Options extends JoshProvider.Options {
     collectionName?: string;
 
     connectOptions?: MongoClientOptions;
@@ -787,6 +807,8 @@ export namespace MongoProvider {
     key: string;
 
     value: Serialize.JSON | StoredValue;
+
+    version: JoshProvider.Semver;
   }
 
   export enum Identifiers {

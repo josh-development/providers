@@ -998,6 +998,7 @@ __metadata:
     "@sapphire/utilities": ^3.6.2
     jest: ^28.1.0
     mongodb: ^4.6.0
+    property-helpers: ^1.1.0
     rollup: ^2.75.5
     standard-version: ^9.3.2
   languageName: unknown
