@@ -46,6 +46,7 @@ export const jobs = [
                 sideEffects: false,
                 scripts: {
                   test: 'jest',
+                  'test:coverage': 'jest --coverage',
                   lint: 'eslint src tests --ext ts --fix -c ../../.eslintrc',
                   build: 'rollup -c rollup.config.ts',
                   prepack: 'rollup-type-bundler',
@@ -95,6 +96,7 @@ export const jobs = [
                 sideEffects: false,
                 scripts: {
                   test: 'jest',
+                  'test:coverage': 'jest --coverage',
                   lint: 'eslint src tests --ext ts --fix -c ../../.eslintrc',
                   build: 'rollup -c rollup.config.ts',
                   prepack: 'rollup-type-bundler',
@@ -288,6 +290,7 @@ const config = {
       tsconfig: '<rootDir>/tests/tsconfig.json'
     }
   },
+  coverageDirectory: '../../coverage/${name}',
   coveragePathIgnorePatterns: []
 };
 

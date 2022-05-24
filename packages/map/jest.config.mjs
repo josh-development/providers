@@ -10,6 +10,7 @@ const config = {
       tsconfig: '<rootDir>/tests/tsconfig.json'
     }
   },
+  coverageDirectory: '../../coverage/map',
   coveragePathIgnorePatterns: []
 };
 
