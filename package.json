@@ -18,7 +18,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.0.1",
     "@commitlint/config-conventional": "^17.0.0",
-    "@faker-js/faker": "^6.3.1",
+    "@faker-js/faker": "^7.1.0",
     "@favware/npm-deprecate": "^1.0.4",
     "@joshdb/core": "3.0.0-next.4613706cda66569b2d1dc99f06665eecec2505ce.0",
     "@joshdb/tests": "1.1.0-next.4ea097e895e79d66b62a3bf7a70736f9f2d36b91.0",
