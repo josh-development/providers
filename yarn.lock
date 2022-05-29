@@ -639,10 +639,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@faker-js/faker@npm:^6.3.1":
-  version: 6.3.1
-  resolution: "@faker-js/faker@npm:6.3.1"
-  checksum: 05071e952248f4565218a95b089ef8f616130c6ff914bb416ba7c891f81d123b637c2abe8aa2eb7b207b5d4b8bd9c75c8c2133019d2d11db4176948737a95813
+"@faker-js/faker@npm:^7.1.0":
+  version: 7.1.0
+  resolution: "@faker-js/faker@npm:7.1.0"
+  checksum: 3538266d5b3c38461e1490c1389ca8c5103c061545033caad9a8de17ca178e24f4cff7b9c83d74d2e1049d9775a270f5431b4f833081b9502b4a0eec4bd88546
   languageName: node
   linkType: hard
 
@@ -6476,7 +6476,7 @@ __metadata:
   dependencies:
     "@commitlint/cli": ^17.0.1
     "@commitlint/config-conventional": ^17.0.0
-    "@faker-js/faker": ^6.3.1
+    "@faker-js/faker": ^7.1.0
     "@favware/npm-deprecate": ^1.0.4
     "@joshdb/core": 3.0.0-next.4613706cda66569b2d1dc99f06665eecec2505ce.0
     "@joshdb/tests": 1.1.0-next.4ea097e895e79d66b62a3bf7a70736f9f2d36b91.0
