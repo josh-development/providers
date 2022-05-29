@@ -5,7 +5,7 @@
     "packages/*"
   ],
   "scripts": {
-    "clean": "rimraf \"packages/**/dist\" \"packages/**/build\" \"packages/**/.turbo\" \"packages/**/node_modules/.cache\" \"node_modules/.cache\"",
+    "clean": "rimraf .bench \"packages/**/.tests\"  \"packages/**/dist\" \"packages/**/build\" \"packages/**/.turbo\" \"packages/**/node_modules/.cache\" node_modules/.cache",
     "benchmark": "tsc -b benchmarks/src && node benchmarks/dist/benchmarks/src/index.js",
     "generate": "node scripts/generate/generate.mjs",
     "lint": "eslint packages scripts --ext mjs,js,ts --fix",
@@ -65,5 +65,11 @@
   "lint-staged": {
     "*.{mjs,ts}": "eslint --fix --ext mjs,ts"
   },
-  "packageManager": "yarn@3.2.1"
+  "packageManager": "yarn@3.2.1",
+  "dependencies": {
+    "@joshdb/redis": "workspace:^",
+    "@types/uuid": "^8.3.4",
+    "add": "^2.0.6",
+    "workspace": "^0.0.1-preview.1"
+  }
 }
