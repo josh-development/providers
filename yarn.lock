@@ -956,7 +956,7 @@ __metadata:
   resolution: "@joshdb/json@workspace:packages/json"
   dependencies:
     "@favware/rollup-type-bundler": ^1.0.7
-    "@joshdb/provider": 1.1.0-next.de81f9f.0
+    "@joshdb/provider": next
     "@joshdb/serialize": ^1.1.0-next.19071d995a3c1164828b64112344ed43d219a4de.0
     "@sapphire/async-queue": ^1.3.1
     "@sapphire/snowflake": ^3.2.2
@@ -971,7 +971,7 @@ __metadata:
   resolution: "@joshdb/map@workspace:packages/map"
   dependencies:
     "@favware/rollup-type-bundler": ^1.0.7
-    "@joshdb/provider": 1.1.0-next.de81f9f.0
+    "@joshdb/provider": next
     "@sapphire/utilities": ^3.6.2
     jest: ^28.1.0
     property-helpers: ^1.1.0
@@ -983,7 +983,7 @@ __metadata:
   resolution: "@joshdb/mongo@workspace:packages/mongo"
   dependencies:
     "@favware/rollup-type-bundler": ^1.0.7
-    "@joshdb/provider": 1.1.0-next.de81f9f.0
+    "@joshdb/provider": next
     "@joshdb/serialize": ^1.1.0-next.19071d995a3c1164828b64112344ed43d219a4de.0
     "@sapphire/utilities": ^3.6.2
     jest: ^28.1.0
@@ -992,12 +992,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/provider@npm:1.1.0-next.de81f9f.0":
-  version: 1.1.0-next.de81f9f.0
-  resolution: "@joshdb/provider@npm:1.1.0-next.de81f9f.0"
+"@joshdb/provider@npm:next":
+  version: 1.1.0-next.4d2b099.0
+  resolution: "@joshdb/provider@npm:1.1.0-next.4d2b099.0"
   dependencies:
     "@sapphire/utilities": ^3.6.2
-  checksum: 9fc5e4e2315ca2c66d3ee2200121635b33ae3f8ffb462dfc7e693bc7842b807eb9d6f8c3d54eb02d82ff6779794c6e09ec552b0acfa7fe0bf24cabc4edfa9c6b
+  checksum: 83f1a7e08b3336c50c3958682fc205528283c020c021fa67e16831c1b1dc1c920bfd9072e5eaa820b7765544d6d127bddde5bebdd297aa9d49fcc3ac76f88045
   languageName: node
   linkType: hard
 
@@ -1006,8 +1006,9 @@ __metadata:
   resolution: "@joshdb/redis@workspace:packages/redis"
   dependencies:
     "@favware/rollup-type-bundler": ^1.0.7
-    "@joshdb/provider": 1.1.0-next.de81f9f.0
+    "@joshdb/provider": next
     "@joshdb/serialize": ^1.1.0-next.19071d995a3c1164828b64112344ed43d219a4de.0
+    jest: ^28.1.0
     redis: ^4.1.0
     rollup: ^2.75.1
     uuid: ^8.3.2

@@ -1,8 +1,5 @@
 import {
   CommonIdentifiers,
-  deleteProperty,
-  getProperty,
-  hasProperty,
   isEveryByHookPayload,
   isEveryByValuePayload,
   isFilterByHookPayload,
@@ -21,27 +18,29 @@ import {
   JoshProvider,
   MathOperator,
   Method,
-  Payloads,
-  PROPERTY_NOT_FOUND,
-  setProperty
-} from '@joshdb/core';
-import { Serialize } from '@joshdb/serialize';
+  Payloads
+} from '@joshdb/provider';
+import { SerializeJSON, toJSON, toRaw } from '@joshdb/serialize';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
+import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 import { createClient, RedisClientOptions, RedisClientType } from 'redis';
 import { v4 } from 'uuid';
 
 export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: RedisProvider.Options;
+  public version: JoshProvider.Semver = { major: 2, minor: 0, patch: 0 };
+  public migrations: JoshProvider.Migration[] = [];
+
   private _client?: RedisClientType;
 
   public constructor(options?: RedisProvider.Options) {
     super(options);
   }
 
-  public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
-    context = await super.init(context);
+  public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
     this._client = createClient(this.options.connectOptions) as RedisClientType;
     await this._client.connect();
+    context = await super.init(context);
     return context;
   }
 
@@ -279,18 +278,23 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Get]<StoredValue>(payload: Payloads.Get<StoredValue>): Promise<Payloads.Get<StoredValue>> {
+  public async [Method.Get]<Value = StoredValue>(payload: Payloads.Get<Value>): Promise<Payloads.Get<Value>> {
     const { key, path } = payload;
-    const doc = (await this.client.get(key)) as unknown as RedisProvider.DocType<StoredValue>;
+    const got = await this.client.get(key);
+    if (!got) {
+      return payload;
+    }
+
+    const doc = JSON.parse(got) as RedisProvider.DocType<StoredValue>;
 
     if (!doc) {
       return payload;
     }
 
     if (path.length === 0) {
-      payload.data = this.deserialize(doc as string) as unknown as StoredValue;
+      payload.data = this.deserialize(doc.value) as unknown as Value;
     } else {
-      const data = getProperty<StoredValue>(this.deserialize(doc as string), path);
+      const data = getProperty<Value>(this.deserialize(doc.value), path);
 
       if (data !== PROPERTY_NOT_FOUND) payload.data = data;
     }
@@ -588,7 +592,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { key, path, value } = payload;
     const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, key, path })).data, path, value) : value;
 
-    await this.client.set(key, this.serialize(val) as string, { EX: this.options.expiry });
+    await this.client.set(key, JSON.stringify({ value: this.serialize(val as StoredValue), version: this.version }), { EX: this.options.expiry });
 
     return payload;
   }
@@ -606,7 +610,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
       const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, key, path: [] })).data, path, value) : value;
 
-      operations.push(this.client.set(key, this.serialize(val) as string, { EX: this.options.expiry }));
+      operations.push(this[Method.Set]({ method: Method.Set, path: [], key, value: val }));
     }
 
     await Promise.all(operations);
@@ -693,23 +697,31 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
+  protected async fetchVersion(): Promise<JoshProvider.Semver> {
+    const key = (await this.client.keys('*'))[0];
+    if (!key) return { major: 2, minor: 0, patch: 0 };
+    const doc = await this.client.get(key);
+    if (!doc) return { major: 2, minor: 0, patch: 0 };
+    const val = JSON.parse(doc) as RedisProvider.DocType<StoredValue>;
+    return val && val.version ? val.version : { major: 1, minor: 0, patch: 0 };
+  }
+
   private async *_iterate() {
     const keys = (await this.client.keys('*')) ?? [];
     for (const key of keys) {
-      const value = this.deserialize((await this.client.get(key)) as unknown as string);
+      const value = (await this[Method.Get]<StoredValue>({ method: Method.Get, key, path: [] })).data as StoredValue;
       yield { key, value };
     }
   }
 
-  private deserialize(value: string): StoredValue {
-    if (this.options.disableSerialization) return JSON.parse(value) as StoredValue;
-
-    return new Serialize({ json: JSON.parse(value as string) as Serialize.JSON }).toRaw<StoredValue>();
+  private deserialize(value: SerializeJSON | StoredValue): StoredValue {
+    if (this.options.disableSerialization) return value as StoredValue;
+    return toRaw(value as SerializeJSON) as StoredValue;
   }
 
-  private serialize<Value = StoredValue>(value: StoredValue | Value) {
-    if (this.options.disableSerialization) return JSON.stringify(value);
-    return JSON.stringify(new Serialize({ raw: value }).toJSON());
+  private serialize<StoredValue>(value: StoredValue) {
+    if (this.options.disableSerialization) return value;
+    return toJSON(value) as SerializeJSON;
   }
 
   private get client(): RedisClientType {
@@ -725,7 +737,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 }
 
 export namespace RedisProvider {
-  export interface Options {
+  export interface Options extends JoshProvider.Options {
     connectOptions?: RedisClientOptions;
 
     expiry?: number;
@@ -733,7 +745,10 @@ export namespace RedisProvider {
     disableSerialization?: boolean;
   }
 
-  export type DocType<StoredValue> = string | StoredValue;
+  export interface DocType<StoredValue> {
+    value: StoredValue | SerializeJSON;
+    version: JoshProvider.Semver;
+  }
 
   export enum Identifiers {
     NotConnected = 'notConnected'
