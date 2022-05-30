@@ -32,7 +32,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
   public declare options: JSONProvider.Options;
 
   public get version(): JoshProvider.Semver {
-    return this.resolveVersion('[VI]{version}[/VI]');
+    return process.env.NODE_ENV === 'test' ? { major: 2, minor: 0, patch: 0 } : this.resolveVersion('[VI]{version}[/VI]');
   }
 
   private _handler?: ChunkHandler<StoredValue>;
