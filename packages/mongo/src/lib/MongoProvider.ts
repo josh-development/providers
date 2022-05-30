@@ -20,7 +20,7 @@ import {
   Method,
   Payloads
 } from '@joshdb/provider';
-import { Serialize } from '@joshdb/serialize';
+import { SerializeJSON, toJSON, toRaw } from '@joshdb/serialize';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
 import { Collection, Document, Filter, MongoClient, MongoClientOptions, ObjectId } from 'mongodb';
 import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
@@ -30,7 +30,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public version: JoshProvider.Semver = { major: 2, minor: 0, patch: 0 };
 
-  protected migrations: JoshProvider.Migration[] = [
+  public migrations: JoshProvider.Migration[] = [
     {
       version: { major: 2, minor: 0, patch: 0 },
       run: async (context: JoshProvider.Context) => {
@@ -797,14 +797,14 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return agg;
   }
 
-  private deserialize(value: Serialize.JSON | StoredValue): StoredValue {
+  private deserialize(value: SerializeJSON | StoredValue): StoredValue {
     if (this.options.disableSerialization) return value as StoredValue;
-    return new Serialize({ json: value as Serialize.JSON }).toRaw<StoredValue>();
+    return toRaw(value as SerializeJSON) as StoredValue;
   }
 
-  private serialize<Value = StoredValue>(value: StoredValue | Value) {
+  private serialize<StoredValue>(value: StoredValue) {
     if (this.options.disableSerialization) return value;
-    return new Serialize({ raw: value }).toJSON();
+    return toJSON(value) as SerializeJSON;
   }
 
   private generateMongoDoc<StoredValue>(collectionName: string): Collection<MongoProvider.DocType<StoredValue>> {
@@ -846,7 +846,7 @@ export namespace MongoProvider {
   export interface DocType<StoredValue> extends Document {
     key: string;
 
-    value: Serialize.JSON | StoredValue;
+    value: SerializeJSON | StoredValue;
 
     version: JoshProvider.Semver;
   }
