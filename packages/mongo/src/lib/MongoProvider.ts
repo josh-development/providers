@@ -760,10 +760,10 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  protected fetchVersion(): Promise<JoshProvider.Semver> {
-    return this.collection
-      .findOne({}, { projection: { version: 1 } })
-      .then((doc) => (doc ? doc.version : { major: 1, minor: 0, patch: 0 }) as JoshProvider.Semver);
+  protected async fetchVersion(): Promise<JoshProvider.Semver> {
+    const doc = await this.collection.findOne({}, { projection: { version: 1 } });
+    if (!doc) return this.version;
+    return doc && doc.version ? doc.version : { major: 1, minor: 0, patch: 0 };
   }
 
   private get client(): MongoClient {

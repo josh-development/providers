@@ -67,9 +67,8 @@
   },
   "packageManager": "yarn@3.2.1",
   "dependencies": {
-    "@joshdb/redis": "workspace:^",
+    "@joshdb/provider": "next",
     "@types/uuid": "^8.3.4",
-    "add": "^2.0.6",
     "workspace": "^0.0.1-preview.1"
   }
 }
