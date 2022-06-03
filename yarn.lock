@@ -956,7 +956,6 @@ __metadata:
   resolution: "@joshdb/json@workspace:packages/json"
   dependencies:
     "@favware/rollup-type-bundler": ^1.0.7
-    "@joshdb/provider": next
     "@joshdb/serialize": ^1.1.0-next.19071d995a3c1164828b64112344ed43d219a4de.0
     "@sapphire/async-queue": ^1.3.1
     "@sapphire/snowflake": ^3.2.2
@@ -971,7 +970,6 @@ __metadata:
   resolution: "@joshdb/map@workspace:packages/map"
   dependencies:
     "@favware/rollup-type-bundler": ^1.0.7
-    "@joshdb/provider": next
     "@sapphire/utilities": ^3.6.2
     jest: ^28.1.0
     property-helpers: ^1.1.0
