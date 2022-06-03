@@ -13,7 +13,7 @@
 
 ## Description
 
-Want to safely store your data in JSON files? This is the package for you.
+A provider that uses the Node.js native [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) class for storage.
 
 ## Features
 
