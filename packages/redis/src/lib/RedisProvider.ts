@@ -28,7 +28,11 @@ import { v4 } from 'uuid';
 
 export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: RedisProvider.Options;
-  public version: JoshProvider.Semver = { major: 2, minor: 0, patch: 0 };
+
+  public get version(): JoshProvider.Semver {
+    return this.resolveVersion('[VI]{version}[/VI]');
+  }
+
   public migrations: JoshProvider.Migration[] = [];
 
   private _client?: RedisClientType;

@@ -28,7 +28,9 @@ import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProper
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: MongoProvider.Options;
 
-  public version: JoshProvider.Semver = { major: 2, minor: 0, patch: 0 };
+  public get version(): JoshProvider.Semver {
+    return this.resolveVersion('[VI]{version}[/VI]');
+  }
 
   public migrations: JoshProvider.Migration[] = [
     {
@@ -65,7 +67,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       connectOptions = {}
     } = this.options;
 
-    if (collectionName === undefined) {
+    if (typeof collectionName === 'undefined') {
       throw this.error({
         message: 'A collection name must be provided if using this class without Josh.',
         identifier: MongoProvider.Identifiers.InitMissingCollectionName
