@@ -703,9 +703,11 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   protected async fetchVersion(): Promise<JoshProvider.Semver> {
     const key = (await this.client.keys('*'))[0];
-    if (!key) return { major: 2, minor: 0, patch: 0 };
+    if (!key) return this.version;
+
     const doc = await this.client.get(key);
-    if (!doc) return { major: 2, minor: 0, patch: 0 };
+    if (!doc) return this.version;
+
     const val = JSON.parse(doc) as RedisProvider.DocType<StoredValue>;
     return val && val.version ? val.version : { major: 1, minor: 0, patch: 0 };
   }
