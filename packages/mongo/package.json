@@ -26,6 +26,7 @@
     "check-update": "cliff-jumper --dry-run"
   },
   "dependencies": {
+    "@joshdb/provider": "1.1.0-next.4d2b099.0",
     "@joshdb/serialize": "^1.1.0-next.19071d995a3c1164828b64112344ed43d219a4de.0",
     "@sapphire/utilities": "^3.6.2",
     "mongodb": "^4.6.0",
