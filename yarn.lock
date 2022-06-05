@@ -1006,6 +1006,7 @@ __metadata:
     "@favware/rollup-type-bundler": ^1.0.7
     "@joshdb/provider": 1.1.0-next.4d2b099.0
     "@joshdb/serialize": ^1.1.0-next.19071d995a3c1164828b64112344ed43d219a4de.0
+    "@types/uuid": ^8.3.4
     jest: ^28.1.0
     redis: ^4.1.0
     rollup: ^2.75.1
@@ -5938,7 +5939,6 @@ __metadata:
     "@types/jest": ^27.5.0
     "@types/node": ^17.0.31
     "@types/prompts": ^2
-    "@types/uuid": ^8.3.4
     "@typescript-eslint/eslint-plugin": ^5.23.0
     "@typescript-eslint/parser": ^5.23.0
     colorette: ^2.0.16
@@ -5962,7 +5962,6 @@ __metadata:
     tslib: ^2.4.0
     turbo: ^1.2.8
     typescript: ^4.6.4
-    workspace: ^0.0.1-preview.1
   languageName: unknown
   linkType: soft
 
@@ -7174,13 +7173,6 @@ __metadata:
   version: 1.2.3
   resolution: "word-wrap@npm:1.2.3"
   checksum: 30b48f91fcf12106ed3186ae4fa86a6a1842416df425be7b60485de14bec665a54a68e4b5156647dec3a70f25e84d270ca8bc8cd23182ed095f5c7206a938c1f
-  languageName: node
-  linkType: hard
-
-"workspace@npm:^0.0.1-preview.1":
-  version: 0.0.1-preview.1
-  resolution: "workspace@npm:0.0.1-preview.1"
-  checksum: 0d3a1ed8a5735bd3295f2685a92cfd59a53d9386d6177e3dc036416e0b200729632a3760d9b34d75597b826e30620d7b02d9852c9bc2e0028c64436c9c5cda2e
   languageName: node
   linkType: hard
 

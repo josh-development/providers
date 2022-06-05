@@ -65,8 +65,5 @@
   "lint-staged": {
     "*.{mjs,ts}": "eslint --fix --ext mjs,ts"
   },
-  "packageManager": "yarn@3.2.1",
-  "dependencies": {
-    "@types/uuid": "^8.3.4"
-  }
+  "packageManager": "yarn@3.2.1"
 }
