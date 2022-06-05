@@ -1446,13 +1446,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jest@npm:^27.5.1":
-  version: 27.5.1
-  resolution: "@types/jest@npm:27.5.1"
+"@types/jest@npm:^28.1.1":
+  version: 28.1.1
+  resolution: "@types/jest@npm:28.1.1"
   dependencies:
     jest-matcher-utils: ^27.0.0
     pretty-format: ^27.0.0
-  checksum: be20e39f7aaf17179109c0060d0a0489cec2034d4e2e28a631284c7ecd13c5ae52f62697a33a0e89b03b6cfe54e9d5e8c2bd387ab2bd90d6071d68c63b86d1e3
+  checksum: 0a8b045a7b660372decc807c390d3f99a2b12bb1659a1cd593afe04557f4b7c235b0576a5e35b1577710d20e42759d3d8755eb8bed6edc8733f47007e75a5509
   languageName: node
   linkType: hard
 
@@ -6482,7 +6482,7 @@ __metadata:
     "@joshdb/tests": 1.1.0-next.4ea097e895e79d66b62a3bf7a70736f9f2d36b91.0
     "@sapphire/eslint-config": ^4.3.5
     "@sapphire/ts-config": ^3.3.4
-    "@types/jest": ^27.5.1
+    "@types/jest": ^28.1.1
     "@types/node": 17.0.23
     "@types/prompts": ^2.4.0
     "@types/rimraf": ^3.0.2
