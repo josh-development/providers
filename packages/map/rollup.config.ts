@@ -17,8 +17,20 @@ export default {
       format: 'es',
       exports: 'named',
       sourcemap: true
+    },
+    {
+      file: './dist/index.umd.js',
+      format: 'umd',
+      name: 'JoshMap',
+      exports: 'named',
+      sourcemap: true,
+      globals: {
+        '@joshdb/provider': 'JoshProvider',
+        '@sapphire/utilities': 'SapphireUtilities',
+        'property-helpers': 'PropertyHelpers'
+      }
     }
   ],
-  external: ['@joshdb/core', '@joshdb/serialize', '@sapphire/utilities', 'mongodb'],
+  external: ['@joshdb/provider', '@sapphire/utilities', 'property-helpers'],
   plugins: [cleaner({ targets: ['./dist'] }), typescript({ tsconfig: resolve(process.cwd(), 'src', 'tsconfig.json') }), versionInjector()]
 };

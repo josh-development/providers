@@ -1,8 +1,5 @@
 import {
   CommonIdentifiers,
-  deleteProperty,
-  getProperty,
-  hasProperty,
   isEveryByHookPayload,
   isEveryByValuePayload,
   isFilterByHookPayload,
@@ -21,27 +18,33 @@ import {
   JoshProvider,
   MathOperator,
   Method,
-  Payloads,
-  PROPERTY_NOT_FOUND,
-  setProperty
-} from '@joshdb/core';
-import { Serialize } from '@joshdb/serialize';
+  Payloads
+} from '@joshdb/provider';
+import { SerializeJSON, toJSON, toRaw } from '@joshdb/serialize';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
+import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 import { createClient, RedisClientOptions, RedisClientType } from 'redis';
 import { v4 } from 'uuid';
 
 export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: RedisProvider.Options;
+
+  public get version(): JoshProvider.Semver {
+    return this.resolveVersion('[VI]{version}[/VI]');
+  }
+
+  public migrations: JoshProvider.Migration[] = [];
+
   private _client?: RedisClientType;
 
   public constructor(options?: RedisProvider.Options) {
     super(options);
   }
 
-  public async init(context: JoshProvider.Context<StoredValue>): Promise<JoshProvider.Context<StoredValue>> {
-    context = await super.init(context);
+  public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
     this._client = createClient(this.options.connectOptions) as RedisClientType;
     await this._client.connect();
+    context = await super.init(context);
     return context;
   }
 
@@ -64,13 +67,15 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { key, path } = payload;
     const getPayload = await this[Method.Get]<StoredValue>({ key, method: Method.Get, path });
 
-    if (!isPayloadWithData(getPayload))
+    if (!isPayloadWithData(getPayload)) {
       return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Dec }, { key, path }) };
+    }
 
     const { data } = getPayload;
 
-    if (!isNumber(data))
+    if (!isNumber(data)) {
       return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Dec }, { key, path, type: 'number' }) };
+    }
 
     await this[Method.Set]({ method: Method.Set, key, path, value: data - 1 });
 
@@ -121,8 +126,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Ensure](payload: Payloads.Ensure<StoredValue>): Promise<Payloads.Ensure<StoredValue>> {
     const { key } = payload;
 
-    if (!(await this[Method.Has]({ key, method: Method.Has, data: false, path: [] })).data)
+    if (!(await this[Method.Has]({ key, method: Method.Has, data: false, path: [] })).data) {
       await this[Method.Set]({ key, value: payload.defaultValue, method: Method.Set, path: [] });
+    }
 
     payload.data = (await this[Method.Get]({ key, method: Method.Get, path: [] })).data as StoredValue;
 
@@ -160,13 +166,17 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       for await (const { key, value: storedValue } of this._iterate()) {
         const data = getProperty(storedValue, path, false);
 
-        if (data === PROPERTY_NOT_FOUND)
+        if (data === PROPERTY_NOT_FOUND) {
           return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Every }, { key, path }) };
-        if (!isPrimitive(data))
+        }
+
+        if (!isPrimitive(data)) {
           return {
             ...payload,
             error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Every }, { key, path, type: 'primitive' })
           };
+        }
+
         if (data === value) continue;
 
         payload.data = false;
@@ -199,13 +209,17 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       for await (const { key, value: storedValue } of this._iterate()) {
         const data = getProperty(storedValue, path, false);
 
-        if (data === PROPERTY_NOT_FOUND)
+        if (data === PROPERTY_NOT_FOUND) {
           return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Filter }, { key, path }) };
-        if (!isPrimitive(data))
+        }
+
+        if (!isPrimitive(data)) {
           return {
             ...payload,
             error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Filter }, { key, path, type: 'primitive' })
           };
+        }
+
         if (data === value) payload.data[key] = storedValue;
       }
     }
@@ -246,13 +260,17 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
         const data = getProperty(storedValue, path, false);
 
-        if (data === PROPERTY_NOT_FOUND)
+        if (data === PROPERTY_NOT_FOUND) {
           return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Find }, { key, path }) };
-        if (!isPrimitive(data))
+        }
+
+        if (!isPrimitive(data)) {
           return {
             ...payload,
             error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Find }, { key, path, type: 'primitive' })
           };
+        }
+
         if (data !== value) continue;
 
         payload.data = [key, storedValue];
@@ -264,18 +282,23 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Get]<StoredValue>(payload: Payloads.Get<StoredValue>): Promise<Payloads.Get<StoredValue>> {
+  public async [Method.Get]<Value = StoredValue>(payload: Payloads.Get<Value>): Promise<Payloads.Get<Value>> {
     const { key, path } = payload;
-    const doc = (await this.client.get(key)) as unknown as RedisProvider.DocType<StoredValue>;
+    const got = await this.client.get(key);
+    if (!got) {
+      return payload;
+    }
+
+    const doc = JSON.parse(got) as RedisProvider.DocType<StoredValue>;
 
     if (!doc) {
       return payload;
     }
 
     if (path.length === 0) {
-      payload.data = this.deserialize(doc as string) as unknown as StoredValue;
+      payload.data = this.deserialize(doc.value) as unknown as Value;
     } else {
-      const data = getProperty<StoredValue>(this.deserialize(doc as string), path);
+      const data = getProperty<Value>(this.deserialize(doc.value), path);
 
       if (data !== PROPERTY_NOT_FOUND) payload.data = data;
     }
@@ -315,13 +338,15 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { key, path } = payload;
     const getPayload = await this[Method.Get]<StoredValue>({ method: Method.Get, key, path });
 
-    if (!isPayloadWithData(getPayload))
+    if (!isPayloadWithData(getPayload)) {
       return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Inc }, { key, path }) };
+    }
 
     const { data } = getPayload;
 
-    if (typeof data !== 'number')
+    if (typeof data !== 'number') {
       return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Inc }, { key, path, type: 'number' }) };
+    }
 
     await this[Method.Set]({ method: Method.Set, key, path, value: data + 1 });
 
@@ -362,13 +387,15 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { key, path, operator, operand } = payload;
     const getPayload = await this[Method.Get]<number>({ method: Method.Get, key, path });
 
-    if (!isPayloadWithData(getPayload))
+    if (!isPayloadWithData(getPayload)) {
       return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Math }, { key, path }) };
+    }
 
     let { data } = getPayload;
 
-    if (typeof data !== 'number')
+    if (typeof data !== 'number') {
       return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Math }, { key, path, type: 'number' }) };
+    }
 
     switch (operator) {
       case MathOperator.Addition:
@@ -429,13 +456,17 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       for await (const { key, value: storedValue } of this._iterate()) {
         const data = getProperty<StoredValue>(storedValue, path);
 
-        if (data === PROPERTY_NOT_FOUND)
+        if (data === PROPERTY_NOT_FOUND) {
           return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Partition }, { key, path }) };
-        if (!isPrimitive(data))
+        }
+
+        if (!isPrimitive(data)) {
           return {
             ...payload,
             error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Partition }, { key, path, type: 'primitive' })
           };
+        }
+
         if (value === data) payload.data.truthy[key] = storedValue;
         else payload.data.falsy[key] = storedValue;
       }
@@ -448,13 +479,15 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { key, path, value } = payload;
     const getPayload = await this[Method.Get]({ method: Method.Get, key, path });
 
-    if (!isPayloadWithData(getPayload))
+    if (!isPayloadWithData(getPayload)) {
       return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Push }, { key, path }) };
+    }
 
     const { data } = getPayload;
 
-    if (!Array.isArray(data))
+    if (!Array.isArray(data)) {
       return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Push }, { key, path, type: 'array' }) };
+    }
 
     data.push(value);
     await this[Method.Set]({ method: Method.Set, key, path, value: data });
@@ -467,11 +500,12 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const docCount = (await this[Method.Size]({ method: Method.Size })).data || 0;
 
     if (docCount === 0) return payload;
-    if (docCount < payload.count)
+    if (docCount < payload.count) {
       return {
         ...payload,
         error: this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random })
       };
+    }
 
     const keys = await this[Method.Keys]({ method: Method.Keys, data: [] });
 
@@ -491,11 +525,12 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const docCount = (await this[Method.Size]({ method: Method.Size })).data || 0;
 
     if (docCount === 0) return payload;
-    if (docCount < payload.count)
+    if (docCount < payload.count) {
       return {
         ...payload,
         error: this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random })
       };
+    }
 
     const keys = await this[Method.Keys]({ method: Method.Keys, data: [] });
 
@@ -516,16 +551,18 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       const { key, path, hook } = payload;
       const getPayload = await this[Method.Get]<HookValue[]>({ method: Method.Get, key, path });
 
-      if (!isPayloadWithData(getPayload))
+      if (!isPayloadWithData(getPayload)) {
         return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Remove }, { key, path }) };
+      }
 
       const { data } = getPayload;
 
-      if (!Array.isArray(data))
+      if (!Array.isArray(data)) {
         return {
           ...payload,
           error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Remove }, { key, path, type: 'array' })
         };
+      }
 
       const filterValues = await Promise.all(data.map(hook));
 
@@ -536,16 +573,18 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       const { key, path, value } = payload;
       const getPayload = await this[Method.Get]({ method: Method.Get, key, path });
 
-      if (!isPayloadWithData(getPayload))
+      if (!isPayloadWithData(getPayload)) {
         return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Remove }, { key, path }) };
+      }
 
       const { data } = getPayload;
 
-      if (!Array.isArray(data))
+      if (!Array.isArray(data)) {
         return {
           ...payload,
           error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Remove }, { key, path, type: 'array' })
         };
+      }
 
       await this[Method.Set]({ method: Method.Set, key, path, value: data.filter((storedValue) => value !== storedValue) });
     }
@@ -557,7 +596,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { key, path, value } = payload;
     const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, key, path })).data, path, value) : value;
 
-    await this.client.set(key, this.serialize(val) as string, { EX: this.options.expiry });
+    await this.client.set(key, JSON.stringify({ value: this.serialize(val as StoredValue), version: this.version }), { EX: this.options.expiry });
 
     return payload;
   }
@@ -575,7 +614,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
       const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, key, path: [] })).data, path, value) : value;
 
-      operations.push(this.client.set(key, this.serialize(val) as string, { EX: this.options.expiry }));
+      operations.push(this[Method.Set]({ method: Method.Set, path: [], key, value: val }));
     }
 
     await Promise.all(operations);
@@ -613,13 +652,17 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       for await (const { key, value: storedValue } of this._iterate()) {
         const data = getProperty(storedValue, path, false);
 
-        if (data === PROPERTY_NOT_FOUND)
+        if (data === PROPERTY_NOT_FOUND) {
           return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Some }, { key, path }) };
-        if (!isPrimitive(data))
+        }
+
+        if (!isPrimitive(data)) {
           return {
             ...payload,
             error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Some }, { key, path, type: 'primitive' })
           };
+        }
+
         if (data !== value) continue;
 
         payload.data = true;
@@ -635,8 +678,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { key, hook } = payload;
     const getPayload = await this[Method.Get]({ method: Method.Get, key, path: [] });
 
-    if (!isPayloadWithData<StoredValue>(getPayload))
+    if (!isPayloadWithData<StoredValue>(getPayload)) {
       return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Update }, { key }) };
+    }
 
     const { data } = getPayload;
 
@@ -657,38 +701,49 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
+  protected async fetchVersion(): Promise<JoshProvider.Semver> {
+    const key = (await this.client.keys('*'))[0];
+    if (!key) return this.version;
+
+    const doc = await this.client.get(key);
+    if (!doc) return this.version;
+
+    const val = JSON.parse(doc) as RedisProvider.DocType<StoredValue>;
+    return val && val.version ? val.version : { major: 1, minor: 0, patch: 0 };
+  }
+
   private async *_iterate() {
     const keys = (await this.client.keys('*')) ?? [];
     for (const key of keys) {
-      const value = this.deserialize((await this.client.get(key)) as unknown as string);
+      const value = (await this[Method.Get]<StoredValue>({ method: Method.Get, key, path: [] })).data as StoredValue;
       yield { key, value };
     }
   }
 
-  private deserialize(value: string): StoredValue {
-    if (this.options.disableSerialization) return JSON.parse(value) as StoredValue;
-
-    return new Serialize({ json: JSON.parse(value as string) as Serialize.JSON }).toRaw<StoredValue>();
+  private deserialize(value: SerializeJSON | StoredValue): StoredValue {
+    if (this.options.disableSerialization) return value as StoredValue;
+    return toRaw(value as SerializeJSON) as StoredValue;
   }
 
-  private serialize<Value = StoredValue>(value: StoredValue | Value) {
-    if (this.options.disableSerialization) return JSON.stringify(value);
-    return JSON.stringify(new Serialize({ raw: value }).toJSON());
+  private serialize<StoredValue>(value: StoredValue) {
+    if (this.options.disableSerialization) return value;
+    return toJSON(value) as SerializeJSON;
   }
 
   private get client(): RedisClientType {
-    if (isNullOrUndefined(this._client))
+    if (isNullOrUndefined(this._client)) {
       throw this.error({
         message: 'Client is not connected, most likely due to `init` not being called or the server not being available',
         identifier: RedisProvider.Identifiers.NotConnected
       });
+    }
 
     return this._client;
   }
 }
 
 export namespace RedisProvider {
-  export interface Options {
+  export interface Options extends JoshProvider.Options {
     connectOptions?: RedisClientOptions;
 
     expiry?: number;
@@ -696,7 +751,10 @@ export namespace RedisProvider {
     disableSerialization?: boolean;
   }
 
-  export type DocType<StoredValue> = string | StoredValue;
+  export interface DocType<StoredValue> {
+    value: StoredValue | SerializeJSON;
+    version: JoshProvider.Semver;
+  }
 
   export enum Identifiers {
     NotConnected = 'notConnected'

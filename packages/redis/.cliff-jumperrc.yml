@@ -1,0 +1,3 @@
+name: redis
+org: joshdb
+packagePath: packages/redis

@@ -8,33 +8,31 @@
   "browser": "dist/index.umd.js",
   "unpkg": "dist/index.umd.js",
   "types": "dist/index.d.ts",
-  "typedocMain": "src/index.ts",
   "exports": {
     "import": "./dist/index.mjs",
-    "require": "./dist/index.js"
+    "require": "./dist/index.js",
+    "types": "./dist/index.d.ts"
   },
+  "sideEffects": false,
   "scripts": {
     "test": "jest",
     "lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
-    "build": "rollup -c rollup.bundle.ts",
-    "release": "npm publish",
-    "prepublishOnly": "rollup-type-bundler"
+    "build": "rollup -c rollup.config.ts",
+    "prepack": "rollup-type-bundler",
+    "bump": "cliff-jumper",
+    "check-update": "cliff-jumper --dry-run"
   },
   "dependencies": {
-    "@joshdb/core": "3.0.0-next.4613706cda66569b2d1dc99f06665eecec2505ce.0",
-    "@joshdb/serialize": "1.1.0-next.d14f7112c7b9d23bbb0a05c7b0deb12ea9c5033b.0",
+    "@joshdb/provider": "1.1.0-next.4d2b099.0",
+    "@joshdb/serialize": "^1.1.0-next.19071d995a3c1164828b64112344ed43d219a4de.0",
     "redis": "^4.1.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@favware/rollup-type-bundler": "^1.0.7",
-    "@types/uuid": "^8",
+    "@types/uuid": "^8.3.4",
     "jest": "^28.1.0",
-    "rollup": "^2.75.5",
-    "rollup-plugin-cleaner": "^1.0.0",
-    "rollup-plugin-typescript2": "^0.32.0",
-    "rollup-plugin-version-injector": "^1.3.3",
-    "standard-version": "^9.3.2"
+    "rollup": "^2.75.1"
   },
   "repository": {
     "type": "git",

@@ -1,10 +1,18 @@
+/packages/json/**/*.ts @RealShadowNova
+/packages/json/README.md @RealShadowNova
+/packages/map/**/*.ts @RealShadowNova
+/packages/map/README.md @RealShadowNova
+/packages/mongo/**/*.ts @dan-online
+/packages/mongo/REAMDE.md @dan-online
+/packages/redis/**/*.ts @dan-online
+/packages/redis/README.md @dan-online
+
 /.github/ @RealShadowNova
 /.husky/ @RealShadowNova
 /.vscode/ @RealShadowNova
 /.yarn/ @RealShadowNova
 /benchmarks @RealShadowNova @dan-online
-/packages/mongo @dan-online
-/packages/json @RealShadowNova
-/scripts @RealShadowNova
+/scripts/ @RealShadowNova
 LICENSE @eslachance
 package.json @RealShadowNova
+README.md @RealShadowNova

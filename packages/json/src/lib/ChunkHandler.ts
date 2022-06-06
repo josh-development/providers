@@ -1,8 +1,8 @@
+import type { JoshProvider } from '@joshdb/provider';
 import { AsyncQueue } from '@sapphire/async-queue';
 import { Snowflake, TwitterSnowflake } from '@sapphire/snowflake';
-import { existsSync } from 'fs';
-import { mkdir } from 'fs/promises';
-import { resolve } from 'path';
+import { mkdir } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { ChunkFile } from './chunk-files/ChunkFile';
 import { ChunkIndexFile } from './chunk-files/ChunkIndexFile';
 import type { File } from './File';
@@ -21,24 +21,24 @@ export class ChunkHandler<StoredValue = unknown> {
   public files: Record<string, ChunkFile<StoredValue>> = {};
 
   public constructor(options: ChunkHandlerOptions) {
-    const { name, dataDirectoryName, epoch, retry } = options;
+    const { name, version, dataDirectoryName, epoch, retry } = options;
 
     this.options = options;
     this.snowflake = epoch === undefined ? TwitterSnowflake : new Snowflake(epoch);
     this.directory = resolve(process.cwd(), dataDirectoryName ?? 'data', name);
-    this.index = new ChunkIndexFile({ directory: this.directory, retry });
+    this.index = new ChunkIndexFile({ version, directory: this.directory, retry });
   }
 
   public async init(): Promise<this> {
-    if (!existsSync(this.directory)) {
-      await this.queue.wait();
-      await mkdir(this.directory, { recursive: true });
-      this.queue.shift();
-    }
+    await this.queue.wait();
 
-    const { name, synchronize } = this.options;
+    await mkdir(this.directory, { recursive: true });
 
-    if (!this.index.exists) await this.index.save({ name, autoKeyCount: 0, chunks: [] });
+    this.queue.shift();
+
+    const { name, version, synchronize } = this.options;
+
+    if (!this.index.exists) await this.index.save({ name, version, autoKeyCount: 0, chunks: [] });
     if (synchronize) await this.synchronize();
 
     return this;
@@ -255,13 +255,14 @@ export class ChunkHandler<StoredValue = unknown> {
 
       entries = entries.filter(([key]) => !chunk.keys.includes(key));
 
-      if (Object.keys(data).length < maxChunkSize)
+      if (Object.keys(data).length < maxChunkSize) {
         for (const [key, value] of entries) {
           if (Object.keys(data).length >= maxChunkSize) break;
 
           data[key] = value;
           entries = entries.filter(([k]) => k !== key);
         }
+      }
     }
 
     if (entries.length > 0) {
@@ -357,6 +358,8 @@ export class ChunkHandler<StoredValue = unknown> {
 
 export interface ChunkHandlerOptions {
   name: string;
+
+  version: JoshProvider.Semver;
 
   dataDirectoryName?: string;
 

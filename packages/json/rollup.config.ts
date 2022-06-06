@@ -20,16 +20,16 @@ export default {
     }
   ],
   external: [
+    '@joshdb/provider',
     '@joshdb/serialize',
-    'fs',
-    'fs/promises',
-    'path',
-    'timers/promises',
-    '@joshdb/core',
-    '@realware/utilities',
-    '@sapphire/utilities',
     '@sapphire/async-queue',
-    '@sapphire/snowflake'
+    '@sapphire/snowflake',
+    '@sapphire/utilities',
+    'node:fs',
+    'node:fs/promises',
+    'node:path',
+    'property-helpers',
+    'timers/promises'
   ],
   plugins: [cleaner({ targets: ['./dist'] }), typescript({ tsconfig: resolve(process.cwd(), 'src', 'tsconfig.json') }), versionInjector()]
 };
