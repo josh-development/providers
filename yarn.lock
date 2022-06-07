@@ -944,14 +944,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@joshdb/core@npm:3.0.0-next.4613706cda66569b2d1dc99f06665eecec2505ce.0":
-  version: 3.0.0-next.4613706cda66569b2d1dc99f06665eecec2505ce.0
-  resolution: "@joshdb/core@npm:3.0.0-next.4613706cda66569b2d1dc99f06665eecec2505ce.0"
+"@joshdb/core@npm:3.0.0-pr-79.7b155ed9e89f985eeb2e055cf00e11d2d4ba706f.0":
+  version: 3.0.0-pr-79.7b155ed9e89f985eeb2e055cf00e11d2d4ba706f.0
+  resolution: "@joshdb/core@npm:3.0.0-pr-79.7b155ed9e89f985eeb2e055cf00e11d2d4ba706f.0"
   dependencies:
     "@sapphire/utilities": ^3.6.2
     property-helpers: ^1.1.0
     reflect-metadata: ^0.1.13
-  checksum: 1cb027380053ca727b12dcb716c2aa9bdb3ab54f2e67e86a549fdbac38e6a0c328aa616d230957f58bfc35e6399d5490b5402e5fa3f370b8062d4bab2d31fd06
+  checksum: 4d9252c2f1d3ca0dc678276793e91449cd271975ca1c5b0d00cd39222db88ba94034e0e0a07c01cbaeaae4c841626694b0e7d0146d5a40444f3a084ee8297751
   languageName: node
   linkType: hard
 
@@ -960,7 +960,7 @@ __metadata:
   resolution: "@joshdb/json@workspace:packages/json"
   dependencies:
     "@favware/rollup-type-bundler": ^1.0.7
-    "@joshdb/provider": 1.1.0-next.d06e5ec.0
+    "@joshdb/provider": 1.1.0-pr-4.d962ff92fb98a59bc3568068a3cedb827bdf66e1.0
     "@joshdb/serialize": ^1.1.0-next.19071d995a3c1164828b64112344ed43d219a4de.0
     "@sapphire/async-queue": ^1.3.1
     "@sapphire/snowflake": ^3.2.2
@@ -975,7 +975,7 @@ __metadata:
   resolution: "@joshdb/map@workspace:packages/map"
   dependencies:
     "@favware/rollup-type-bundler": ^1.0.7
-    "@joshdb/provider": 1.1.0-next.d06e5ec.0
+    "@joshdb/provider": 1.1.0-pr-4.d962ff92fb98a59bc3568068a3cedb827bdf66e1.0
     "@sapphire/utilities": ^3.6.2
     jest: ^28.1.0
     property-helpers: ^1.1.0
@@ -987,7 +987,7 @@ __metadata:
   resolution: "@joshdb/mongo@workspace:packages/mongo"
   dependencies:
     "@favware/rollup-type-bundler": ^1.0.7
-    "@joshdb/provider": 1.1.0-next.d06e5ec.0
+    "@joshdb/provider": 1.1.0-pr-4.d962ff92fb98a59bc3568068a3cedb827bdf66e1.0
     "@joshdb/serialize": ^1.1.0-next.19071d995a3c1164828b64112344ed43d219a4de.0
     "@sapphire/utilities": ^3.6.2
     jest: ^28.1.0
@@ -996,12 +996,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/provider@npm:1.1.0-next.d06e5ec.0":
-  version: 1.1.0-next.d06e5ec.0
-  resolution: "@joshdb/provider@npm:1.1.0-next.d06e5ec.0"
+"@joshdb/provider@npm:1.1.0-pr-4.d962ff92fb98a59bc3568068a3cedb827bdf66e1.0":
+  version: 1.1.0-pr-4.d962ff92fb98a59bc3568068a3cedb827bdf66e1.0
+  resolution: "@joshdb/provider@npm:1.1.0-pr-4.d962ff92fb98a59bc3568068a3cedb827bdf66e1.0"
   dependencies:
     "@sapphire/utilities": ^3.6.2
-  checksum: f7a5a31d510150b592a29aa904d0c6483455247f1b74e172fa689858dc254097230e3022a59192d7f056f095cf3f95ff9a7a78d09ef02f8d3b05e3fc6ed937fc
+  checksum: 9cc91a35c899e5678834e3c4f60bd30e34c9f11307cee53616d087ef1cfa9909016a889cecf32ceb4a6adeefd44f7762c2ab3d2d8856e0de4ccf4935bf49e09c
   languageName: node
   linkType: hard
 
@@ -1010,7 +1010,7 @@ __metadata:
   resolution: "@joshdb/redis@workspace:packages/redis"
   dependencies:
     "@favware/rollup-type-bundler": ^1.0.7
-    "@joshdb/provider": 1.1.0-next.d06e5ec.0
+    "@joshdb/provider": 1.1.0-pr-4.d962ff92fb98a59bc3568068a3cedb827bdf66e1.0
     "@joshdb/serialize": ^1.1.0-next.19071d995a3c1164828b64112344ed43d219a4de.0
     "@types/uuid": ^8.3.4
     jest: ^28.1.0
@@ -5728,7 +5728,7 @@ __metadata:
     "@favware/cliff-jumper": ^1.7.0
     "@favware/npm-deprecate": ^1.0.4
     "@favware/rollup-type-bundler": ^1.0.7
-    "@joshdb/core": 3.0.0-next.4613706cda66569b2d1dc99f06665eecec2505ce.0
+    "@joshdb/core": 3.0.0-pr-79.7b155ed9e89f985eeb2e055cf00e11d2d4ba706f.0
     "@sapphire/eslint-config": ^4.3.4
     "@sapphire/ts-config": ^3.3.4
     "@types/jest": ^27.5.0

@@ -24,7 +24,7 @@
     "@favware/cliff-jumper": "^1.7.0",
     "@favware/npm-deprecate": "^1.0.4",
     "@favware/rollup-type-bundler": "^1.0.7",
-    "@joshdb/core": "3.0.0-next.4613706cda66569b2d1dc99f06665eecec2505ce.0",
+    "@joshdb/core": "3.0.0-pr-79.7b155ed9e89f985eeb2e055cf00e11d2d4ba706f.0",
     "@sapphire/eslint-config": "^4.3.4",
     "@sapphire/ts-config": "^3.3.4",
     "@types/jest": "^27.5.0",
