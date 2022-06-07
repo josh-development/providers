@@ -116,7 +116,6 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { hook } = payload;
 
     for await (const { key, value } of this._iterate()) {
-      console.log(key, value);
       await hook(value, key);
     }
 
