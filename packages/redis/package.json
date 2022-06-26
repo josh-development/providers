@@ -29,10 +29,10 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@favware/rollup-type-bundler": "^1.0.7",
+    "@favware/rollup-type-bundler": "^1.0.8",
     "@types/uuid": "^8.3.4",
     "jest": "^28.1.1",
-    "rollup": "^2.75.6"
+    "rollup": "^2.75.7"
   },
   "repository": {
     "type": "git",
