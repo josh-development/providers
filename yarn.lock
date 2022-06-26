@@ -5355,9 +5355,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ora@npm:^6.1.0":
-  version: 6.1.0
-  resolution: "ora@npm:6.1.0"
+"ora@npm:^6.1.1":
+  version: 6.1.1
+  resolution: "ora@npm:6.1.1"
   dependencies:
     bl: ^5.0.0
     chalk: ^5.0.0
@@ -5368,7 +5368,7 @@ __metadata:
     log-symbols: ^5.1.0
     strip-ansi: ^7.0.1
     wcwidth: ^1.0.1
-  checksum: 0e84d9c32f2c62617324658ea547963412152f0bf60c1580ed18ec660769713452a6a47d117a1767bb118bb0867720ecc109ef6e12d18fd71ae244683e722b23
+  checksum: 2425718d4bad04b0ab1ffd4034fdcc249706211fff85d800fc19a2bab0c64626c12f7b223b1d8461439b835c444e92f7b92d6864810f4e43082304be60de3339
   languageName: node
   linkType: hard
 
@@ -5988,7 +5988,7 @@ __metadata:
     jest: ^28.1.1
     jest-extended: ^2.0.0
     lint-staged: ^12.5.0
-    ora: ^6.1.0
+    ora: ^6.1.1
     prettier: ^2.7.1
     pretty-quick: ^3.1.3
     prompts: ^2.4.2
