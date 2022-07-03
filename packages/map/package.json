@@ -24,12 +24,12 @@
   },
   "dependencies": {
     "@joshdb/provider": "1.1.0",
-    "@sapphire/utilities": "^3.6.2",
+    "@sapphire/utilities": "^3.7.0",
     "property-helpers": "^1.1.0"
   },
   "devDependencies": {
-    "@favware/rollup-type-bundler": "^1.0.8",
-    "jest": "^28.1.1"
+    "@favware/rollup-type-bundler": "^1.0.9",
+    "jest": "^28.1.2"
   },
   "repository": {
     "type": "git",
