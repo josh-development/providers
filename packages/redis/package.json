@@ -25,13 +25,13 @@
   "dependencies": {
     "@joshdb/provider": "1.1.0",
     "@joshdb/serialize": "^1.1.0",
-    "redis": "^4.1.0",
+    "redis": "^4.1.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@favware/rollup-type-bundler": "^1.0.8",
+    "@favware/rollup-type-bundler": "^1.0.9",
     "@types/uuid": "^8.3.4",
-    "jest": "^28.1.1",
+    "jest": "^28.1.2",
     "rollup": "^2.75.7"
   },
   "repository": {
