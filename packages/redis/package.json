@@ -23,7 +23,7 @@
     "check-update": "cliff-jumper --dry-run"
   },
   "dependencies": {
-    "@joshdb/provider": "1.1.0",
+    "@joshdb/provider": "1.1.0-pr-56.8aca45a.0",
     "@joshdb/serialize": "^1.1.0",
     "redis": "^4.2.0",
     "uuid": "^8.3.2"
