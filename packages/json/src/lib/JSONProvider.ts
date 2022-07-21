@@ -167,7 +167,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
       const { path, value } = payload;
 
       for (const [key, storedValue] of await this.handler.entries()) {
-        const data = getProperty(storedValue, path, false);
+        const data = getProperty(storedValue, path);
 
         if (data === PROPERTY_NOT_FOUND) {
           return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Every }, { key, path }) };
@@ -626,7 +626,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
       const { path, value } = payload;
 
       for (const [key, storedValue] of await this.handler.entries()) {
-        const data = getProperty(storedValue, path, false);
+        const data = getProperty(storedValue, path);
 
         if (data === PROPERTY_NOT_FOUND) {
           return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Some }, { key, path }) };
