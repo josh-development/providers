@@ -141,7 +141,7 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
       const { path, value } = payload;
 
       for (const [key, storedValue] of this.cache.entries()) {
-        const data = getProperty(storedValue, path, false);
+        const data = getProperty(storedValue, path);
 
         if (data === PROPERTY_NOT_FOUND) {
           return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Every }, { key, path }) };
@@ -607,7 +607,7 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
       const { path, value } = payload;
 
       for (const [key, storedValue] of this.cache.entries()) {
-        const data = getProperty(storedValue, path, false);
+        const data = getProperty(storedValue, path);
 
         if (data === PROPERTY_NOT_FOUND) {
           return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Some }, { key, path }) };

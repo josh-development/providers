@@ -163,7 +163,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isEveryByValuePayload(payload)) {
       const { path, value } = payload;
       for await (const { key, value: storedValue } of this._iterate()) {
-        const data = getProperty(storedValue, path, false);
+        const data = getProperty(storedValue, path);
 
         if (data === PROPERTY_NOT_FOUND) {
           return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Every }, { key, path }) };
@@ -649,7 +649,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       const { path, value } = payload;
 
       for await (const { key, value: storedValue } of this._iterate()) {
-        const data = getProperty(storedValue, path, false);
+        const data = getProperty(storedValue, path);
 
         if (data === PROPERTY_NOT_FOUND) {
           return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Some }, { key, path }) };

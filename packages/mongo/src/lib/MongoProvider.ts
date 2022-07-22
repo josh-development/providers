@@ -215,7 +215,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       const { path, value } = payload;
       for await (const { key, value: storedValue } of this._iterate({})) {
         const deserialized = this.deserialize(storedValue);
-        const data = getProperty(deserialized, path, false);
+        const data = getProperty(deserialized, path);
 
         if (data === PROPERTY_NOT_FOUND) {
           return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Every }, { key, path }) };
@@ -260,7 +260,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
       for await (const { key, value: storedValue } of this._iterate({})) {
         const deserialized = this.deserialize(storedValue);
-        const data = getProperty(deserialized, path, false);
+        const data = getProperty(deserialized, path);
 
         if (data === PROPERTY_NOT_FOUND) {
           return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Filter }, { key, path }) };
@@ -715,7 +715,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
       for await (const { key, value: storedValue } of this._iterate({})) {
         const deserialized = this.deserialize(storedValue);
-        const data = getProperty(deserialized, path, false);
+        const data = getProperty(deserialized, path);
 
         if (data === PROPERTY_NOT_FOUND) {
           return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Some }, { key, path }) };
