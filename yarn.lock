@@ -996,7 +996,7 @@ __metadata:
     "@favware/rollup-type-bundler": ^1.0.9
     "@joshdb/provider": 1.1.0-next.ffebf9f.0
     "@joshdb/serialize": ^1.1.0
-    "@sapphire/async-queue": ^1.3.1
+    "@sapphire/async-queue": ^1.3.2
     "@sapphire/snowflake": ^3.2.2
     "@sapphire/utilities": ^3.7.0
     jest: ^28.1.3
@@ -1299,10 +1299,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/async-queue@npm:^1.3.1":
-  version: 1.3.1
-  resolution: "@sapphire/async-queue@npm:1.3.1"
-  checksum: 4016010a8b6f2896ce7694eb04c1839b613387cbfb104028a4a1bea471afb1dc4d569b66d3c9770319c47be55035dc786c072c32656d467fc2cded4347055d92
+"@sapphire/async-queue@npm:^1.3.2":
+  version: 1.3.2
+  resolution: "@sapphire/async-queue@npm:1.3.2"
+  checksum: 348f35a278bff68cb6d5e2c2219b03ce66243162522003bb14426e5fdad251300bea8ef3883043eb034c181dddd52296a519e9f377075a5b31074807fe163e76
   languageName: node
   linkType: hard
 
