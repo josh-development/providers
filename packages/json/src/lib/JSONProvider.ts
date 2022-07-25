@@ -44,12 +44,13 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
   public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
     context = await super.init(context);
 
-    const { dataDirectoryName, disableSerialization, epoch, maxChunkSize, retry, synchronize } = this.options;
+    const { useAbsolutePath, dataDirectory, disableSerialization, epoch, maxChunkSize, retry, synchronize } = this.options;
 
     this._handler = await new ChunkHandler<StoredValue>({
       name: context.name,
       version: this.version,
-      dataDirectoryName,
+      useAbsolutePath,
+      dataDirectory,
       serialize: disableSerialization ? false : true,
       epoch,
       maxChunkSize: maxChunkSize ?? 100,
@@ -686,8 +687,12 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
 
   protected async fetchVersion(context: JoshProvider.Context) {
     const { name } = context;
-    const { dataDirectoryName } = this.options;
-    const index = new ChunkIndexFile({ directory: resolve(process.cwd(), dataDirectoryName ?? 'data', name), version: this.version });
+    const { useAbsolutePath, dataDirectory } = this.options;
+    const index = new ChunkIndexFile({
+      directory: useAbsolutePath ? resolve(dataDirectory ?? 'data', name) : resolve(process.cwd(), dataDirectory ?? 'data', name),
+      version: this.version
+    });
+
     const data = await index.fetch();
 
     return this.isLegacyIndexData(data) ? { major: 1, minor: 0, patch: 0 } : data.version;
@@ -708,7 +713,9 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
 
 export namespace JSONProvider {
   export interface Options extends JoshProvider.Options {
-    dataDirectoryName?: string;
+    useAbsolutePath?: boolean;
+
+    dataDirectory?: string;
 
     disableSerialization?: boolean;
 

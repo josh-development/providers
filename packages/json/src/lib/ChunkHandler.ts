@@ -21,11 +21,11 @@ export class ChunkHandler<StoredValue = unknown> {
   public files: Record<string, ChunkFile<StoredValue>> = {};
 
   public constructor(options: ChunkHandlerOptions) {
-    const { name, version, dataDirectoryName, epoch, retry } = options;
+    const { name, version, useAbsolutePath, dataDirectory, epoch, retry } = options;
 
     this.options = options;
     this.snowflake = epoch === undefined ? TwitterSnowflake : new Snowflake(epoch);
-    this.directory = resolve(process.cwd(), dataDirectoryName ?? 'data', name);
+    this.directory = useAbsolutePath ? resolve(dataDirectory ?? 'data', name) : resolve(process.cwd(), dataDirectory ?? 'data', name);
     this.index = new ChunkIndexFile({ version, directory: this.directory, retry });
   }
 
@@ -361,7 +361,9 @@ export interface ChunkHandlerOptions {
 
   version: JoshProvider.Semver;
 
-  dataDirectoryName?: string;
+  useAbsolutePath?: boolean;
+
+  dataDirectory?: string;
 
   maxChunkSize: number;
 

@@ -16,7 +16,7 @@ describe('ChunkHandler', () => {
       name: 'chunkHandler',
       version: { major: 0, minor: 0, patch: 0 },
       maxChunkSize: 100,
-      dataDirectoryName: '.tests',
+      dataDirectory: '.tests',
       serialize: false
     });
 

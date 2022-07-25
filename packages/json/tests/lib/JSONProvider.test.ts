@@ -7,5 +7,5 @@ mkdirSync(resolve(process.cwd(), '.tests', 'provider'), { recursive: true });
 
 runProviderTest<typeof JSONProvider, JSONProvider.Options>({
   providerConstructor: JSONProvider,
-  providerOptions: { dataDirectoryName: '.tests', disableSerialization: true }
+  providerOptions: { dataDirectory: '.tests', disableSerialization: true }
 });
