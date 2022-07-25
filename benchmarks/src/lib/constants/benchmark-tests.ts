@@ -1,4 +1,4 @@
-import { MathOperator, Method } from '@joshdb/core';
+import { MathOperator, Method } from '@joshdb/provider';
 import type { Benchmark } from '../Benchmark';
 
 export const BENCHMARK_TESTS: Benchmark.Test[] = [
