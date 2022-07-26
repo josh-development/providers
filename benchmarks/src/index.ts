@@ -10,8 +10,8 @@ import { PickType } from './lib/types/YesNo';
 
 async function main() {
   const benchmark = new Benchmark()
-    .add(new JSONProvider({ dataDirectoryName: '.bench' }), 'JSONProvider (Serialize)')
-    .add(new JSONProvider({ dataDirectoryName: '.bench', disableSerialization: true }))
+    .add(new JSONProvider({ dataDirectory: '.bench' }), 'JSONProvider (Serialize)')
+    .add(new JSONProvider({ dataDirectory: '.bench', disableSerialization: true }))
     .add(new MapProvider())
     .add(new MongoProvider({ collectionName: 'benchmark' }), 'MongoProvider (Serialize)')
     .add(new MongoProvider({ collectionName: 'benchmark', disableSerialization: true }))

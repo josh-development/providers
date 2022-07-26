@@ -1,9 +1,9 @@
-import type { Card } from '@faker-js/faker/helpers';
-import { Josh, JoshProvider } from '@joshdb/core';
+import { Spinner } from '@favware/colorette-spinner';
+import { Josh } from '@joshdb/core';
+import type { JoshProvider } from '@joshdb/provider';
 import { blueBright, cyanBright, gray, greenBright, magentaBright } from 'colorette';
 import { existsSync } from 'fs';
 import { mkdir, writeFile } from 'fs/promises';
-import ora from 'ora-classic';
 import { resolve } from 'path';
 import { performance } from 'perf_hooks';
 import { createCard } from './functions/createCard';
@@ -55,7 +55,7 @@ export class Benchmark {
       };
 
       for (const test of this.tests) {
-        const spinner = ora(test.name).start();
+        const spinner = new Spinner(test.name).start();
         const testResult: Benchmark.PerformanceTestResult = {
           name: test.name,
 
@@ -89,12 +89,12 @@ export class Benchmark {
 
           const end = performance.now();
 
-          spinner.text = `${test.name} (${id}/${cardCount})`;
+          spinner.update({ text: `${test.name} (${id}/${cardCount})` });
           testResult.times.push(end - start);
         }
 
         await josh.clear();
-        spinner.succeed(test.name);
+        spinner.success({ text: test.name });
         result.tests.push(testResult);
       }
 
@@ -156,16 +156,16 @@ export class Benchmark {
   }
 
   private generateCards(cardCount: number): Record<string, Benchmark.TestCard> {
-    const spinner = ora('Card Generation').start();
+    const spinner = new Spinner('Card Generation').start();
     const cards: Record<string, Benchmark.TestCard> = {};
 
     for (let i = 0; i < cardCount; i++) {
-      spinner.text = `Card Generation (${i}/${cardCount})`;
+      spinner.update({ text: `Card Generation (${i}/${cardCount})` });
       const card = createCard(i);
       cards[i.toString()] = card;
     }
 
-    spinner.succeed('Card Generation Complete\n');
+    spinner.success({ text: 'Card Generation Complete\n' });
 
     return cards;
   }
@@ -234,7 +234,7 @@ export namespace Benchmark {
     card: TestCard;
   }
 
-  export interface TestCard extends Card {
+  export interface TestCard {
     id: string;
 
     net: number;
