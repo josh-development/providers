@@ -48,7 +48,6 @@ jobs:
     name: Upload Documentation
     needs: build
     strategy:
-      max-parallel: 1
       fail-fast: false
       matrix:
         package: ['json', 'map', 'mongo', 'redis']
