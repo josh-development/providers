@@ -376,4 +376,4 @@ export interface ChunkHandlerOptions {
   retry?: File.RetryOptions;
 }
 
-type ChunkHandlerUseQueueOptions = [ChunkIndexFile.Data, () => void];
+export type ChunkHandlerUseQueueOptions = [ChunkIndexFile.Data, () => void];
