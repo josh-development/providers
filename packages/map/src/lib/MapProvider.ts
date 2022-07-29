@@ -44,6 +44,10 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
    */
   private autoKeyCount = 0;
 
+  public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
+    return super.init(context);
+  }
+
   public [Method.AutoKey](payload: Payloads.AutoKey): Payloads.AutoKey {
     this.autoKeyCount++;
     payload.data = this.autoKeyCount.toString();
