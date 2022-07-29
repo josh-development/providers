@@ -6,8 +6,11 @@
 
 **A provider for `@joshdb/core`**
 
-[![GitHub](https://img.shields.io/github/license/josh-development/providers)](https://github.com/josh-development/providers/blob/main/LICENSE)
-[![npm](https://img.shields.io/npm/v/@joshdb/mongo?color=crimson&logo=npm&style=flat-square&label=@joshdb/mongo)](https://www.npmjs.com/package/@joshdb/mongo)
+[![GitHub](https://img.shields.io/github/license/josh-development/providers)](https://github.com/josh-development/providers/blob/main/LICENSE.md)
+[![codecov](https://codecov.io/gh/josh-development/providers/branch/main/graph/badge.svg?token=JnJcjxqT3k)](https://codecov.io/gh/josh-development/providers)
+[![npm](https://img.shields.io/npm/v/@joshdb/map?color=crimson&logo=npm&style=flat-square)](https://www.npmjs.com/package/@joshdb/mongo)
+
+[![Support Server](https://discord.com/api/guilds/298508738623438848/embed.png?style=banner2)](https://discord.gg/N7ZKH3P)
 
 </div>
 
@@ -41,9 +44,10 @@ interface Options {
 
   /**
    * Mongoose connection options
+   * @see https://mongodb.github.io/node-mongodb-native/4.5/interfaces/MongoClientOptions.html
    * @since 2.0.0
    */
-  connectOptions?: Mongodb.ConnectOptions; // see https://mongodb.github.io/node-mongodb-native/4.5/interfaces/MongoClientOptions.html
+  connectOptions?: Mongodb.ConnectOptions;
 
   /**
    * Sanitize collection name
@@ -71,21 +75,25 @@ interface Authentication {
    * @since 2.0.0
    */
   user?: string;
+
   /**
    * The password for authentication.
    * @since 2.0.0
    */
   password?: string;
+
   /**
    * The database name for authentication.
    * @since 2.0.0
    */
   dbName: string;
+
   /**
    * The database port for authentication.
    * @since 2.0.0
    */
   port: number;
+
   /**
    * The database host for authentication.
    * @since 2.0.0

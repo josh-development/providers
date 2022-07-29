@@ -11,7 +11,6 @@
     "docs": "turbo run docs",
     "lint": "eslint packages scripts --ext mjs,js,ts --fix",
     "format": "prettier --write \"packages/**/{src,tests}/**/*.{mjs,js,ts}\"",
-    "test": "turbo run test",
     "test:coverage": "yarn jest --coverage",
     "build": "turbo run build",
     "update": "yarn upgrade-interactive",

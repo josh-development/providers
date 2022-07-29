@@ -6,11 +6,11 @@ node_modules/
 dist/
 build/
 docs/
+coverage/
 .turbo/
 **/.tests
 **/.bench
 **/benchmarks/results
-
 
 # Ignore heapsnapshot and log files
 *.heapsnapshot

@@ -3,9 +3,7 @@
   "compilerOptions": {
     "rootDir": "./",
     "outDir": "./build",
-    "tsBuildInfoFile": "./build/.tsbuildinfo",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "tsBuildInfoFile": "./build/.tsbuildinfo"
   },
   "include": ["./"],
   "references": [{ "path": "../src" }]
