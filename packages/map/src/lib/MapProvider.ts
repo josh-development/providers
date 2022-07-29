@@ -25,7 +25,7 @@ import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProper
 
 /**
  * A provider that uses the Node.js native [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) class.
- * @since 2.0.0
+ * @since 1.0.0
  */
 export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public get version(): JoshProvider.Semver {
@@ -34,13 +34,13 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
 
   /**
    * The [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) cache to store data.
-   * @since 2.0.0
+   * @since 1.0.0
    */
   private cache = new Map<string, StoredValue>();
 
   /**
    * A simple cache for the autoKey method.
-   * @since 2.0.0
+   * @since 1.0.0
    */
   private autoKeyCount = 0;
 
