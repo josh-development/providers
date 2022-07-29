@@ -59,6 +59,7 @@ export const jobs = [
                 devDependencies: {
                   '@favware/cliff-jumper': '^1.8.5',
                   '@favware/rollup-type-bundler': '^1.0.9',
+                  jest: '^28.1.3',
                   typedoc: '^0.23.9',
                   'typedoc-json-parser': '^2.0.1'
                 },
@@ -111,6 +112,7 @@ export const jobs = [
                 devDependencies: {
                   '@favware/cliff-jumper': '^1.8.5',
                   '@favware/rollup-type-bundler': '^1.0.9',
+                  jest: '^28.1.3',
                   typedoc: '^0.23.9',
                   'typedoc-json-parser': '^2.0.1'
                 },
