@@ -481,7 +481,7 @@ export namespace ${title}Provider {
       await mkdir(resolvePath(name, 'tests', 'lib'));
       await writeFile(
         resolvePath(name, 'tests', 'lib', `${title}Provider.test.ts`),
-        `import { runProviderTest } from '@joshdb/tests';
+        `import { runProviderTest } from '@joshdb/provider';
 import { ${title}Provider } from '../../src';
 
 runProviderTest<typeof ${title}Provider, ${title}Provider.Options>({
