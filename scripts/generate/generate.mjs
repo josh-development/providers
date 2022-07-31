@@ -1,5 +1,5 @@
+import { Spinner } from '@favware/colorette-spinner';
 import { blueBright } from 'colorette';
-import ora from 'ora';
 import prompts from 'prompts';
 import { jobs } from './jobs.mjs';
 
@@ -23,15 +23,15 @@ if (response.title === undefined) process.exit(1);
 if (response.umd === undefined) process.exit(1);
 
 for (const job of jobs) {
-  const spinner = ora(job.description).start();
+  const spinner = new Spinner(job.description).start();
 
   await job.callback({ name: response.name, title: response.title, description: response.description, umd: response.umd }).catch((error) => {
-    spinner.fail(error.message);
+    spinner.error({ text: error.message });
     console.log(error);
     process.exit(1);
   });
 
-  spinner.succeed();
+  spinner.success();
 }
 
 console.log(blueBright('Done!'));
