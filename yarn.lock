@@ -1046,9 +1046,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/postgres@workspace:packages/postgres":
+"@joshdb/postgresql@workspace:packages/postgresql":
   version: 0.0.0-use.local
-  resolution: "@joshdb/postgres@workspace:packages/postgres"
+  resolution: "@joshdb/postgresql@workspace:packages/postgresql"
   dependencies:
     "@favware/cliff-jumper": ^1.8.5
     "@favware/rollup-type-bundler": ^1.0.9

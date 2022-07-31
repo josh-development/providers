@@ -14,7 +14,7 @@
 [![npm](https://img.shields.io/npm/v/@joshdb/json?color=crimson&logo=npm&style=flat-square&label=@joshdb/json)](https://www.npmjs.com/package/@joshdb/json)
 [![npm](https://img.shields.io/npm/v/@joshdb/map?color=crimson&logo=npm&style=flat-square&label=@joshdb/map)](https://www.npmjs.com/package/@joshdb/map)
 [![npm](https://img.shields.io/npm/v/@joshdb/mongo?color=crimson&logo=npm&style=flat-square&label=@joshdb/mongo)](https://www.npmjs.com/package/@joshdb/mongo)
-[![npm](https://img.shields.io/npm/v/@joshdb/postgres?color=crimson&logo=npm&style=flat-square&label=@joshdb/postgres)](https://www.npmjs.com/package/@joshdb/postgres)
+[![npm](https://img.shields.io/npm/v/@joshdb/postgresql?color=crimson&logo=npm&style=flat-square&label=@joshdb/postgresql)](https://www.npmjs.com/package/@joshdb/postgresql)
 [![npm](https://img.shields.io/npm/v/@joshdb/redis?color=crimson&logo=npm&style=flat-square&label=@joshdb/redis)](https://www.npmjs.com/package/@joshdb/redis)
 
 </div>

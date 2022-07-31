@@ -3,5 +3,5 @@ package:
   - '@joshdb/json'
   - '@joshdb/map'
   - '@joshdb/mongo'
-  - '@joshdb/postgres'
+  - '@joshdb/postgresql'
   - '@joshdb/redis'

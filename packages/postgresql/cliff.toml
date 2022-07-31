@@ -27,7 +27,7 @@ body = """
       {% endif %}\
             {{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/josh-development/utilities/commit/{{ commit.id }}))\
     {% if commit.breaking %}\
-      
+
 
  {% raw %}  {% endraw %} ### 💥 Breaking Changes:
  \
@@ -61,7 +61,7 @@ commit_parsers = [
     { body = ".*security", group = "🛡️ Security" },
 ]
 filter_commits = true
-tag_pattern = "@joshdb/postgres@[0-9]*"
+tag_pattern = "@joshdb/postgresql@[0-9]*"
 ignore_tags = ""
 topo_order = false
 sort_commits = "newest"

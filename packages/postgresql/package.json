@@ -1,5 +1,5 @@
 {
-  "name": "@joshdb/postgres",
+  "name": "@joshdb/postgresql",
   "version": "1.0.0",
   "description": "A Josh provider using postgres",
   "author": "Évelyne Lachance <eslachance@gmail.com> (https://evie.codes/)",

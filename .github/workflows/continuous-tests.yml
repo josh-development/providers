@@ -76,7 +76,7 @@ jobs:
           name: coverage
           path: coverage/
   postgres:
-    name: PostgresProvider
+    name: PostgreSQLProvider
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Project
@@ -90,7 +90,7 @@ jobs:
       - name: Install Dependencies
         run: yarn --immutable
       - name: Run Tests
-        run: yarn workspace @joshdb/postgres run test --coverage
+        run: yarn workspace @joshdb/postgresql run test --coverage
       - name: Store Code Coverage Report
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
         with:
