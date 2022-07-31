@@ -3,6 +3,7 @@ package:
   - '@joshdb/json'
   - '@joshdb/map'
   - '@joshdb/mongo'
+  - '@joshdb/postgresql'
   - '@joshdb/redis'
   - '@joshdb/maria'
   - '@joshdb/sqlite'
