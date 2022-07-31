@@ -962,15 +962,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@joshdb/core@npm:3.0.0-next.9743df0.0":
-  version: 3.0.0-next.9743df0.0
-  resolution: "@joshdb/core@npm:3.0.0-next.9743df0.0"
+"@joshdb/core@npm:3.0.0-next.c67d6d9.0":
+  version: 3.0.0-next.c67d6d9.0
+  resolution: "@joshdb/core@npm:3.0.0-next.c67d6d9.0"
   dependencies:
     "@joshdb/auto-ensure": 1.1.0-next.e9d0c3d.0
     "@joshdb/map": 1.1.0-next.d8e99a9.0
     "@joshdb/middleware": 1.1.0-next.ffebf9f.0
-    "@sapphire/utilities": ^3.7.0
-  checksum: 05c4f7d61dcbfe0f06704b669e6a2418700b2a6dd7057dd6eee409ac89392eb798f926fe260694f3ff137720690f7302b433a9a07f7d6c21180390e72a22210a
+    "@sapphire/utilities": ^3.8.0
+  checksum: 2783d56339fb8d788f06b3cec51c71d83668759cee0185c1f72861d3d9e0cdc0c1f8be0bfcb01cb6b4a827c9bbe7de8342704d656dca3f24ff0d25f0d4477906
   languageName: node
   linkType: hard
 
@@ -980,8 +980,8 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^1.8.6
     "@favware/rollup-type-bundler": ^1.0.10
-    "@joshdb/provider": 1.1.0-next.24ef775.0
-    "@joshdb/serialize": ^1.1.0
+    "@joshdb/provider": 1.1.0-next.98baf42.0
+    "@joshdb/serialize": ^1.1.0-next
     "@sapphire/async-queue": ^1.3.2
     "@sapphire/snowflake": ^3.2.2
     "@sapphire/utilities": ^3.8.0
@@ -1009,7 +1009,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^1.8.6
     "@favware/rollup-type-bundler": ^1.0.10
-    "@joshdb/provider": 1.1.0-next.24ef775.0
+    "@joshdb/provider": 1.1.0-next.98baf42.0
     "@sapphire/utilities": ^3.8.0
     jest: ^28.1.3
     property-helpers: ^1.1.0
@@ -1035,8 +1035,8 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^1.8.6
     "@favware/rollup-type-bundler": ^1.0.10
-    "@joshdb/provider": 1.1.0-next.24ef775.0
-    "@joshdb/serialize": ^1.1.0
+    "@joshdb/provider": 1.1.0-next.98baf42.0
+    "@joshdb/serialize": ^1.1.0-next
     "@sapphire/utilities": ^3.8.0
     jest: ^28.1.3
     mongodb: ^4.8.1
@@ -1046,12 +1046,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/provider@npm:1.1.0-next.24ef775.0":
-  version: 1.1.0-next.24ef775.0
-  resolution: "@joshdb/provider@npm:1.1.0-next.24ef775.0"
+"@joshdb/provider@npm:1.1.0-next.98baf42.0":
+  version: 1.1.0-next.98baf42.0
+  resolution: "@joshdb/provider@npm:1.1.0-next.98baf42.0"
   dependencies:
-    "@sapphire/utilities": ^3.7.0
-  checksum: 48f9395122d299687aee65afdccfe3f7389fc11a0a96a1b805fce6e5ff393c7fe9ba114ae668d7c380b5e20451513664248e77d4d431dded012593b89c38b0b7
+    "@sapphire/utilities": ^3.8.0
+  checksum: 3328afc7b362dfa1bf36e0d6aa22bf34464c236f5cc93606d7058f3dd786922e6ec8335a9bb9eeb27915d4af107eb5a6d174ab0d7bc4d27697677689af3dc62d
   languageName: node
   linkType: hard
 
@@ -1064,7 +1064,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@joshdb/provider@npm:^1.0.0, @joshdb/provider@npm:^1.1.0-pr-4.d962ff92fb98a59bc3568068a3cedb827bdf66e1.0":
+"@joshdb/provider@npm:^1.0.0, @joshdb/provider@npm:^1.1.0-next":
   version: 1.1.0
   resolution: "@joshdb/provider@npm:1.1.0"
   dependencies:
@@ -1079,8 +1079,8 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^1.8.6
     "@favware/rollup-type-bundler": ^1.0.10
-    "@joshdb/provider": 1.1.0-next.24ef775.0
-    "@joshdb/serialize": ^1.1.0
+    "@joshdb/provider": 1.1.0-next.98baf42.0
+    "@joshdb/serialize": ^1.1.0-next
     "@types/uuid": ^8.3.4
     jest: ^28.1.3
     redis: ^4.2.0
@@ -1090,7 +1090,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/serialize@npm:^1.1.0":
+"@joshdb/serialize@npm:^1.1.0-next":
   version: 1.1.0
   resolution: "@joshdb/serialize@npm:1.1.0"
   checksum: 7495bab9ac2eb3799d511619ddf297c907a718e3c6efaf2faf5257b0a891bcb8018d1ddeec4596c74a0f3ea6b89a185e5b9e757204b84913c8f531e08aa50a49
@@ -5771,8 +5771,8 @@ __metadata:
     "@favware/colorette-spinner": ^1.0.0
     "@favware/npm-deprecate": ^1.0.5
     "@favware/rollup-type-bundler": ^1.0.10
-    "@joshdb/core": 3.0.0-next.9743df0.0
-    "@joshdb/provider": ^1.1.0-pr-4.d962ff92fb98a59bc3568068a3cedb827bdf66e1.0
+    "@joshdb/core": 3.0.0-next.c67d6d9.0
+    "@joshdb/provider": ^1.1.0-next
     "@sapphire/eslint-config": ^4.3.7
     "@sapphire/ts-config": ^3.3.4
     "@types/jest": ^27.5.2
