@@ -439,7 +439,7 @@ export default {
       await mkdir(resolvePath(name, 'src', 'lib'));
       await writeFile(
         resolvePath(name, 'src', 'lib', `${title}Provider.ts`),
-        `import { JoshProvider } from '@joshdb/core';
+        `import { JoshProvider } from '@joshdb/provider';
 
 export class ${title}Provider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: ${title}Provider.Options;
