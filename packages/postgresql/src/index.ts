@@ -1,1 +1,1 @@
-export * from './lib/postgresqlProvider';
+export * from './lib/PostgreSQLProvider';

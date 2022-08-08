@@ -25,10 +25,11 @@ export default {
       exports: 'named',
       sourcemap: true,
       globals: {
-        '@joshdb/provider': 'JoshProvider'
+        '@joshdb/provider': 'JoshProvider',
+        postgres: 'Postgres'
       }
     }
   ],
-  external: ['@joshdb/provider'],
+  external: ['@joshdb/provider', 'postgres'],
   plugins: [cleaner({ targets: ['./dist'] }), typescript({ tsconfig: resolve(process.cwd(), 'src', 'tsconfig.json') }), versionInjector()]
 };

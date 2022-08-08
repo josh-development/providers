@@ -1081,7 +1081,12 @@ __metadata:
     "@favware/cliff-jumper": ^1.8.5
     "@favware/rollup-type-bundler": ^1.0.9
     "@joshdb/provider": next
+    "@joshdb/serialize": ^1.1.0-next.19071d995a3c1164828b64112344ed43d219a4de.0
+    "@sapphire/snowflake": ^3.2.2
+    "@sapphire/utilities": ^3.8.0
     jest: ^28.1.3
+    postgres: ^3.2.4
+    property-helpers: ^1.1.0
     typedoc: ^0.23.9
     typedoc-json-parser: ^2.0.1
   languageName: unknown
@@ -1129,6 +1134,13 @@ __metadata:
   version: 1.1.0-next.1a837f5.0
   resolution: "@joshdb/serialize@npm:1.1.0-next.1a837f5.0"
   checksum: f0040466fcc81d0d0319b087a011764c0aebc3b2abff01bcf2c9522686e0ad3cdd08fd0a37ee15c6bed957cea0fb04f328beddb9c0e47eddc45f45e1404aefcc
+  languageName: node
+  linkType: hard
+
+"@joshdb/serialize@npm:^1.1.0-next.19071d995a3c1164828b64112344ed43d219a4de.0":
+  version: 1.1.0
+  resolution: "@joshdb/serialize@npm:1.1.0"
+  checksum: 7495bab9ac2eb3799d511619ddf297c907a718e3c6efaf2faf5257b0a891bcb8018d1ddeec4596c74a0f3ea6b89a185e5b9e757204b84913c8f531e08aa50a49
   languageName: node
   linkType: hard
 
@@ -6084,6 +6096,13 @@ __metadata:
     picocolors: ^1.0.0
     source-map-js: ^1.0.2
   checksum: 10eee25efd77868036403858577da0cefaf2e0905feeaba5770d5438ccdddba3d01cba8063e96b8aac4c6daa0ed413dd5ae0554a433a3c4db38df1d134cffc1f
+  languageName: node
+  linkType: hard
+
+"postgres@npm:^3.2.4":
+  version: 3.2.4
+  resolution: "postgres@npm:3.2.4"
+  checksum: 613d09d66927bd436e286685881fa40297bac97ca3fc34359abf347f1e9cf00fb3c6fea328b004c632c507129e279883354b4e411d9c0c7478f88d670df78503
   languageName: node
   linkType: hard
 
