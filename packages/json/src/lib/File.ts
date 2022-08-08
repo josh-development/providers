@@ -18,6 +18,14 @@ export class File<StoredValue = unknown> {
     this.path = resolve(directory, name);
   }
 
+  public get retryOptions(): File.RetryOptions {
+    return this.options.retry ?? File.defaultRetryOptions;
+  }
+
+  public get exists(): boolean {
+    return existsSync(this.path);
+  }
+
   public async read<Data = File.Data<StoredValue>>(): Promise<Data> {
     return this.attempt<Data>(async () =>
       this.options.serialize
@@ -50,14 +58,6 @@ export class File<StoredValue = unknown> {
 
       return wait(retry.delay, this.attempt(callback, { ...retry, attempts: retry.attempts - 1 }));
     }
-  }
-
-  public get retryOptions(): File.RetryOptions {
-    return this.options.retry ?? File.defaultRetryOptions;
-  }
-
-  public get exists(): boolean {
-    return existsSync(this.path);
   }
 
   public static defaultRetryOptions: File.RetryOptions = { delay: 100, attempts: 10 };

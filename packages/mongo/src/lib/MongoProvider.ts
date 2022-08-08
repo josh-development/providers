@@ -28,10 +28,6 @@ import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProper
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: MongoProvider.Options;
 
-  public get version(): JoshProvider.Semver {
-    return this.resolveVersion('[VI]{version}[/VI]');
-  }
-
   public migrations: JoshProvider.Migration[] = [
     {
       version: { major: 2, minor: 0, patch: 0 },
@@ -57,6 +53,32 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public constructor(options?: MongoProvider.Options) {
     super(options);
+  }
+
+  public get version(): JoshProvider.Semver {
+    return this.resolveVersion('[VI]{version}[/VI]');
+  }
+
+  private get client(): MongoClient {
+    if (isNullOrUndefined(this._client)) {
+      throw this.error({
+        message: 'Client is not connected, most likely due to `init` not being called or the server not being available',
+        identifier: MongoProvider.Identifiers.NotConnected
+      });
+    }
+
+    return this._client;
+  }
+
+  private get collection(): Collection<MongoProvider.DocType<StoredValue>> {
+    if (isNullOrUndefined(this._collection)) {
+      throw this.error({
+        message: 'Client is not connected, most likely due to `init` not being called or the server not being available',
+        identifier: MongoProvider.Identifiers.NotConnected
+      });
+    }
+
+    return this._collection;
   }
 
   public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
@@ -88,6 +110,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     }
 
     const client = new MongoClient(this.connectionURI, connectOptions);
+
     this._client = await client.connect();
     this._collection = this.generateMongoDoc(enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName);
     context = await super.init(context);
@@ -213,6 +236,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     if (isEveryByValuePayload(payload)) {
       const { path, value } = payload;
+
       for await (const { key, value: storedValue } of this._iterate({})) {
         const deserialized = this.deserialize(storedValue);
         const data = getProperty(deserialized, path);
@@ -311,6 +335,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
       for await (const { key, value: storedValue } of this._iterate({})) {
         const deserialized = this.deserialize(storedValue);
+
         if (payload.data[0] !== null && payload.data[1] !== null) break;
 
         const data = getProperty(deserialized, path, false);
@@ -551,6 +576,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   // Due to the use of $sample, the output will never have duplicates
   public async [Method.Random](payload: Payloads.Random<StoredValue>): Promise<Payloads.Random<StoredValue>> {
     const docCount = await this.collection.countDocuments({});
+
     if (docCount === 0) return payload;
     if (docCount < payload.count) {
       return {
@@ -569,6 +595,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.RandomKey](payload: Payloads.RandomKey): Promise<Payloads.RandomKey> {
     const docCount = await this.collection.countDocuments({});
+
     if (docCount === 0) return payload;
     if (docCount < payload.count) {
       return {
@@ -764,30 +791,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   protected async fetchVersion(): Promise<JoshProvider.Semver> {
     const doc = await this.collection.findOne({}, { projection: { version: 1 } });
+
     if (!doc) return this.version;
     return doc && doc.version ? doc.version : { major: 1, minor: 0, patch: 0 };
-  }
-
-  private get client(): MongoClient {
-    if (isNullOrUndefined(this._client)) {
-      throw this.error({
-        message: 'Client is not connected, most likely due to `init` not being called or the server not being available',
-        identifier: MongoProvider.Identifiers.NotConnected
-      });
-    }
-
-    return this._client;
-  }
-
-  private get collection(): Collection<MongoProvider.DocType<StoredValue>> {
-    if (isNullOrUndefined(this._collection)) {
-      throw this.error({
-        message: 'Client is not connected, most likely due to `init` not being called or the server not being available',
-        identifier: MongoProvider.Identifiers.NotConnected
-      });
-    }
-
-    return this._collection;
   }
 
   private _getAll(projection: { [key: string]: 1 | 0 } = { key: 1, value: 1 }) {
@@ -796,6 +802,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   private _iterate(filter: Filter<MongoProvider.DocType<StoredValue>>, projection: { [key: string]: 1 | 0 } = { key: 1, value: 1 }) {
     const agg = this.collection.aggregate([{ $match: filter }, { $project: projection }]);
+
     return agg;
   }
 

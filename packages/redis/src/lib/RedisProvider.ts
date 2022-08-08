@@ -29,16 +29,27 @@ import { v4 } from 'uuid';
 export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: RedisProvider.Options;
 
-  public get version(): JoshProvider.Semver {
-    return this.resolveVersion('[VI]{version}[/VI]');
-  }
-
   public migrations: JoshProvider.Migration[] = [];
 
   private _client?: RedisClientType;
 
   public constructor(options?: RedisProvider.Options) {
     super(options);
+  }
+
+  public get version(): JoshProvider.Semver {
+    return this.resolveVersion('[VI]{version}[/VI]');
+  }
+
+  private get client(): RedisClientType {
+    if (isNullOrUndefined(this._client)) {
+      throw this.error({
+        message: 'Client is not connected, most likely due to `init` not being called or the server not being available',
+        identifier: RedisProvider.Identifiers.NotConnected
+      });
+    }
+
+    return this._client;
   }
 
   public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
@@ -84,6 +95,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Delete](payload: Payloads.Delete): Promise<Payloads.Delete> {
     const { key, path } = payload;
+
     if (path.length === 0) {
       await this.client.del(key);
 
@@ -162,6 +174,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     if (isEveryByValuePayload(payload)) {
       const { path, value } = payload;
+
       for await (const { key, value: storedValue } of this._iterate()) {
         const data = getProperty(storedValue, path);
 
@@ -284,6 +297,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Get]<Value = StoredValue>(payload: Payloads.Get<Value>): Promise<Payloads.Get<Value>> {
     const { key, path } = payload;
     const got = await this.client.get(key);
+
     if (!got) {
       return payload;
     }
@@ -309,6 +323,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     payload.data = {};
 
     const { keys } = payload;
+
     for (const key of keys) {
       const value = (await this[Method.Get]<StoredValue>({ method: Method.Get, key, path: [] })).data;
 
@@ -537,6 +552,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     payload.data = [];
     for (let i = 0; i < payload.count; i++) {
       const key = keys.data[Math.floor(Math.random() * keys.data.length)];
+
       payload.data.push(key);
     }
 
@@ -702,19 +718,24 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   protected async fetchVersion(): Promise<JoshProvider.Semver> {
     const key = (await this.client.keys('*'))[0];
+
     if (!key) return this.version;
 
     const doc = await this.client.get(key);
+
     if (!doc) return this.version;
 
     const val = JSON.parse(doc) as RedisProvider.DocType<StoredValue>;
+
     return val && val.version ? val.version : { major: 1, minor: 0, patch: 0 };
   }
 
   private async *_iterate() {
     const keys = (await this.client.keys('*')) ?? [];
+
     for (const key of keys) {
       const value = (await this[Method.Get]<StoredValue>({ method: Method.Get, key, path: [] })).data as StoredValue;
+
       yield { key, value };
     }
   }
@@ -727,17 +748,6 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   private serialize<StoredValue>(value: StoredValue) {
     if (this.options.disableSerialization) return value;
     return toJSON(value) as SerializeJSON;
-  }
-
-  private get client(): RedisClientType {
-    if (isNullOrUndefined(this._client)) {
-      throw this.error({
-        message: 'Client is not connected, most likely due to `init` not being called or the server not being available',
-        identifier: RedisProvider.Identifiers.NotConnected
-      });
-    }
-
-    return this._client;
   }
 }
 

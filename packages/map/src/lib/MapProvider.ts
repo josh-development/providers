@@ -28,10 +28,6 @@ import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProper
  * @since 1.0.0
  */
 export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
-  public get version(): JoshProvider.Semver {
-    return this.resolveVersion('[VI]{version}[/VI]');
-  }
-
   /**
    * The [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) cache to store data.
    * @since 1.0.0
@@ -43,6 +39,10 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
    * @since 1.0.0
    */
   private autoKeyCount = 0;
+
+  public get version(): JoshProvider.Semver {
+    return this.resolveVersion('[VI]{version}[/VI]');
+  }
 
   public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
     return super.init(context);

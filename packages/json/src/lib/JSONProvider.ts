@@ -31,14 +31,20 @@ import type { File } from './File';
 export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: JSONProvider.Options;
 
-  public get version(): JoshProvider.Semver {
-    return this.resolveVersion('[VI]{version}[/VI]');
-  }
-
   private _handler?: ChunkHandler<StoredValue>;
 
   public constructor(options: JSONProvider.Options) {
     super(options);
+  }
+
+  public get version(): JoshProvider.Semver {
+    return this.resolveVersion('[VI]{version}[/VI]');
+  }
+
+  private get handler(): ChunkHandler<StoredValue> {
+    if (this._handler instanceof ChunkHandler) return this._handler;
+
+    throw this.error(JSONProvider.Identifiers.ChunkHandlerNotFound);
   }
 
   public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
@@ -702,12 +708,6 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return (
       Array.isArray(data) && data.every((entry) => typeof entry === 'object' && typeof entry.key === 'string' && typeof entry.location === 'string')
     );
-  }
-
-  private get handler(): ChunkHandler<StoredValue> {
-    if (this._handler instanceof ChunkHandler) return this._handler;
-
-    throw this.error(JSONProvider.Identifiers.ChunkHandlerNotFound);
   }
 }
 
