@@ -29,7 +29,7 @@
   "dependencies": {
     "@joshdb/provider": "1.1.0-next.98baf42.0",
     "@joshdb/serialize": "^1.1.0-next",
-    "@sapphire/async-queue": "^1.3.2",
+    "@sapphire/async-queue": "^1.4.0",
     "@sapphire/snowflake": "^3.2.2",
     "@sapphire/utilities": "^3.9.0",
     "property-helpers": "^1.1.0"
