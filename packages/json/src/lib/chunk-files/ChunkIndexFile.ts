@@ -1,4 +1,5 @@
 import type { JoshProvider } from '@joshdb/provider';
+import { mkdir } from 'node:fs/promises';
 import { File } from '../File';
 import { ChunkLockFile } from './ChunkLockFile';
 
@@ -17,6 +18,10 @@ export class ChunkIndexFile extends File {
 
   public async fetch(): Promise<ChunkIndexFile.Data> {
     if (!this.exists) {
+      const { directory } = this.options;
+
+      await mkdir(directory, { recursive: true });
+
       await this.save({ name: this.options.name, version: this.version, autoKeyCount: 0, chunks: [] });
 
       return this.fetch();
