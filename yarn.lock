@@ -998,7 +998,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^1.8.6
     "@favware/rollup-type-bundler": ^1.0.10
-    "@joshdb/provider": 2.0.0-next.c11c4d3.0
+    "@joshdb/provider": 2.0.0-next.119b020.0
     "@joshdb/serialize": ^1.1.0-next
     "@sapphire/async-queue": ^1.4.0
     "@sapphire/snowflake": ^3.2.2
@@ -1027,7 +1027,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^1.8.6
     "@favware/rollup-type-bundler": ^1.0.10
-    "@joshdb/provider": 2.0.0-next.c11c4d3.0
+    "@joshdb/provider": 2.0.0-next.119b020.0
     "@sapphire/utilities": ^3.9.0
     jest: ^28.1.3
     property-helpers: ^1.1.0
@@ -1053,7 +1053,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^1.8.6
     "@favware/rollup-type-bundler": ^1.0.10
-    "@joshdb/provider": 2.0.0-next.c11c4d3.0
+    "@joshdb/provider": 2.0.0-next.119b020.0
     "@joshdb/serialize": ^1.1.0-next
     "@sapphire/utilities": ^3.9.0
     jest: ^28.1.3
@@ -1073,12 +1073,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@joshdb/provider@npm:2.0.0-next.c11c4d3.0":
-  version: 2.0.0-next.c11c4d3.0
-  resolution: "@joshdb/provider@npm:2.0.0-next.c11c4d3.0"
+"@joshdb/provider@npm:2.0.0-next.119b020.0":
+  version: 2.0.0-next.119b020.0
+  resolution: "@joshdb/provider@npm:2.0.0-next.119b020.0"
   dependencies:
     "@sapphire/utilities": ^3.9.0
-  checksum: 521e29a17e53b4329e4900cbd997d67518d2cb5d7e2a2b3325cc7747b595abf2d609aa39779021f01f1cfbcfe418f7e5d0a751e1804ddf41fa2446b88b6618a8
+    reflect-metadata: ^0.1.13
+  checksum: 552674c84fd6b393139424960f71231397fbc97aece3d38d222e28fec40369ec2b862a76d98034350fe075a971551c89c5de811d1a103a30acdab7bf1ce91d57
   languageName: node
   linkType: hard
 
@@ -1097,7 +1098,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^1.8.6
     "@favware/rollup-type-bundler": ^1.0.10
-    "@joshdb/provider": 2.0.0-next.c11c4d3.0
+    "@joshdb/provider": 2.0.0-next.119b020.0
     "@joshdb/serialize": ^1.1.0-next
     "@types/uuid": ^8.3.4
     jest: ^28.1.3
