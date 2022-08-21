@@ -579,7 +579,6 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     if (!Array.isArray(data)) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Push }, { key, path, type: 'array' }));
-
       return payload;
     }
 
@@ -678,7 +677,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Set]<Value = StoredValue>(payload: Payloads.Set<Value>): Promise<Payloads.Set<Value>> {
     const { key, path, value } = payload;
-    const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, errors: [], key, path })).data, path, value) : value;
+    const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] })).data, path, value) : value;
 
     await this.collection.findOneAndUpdate(
       {
