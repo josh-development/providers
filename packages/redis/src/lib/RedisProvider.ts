@@ -76,19 +76,23 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Dec](payload: Payloads.Dec): Promise<Payloads.Dec> {
     const { key, path } = payload;
-    const getPayload = await this[Method.Get]<StoredValue>({ key, method: Method.Get, path });
+    const getPayload = await this[Method.Get]<StoredValue>({ method: Method.Get, errors: [], key, path });
 
     if (!isPayloadWithData(getPayload)) {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Dec }, { key, path }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Dec }, { key, path }));
+
+      return payload;
     }
 
     const { data } = getPayload;
 
     if (!isNumber(data)) {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Dec }, { key, path, type: 'number' }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Dec }, { key, path, type: 'number' }));
+
+      return payload;
     }
 
-    await this[Method.Set]({ method: Method.Set, key, path, value: data - 1 });
+    await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data - 1 });
 
     return payload;
   }
@@ -102,11 +106,11 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       return payload;
     }
 
-    if ((await this[Method.Has]({ method: Method.Has, key, path, data: false })).data) {
-      const { data } = await this[Method.Get]({ method: Method.Get, key, path: [] });
+    if ((await this[Method.Has]({ method: Method.Has, errors: [], key, path })).data) {
+      const { data } = await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
 
       deleteProperty(data, path);
-      await this[Method.Set]({ method: Method.Set, key, path: [], value: data });
+      await this[Method.Set]({ method: Method.Set, errors: [], key, path: [], value: data });
 
       return payload;
     }
@@ -127,7 +131,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Each](payload: Payloads.Each<StoredValue>): Promise<Payloads.Each<StoredValue>> {
     const { hook } = payload;
 
-    for await (const { key, value } of this._iterate()) {
+    for await (const { key, value } of this.iterate()) {
       await hook(value, key);
     }
 
@@ -137,11 +141,11 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Ensure](payload: Payloads.Ensure<StoredValue>): Promise<Payloads.Ensure<StoredValue>> {
     const { key } = payload;
 
-    if (!(await this[Method.Has]({ key, method: Method.Has, data: false, path: [] })).data) {
-      await this[Method.Set]({ key, value: payload.defaultValue, method: Method.Set, path: [] });
+    if (!(await this[Method.Has]({ method: Method.Has, errors: [], key, path: [] })).data) {
+      await this[Method.Set]({ method: Method.Set, errors: [], key, path: [], value: payload.defaultValue });
     }
 
-    payload.data = (await this[Method.Get]({ key, method: Method.Get, path: [] })).data as StoredValue;
+    payload.data = (await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] })).data as StoredValue;
 
     return payload;
   }
@@ -149,7 +153,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Entries](payload: Payloads.Entries<StoredValue>): Promise<Payloads.Entries<StoredValue>> {
     payload.data = {};
 
-    for await (const doc of this._iterate()) payload.data[doc.key] = doc.value;
+    for await (const doc of this.iterate()) payload.data[doc.key] = doc.value;
 
     return payload;
   }
@@ -159,12 +163,12 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Every](payload: Payloads.Every<StoredValue>): Promise<Payloads.Every<StoredValue>> {
     payload.data = true;
 
-    if ((await this[Method.Size]({ method: Method.Size })).data === 0) return payload;
+    if ((await this[Method.Size]({ method: Method.Size, errors: [] })).data === 0) return payload;
     if (isEveryByHookPayload(payload)) {
       const { hook } = payload;
 
-      for await (const { value } of this._iterate()) {
-        const result = await hook(value);
+      for await (const { key, value } of this.iterate()) {
+        const result = await hook(value, key);
 
         if (result) continue;
 
@@ -175,18 +179,19 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isEveryByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for await (const { key, value: storedValue } of this._iterate()) {
+      for await (const { key, value: storedValue } of this.iterate()) {
         const data = getProperty(storedValue, path);
 
         if (data === PROPERTY_NOT_FOUND) {
-          return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Every }, { key, path }) };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Every }, { key, path }));
+
+          return payload;
         }
 
         if (!isPrimitive(data)) {
-          return {
-            ...payload,
-            error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Every }, { key, path, type: 'primitive' })
-          };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Every }, { key, path, type: 'primitive' }));
+
+          return payload;
         }
 
         if (data === value) continue;
@@ -206,8 +211,8 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isFilterByHookPayload(payload)) {
       const { hook } = payload;
 
-      for await (const { key, value } of this._iterate()) {
-        const filterValue = await hook(value);
+      for await (const { key, value } of this.iterate()) {
+        const filterValue = await hook(value, key);
 
         if (!filterValue) continue;
 
@@ -218,18 +223,19 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isFilterByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for await (const { key, value: storedValue } of this._iterate()) {
+      for await (const { key, value: storedValue } of this.iterate()) {
         const data = getProperty(storedValue, path, false);
 
         if (data === PROPERTY_NOT_FOUND) {
-          return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Filter }, { key, path }) };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Filter }, { key, path }));
+
+          return payload;
         }
 
         if (!isPrimitive(data)) {
-          return {
-            ...payload,
-            error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Filter }, { key, path, type: 'primitive' })
-          };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Filter }, { key, path, type: 'primitive' }));
+
+          return payload;
         }
 
         if (data === value) payload.data[key] = storedValue;
@@ -247,8 +253,8 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isFindByHookPayload(payload)) {
       const { hook } = payload;
 
-      for await (const { key, value } of this._iterate()) {
-        const result = await hook(value);
+      for await (const { key, value } of this.iterate()) {
+        const result = await hook(value, key);
 
         if (!result) continue;
 
@@ -261,26 +267,21 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isFindByValuePayload(payload)) {
       const { path, value } = payload;
 
-      if (!isPrimitive(value)) {
-        payload.error = this.error({ identifier: CommonIdentifiers.InvalidValueType, method: Method.Find }, { type: 'primitive' });
-
-        return payload;
-      }
-
-      for await (const { key, value: storedValue } of this._iterate()) {
+      for await (const { key, value: storedValue } of this.iterate()) {
         if (payload.data[0] !== null && payload.data[1] !== null) break;
 
         const data = getProperty(storedValue, path, false);
 
         if (data === PROPERTY_NOT_FOUND) {
-          return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Find }, { key, path }) };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Find }, { key, path }));
+
+          return payload;
         }
 
         if (!isPrimitive(data)) {
-          return {
-            ...payload,
-            error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Find }, { key, path, type: 'primitive' })
-          };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Find }, { key, path, type: 'primitive' }));
+
+          return payload;
         }
 
         if (data !== value) continue;
@@ -296,22 +297,15 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Get]<Value = StoredValue>(payload: Payloads.Get<Value>): Promise<Payloads.Get<Value>> {
     const { key, path } = payload;
-    const got = await this.client.get(key);
+    const rowString = await this.client.get(key);
 
-    if (!got) {
-      return payload;
-    }
+    if (rowString === null) return payload;
 
-    const doc = JSON.parse(got) as RedisProvider.DocType<StoredValue>;
+    const row = JSON.parse(rowString) as RedisProvider.Row<StoredValue>;
 
-    if (!doc) {
-      return payload;
-    }
-
-    if (path.length === 0) {
-      payload.data = this.deserialize(doc.value) as unknown as Value;
-    } else {
-      const data = getProperty<Value>(this.deserialize(doc.value), path);
+    if (path.length === 0) payload.data = this.deserialize(row.value) as unknown as Value;
+    else {
+      const data = getProperty<Value>(this.deserialize(row.value), path);
 
       if (data !== PROPERTY_NOT_FOUND) payload.data = data;
     }
@@ -325,9 +319,14 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { keys } = payload;
 
     for (const key of keys) {
-      const value = (await this[Method.Get]<StoredValue>({ method: Method.Get, key, path: [] })).data;
+      const rowString = await this.client.get(key);
 
-      payload.data[key] = value || null;
+      if (rowString === null) payload.data[key] = null;
+      else {
+        const row = JSON.parse(rowString) as RedisProvider.Row<StoredValue>;
+
+        payload.data[key] = this.deserialize(row.value);
+      }
     }
 
     return payload;
@@ -335,34 +334,39 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Has](payload: Payloads.Has): Promise<Payloads.Has> {
     const { key, path } = payload;
-    let isThere = (await this.client.exists(key)) === 1;
 
-    if (path.length !== 0 && isThere) {
-      const value = await this[Method.Get]({ method: Method.Get, key, path: [] });
+    if ((await this.client.exists(key)) === 1) {
+      const rowString = await this.client.get(key);
 
-      isThere = hasProperty(value.data, path);
-    }
+      if (rowString === null) return payload;
 
-    payload.data = isThere;
+      const row = JSON.parse(rowString) as RedisProvider.Row<StoredValue>;
+
+      payload.data = hasProperty(this.deserialize(row.value), path);
+    } else payload.data = false;
 
     return payload;
   }
 
   public async [Method.Inc](payload: Payloads.Inc): Promise<Payloads.Inc> {
     const { key, path } = payload;
-    const getPayload = await this[Method.Get]<StoredValue>({ method: Method.Get, key, path });
+    const getPayload = await this[Method.Get]<StoredValue>({ method: Method.Get, errors: [], key, path });
 
     if (!isPayloadWithData(getPayload)) {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Inc }, { key, path }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Inc }, { key, path }));
+
+      return payload;
     }
 
     const { data } = getPayload;
 
     if (typeof data !== 'number') {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Inc }, { key, path, type: 'number' }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Inc }, { key, path, type: 'number' }));
+
+      return payload;
     }
 
-    await this[Method.Set]({ method: Method.Set, key, path, value: data + 1 });
+    await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data + 1 });
 
     return payload;
   }
@@ -381,13 +385,13 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isMapByHookPayload(payload)) {
       const { hook } = payload;
 
-      for await (const { value } of this._iterate()) payload.data.push(await hook(value));
+      for await (const { key, value } of this.iterate()) payload.data.push(await hook(value, key));
     }
 
     if (isMapByPathPayload(payload)) {
       const { path } = payload;
 
-      for await (const { value } of this._iterate()) {
+      for await (const { value } of this.iterate()) {
         const data = getProperty<Value>(value, path);
 
         if (data !== PROPERTY_NOT_FOUND) payload.data.push(data);
@@ -399,16 +403,20 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Math](payload: Payloads.Math): Promise<Payloads.Math> {
     const { key, path, operator, operand } = payload;
-    const getPayload = await this[Method.Get]<number>({ method: Method.Get, key, path });
+    const getPayload = await this[Method.Get]<number>({ method: Method.Get, errors: [], key, path });
 
     if (!isPayloadWithData(getPayload)) {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Math }, { key, path }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Math }, { key, path }));
+
+      return payload;
     }
 
     let { data } = getPayload;
 
     if (typeof data !== 'number') {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Math }, { key, path, type: 'number' }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Math }, { key, path, type: 'number' }));
+
+      return payload;
     }
 
     switch (operator) {
@@ -443,7 +451,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         break;
     }
 
-    await this[Method.Set]({ method: Method.Set, key, path, value: data });
+    await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data });
 
     return payload;
   }
@@ -456,8 +464,8 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isPartitionByHookPayload(payload)) {
       const { hook } = payload;
 
-      for await (const { key, value } of this._iterate()) {
-        const result = await hook(value);
+      for await (const { key, value } of this.iterate()) {
+        const result = await hook(value, key);
 
         if (result) payload.data.truthy[key] = value;
         else payload.data.falsy[key] = value;
@@ -467,18 +475,21 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isPartitionByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for await (const { key, value: storedValue } of this._iterate()) {
+      for await (const { key, value: storedValue } of this.iterate()) {
         const data = getProperty<StoredValue>(storedValue, path);
 
         if (data === PROPERTY_NOT_FOUND) {
-          return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Partition }, { key, path }) };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Partition }, { key, path }));
+
+          return payload;
         }
 
         if (!isPrimitive(data)) {
-          return {
-            ...payload,
-            error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Partition }, { key, path, type: 'primitive' })
-          };
+          payload.errors.push(
+            this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Partition }, { key, path, type: 'primitive' })
+          );
+
+          return payload;
         }
 
         if (value === data) payload.data.truthy[key] = storedValue;
@@ -491,43 +502,46 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Push]<Value = StoredValue>(payload: Payloads.Push<Value>): Promise<Payloads.Push<Value>> {
     const { key, path, value } = payload;
-    const getPayload = await this[Method.Get]({ method: Method.Get, key, path });
+    const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
     if (!isPayloadWithData(getPayload)) {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Push }, { key, path }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Push }, { key, path }));
+
+      return payload;
     }
 
     const { data } = getPayload;
 
     if (!Array.isArray(data)) {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Push }, { key, path, type: 'array' }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Push }, { key, path, type: 'array' }));
+
+      return payload;
     }
 
     data.push(value);
-    await this[Method.Set]({ method: Method.Set, key, path, value: data });
+    await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data });
 
     return payload;
   }
 
-  // Due to the use of $sample, the output will never have duplicates
   public async [Method.Random](payload: Payloads.Random<StoredValue>): Promise<Payloads.Random<StoredValue>> {
-    const docCount = (await this[Method.Size]({ method: Method.Size })).data || 0;
+    const docCount = (await this[Method.Size]({ method: Method.Size, errors: [] })).data || 0;
 
     if (docCount === 0) return payload;
     if (docCount < payload.count) {
-      return {
-        ...payload,
-        error: this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random })
-      };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { count: payload.count, docCount }));
+
+      return payload;
     }
 
-    const keys = await this[Method.Keys]({ method: Method.Keys, data: [] });
+    const keys = await this[Method.Keys]({ method: Method.Keys, errors: [] });
 
     keys.data = keys.data || [];
     payload.data = [];
+
     for (let i = 0; i < payload.count; i++) {
       const key = keys.data[Math.floor(Math.random() * keys.data.length)];
-      const getPayload = await this[Method.Get]({ method: Method.Get, key, path: [] });
+      const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
 
       payload.data.push(getPayload.data as StoredValue);
     }
@@ -536,17 +550,16 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   public async [Method.RandomKey](payload: Payloads.RandomKey): Promise<Payloads.RandomKey> {
-    const docCount = (await this[Method.Size]({ method: Method.Size })).data || 0;
+    const docCount = (await this[Method.Size]({ method: Method.Size, errors: [] })).data || 0;
 
     if (docCount === 0) return payload;
     if (docCount < payload.count) {
-      return {
-        ...payload,
-        error: this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random })
-      };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }, { count: payload.count, docCount }));
+
+      return payload;
     }
 
-    const keys = await this[Method.Keys]({ method: Method.Keys, data: [] });
+    const keys = await this[Method.Keys]({ method: Method.Keys, errors: [] });
 
     keys.data = keys.data || [];
     payload.data = [];
@@ -564,44 +577,46 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Remove]<HookValue = StoredValue>(payload: Payloads.Remove<HookValue>): Promise<Payloads.Remove<HookValue>> {
     if (isRemoveByHookPayload(payload)) {
       const { key, path, hook } = payload;
-      const getPayload = await this[Method.Get]<HookValue[]>({ method: Method.Get, key, path });
+      const getPayload = await this[Method.Get]<HookValue[]>({ method: Method.Get, errors: [], key, path });
 
       if (!isPayloadWithData(getPayload)) {
-        return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Remove }, { key, path }) };
+        payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Remove }, { key, path }));
+
+        return payload;
       }
 
       const { data } = getPayload;
 
       if (!Array.isArray(data)) {
-        return {
-          ...payload,
-          error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Remove }, { key, path, type: 'array' })
-        };
+        payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Remove }, { key, path, type: 'array' }));
+
+        return payload;
       }
 
-      const filterValues = await Promise.all(data.map(hook));
+      const filterValues = await Promise.all(data.map((value) => hook(value, key)));
 
-      await this[Method.Set]({ method: Method.Set, key, path, value: data.filter((_, index) => !filterValues[index]) });
+      await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data.filter((_, index) => !filterValues[index]) });
     }
 
     if (isRemoveByValuePayload(payload)) {
       const { key, path, value } = payload;
-      const getPayload = await this[Method.Get]({ method: Method.Get, key, path });
+      const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
       if (!isPayloadWithData(getPayload)) {
-        return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Remove }, { key, path }) };
+        payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Remove }, { key, path }));
+
+        return payload;
       }
 
       const { data } = getPayload;
 
       if (!Array.isArray(data)) {
-        return {
-          ...payload,
-          error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Remove }, { key, path, type: 'array' })
-        };
+        payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Remove }, { key, path, type: 'array' }));
+
+        return payload;
       }
 
-      await this[Method.Set]({ method: Method.Set, key, path, value: data.filter((storedValue) => value !== storedValue) });
+      await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data.filter((storedValue) => value !== storedValue) });
     }
 
     return payload;
@@ -609,7 +624,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Set]<Value = StoredValue>(payload: Payloads.Set<Value>): Promise<Payloads.Set<Value>> {
     const { key, path, value } = payload;
-    const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, key, path })).data, path, value) : value;
+    const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] })).data, path, value) : value;
 
     await this.client.set(key, JSON.stringify({ value: this.serialize(val as StoredValue), version: this.version }), { EX: this.options.expiry });
 
@@ -620,16 +635,17 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { entries } = payload;
     const operations = [];
 
-    for (const [{ key, path }, value] of entries) {
+    for (const { key, path, value } of entries) {
       if (!payload.overwrite) {
-        const found = (await this[Method.Has]({ method: Method.Has, key, path, data: false })).data;
+        const found = (await this[Method.Has]({ method: Method.Has, errors: [], key, path })).data;
 
         if (found) continue;
       }
 
-      const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, key, path: [] })).data, path, value) : value;
+      const val =
+        path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] })).data, path, value) : value;
 
-      operations.push(this[Method.Set]({ method: Method.Set, path: [], key, value: val }));
+      operations.push(this[Method.Set]({ method: Method.Set, errors: [], key, path: [], value: val }));
     }
 
     await Promise.all(operations);
@@ -650,8 +666,8 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isSomeByHookPayload(payload)) {
       const { hook } = payload;
 
-      for await (const { value } of this._iterate()) {
-        const someValue = await hook(value);
+      for await (const { key, value } of this.iterate()) {
+        const someValue = await hook(value, key);
 
         if (!someValue) continue;
 
@@ -664,18 +680,19 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isSomeByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for await (const { key, value: storedValue } of this._iterate()) {
+      for await (const { key, value: storedValue } of this.iterate()) {
         const data = getProperty(storedValue, path);
 
         if (data === PROPERTY_NOT_FOUND) {
-          return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Some }, { key, path }) };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Some }, { key, path }));
+
+          return payload;
         }
 
         if (!isPrimitive(data)) {
-          return {
-            ...payload,
-            error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Some }, { key, path, type: 'primitive' })
-          };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Some }, { key, path, type: 'primitive' }));
+
+          return payload;
         }
 
         if (data !== value) continue;
@@ -691,15 +708,17 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Update]<Value = StoredValue>(payload: Payloads.Update<StoredValue, Value>): Promise<Payloads.Update<StoredValue, Value>> {
     const { key, hook } = payload;
-    const getPayload = await this[Method.Get]({ method: Method.Get, key, path: [] });
+    const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
 
     if (!isPayloadWithData<StoredValue>(getPayload)) {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Update }, { key }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Update }, { key }));
+
+      return payload;
     }
 
     const { data } = getPayload;
 
-    await this[Method.Set]({ method: Method.Set, key, path: [], value: await hook(data) });
+    await this[Method.Set]({ method: Method.Set, errors: [], key, path: [], value: await hook(data, key) });
 
     return payload;
   }
@@ -707,9 +726,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Values](payload: Payloads.Values<StoredValue>): Promise<Payloads.Values<StoredValue>> {
     const values = [];
 
-    for await (const { value } of this._iterate()) {
-      values.push(value);
-    }
+    for await (const { value } of this.iterate()) values.push(value);
 
     payload.data = values;
 
@@ -717,26 +734,20 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   protected async fetchVersion(): Promise<JoshProvider.Semver> {
-    const key = (await this.client.keys('*'))[0];
+    for await (const { version } of this.iterate()) return version;
 
-    if (!key) return this.version;
-
-    const doc = await this.client.get(key);
-
-    if (!doc) return this.version;
-
-    const val = JSON.parse(doc) as RedisProvider.DocType<StoredValue>;
-
-    return val && val.version ? val.version : { major: 1, minor: 0, patch: 0 };
+    return this.version;
   }
 
-  private async *_iterate() {
-    const keys = (await this.client.keys('*')) ?? [];
+  private async *iterate(): AsyncIterableIterator<IterateReturn<StoredValue>> {
+    for await (const key of this.client.scanIterator()) {
+      const rowString = await this.client.get(key);
 
-    for (const key of keys) {
-      const value = (await this[Method.Get]<StoredValue>({ method: Method.Get, key, path: [] })).data as StoredValue;
+      if (rowString === null) continue;
 
-      yield { key, value };
+      const row = JSON.parse(rowString) as RedisProvider.Row<StoredValue>;
+
+      yield { key, value: this.deserialize(row.value), version: row.version };
     }
   }
 
@@ -760,12 +771,21 @@ export namespace RedisProvider {
     disableSerialization?: boolean;
   }
 
-  export interface DocType<StoredValue> {
+  export interface Row<StoredValue> {
     value: StoredValue | SerializeJSON;
+
     version: JoshProvider.Semver;
   }
 
   export enum Identifiers {
     NotConnected = 'notConnected'
   }
+}
+
+interface IterateReturn<StoredValue = unknown> {
+  key: string;
+
+  value: StoredValue;
+
+  version: JoshProvider.Semver;
 }
