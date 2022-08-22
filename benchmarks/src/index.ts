@@ -1,6 +1,7 @@
 import prompts from 'prompts';
 import { JSONProvider } from '../../packages/json/src';
 import { MapProvider } from '../../packages/map/src';
+import { MariaDBProvider } from '../../packages/mariadb/src';
 import { MongoProvider } from '../../packages/mongo/src';
 import { RedisProvider } from '../../packages/redis/src';
 import { Benchmark } from './lib/Benchmark';
@@ -16,7 +17,9 @@ async function main() {
     .add(new MongoProvider({ collectionName: 'benchmark' }), 'MongoProvider (Serialize)')
     .add(new MongoProvider({ collectionName: 'benchmark', disableSerialization: true }))
     .add(new RedisProvider({}), 'RedisProvider (Serialize)')
-    .add(new RedisProvider({ disableSerialization: true }));
+    .add(new RedisProvider({ disableSerialization: true }))
+    .add(new MariaDBProvider({ disableSerialization: true }))
+    .add(new MariaDBProvider({}), 'MariaDBProvider (Serialize)');
 
   if (process.env.CI === 'true') prompts.inject([100, 50, BenchmarkType.All, PickType.No]);
 
