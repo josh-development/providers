@@ -22,7 +22,7 @@ import {
 } from '@joshdb/provider';
 import { Snowflake, TwitterSnowflake } from '@sapphire/snowflake';
 import { isPrimitive } from '@sapphire/utilities';
-import type mariadb from 'mariadb';
+import type { ConnectionConfig as MariaConnectionConfig } from 'mariadb';
 import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 import { QueryHandler } from './QueryHandler';
 
@@ -734,5 +734,5 @@ export namespace MariaProvider {
     epoch?: number | bigint | Date;
   }
 
-  export type ConnectionConfig = mariadb.ConnectionConfig;
+  export type ConnectionConfig = MariaConnectionConfig;
 }
