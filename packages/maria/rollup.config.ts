@@ -19,6 +19,6 @@ export default {
       sourcemap: true
     }
   ],
-  external: [],
+  external: ['@joshdb/provider', '@joshdb/serialize', 'mariadb', 'property-helpers', '@sapphire/utilities', '@sapphire/snowflake'],
   plugins: [cleaner({ targets: ['./dist'] }), typescript({ tsconfig: resolve(process.cwd(), 'src', 'tsconfig.json') }), versionInjector()]
 };

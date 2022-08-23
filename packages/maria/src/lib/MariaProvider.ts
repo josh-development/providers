@@ -22,30 +22,30 @@ import {
 } from '@joshdb/provider';
 import { Snowflake, TwitterSnowflake } from '@sapphire/snowflake';
 import { isPrimitive } from '@sapphire/utilities';
-import type { ConnectionConfig as MariaDBConnectionConfig } from 'mariadb';
+import type mariadb from 'mariadb';
 import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 import { QueryHandler } from './QueryHandler';
 
-export class MariaDBProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
-  public declare options: MariaDBProvider.Options;
+export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
+  public declare options: MariaProvider.Options;
 
   private handler: QueryHandler<StoredValue>;
 
   private snowflake: Snowflake | typeof TwitterSnowflake;
 
-  public constructor(options: MariaDBProvider.Options) {
+  public constructor(options: MariaProvider.Options) {
     super(options);
 
-    const { connectionConfig = MariaDBProvider.defaultConnectionConfig, epoch, disableSerialization } = options;
+    const { connectionConfig = MariaProvider.defaultConnectionConfig, epoch, disableSerialization } = options;
 
     this.snowflake = epoch === undefined ? TwitterSnowflake : new Snowflake(epoch);
 
     const { major, minor, patch } = this.version;
 
     if (typeof connectionConfig === 'object') {
-      connectionConfig.user ??= MariaDBProvider.defaultConnectionConfig.user;
-      connectionConfig.password ??= MariaDBProvider.defaultConnectionConfig.password;
-      connectionConfig.database ??= MariaDBProvider.defaultConnectionConfig.database;
+      connectionConfig.user ??= MariaProvider.defaultConnectionConfig.user;
+      connectionConfig.password ??= MariaProvider.defaultConnectionConfig.password;
+      connectionConfig.database ??= MariaProvider.defaultConnectionConfig.database;
     }
 
     this.handler = new QueryHandler<StoredValue>({
@@ -718,14 +718,14 @@ export class MariaDBProvider<StoredValue = unknown> extends JoshProvider<StoredV
     return this.version;
   }
 
-  public static defaultConnectionConfig: MariaDBProvider.ConnectionConfig = {
+  public static defaultConnectionConfig: MariaProvider.ConnectionConfig = {
     user: 'josh',
     password: 'josh',
     database: 'josh'
   };
 }
 
-export namespace MariaDBProvider {
+export namespace MariaProvider {
   export interface Options extends JoshProvider.Options {
     connectionConfig?: ConnectionConfig | string;
 
@@ -734,5 +734,5 @@ export namespace MariaDBProvider {
     epoch?: number | bigint | Date;
   }
 
-  export type ConnectionConfig = MariaDBConnectionConfig;
+  export type ConnectionConfig = mariadb.ConnectionConfig;
 }

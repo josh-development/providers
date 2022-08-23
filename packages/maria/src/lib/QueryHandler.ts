@@ -1,4 +1,4 @@
-import { toJSON, toRaw } from '@joshdb/serialize';
+import * as serialize from '@joshdb/serialize';
 import mariadb from 'mariadb';
 
 export class QueryHandler<StoredValue = unknown> {
@@ -49,7 +49,7 @@ export class QueryHandler<StoredValue = unknown> {
       SELECT * FROM \`${this.options.tableName}\`
     `)) as QueryHandler.RowData[];
 
-    return rows.map((row) => [row.key, disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value))]);
+    return rows.map((row) => [row.key, disableSerialization ? JSON.parse(row.value) : serialize.toRaw(JSON.parse(row.value))]);
   }
 
   public async has(key: string): Promise<boolean> {
@@ -88,7 +88,7 @@ export class QueryHandler<StoredValue = unknown> {
       [key]
     )) as QueryHandler.RowData[];
 
-    return disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value));
+    return disableSerialization ? JSON.parse(row.value) : serialize.toRaw(JSON.parse(row.value));
   }
 
   public async getMany(keys: string[]): Promise<Record<string, StoredValue | null>> {
@@ -108,7 +108,7 @@ export class QueryHandler<StoredValue = unknown> {
 
       const row = rows.find((row) => row.key === key)!;
 
-      return { ...data, [key]: disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value)) };
+      return { ...data, [key]: disableSerialization ? JSON.parse(row.value) : serialize.toRaw(JSON.parse(row.value)) };
     }, {});
   }
 
@@ -124,7 +124,7 @@ export class QueryHandler<StoredValue = unknown> {
       ON DUPLICATE KEY
       UPDATE \`value\` = :value, \`version\` = :version;`
       },
-      { key, value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)), version }
+      { key, value: disableSerialization ? JSON.stringify(value) : JSON.stringify(serialize.toJSON(value)), version }
     );
   }
 
@@ -143,7 +143,7 @@ export class QueryHandler<StoredValue = unknown> {
         },
         entries.map(([key, value]) => ({
           key,
-          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)),
+          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(serialize.toJSON(value)),
           version
         }))
       );
@@ -159,7 +159,7 @@ export class QueryHandler<StoredValue = unknown> {
         },
         entries.map(([key, value]) => ({
           key,
-          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)),
+          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(serialize.toJSON(value)),
           version
         }))
       );
@@ -182,7 +182,7 @@ export class QueryHandler<StoredValue = unknown> {
       FROM \`${this.options.tableName}\`
     `)) as Omit<QueryHandler.RowData, 'key' | 'version'>[];
 
-    return rows.map((row) => (disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value))));
+    return rows.map((row) => (disableSerialization ? JSON.parse(row.value) : serialize.toRaw(JSON.parse(row.value))));
   }
 
   private ensureTable() {

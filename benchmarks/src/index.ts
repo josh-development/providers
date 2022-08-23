@@ -18,8 +18,8 @@ async function main() {
     .add(new MongoProvider({ collectionName: 'benchmark', disableSerialization: true }))
     .add(new RedisProvider({}), 'RedisProvider (Serialize)')
     .add(new RedisProvider({ disableSerialization: true }))
-    .add(new MariaDBProvider({ disableSerialization: true }))
-    .add(new MariaDBProvider({}), 'MariaDBProvider (Serialize)');
+    .add(new MariaDBProvider({}), 'MariaDBProvider (Serialize)')
+    .add(new MariaDBProvider({ disableSerialization: true }));
 
   if (process.env.CI === 'true') prompts.inject([100, 50, BenchmarkType.All, PickType.No]);
 

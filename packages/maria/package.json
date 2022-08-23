@@ -1,5 +1,5 @@
 {
-  "name": "@joshdb/mariadb",
+  "name": "@joshdb/maria",
   "version": "1.0.0",
   "description": "A provider for @joshdb/core whichs uses MariaDB",
   "author": "Évelyne Lachance <eslachance@gmail.com> (https://evie.codes/)",
