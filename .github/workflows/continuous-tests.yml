@@ -98,10 +98,37 @@ jobs:
         with:
           name: coverage
           path: coverage/
+  maria:
+    name: MariaProvider
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
+      - name: Use Node.js v16
+        uses: actions/setup-node@2fddd8803e2f5c9604345a0b591c3020ee971a93 # tag=v3
+        with:
+          node-version: 16
+      - name: Shutdown MySQL
+        run: sudo service mysql stop
+      - name: Start MariaDB Instance
+        uses: getong/mariadb-action@acf7bc08e06a9c26e2a534d54284cb9a62697e7d # tag=v1.1
+        with:
+          mysql database: 'josh'
+          mysql user: 'josh'
+          mysql password: 'josh'
+      - name: Install Dependencies
+        run: yarn --immutable
+      - name: Run Tests
+        run: yarn workspace @joshdb/maria run test --coverage
+      - name: Store Code Coverage Report
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
+        with:
+          name: coverage
+          path: coverage/
 
   upload-coverage-report:
     name: Upload Code Coverage Report
-    needs: [json, map, mongo, redis]
+    needs: [json, map, mongo, redis, maria]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Project
