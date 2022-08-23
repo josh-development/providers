@@ -4,3 +4,4 @@ package:
   - '@joshdb/map'
   - '@joshdb/mongo'
   - '@joshdb/redis'
+  - '@joshdb/maria'
