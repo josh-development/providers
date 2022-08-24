@@ -28,10 +28,6 @@ import { QueryHandler } from './QueryHandler';
 export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: PostgreSQLProvider.Options;
 
-  public get version(): JoshProvider.Semver {
-    return process.env.NODE_ENV === 'test' ? { major: 1, minor: 0, patch: 0 } : this.resolveVersion('[VI]{version}[/VI]');
-  }
-
   private handler: QueryHandler<StoredValue>;
 
   private snowflake: Snowflake | typeof TwitterSnowflake;
@@ -63,6 +59,10 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
     }
   }
 
+  public get version(): JoshProvider.Semver {
+    return process.env.NODE_ENV === 'test' ? { major: 1, minor: 0, patch: 0 } : this.resolveVersion('[VI]{version}[/VI]');
+  }
+
   public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
     context = await super.init(context);
 
@@ -85,19 +85,23 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
 
   public async [Method.Dec](payload: Payloads.Dec): Promise<Payloads.Dec> {
     const { key, path } = payload;
-    const getPayload = await this[Method.Get]({ method: Method.Get, key, path });
+    const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
     if (!isPayloadWithData(getPayload)) {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Dec }, { key, path }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Dec }, { key, path }));
+
+      return payload;
     }
 
     const { data } = getPayload;
 
     if (typeof data !== 'number') {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Dec }, { key, path, type: 'number' }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Dec }, { key, path }));
+
+      return payload;
     }
 
-    await this[Method.Set]({ method: Method.Set, key, path, value: data - 1 });
+    await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data - 1 });
 
     return payload;
   }
@@ -106,8 +110,8 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
     const { key, path } = payload;
 
     if (path.length === 0) await this.handler.delete(key);
-    else if ((await this[Method.Has]({ method: Method.Has, key, path })).data) {
-      const { data } = await this[Method.Get]({ method: Method.Get, key, path: [] });
+    else if ((await this[Method.Has]({ method: Method.Has, errors: [], key, path })).data) {
+      const { data } = await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
 
       deleteProperty(data, path);
       await this.handler.set(key, data!);
@@ -137,7 +141,7 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
 
     payload.data = defaultValue;
 
-    if ((await this[Method.Has]({ method: Method.Has, key, path: [] })).data) payload.data = await this.handler.get(key);
+    if ((await this[Method.Has]({ method: Method.Has, errors: [], key, path: [] })).data) payload.data = await this.handler.get(key);
     else await this.handler.set(key, defaultValue);
 
     return payload;
@@ -158,8 +162,8 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
     if (isEveryByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const value of await this.handler.values()) {
-        const result = await hook(value);
+      for (const [key, value] of await this.handler.entries()) {
+        const result = await hook(value, key);
 
         if (result) continue;
 
@@ -174,14 +178,15 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
         const data = getProperty(storedValue, path);
 
         if (data === PROPERTY_NOT_FOUND) {
-          return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Every }, { key, path }) };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Every }, { key, path }));
+
+          return payload;
         }
 
         if (!isPrimitive(data)) {
-          return {
-            ...payload,
-            error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Every }, { key, path, type: 'primitive' })
-          };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Every }, { key, path, type: 'primitive' }));
+
+          return payload;
         }
 
         if (data === value) continue;
@@ -201,7 +206,7 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
     if (isFilterByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const [key, value] of await this.handler.entries()) if (await hook(value)) payload.data[key] = value;
+      for (const [key, value] of await this.handler.entries()) if (await hook(value, key)) payload.data[key] = value;
     }
 
     if (isFilterByValuePayload(payload)) {
@@ -211,14 +216,15 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
         const data = getProperty(storedValue, path, false);
 
         if (data === PROPERTY_NOT_FOUND) {
-          return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Filter }, { key, path }) };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Filter }, { key, path }));
+
+          return payload;
         }
 
         if (!isPrimitive(data)) {
-          return {
-            ...payload,
-            error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Filter }, { key, path, type: 'primitive' })
-          };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Filter }, { key, path, type: 'primitive' }));
+
+          return payload;
         }
 
         if (data === value) payload.data[key] = storedValue;
@@ -237,7 +243,7 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
       const { hook } = payload;
 
       for (const [key, value] of await this.handler.entries()) {
-        const result = await hook(value);
+        const result = await hook(value, key);
 
         if (!result) continue;
 
@@ -250,24 +256,21 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
     if (isFindByValuePayload(payload)) {
       const { path, value } = payload;
 
-      if (!isPrimitive(value)) {
-        return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Find }, { path, type: 'primitive' }) };
-      }
-
       for (const [key, storedValue] of await this.handler.entries()) {
         if (payload.data[0] !== null && payload.data[1] !== null) break;
 
         const data = getProperty(storedValue, path, false);
 
         if (data === PROPERTY_NOT_FOUND) {
-          return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Find }, { key, path }) };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Find }, { key, path }));
+
+          return payload;
         }
 
         if (!isPrimitive(data)) {
-          return {
-            ...payload,
-            error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Find }, { key, path, type: 'primitive' })
-          };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Find }, { key, path, type: 'primitive' }));
+
+          return payload;
         }
 
         if (data !== value) continue;
@@ -313,19 +316,23 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
 
   public async [Method.Inc](payload: Payloads.Inc): Promise<Payloads.Inc> {
     const { key, path } = payload;
-    const getPayload = await this[Method.Get]({ method: Method.Get, key, path });
+    const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
     if (!isPayloadWithData(getPayload)) {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Inc }, { key, path }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Inc }, { key, path }));
+
+      return payload;
     }
 
     const { data } = getPayload;
 
     if (typeof data !== 'number') {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Inc }, { key, path, type: 'number' }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Inc }, { key, path, type: 'number' }));
+
+      return payload;
     }
 
-    await this[Method.Set]({ method: Method.Set, key, path, value: data + 1 });
+    await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data + 1 });
 
     return payload;
   }
@@ -344,7 +351,7 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
     if (isMapByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const value of await this.handler.values()) payload.data.push(await hook(value));
+      for (const [key, value] of await this.handler.entries()) payload.data.push(await hook(value, key));
     }
 
     if (isMapByPathPayload(payload)) {
@@ -362,16 +369,20 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
 
   public async [Method.Math](payload: Payloads.Math): Promise<Payloads.Math> {
     const { key, path, operator, operand } = payload;
-    const getPayload = await this[Method.Get]<number>({ method: Method.Get, key, path });
+    const getPayload = await this[Method.Get]<number>({ method: Method.Get, errors: [], key, path });
 
     if (!isPayloadWithData(getPayload)) {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Math }, { key, path }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Math }, { key, path }));
+
+      return payload;
     }
 
     let { data } = getPayload;
 
     if (typeof data !== 'number') {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Math }, { key, path, type: 'number' }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Math }, { key, path, type: 'number' }));
+
+      return payload;
     }
 
     switch (operator) {
@@ -406,7 +417,7 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
         break;
     }
 
-    await this[Method.Set]({ method: Method.Set, key, path, value: data });
+    await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data });
 
     return payload;
   }
@@ -420,7 +431,7 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
       const { hook } = payload;
 
       for (const [key, value] of await this.handler.entries()) {
-        const result = await hook(value);
+        const result = await hook(value, key);
 
         payload.data[result ? 'truthy' : 'falsy'][key] = value;
       }
@@ -433,14 +444,17 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
         const data = getProperty(storedValue, path);
 
         if (data === PROPERTY_NOT_FOUND) {
-          return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Partition }, { key, path }) };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Partition }, { key, path }));
+
+          return payload;
         }
 
         if (!isPrimitive(data)) {
-          return {
-            ...payload,
-            error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Partition }, { key, path, type: 'primitive' })
-          };
+          payload.errors.push(
+            this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Partition }, { key, path, type: 'primitive' })
+          );
+
+          return payload;
         }
 
         payload.data[data === value ? 'truthy' : 'falsy'][key] = storedValue;
@@ -452,20 +466,24 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
 
   public async [Method.Push]<Value = StoredValue>(payload: Payloads.Push<Value>): Promise<Payloads.Push<Value>> {
     const { key, path, value } = payload;
-    const getPayload = await this[Method.Get]({ method: Method.Get, key, path });
+    const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
     if (!isPayloadWithData(getPayload)) {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Push }, { key, path }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Push }, { key, path }));
+
+      return payload;
     }
 
     const { data } = getPayload;
 
     if (!Array.isArray(data)) {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Push }, { key, path, type: 'array' }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Push }, { key, path, type: 'array' }));
+
+      return payload;
     }
 
     data.push(value);
-    await this[Method.Set]({ method: Method.Set, key, path, value: data });
+    await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data });
 
     return payload;
   }
@@ -475,7 +493,11 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
     const size = await this.handler.size();
 
     if (size === 0) return payload;
-    if (size < count) return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }) };
+    if (size < count) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }));
+
+      return payload;
+    }
 
     payload.data = [];
 
@@ -503,7 +525,11 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
     const size = await this.handler.size();
 
     if (size === 0) return payload;
-    if (size < count) return { ...payload, error: this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }) };
+    if (size < count) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }));
+
+      return payload;
+    }
 
     payload.data = [];
 
@@ -527,44 +553,46 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
   public async [Method.Remove]<Value = StoredValue>(payload: Payloads.Remove<Value>): Promise<Payloads.Remove<Value>> {
     if (isRemoveByHookPayload(payload)) {
       const { key, path, hook } = payload;
-      const getPayload = await this[Method.Get]<Value[]>({ method: Method.Get, key, path });
+      const getPayload = await this[Method.Get]<Value[]>({ method: Method.Get, errors: [], key, path });
 
       if (!isPayloadWithData(getPayload)) {
-        return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Remove }, { key, path }) };
+        payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Remove }, { key, path }));
+
+        return payload;
       }
 
       const { data } = getPayload;
 
       if (!Array.isArray(data)) {
-        return {
-          ...payload,
-          error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Remove }, { key, path, type: 'array' })
-        };
+        payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Remove }, { key, path, type: 'array' }));
+
+        return payload;
       }
 
-      const filterValues = await Promise.all(data.map(hook));
+      const filterValues = await Promise.all(data.map((value) => hook(value, key)));
 
-      await this[Method.Set]({ method: Method.Set, key, path, value: data.filter((_, index) => !filterValues[index]) });
+      await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data.filter((_, index) => !filterValues[index]) });
     }
 
     if (isRemoveByValuePayload(payload)) {
       const { key, path, value } = payload;
-      const getPayload = await this[Method.Get]({ method: Method.Get, key, path });
+      const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
       if (!isPayloadWithData(getPayload)) {
-        return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Remove }, { key, path }) };
+        payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Remove }, { key, path }));
+
+        return payload;
       }
 
       const { data } = getPayload;
 
       if (!Array.isArray(data)) {
-        return {
-          ...payload,
-          error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Remove }, { key, path, type: 'array' })
-        };
+        payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Remove }, { key, path, type: 'array' }));
+
+        return payload;
       }
 
-      await this[Method.Set]({ method: Method.Set, key, path, value: data.filter((storedValue) => storedValue !== value) });
+      await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data.filter((storedValue) => storedValue !== value) });
     }
 
     return payload;
@@ -585,17 +613,19 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
 
   public async [Method.SetMany](payload: Payloads.SetMany): Promise<Payloads.SetMany> {
     const { entries, overwrite } = payload;
-    const withPath = entries.filter(([{ path }]) => path.length > 0);
-    const withoutPath = entries.filter(([{ path }]) => path.length === 0);
+    const withPath = entries.filter((entry) => entry.path.length > 0);
+    const withoutPath = entries.filter((entry) => entry.path.length === 0);
 
-    for (const [{ key, path }, value] of withPath) {
-      if (overwrite) await this[Method.Set]({ method: Method.Set, key, path, value });
-      else if (!(await this[Method.Has]({ method: Method.Has, key, path })).data) await this[Method.Set]({ method: Method.Set, key, path, value });
+    for (const { key, path, value } of withPath) {
+      if (overwrite) await this[Method.Set]({ method: Method.Set, errors: [], key, path, value });
+      else if (!(await this[Method.Has]({ method: Method.Has, errors: [], key, path })).data) {
+        await this[Method.Set]({ method: Method.Set, errors: [], key, path, value });
+      }
     }
 
     if (withoutPath.length > 0) {
       await this.handler.setMany(
-        withoutPath.map(([{ key }, value]) => [key, value as unknown as StoredValue]),
+        withoutPath.map((entry) => [entry.key, entry.value as unknown as StoredValue]),
         overwrite
       );
     }
@@ -617,8 +647,8 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
     if (isSomeByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const value of await this.handler.values()) {
-        const result = await hook(value);
+      for (const [key, value] of await this.handler.entries()) {
+        const result = await hook(value, key);
 
         if (!result) continue;
 
@@ -635,14 +665,15 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
         const data = getProperty(storedValue, path);
 
         if (data === PROPERTY_NOT_FOUND) {
-          return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Some }, { key, path }) };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Some }, { key, path }));
+
+          return payload;
         }
 
         if (!isPrimitive(data)) {
-          return {
-            ...payload,
-            error: this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Some }, { key, path, type: 'primitive' })
-          };
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Some }, { key, path, type: 'primitive' }));
+
+          return payload;
         }
 
         if (data !== value) continue;
@@ -658,15 +689,17 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
 
   public async [Method.Update]<Value = StoredValue>(payload: Payloads.Update<StoredValue, Value>): Promise<Payloads.Update<StoredValue, Value>> {
     const { key, hook } = payload;
-    const getPayload = await this[Method.Get]({ method: Method.Get, key, path: [] });
+    const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
 
     if (!isPayloadWithData<StoredValue>(getPayload)) {
-      return { ...payload, error: this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Update }, { key }) };
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Update }, { key }));
+
+      return payload;
     }
 
     const { data } = getPayload;
 
-    await this[Method.Set]({ method: Method.Set, key, path: [], value: await hook(data) });
+    await this[Method.Set]({ method: Method.Set, errors: [], key, path: [], value: await hook(data, key) });
 
     return payload;
   }

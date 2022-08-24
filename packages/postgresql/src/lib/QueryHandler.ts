@@ -32,11 +32,9 @@ export class QueryHandler<StoredValue = unknown> {
   }
 
   public async clear(): Promise<void> {
-    await this.sql`
-      DROP TABLE IF EXISTS "data"
-    `;
+    const keys = await this.keys();
 
-    await this.init();
+    await this.deleteMany(keys);
   }
 
   public async delete(key: string): Promise<void> {
@@ -48,14 +46,15 @@ export class QueryHandler<StoredValue = unknown> {
   public async deleteMany(keys: string[]): Promise<void> {
     await this.sql`
       DELETE FROM "data"
-      WHERE key
-      IN ${this.sql(keys)}}`;
+      WHERE key (
+      IN ${this.sql(keys)}
+      )`;
   }
 
   public async entries(): Promise<[string, StoredValue][]> {
     const { disableSerialization } = this.options;
     const rows = await this.sql<QueryHandler.RowData[]>`
-      SELECT *
+      SELECT key, value
       FROM "data"
     `;
 
@@ -75,6 +74,8 @@ export class QueryHandler<StoredValue = unknown> {
   }
 
   public async keys(): Promise<string[]> {
+    await this.init();
+
     const rows = await this.sql<Omit<QueryHandler.RowData, 'value' | 'version'>[]>`
       SELECT key
       FROM "data"
@@ -177,6 +178,8 @@ export class QueryHandler<StoredValue = unknown> {
   }
 
   public async size(): Promise<number> {
+    await this.init();
+
     const [{ count }] = await this.sql<[QueryHandler.RowCount]>`
       SELECT COUNT(*)
       FROM "data"
