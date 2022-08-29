@@ -1070,16 +1070,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/provider@npm:2.0.0-next.6cc7d77.0":
-  version: 2.0.0-next.6cc7d77.0
-  resolution: "@joshdb/provider@npm:2.0.0-next.6cc7d77.0"
-  dependencies:
-    "@sapphire/utilities": ^3.9.2
-    reflect-metadata: ^0.1.13
-  checksum: 1afdfd5a124b545f7945c316c078f2b6d985769d5f493cb287ccc50a49e31f1463b7ab9bee5e7de4349ddb8b2df4ce0bbe0d28844c8ed4daf6c9e5e650e8ba40
-  languageName: node
-  linkType: hard
-
 "@joshdb/provider@npm:2.0.0-next.865d0de.0":
   version: 2.0.0-next.865d0de.0
   resolution: "@joshdb/provider@npm:2.0.0-next.865d0de.0"
@@ -2069,7 +2059,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "benchmarks@workspace:benchmarks"
   dependencies:
-    "@joshdb/provider": 2.0.0-next.6cc7d77.0
+    "@joshdb/provider": 2.0.0-next.865d0de.0
   languageName: unknown
   linkType: soft
 

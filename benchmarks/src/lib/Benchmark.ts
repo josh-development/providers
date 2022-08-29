@@ -68,7 +68,7 @@ export class Benchmark {
 
           values: Object.values(cards),
 
-          entries: Object.entries(cards)
+          entries: Object.entries(cards).map(([key, value]) => ({ key, value, path: [] }))
         };
 
         if (test.beforeAll !== undefined) await test.beforeAll(runOptions);
@@ -88,16 +88,16 @@ export class Benchmark {
 
           const end = performance.now();
 
-          spinner.update({ text: `${test.name} (${id}/${cardCount})` });
           testResult.times.push(end - start);
+          spinner.update({ text: `${test.name} (${id}/${cardCount})` });
         }
 
-        await josh[Method.Clear]({ errors: [], method: Method.Clear });
+        await josh.clear({ method: Method.Clear, errors: [] });
         spinner.success({ text: test.name });
         result.tests.push(testResult);
       }
 
-      result.total = result.tests.reduce((acc, test) => acc + test.times.reduce((acc, time) => acc + time, 0), 0);
+      result.total = result.tests.reduce((acc, test) => acc + test.times.reduce((ac, time) => ac + time, 0), 0);
       console.log(greenBright(`\n${name} Benchmark Results:`));
       console.table(
         result.tests.reduce<Record<string, Record<string, string>>>((table, result) => {
@@ -228,7 +228,7 @@ export namespace Benchmark {
 
     values: TestCard[];
 
-    entries: [string, TestCard][];
+    entries: { key: string; path: string[]; value: TestCard }[];
   }
 
   export interface TestRunEachOptions extends TestRunOptions {

@@ -15,8 +15,10 @@ async function main() {
     .add(new MapProvider())
     .add(new MongoProvider({ collectionName: 'benchmark' }), 'MongoProvider (Serialize)')
     .add(new MongoProvider({ collectionName: 'benchmark', disableSerialization: true }))
-    .add(new RedisProvider({ disableSerialization: true }))
-    .add(new RedisProvider({}), 'RedisProvider (Serialize)');
+    .add(new RedisProvider({}), 'RedisProvider (Serialize)')
+    .add(new RedisProvider({ disableSerialization: true }));
+
+  if (process.env.CI === 'true') prompts.inject([100, 50, BenchmarkType.All, PickType.No]);
 
   const response = await prompts([
     { type: 'number', name: 'cardCount', message: 'How many cards do you want to test?', initial: Benchmark.defaultCardCount },
