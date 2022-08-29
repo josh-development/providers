@@ -2,7 +2,8 @@
   "name": "root",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "benchmarks"
   ],
   "scripts": {
     "clean": "rimraf .bench \"packages/**/.tests\"  \"packages/**/dist\" \"packages/**/build\" \"packages/**/.turbo\" \"packages/**/node_modules/.cache\" node_modules/.cache",
@@ -25,7 +26,6 @@
     "@favware/colorette-spinner": "^1.0.0",
     "@favware/npm-deprecate": "^1.0.5",
     "@favware/rollup-type-bundler": "^1.0.10",
-    "@joshdb/core": "3.0.0-next.c67d6d9.0",
     "@sapphire/eslint-config": "^4.3.7",
     "@sapphire/ts-config": "^3.3.4",
     "@types/jest": "^28.1.6",

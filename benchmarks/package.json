@@ -1,0 +1,10 @@
+{
+  "name": "benchmarks",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Benchmark for @joshdb providers",
+  "author": "@joshdb",
+  "dependencies": {
+    "@joshdb/provider": "2.0.0-next.865d0de.0"
+  }
+}

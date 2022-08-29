@@ -109,10 +109,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       this.connectionURI = `mongodb://${user?.length && password?.length ? `${user}:${password}@` : ''}${host}:${port}/${dbName}`;
     }
 
-    const client = new MongoClient(this.connectionURI, connectOptions);
-
-    this._client = await client.connect();
-    this._collection = this.generateMongoDoc(enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName);
+    await this.connect({ connectionURI: this.connectionURI, connectOptions, enforceCollectionName, collectionName });
     context = await super.init(context);
     return context;
   }
@@ -129,9 +126,6 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Clear](payload: Payloads.Clear): Promise<Payloads.Clear> {
     await this.collection.deleteMany({});
-    // await this.client.connection.db.dropCollection(this.collection.collection.collectionName); <- would probably be faster but disconnects the collection, requires a new init
-    // this._collection = undefined;
-
     return payload;
   }
 
@@ -814,6 +808,23 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     if (!doc) return this.version;
     return doc && doc.version ? doc.version : { major: 1, minor: 0, patch: 0 };
+  }
+
+  private async connect({
+    connectionURI,
+    connectOptions,
+    enforceCollectionName,
+    collectionName
+  }: {
+    connectionURI: string;
+    connectOptions?: MongoClientOptions;
+    enforceCollectionName?: boolean;
+    collectionName: string;
+  }): Promise<void> {
+    const client = new MongoClient(connectionURI, connectOptions);
+
+    this._client = await client.connect();
+    this._collection = this.generateMongoDoc(enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName);
   }
 
   private _getAll(projection: { [key: string]: 1 | 0 } = { key: 1, value: 1 }) {

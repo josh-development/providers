@@ -1,6 +1,5 @@
 import { Spinner } from '@favware/colorette-spinner';
-import { Josh } from '@joshdb/core';
-import type { JoshProvider } from '@joshdb/provider';
+import { JoshProvider, Method } from '@joshdb/provider';
 import { blueBright, cyanBright, gray, greenBright, magentaBright } from 'colorette';
 import { existsSync } from 'fs';
 import { mkdir, writeFile } from 'fs/promises';
@@ -43,10 +42,10 @@ export class Benchmark {
     for (const [name, provider] of this.providers) {
       console.log(`${blueBright('Benchmark:')} ${cyanBright(name)}\n`);
 
-      const josh = new Josh<Benchmark.TestCard>({ name: 'benchmark', provider });
+      const josh = provider;
 
-      await josh.init();
-      await josh.clear();
+      await josh.init({ name: 'benchmark' });
+      await josh[Method.Clear]({ method: Method.Clear, errors: [] });
 
       const result: Benchmark.PerformanceProviderResult = {
         name,
@@ -69,7 +68,7 @@ export class Benchmark {
 
           values: Object.values(cards),
 
-          entries: Object.entries(cards)
+          entries: Object.entries(cards).map(([key, value]) => ({ key, value, path: [] }))
         };
 
         if (test.beforeAll !== undefined) await test.beforeAll(runOptions);
@@ -89,16 +88,16 @@ export class Benchmark {
 
           const end = performance.now();
 
-          spinner.update({ text: `${test.name} (${id}/${cardCount})` });
           testResult.times.push(end - start);
+          spinner.update({ text: `${test.name} (${id}/${cardCount})` });
         }
 
-        await josh.clear();
+        await josh[Method.Clear]({ method: Method.Clear, errors: [] });
         spinner.success({ text: test.name });
         result.tests.push(testResult);
       }
 
-      result.total = result.tests.reduce((acc, test) => acc + test.times.reduce((acc, time) => acc + time, 0), 0);
+      result.total = result.tests.reduce((acc, test) => acc + test.times.reduce((ac, time) => ac + time, 0), 0);
       console.log(greenBright(`\n${name} Benchmark Results:`));
       console.table(
         result.tests.reduce<Record<string, Record<string, string>>>((table, result) => {
@@ -133,10 +132,10 @@ export class Benchmark {
       }
     }
 
-    table['Total'] = {};
+    table.Total = {};
 
     for (const result of results) {
-      table['Total'][result.name] = this.totalTimeString(result.tests.map((result) => result.times.reduce((prev, curr) => prev + curr, 0)));
+      table.Total[result.name] = this.totalTimeString(result.tests.map((result) => result.times.reduce((prev, curr) => prev + curr, 0)));
     }
 
     console.log(greenBright('\nBenchmark Results:'));
@@ -161,7 +160,9 @@ export class Benchmark {
 
     for (let i = 0; i < cardCount; i++) {
       spinner.update({ text: `Card Generation (${i}/${cardCount})` });
+
       const card = createCard(i);
+
       cards[i.toString()] = card;
     }
 
@@ -221,13 +222,13 @@ export namespace Benchmark {
   }
 
   export interface TestRunOptions {
-    josh: Josh<TestCard>;
+    josh: JoshProvider<TestCard>;
 
     keys: string[];
 
     values: TestCard[];
 
-    entries: [string, TestCard][];
+    entries: { key: string; path: string[]; value: TestCard }[];
   }
 
   export interface TestRunEachOptions extends TestRunOptions {

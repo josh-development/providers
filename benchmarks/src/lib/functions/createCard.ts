@@ -5,7 +5,7 @@ export function createCard(i: number) {
     id: i.toString(),
     net: 0,
     ids: [],
-    name: faker.name.findName(),
+    name: faker.name.fullName(),
     username: faker.internet.userName(),
     email: faker.internet.email(),
     address: {
@@ -25,7 +25,7 @@ export function createCard(i: number) {
     phone: faker.phone.number(),
     website: faker.internet.domainName(),
     company: {
-      name: faker.company.companyName(),
+      name: faker.company.name(),
       catchPhrase: faker.company.catchPhrase(),
       bs: faker.company.bs()
     },
