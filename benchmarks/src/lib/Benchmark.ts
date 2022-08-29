@@ -45,7 +45,7 @@ export class Benchmark {
       const josh = provider;
 
       await josh.init({ name: 'benchmark' });
-      await josh.clear({ method: Method.Clear, errors: [] });
+      await josh[Method.Clear]({ method: Method.Clear, errors: [] });
 
       const result: Benchmark.PerformanceProviderResult = {
         name,
@@ -92,7 +92,7 @@ export class Benchmark {
           spinner.update({ text: `${test.name} (${id}/${cardCount})` });
         }
 
-        await josh.clear({ method: Method.Clear, errors: [] });
+        await josh[Method.Clear]({ method: Method.Clear, errors: [] });
         spinner.success({ text: test.name });
         result.tests.push(testResult);
       }
