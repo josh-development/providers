@@ -38,11 +38,19 @@
   color: '24853c'
 - name: packages:json
   color: 'fbca04'
+- name: packages:indexed
+  color: 'fbca04'
 - name: packages:map
+  color: 'fbca04'
+- name: packages:maria
   color: 'fbca04'
 - name: packages:mongo
   color: 'fbca04'
+- name: packages:postgresql
+  color: 'fbca04'
 - name: packages:redis
+  color: 'fbca04'
+- name: packages:sqlite
   color: 'fbca04'
 - name: performance
   color: '80c042'
