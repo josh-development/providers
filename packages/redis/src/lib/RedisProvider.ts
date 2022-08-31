@@ -739,7 +739,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return this.version;
   }
 
-  private async *iterate(): AsyncIterableIterator<IterateReturn<StoredValue>> {
+  private async *iterate(): AsyncIterableIterator<RedisProvider.IterateReturn<StoredValue>> {
     for await (const key of this.client.scanIterator()) {
       const rowString = await this.client.get(key);
 
@@ -777,15 +777,15 @@ export namespace RedisProvider {
     version: JoshProvider.Semver;
   }
 
+  export interface IterateReturn<StoredValue = unknown> {
+    key: string;
+
+    value: StoredValue;
+
+    version: JoshProvider.Semver;
+  }
+
   export enum Identifiers {
     NotConnected = 'notConnected'
   }
-}
-
-interface IterateReturn<StoredValue = unknown> {
-  key: string;
-
-  value: StoredValue;
-
-  version: JoshProvider.Semver;
 }
