@@ -831,7 +831,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return this.collection.find<MongoProvider.DocType<StoredValue>>({}, { projection }).toArray();
   }
 
-  private async *iterate(options: IterateOptions = {}): AsyncIterableIterator<MongoProvider.DocType<StoredValue>> {
+  private async *iterate(options: MongoProvider.IterateOptions = {}): AsyncIterableIterator<MongoProvider.DocType<StoredValue>> {
     const { filter = {}, project = { key: 1, value: 1 } } = options;
 
     for await (const document of this.collection.aggregate<MongoProvider.DocType<StoredValue>>([{ $match: filter }, { $project: project }])) {
@@ -889,15 +889,15 @@ export namespace MongoProvider {
     version: JoshProvider.Semver;
   }
 
+  export interface IterateOptions<StoredValue = unknown> {
+    filter?: Filter<DocType<StoredValue>>;
+
+    project?: Partial<Record<'key' | 'value' | 'version', 0 | 1>>;
+  }
+
   export enum Identifiers {
     InitMissingCollectionName = 'initMissingCollectionName',
 
     NotConnected = 'notConnected'
   }
-}
-
-interface IterateOptions<StoredValue = unknown> {
-  filter?: Filter<MongoProvider.DocType<StoredValue>>;
-
-  project?: Partial<Record<'key' | 'value' | 'version', 0 | 1>>;
 }
