@@ -18,6 +18,7 @@ jobs:
   publish:
     name: Publish Next to NPM
     runs-on: ubuntu-latest
+
     if: github.repository_owner == 'josh-development'
     steps:
       - name: Checkout Project

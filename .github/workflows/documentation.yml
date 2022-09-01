@@ -5,7 +5,11 @@ on:
     branches:
       - main
     tags:
-      - 'v*'
+      - '**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -49,8 +53,13 @@ jobs:
     needs: build
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
-        package: ['json', 'map', 'mongo', 'redis']
+        package:
+          - json
+          - map
+          - mongo
+          - redis
     runs-on: ubuntu-latest
     env:
       NAME: ${{ needs.build.outputs.NAME }}
@@ -92,15 +101,15 @@ jobs:
           PACKAGE: ${{ steps.extract-tag.outputs.package }}
           SEMVER: ${{ steps.extract-tag.outputs.semver }}
         run: |
-          mkdir -p out/${PACKAGE}
-          mv docs/${PACKAGE}/docs/api.json out/${PACKAGE}/${SEMVER}.json
+          mkdir -p out/providers/${PACKAGE}
+          mv docs/${PACKAGE}/docs/api.json out/providers/${PACKAGE}/${SEMVER}.json
       - name: Move Documentation
         if: ${{ env.TYPE == 'branch' }}
         env:
           PACKAGE: ${{ matrix.package }}
         run: |
-          mkdir -p out/${PACKAGE}
-          mv docs/${PACKAGE}/docs/api.json out/${PACKAGE}/${NAME}.json
+          mkdir -p out/providers/${PACKAGE}
+          mv docs/${PACKAGE}/docs/api.json out/providers/${PACKAGE}/${NAME}.json
 
       - name: Commit & Push
         env:
@@ -109,7 +118,9 @@ jobs:
           cd out
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git config rebase.autostash true
+          git config pull.rebase true
           git add .
           git commit -m "docs(${PACKAGE}): build for ${TYPE} ${NAME}: ${SHA}" || true
-          git pull --rebase
+          git pull
           git push
