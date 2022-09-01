@@ -1,12 +1,12 @@
 import { Spinner } from '@favware/colorette-spinner';
 import { JoshProvider, Method } from '@joshdb/provider';
+import { toTitleCase } from '@sapphire/utilities';
 import { blueBright, cyanBright, gray, greenBright, magentaBright } from 'colorette';
 import { existsSync } from 'fs';
 import { mkdir, writeFile } from 'fs/promises';
 import { resolve } from 'path';
 import { performance } from 'perf_hooks';
 import { createCard } from './functions/createCard';
-import { toTitleCase } from './functions/toTitleCase';
 
 export class Benchmark {
   public providers: [string, JoshProvider<Benchmark.TestCard>][] = [];
@@ -16,13 +16,46 @@ export class Benchmark {
   public add(provider: JoshProvider<Benchmark.TestCard> | (() => JoshProvider<Benchmark.TestCard>), name?: string): this {
     if (typeof provider === 'function') provider = provider();
 
-    this.providers.push([toTitleCase(name ?? provider.constructor.name), provider]);
+    this.providers.push([
+      toTitleCase(name ?? provider.constructor.name, {
+        additionalVariants: {
+          mapProvider: 'MapProvider',
+          jsonProvider: 'JSONProvider',
+          mongoProvider: 'MongoProvider',
+          autoKey: 'AutoKey',
+          deleteMany: 'DeleteMany',
+          getAll: 'GetAll',
+          getMany: 'GetMany',
+          randomKey: 'RandomKey',
+          setMany: 'SetMany'
+        }
+      }),
+      provider
+    ]);
 
     return this;
   }
 
   public use(...tests: Benchmark.Test[]): this {
-    this.tests = [...this.tests, ...tests.map((test) => ({ ...test, name: toTitleCase(test.name) }))];
+    this.tests = [
+      ...this.tests,
+      ...tests.map((test) => ({
+        ...test,
+        name: toTitleCase(test.name, {
+          additionalVariants: {
+            mapProvider: 'MapProvider',
+            jsonProvider: 'JSONProvider',
+            mongoProvider: 'MongoProvider',
+            autoKey: 'AutoKey',
+            deleteMany: 'DeleteMany',
+            getAll: 'GetAll',
+            getMany: 'GetMany',
+            randomKey: 'RandomKey',
+            setMany: 'SetMany'
+          }
+        })
+      }))
+    ];
 
     return this;
   }
