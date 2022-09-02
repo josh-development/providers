@@ -652,7 +652,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@favware/colorette-spinner@npm:^1.0.0":
+"@favware/colorette-spinner@npm:^1.0.0, @favware/colorette-spinner@npm:^1.0.1":
   version: 1.0.1
   resolution: "@favware/colorette-spinner@npm:1.0.1"
   dependencies:
@@ -1034,7 +1034,7 @@ __metadata:
     jest: ^29.0.1
     property-helpers: ^1.1.0
     typedoc: ^0.23.10
-    typedoc-json-parser: ^2.3.2
+    typedoc-json-parser: ^3.0.0
   languageName: unknown
   linkType: soft
 
@@ -1049,7 +1049,7 @@ __metadata:
     jest: ^29.0.1
     property-helpers: ^1.1.0
     typedoc: ^0.23.10
-    typedoc-json-parser: ^2.3.2
+    typedoc-json-parser: ^3.0.0
   languageName: unknown
   linkType: soft
 
@@ -1066,7 +1066,7 @@ __metadata:
     mongodb: ~4.8.1
     property-helpers: ^1.1.0
     typedoc: ^0.23.10
-    typedoc-json-parser: ^2.3.2
+    typedoc-json-parser: ^3.0.0
   languageName: unknown
   linkType: soft
 
@@ -1092,7 +1092,7 @@ __metadata:
     jest: ^29.0.1
     redis: ^4.2.0
     typedoc: ^0.23.10
-    typedoc-json-parser: ^2.3.2
+    typedoc-json-parser: ^3.0.0
     uuid: ^8.3.2
   languageName: unknown
   linkType: soft
@@ -6678,19 +6678,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typedoc-json-parser@npm:^2.3.2":
-  version: 2.3.2
-  resolution: "typedoc-json-parser@npm:2.3.2"
+"typedoc-json-parser@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "typedoc-json-parser@npm:3.0.0"
   dependencies:
-    "@favware/colorette-spinner": ^1.0.0
+    "@favware/colorette-spinner": ^1.0.1
     colorette: ^2.0.19
     commander: ^9.4.0
     js-yaml: ^4.1.0
     tslib: ^2.4.0
-    typedoc: ^0.23.10
+    typedoc: ^0.23.11
   bin:
     typedoc-json-parser: ./dist/bin/index.js
-  checksum: 9223c36cc93cc9c71b710532080b282c3c4e5ff9836474d2af6701058bd3073f4078d4286f08572de7e32983db9967a4d71d37c0250382130f8e738636d3406b
+  checksum: 198da438307d897ff954c79a697ed01431374b09db34c53bddfd66d13e1ca3b05f27642c4b2f968b982661b9c9cd74dd9a848d578732b5d17f7d048257cb3109
   languageName: node
   linkType: hard
 
@@ -6707,6 +6707,22 @@ __metadata:
   bin:
     typedoc: bin/typedoc
   checksum: 02bc1e4c15ea064c0a35e049500b40f99ce8dec1d2778edd9dbc12c0ca348c630253ad17e1c2b901961fcd56e3eea31fd62f82eed4ff95864e9e1d2e5e7564d7
+  languageName: node
+  linkType: hard
+
+"typedoc@npm:^0.23.11":
+  version: 0.23.13
+  resolution: "typedoc@npm:0.23.13"
+  dependencies:
+    lunr: ^2.3.9
+    marked: ^4.0.19
+    minimatch: ^5.1.0
+    shiki: ^0.11.1
+  peerDependencies:
+    typescript: 4.6.x || 4.7.x || 4.8.x
+  bin:
+    typedoc: bin/typedoc
+  checksum: 720b5fa9846fcb2d0e3a763bc01b8f856d7e1c80ac50d2efd85dd850f61b98c4f52b7519a86ff2c59cebc7ab1e19e92cab31a25082d4574ab9a6f93e660e5369
   languageName: node
   linkType: hard
 
