@@ -23,10 +23,8 @@ export class QueryHandler<StoredValue = unknown> {
 
   public async clear(): Promise<void> {
     await this.connection!.query(`
-      DROP TABLE IF EXISTS \`${this.options.tableName}\`;
+      DELETE FROM \`${this.options.tableName}\`;
     `);
-
-    await this.ensureTable();
   }
 
   public async delete(key: string): Promise<void> {
@@ -139,7 +137,7 @@ export class QueryHandler<StoredValue = unknown> {
       INSERT INTO \`${this.options.tableName}\` (\`key\`, \`value\`, \`version\`)
       VALUES (:key, :value, :version)
       ON DUPLICATE KEY
-      UPDATE \`value\` = :value, \`version\` = :version;`
+      UPDATE \`value\` = :value;`
         },
         entries.map(([key, value]) => ({
           key,

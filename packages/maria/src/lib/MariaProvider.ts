@@ -150,7 +150,11 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   public async [Method.Entries](payload: Payloads.Entries<StoredValue>): Promise<Payloads.Entries<StoredValue>> {
-    payload.data = (await this.handler.entries()).reduce((data, [key, value]) => ({ ...data, [key]: value }), {});
+    payload.data = {};
+
+    for (const [key, value] of await this.handler.entries()) {
+      payload.data[key] = value;
+    }
 
     return payload;
   }
