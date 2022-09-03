@@ -35,14 +35,15 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
   public constructor(options: PostgreSQLProvider.Options) {
     super(options);
 
-    const { connectionDetails = PostgreSQLProvider.defaultConnectionDetails, epoch, disableSerialization } = options;
+    const { tableName = 'data', connectionDetails = PostgreSQLProvider.defaultConnectionDetails, epoch, disableSerialization } = options;
 
     this.snowflake = epoch === undefined ? TwitterSnowflake : new Snowflake(epoch);
 
     const { major, minor, patch } = this.version;
 
-    if (typeof connectionDetails === 'string') this.handler = new QueryHandler({ connectionDetails, version: `${major}.${minor}.${patch}` });
-    else {
+    if (typeof connectionDetails === 'string') {
+      this.handler = new QueryHandler({ tableName, connectionDetails, version: `${major}.${minor}.${patch}` });
+    } else {
       const { host, port, database, user, password } = {
         host: connectionDetails.host ?? PostgreSQLProvider.defaultConnectionDetails.host,
         port: connectionDetails.port ?? PostgreSQLProvider.defaultConnectionDetails.port,
@@ -52,6 +53,7 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
       };
 
       this.handler = new QueryHandler({
+        tableName,
         connectionDetails: { host, port, database, user, password },
         disableSerialization,
         version: `${major}.${minor}.${patch}`
@@ -727,6 +729,8 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
 
 export namespace PostgreSQLProvider {
   export interface Options extends JoshProvider.Options {
+    tableName?: string;
+
     connectionDetails?: Partial<ConnectionDetails> | string;
 
     disableSerialization?: boolean;

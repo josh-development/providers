@@ -1,4 +1,4 @@
-import { SerializeJSON, toRaw } from '@joshdb/serialize';
+import { toJSON, toRaw } from '@joshdb/serialize';
 import type { Sql } from 'postgres';
 import postgres from 'postgres';
 import type { PostgreSQLProvider } from './PostgreSQLProvider';
@@ -17,13 +17,15 @@ export class QueryHandler<StoredValue = unknown> {
     else {
       const { host, port, database, user, password } = connectionDetails;
 
-      this.sql = postgres({ host, port, database, user, password });
+      this.sql = postgres({ host, port, database, user, password, onnotice: () => null, transform: { undefined: null } });
     }
   }
 
   public async init(): Promise<void> {
+    const { tableName } = this.options;
+
     await this.sql`
-      CREATE TABLE IF NOT EXISTS "data" (
+      CREATE TABLE IF NOT EXISTS ${this.sql(tableName)} (
         key VARCHAR(255) PRIMARY KEY,
         value TEXT NOT NULL,
         version VARCHAR(255) NOT NULL
@@ -32,40 +34,47 @@ export class QueryHandler<StoredValue = unknown> {
   }
 
   public async clear(): Promise<void> {
-    const keys = await this.keys();
+    const { tableName } = this.options;
 
-    await this.deleteMany(keys);
+    await this.sql`
+      DELETE FROM ${this.sql(tableName)}
+    `;
   }
 
   public async delete(key: string): Promise<void> {
+    const { tableName } = this.options;
+
     await this.sql`
-      DELETE FROM "data"
+      DELETE FROM ${this.sql(tableName)}
       WHERE key = ${key}`;
   }
 
   public async deleteMany(keys: string[]): Promise<void> {
+    const { tableName } = this.options;
+
     await this.sql`
-      DELETE FROM "data"
-      WHERE key (
+      DELETE FROM ${this.sql(tableName)}
+      WHERE key
       IN ${this.sql(keys)}
-      )`;
+      `;
   }
 
   public async entries(): Promise<[string, StoredValue][]> {
-    const { disableSerialization } = this.options;
+    const { tableName, disableSerialization } = this.options;
     const rows = await this.sql<QueryHandler.RowData[]>`
       SELECT key, value
-      FROM "data"
+      FROM ${this.sql(tableName)}
     `;
 
     return rows.map((row) => [row.key, disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value))]);
   }
 
   public async has(key: string): Promise<boolean> {
+    const { tableName } = this.options;
     const [{ exists }] = await this.sql<[QueryHandler.RowExists]>`
       SELECT EXISTS (
         SELECT 1
-        FROM "data"
+        FROM ${this.sql(tableName)}
         WHERE key = ${key}
       )
     `;
@@ -74,24 +83,23 @@ export class QueryHandler<StoredValue = unknown> {
   }
 
   public async keys(): Promise<string[]> {
-    await this.init();
-
+    const { tableName } = this.options;
     const rows = await this.sql<Omit<QueryHandler.RowData, 'value' | 'version'>[]>`
       SELECT key
-      FROM "data"
+      FROM ${this.sql(tableName)}
     `;
 
     return rows.map((row) => row.key);
   }
 
   public async get(key: string): Promise<StoredValue | undefined> {
-    const { disableSerialization } = this.options;
+    const { tableName, disableSerialization } = this.options;
 
     if (!(await this.has(key))) return;
 
     const [row] = await this.sql<QueryHandler.RowData[]>`
       SELECT *
-      FROM "data"
+      FROM ${this.sql(tableName)}
       WHERE key = ${key}
     `;
 
@@ -99,10 +107,10 @@ export class QueryHandler<StoredValue = unknown> {
   }
 
   public async getMany(keys: string[]): Promise<Record<string, StoredValue | null>> {
-    const { disableSerialization } = this.options;
+    const { tableName, disableSerialization } = this.options;
     const rows = await this.sql<QueryHandler.RowData[]>`
       SELECT *
-      FROM "data"
+      FROM ${this.sql(tableName)}
       WHERE key
       IN ${this.sql(keys)}
     `;
@@ -117,33 +125,30 @@ export class QueryHandler<StoredValue = unknown> {
   }
 
   public async set(key: string, value: StoredValue): Promise<void> {
-    const { disableSerialization, version } = this.options;
+    const { tableName, disableSerialization, version } = this.options;
 
     await this.sql`
-      INSERT INTO "data" ${this.sql(
-        { key, value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toRaw(value as unknown as SerializeJSON)), version },
-        'key',
-        'value',
-        'version'
-      )}
+      INSERT INTO ${this.sql(tableName)} ${this.sql(
+      { key, value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)), version },
+      'key',
+      'value',
+      'version'
+    )}
       ON CONFLICT (key)
-      DO UPDATE SET ${this.sql(
-        { value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toRaw(value as unknown as SerializeJSON)), version },
-        'value',
-        'version'
-      )}
+      DO UPDATE SET ${this.sql({ value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)), version }, 'value', 'version')}
     `;
   }
 
   public async setMany(entries: [string, StoredValue][], overwrite: boolean): Promise<void> {
-    const { disableSerialization, version } = this.options;
+    const { tableName, disableSerialization, version } = this.options;
 
     if (overwrite) {
       await this.sql`
-      INSERT INTO "data" ${this.sql(
+      INSERT INTO ${this.sql(tableName)}
+      ${this.sql(
         entries.map(([key, value]) => ({
           key,
-          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toRaw(value as unknown as SerializeJSON)),
+          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)),
           version
         })),
         'key',
@@ -151,9 +156,10 @@ export class QueryHandler<StoredValue = unknown> {
         'version'
       )}
       ON CONFLICT (key)
-      DO UPDATE SET ${this.sql(
+      DO UPDATE SET
+      ${this.sql(
         entries.map(([, value]) => ({
-          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toRaw(value as unknown as SerializeJSON)),
+          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)),
           version
         })),
         'value',
@@ -162,10 +168,11 @@ export class QueryHandler<StoredValue = unknown> {
     `;
     } else {
       await this.sql`
-      INSERT INTO "data" ${this.sql(
+      INSERT INTO ${this.sql(tableName)}
+      ${this.sql(
         entries.map(([key, value]) => ({
           key,
-          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toRaw(value as unknown as SerializeJSON)),
+          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)),
           version
         })),
         'key',
@@ -178,21 +185,20 @@ export class QueryHandler<StoredValue = unknown> {
   }
 
   public async size(): Promise<number> {
-    await this.init();
-
+    const { tableName } = this.options;
     const [{ count }] = await this.sql<[QueryHandler.RowCount]>`
       SELECT COUNT(*)
-      FROM "data"
+      FROM ${this.sql(tableName)}
     `;
 
     return Number(count);
   }
 
   public async values(): Promise<StoredValue[]> {
-    const { disableSerialization } = this.options;
+    const { tableName, disableSerialization } = this.options;
     const rows = await this.sql<Omit<QueryHandler.RowData, 'key' | 'version'>[]>`
       SELECT value
-      FROM "data"
+      FROM ${this.sql(tableName)}
     `;
 
     return rows.map((row) => (disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value))));
@@ -201,6 +207,8 @@ export class QueryHandler<StoredValue = unknown> {
 
 export namespace QueryHandler {
   export interface Options {
+    tableName: string;
+
     connectionDetails: PostgreSQLProvider.ConnectionDetails | string;
 
     disableSerialization?: boolean;
