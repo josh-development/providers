@@ -128,7 +128,7 @@ jobs:
 
   upload-coverage-report:
     name: Upload Code Coverage Report
-    needs: [json, map, mongo, redis, maria]
+    needs: [json, map, maria, mongo, redis]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Project
