@@ -101,7 +101,7 @@ jobs:
         with:
           name: coverage
           path: coverage/
-  postgres:
+  postgresql:
     name: PostgreSQLProvider
     runs-on: ubuntu-latest
     services:
@@ -180,7 +180,7 @@ jobs:
 
   upload-coverage-report:
     name: Upload Code Coverage Report
-    needs: [json, map, maria, mongo, redis, sqlite]
+    needs: [json, map, maria, mongo, postgresql, redis, sqlite]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Project
