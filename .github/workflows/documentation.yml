@@ -58,6 +58,7 @@ jobs:
         package:
           - json
           - map
+          - maria
           - mongo
           - redis
     runs-on: ubuntu-latest
