@@ -1035,9 +1035,9 @@ __metadata:
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.865d0de.0
     "@joshdb/serialize": ^1.1.0-next
-    "@sapphire/async-queue": ^1.4.0
+    "@sapphire/async-queue": ^1.5.0
     "@sapphire/snowflake": ^3.2.2
-    "@sapphire/utilities": ^3.9.0
+    "@sapphire/utilities": ^3.9.3
     jest: ^29.0.2
     property-helpers: ^1.1.0
     typedoc: ^0.23.14
@@ -1052,7 +1052,7 @@ __metadata:
     "@favware/cliff-jumper": ^1.8.7
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.865d0de.0
-    "@sapphire/utilities": ^3.9.0
+    "@sapphire/utilities": ^3.9.3
     jest: ^29.0.2
     property-helpers: ^1.1.0
     typedoc: ^0.23.14
@@ -1083,9 +1083,9 @@ __metadata:
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.865d0de.0
     "@joshdb/serialize": ^1.1.0-next
-    "@sapphire/utilities": ^3.9.0
+    "@sapphire/utilities": ^3.9.3
     jest: ^29.0.2
-    mongodb: ~4.8.1
+    mongodb: ~4.9.1
     property-helpers: ^1.1.0
     typedoc: ^0.23.14
     typedoc-json-parser: ^3.1.0
@@ -1112,7 +1112,7 @@ __metadata:
     "@joshdb/serialize": ^1.1.0-next
     "@types/uuid": ^8.3.4
     jest: ^29.0.2
-    redis: ^4.2.0
+    redis: ^4.3.0
     typedoc: ^0.23.14
     typedoc-json-parser: ^3.1.0
     uuid: ^8.3.2
@@ -1301,7 +1301,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/async-queue@npm:^1.4.0":
+"@sapphire/async-queue@npm:^1.5.0":
   version: 1.5.0
   resolution: "@sapphire/async-queue@npm:1.5.0"
   checksum: 983dbd1fd1b1798496e5edb6a0db7e4d90015160e1028f20475eab0a92625513f1e8d938bc0305811a9cec461c94e01b1e4191615ff03ba49356f568f3255250
@@ -1356,10 +1356,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/utilities@npm:^3.8.0, @sapphire/utilities@npm:^3.9.0, @sapphire/utilities@npm:^3.9.2":
+"@sapphire/utilities@npm:^3.8.0, @sapphire/utilities@npm:^3.9.2":
   version: 3.9.2
   resolution: "@sapphire/utilities@npm:3.9.2"
   checksum: eeef33b03b802e931ada752b8c335cc8bde4017f8029b577b0247e3f3d2b57bf5f1936b2c8c29aef5e2c6975d9b162363e4c5c434c4fead0bba74253d067b4d9
+  languageName: node
+  linkType: hard
+
+"@sapphire/utilities@npm:^3.9.3":
+  version: 3.9.3
+  resolution: "@sapphire/utilities@npm:3.9.3"
+  checksum: 9f3f977fd5c0677d5f79136e9cb68ade3317cfba3e87bb58689f4af68233a807af34eb6092ad262c946d5eaf5c4a76cd534b0b395ebbaf0f0912dd80e174f912
   languageName: node
   linkType: hard
 
@@ -2090,7 +2097,7 @@ __metadata:
   resolution: "benchmarks@workspace:benchmarks"
   dependencies:
     "@joshdb/provider": 2.0.0-next.865d0de.0
-    "@sapphire/utilities": ^3.9.2
+    "@sapphire/utilities": ^3.9.3
   languageName: unknown
   linkType: soft
 
@@ -2154,7 +2161,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bson@npm:^4.6.5":
+"bson@npm:^4.7.0":
   version: 4.7.0
   resolution: "bson@npm:4.7.0"
   dependencies:
@@ -2683,7 +2690,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"denque@npm:^2.0.1":
+"denque@npm:^2.0.1, denque@npm:^2.1.0":
   version: 2.1.0
   resolution: "denque@npm:2.1.0"
   checksum: 1d4ae1d05e59ac3a3481e7b478293f4b4c813819342273f3d5b826c7ffa9753c520919ba264f377e09108d24ec6cf0ec0ac729a5686cbb8f32d797126c5dae74
@@ -5007,7 +5014,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb-connection-string-url@npm:^2.5.2":
+"mongodb-connection-string-url@npm:^2.5.3":
   version: 2.5.3
   resolution: "mongodb-connection-string-url@npm:2.5.3"
   dependencies:
@@ -5017,19 +5024,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:~4.8.1":
-  version: 4.8.1
-  resolution: "mongodb@npm:4.8.1"
+"mongodb@npm:~4.9.1":
+  version: 4.9.1
+  resolution: "mongodb@npm:4.9.1"
   dependencies:
-    bson: ^4.6.5
-    denque: ^2.0.1
-    mongodb-connection-string-url: ^2.5.2
+    bson: ^4.7.0
+    denque: ^2.1.0
+    mongodb-connection-string-url: ^2.5.3
     saslprep: ^1.0.3
-    socks: ^2.6.2
+    socks: ^2.7.0
   dependenciesMeta:
     saslprep:
       optional: true
-  checksum: 97ff4ebe3fde7b3b5b133d8f7a2e4d6e372c44f8223a6d40b13bb3a705bbbb48ed50958a0fc6b3a33161605723479fced8e0eb83cf7fd5271f7530e6e2d67a2d
+  checksum: 43d66207f094930d134e263489f788c5efd0ef079bf059986cd887570b561067f4dcf23d6e4334d2fd13fee7ce3ef8f9b163e609fc48e03e1236b6407095a4c5
   languageName: node
   linkType: hard
 
@@ -5646,7 +5653,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redis@npm:^4.2.0":
+"redis@npm:^4.3.0":
   version: 4.3.0
   resolution: "redis@npm:4.3.0"
   dependencies:
@@ -6103,7 +6110,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"socks@npm:^2.6.2":
+"socks@npm:^2.6.2, socks@npm:^2.7.0":
   version: 2.7.0
   resolution: "socks@npm:2.7.0"
   dependencies:
