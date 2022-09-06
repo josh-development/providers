@@ -63,6 +63,8 @@ export class SqliteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
           }
 
           database.prepare(`DELETE FROM 'internal:autonum' WHERE josh = '${tableName}'`).run();
+
+          database.close();
         }
       }
     }
