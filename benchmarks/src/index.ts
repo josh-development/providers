@@ -4,6 +4,7 @@ import { MapProvider } from '../../packages/map/src';
 import { MariaProvider } from '../../packages/maria/src';
 import { MongoProvider } from '../../packages/mongo/src';
 import { RedisProvider } from '../../packages/redis/src';
+import { SqliteProvider } from '../../packages/sqlite/src';
 import { Benchmark } from './lib/Benchmark';
 import { BASIC_BENCHMARK_TESTS, BENCHMARK_TESTS } from './lib/constants/benchmark-tests';
 import { BenchmarkType } from './lib/types/BenchmarkType';
@@ -16,10 +17,12 @@ async function main() {
     .add(new MapProvider())
     .add(new MongoProvider({ collectionName: 'benchmark' }), 'MongoProvider (Serialize)')
     .add(new MongoProvider({ collectionName: 'benchmark', disableSerialization: true }))
+    .add(new MariaProvider({}), 'MariaDBProvider (Serialize)')
+    .add(new MariaProvider({ disableSerialization: true }))
     .add(new RedisProvider({}), 'RedisProvider (Serialize)')
     .add(new RedisProvider({ disableSerialization: true }))
-    .add(new MariaProvider({}), 'MariaDBProvider (Serialize)')
-    .add(new MariaProvider({ disableSerialization: true }));
+    .add(new SqliteProvider({ dataDirectory: '.bench', wal: false }), 'SqliteProvider (Serialize)')
+    .add(new SqliteProvider({ dataDirectory: '.bench', wal: false, disableSerialization: true }));
 
   if (process.env.CI === 'true') prompts.inject([100, 50, BenchmarkType.All, PickType.No]);
 
