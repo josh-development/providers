@@ -4,7 +4,7 @@ import { SqliteProvider } from '../../src';
 runProviderTest<typeof SqliteProvider, Partial<SqliteProvider.Options>>({
   providerConstructor: SqliteProvider,
   providerOptions: {
-    persistent: true
+    persistent: false
   },
   // @ts-expect-error 2322
   cleanup: (provider: SqliteProvider) => {

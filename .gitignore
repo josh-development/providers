@@ -8,9 +8,9 @@ build/
 docs/
 coverage/
 .turbo/
-**/.tests
-**/.bench
-**/benchmarks/results
+.tests
+.bench
+benchmarks/results
 
 # Ignore heapsnapshot and log files
 *.heapsnapshot
