@@ -22,14 +22,25 @@ export class QueryHandler<StoredValue = unknown> {
   }
 
   public async init(): Promise<void> {
-    const { tableName } = this.options;
+    const { tableName, version } = this.options;
 
     await this.sql`
       CREATE TABLE IF NOT EXISTS ${this.sql(tableName)} (
         key VARCHAR(255) PRIMARY KEY,
-        value TEXT NOT NULL,
+        value TEXT NOT NULL
+      )
+    `;
+
+    await this.sql`
+      CREATE TABLE IF NOT EXISTS internal_metadata (
+        name VARCHAR(255) PRIMARY KEY,
         version VARCHAR(255) NOT NULL
       )
+    `;
+
+    await this.sql`
+      INSERT INTO internal_metadata ${this.sql({ name: tableName, version }, 'name', 'version')}
+      ON CONFLICT DO NOTHING
     `;
   }
 
@@ -61,7 +72,7 @@ export class QueryHandler<StoredValue = unknown> {
 
   public async entries(): Promise<[string, StoredValue][]> {
     const { tableName, disableSerialization } = this.options;
-    const rows = await this.sql<QueryHandler.RowData[]>`
+    const rows = await this.sql<QueryHandler.Row[]>`
       SELECT key, value
       FROM ${this.sql(tableName)}
     `;
@@ -84,7 +95,7 @@ export class QueryHandler<StoredValue = unknown> {
 
   public async keys(): Promise<string[]> {
     const { tableName } = this.options;
-    const rows = await this.sql<Omit<QueryHandler.RowData, 'value' | 'version'>[]>`
+    const rows = await this.sql<Pick<QueryHandler.Row, 'key'>[]>`
       SELECT key
       FROM ${this.sql(tableName)}
     `;
@@ -97,7 +108,7 @@ export class QueryHandler<StoredValue = unknown> {
 
     if (!(await this.has(key))) return;
 
-    const [row] = await this.sql<QueryHandler.RowData[]>`
+    const [row] = await this.sql<QueryHandler.Row[]>`
       SELECT *
       FROM ${this.sql(tableName)}
       WHERE key = ${key}
@@ -108,7 +119,7 @@ export class QueryHandler<StoredValue = unknown> {
 
   public async getMany(keys: string[]): Promise<Record<string, StoredValue | null>> {
     const { tableName, disableSerialization } = this.options;
-    const rows = await this.sql<QueryHandler.RowData[]>`
+    const rows = await this.sql<QueryHandler.Row[]>`
       SELECT *
       FROM ${this.sql(tableName)}
       WHERE key
@@ -125,22 +136,21 @@ export class QueryHandler<StoredValue = unknown> {
   }
 
   public async set(key: string, value: StoredValue): Promise<void> {
-    const { tableName, disableSerialization, version } = this.options;
+    const { tableName, disableSerialization } = this.options;
 
     await this.sql`
       INSERT INTO ${this.sql(tableName)} ${this.sql(
-      { key, value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)), version },
+      { key, value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)) },
       'key',
-      'value',
-      'version'
+      'value'
     )}
       ON CONFLICT (key)
-      DO UPDATE SET ${this.sql({ value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)), version }, 'value', 'version')}
+      DO UPDATE SET ${this.sql({ value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)) }, 'value')}
     `;
   }
 
   public async setMany(entries: [string, StoredValue][], overwrite: boolean): Promise<void> {
-    const { tableName, disableSerialization, version } = this.options;
+    const { tableName, disableSerialization } = this.options;
 
     if (overwrite) {
       await this.sql`
@@ -148,22 +158,18 @@ export class QueryHandler<StoredValue = unknown> {
       ${this.sql(
         entries.map(([key, value]) => ({
           key,
-          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)),
-          version
+          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value))
         })),
         'key',
-        'value',
-        'version'
+        'value'
       )}
       ON CONFLICT (key)
       DO UPDATE SET
       ${this.sql(
         entries.map(([, value]) => ({
-          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)),
-          version
+          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value))
         })),
-        'value',
-        'version'
+        'value'
       )}
     `;
     } else {
@@ -172,12 +178,10 @@ export class QueryHandler<StoredValue = unknown> {
       ${this.sql(
         entries.map(([key, value]) => ({
           key,
-          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)),
-          version
+          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value))
         })),
         'key',
-        'value',
-        'version'
+        'value'
       )}
       ON CONFLICT DO NOTHING
       `;
@@ -196,12 +200,23 @@ export class QueryHandler<StoredValue = unknown> {
 
   public async values(): Promise<StoredValue[]> {
     const { tableName, disableSerialization } = this.options;
-    const rows = await this.sql<Omit<QueryHandler.RowData, 'key' | 'version'>[]>`
+    const rows = await this.sql<Pick<QueryHandler.Row, 'value'>[]>`
       SELECT value
       FROM ${this.sql(tableName)}
     `;
 
     return rows.map((row) => (disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value))));
+  }
+
+  public async fetchMetadata(): Promise<QueryHandler.MetadataRow> {
+    const { tableName } = this.options;
+    const [row] = await this.sql<QueryHandler.MetadataRow[]>`
+      SELECT *
+      FROM internal_metadata
+      WHERE name = ${tableName}
+    `;
+
+    return row;
   }
 }
 
@@ -216,10 +231,14 @@ export namespace QueryHandler {
     version: string;
   }
 
-  export interface RowData {
+  export interface Row {
     key: string;
 
     value: string;
+  }
+
+  export interface MetadataRow {
+    name: string;
 
     version: string;
   }

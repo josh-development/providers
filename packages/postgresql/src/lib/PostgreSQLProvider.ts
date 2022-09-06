@@ -67,7 +67,9 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
 
   public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
     await this.handler.init();
+
     context = await super.init(context);
+
     return context;
   }
 
@@ -309,7 +311,7 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
   public async [Method.Has](payload: Payloads.Has): Promise<Payloads.Has> {
     const { key, path } = payload;
 
-    payload.data = (await this.handler.has(key)) && path.length === 0 ? true : hasProperty(await this.handler.get(key), path);
+    payload.data = (await this.handler.has(key)) && (path.length === 0 ? true : hasProperty(await this.handler.get(key), path));
 
     return payload;
   }
@@ -711,15 +713,9 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
   }
 
   protected async fetchVersion() {
-    if ((await this.handler.size()) === 0) return this.version;
+    const metadata = await this.handler.fetchMetadata();
 
-    const [row] = await this.handler.sql<[Omit<QueryHandler.RowData, 'key' | 'value'>]>`
-      SELECT version
-      FROM "data"
-      LIMIT 1
-    `;
-
-    return this.resolveVersion(row.version);
+    return this.resolveVersion(metadata.version);
   }
 
   public static defaultConnectionDetails: PostgreSQLProvider.ConnectionDetails = { host: 'localhost', port: 5432, user: 'postgres' };
