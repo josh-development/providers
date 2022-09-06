@@ -26,10 +26,36 @@ import { resolve } from 'node:path';
 import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 import { ChunkIndexFile } from './chunk-files/ChunkIndexFile';
 import { ChunkHandler } from './ChunkHandler';
-import type { File } from './File';
+import { File } from './File';
 
 export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: JSONProvider.Options;
+
+  public migrations: JoshProvider.Migration[] = [
+    {
+      version: { major: 1, minor: 0, patch: 0 },
+      run: async (context) => {
+        const { dataDirectory, useAbsolutePath } = this.options;
+        const directory = useAbsolutePath ? resolve(dataDirectory ?? 'data') : resolve(process.cwd(), dataDirectory ?? 'data');
+        const file = new File({ name: context.name, directory, serialize: false });
+
+        if (file.exists) {
+          const data = await file.read<LegacyIndexData | ChunkIndexFile.Data>();
+
+          if ('files' in data) {
+            const index = new ChunkIndexFile({ directory, version: this.version });
+
+            await index.save({
+              name: context.name,
+              version: this.version,
+              autoKeyCount: 0,
+              chunks: data.files.map((file) => ({ id: file.location, keys: file.keys }))
+            });
+          }
+        }
+      }
+    }
+  ];
 
   private _handler?: ChunkHandler<StoredValue>;
 
@@ -770,4 +796,14 @@ export namespace JSONProvider {
   export enum Identifiers {
     ChunkHandlerNotFound = 'chunkHandlerNotFound'
   }
+}
+
+interface LegacyIndexData {
+  files: LegacyIndexFileData[];
+}
+
+interface LegacyIndexFileData {
+  keys: string[];
+
+  location: string;
 }
