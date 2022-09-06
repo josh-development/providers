@@ -66,10 +66,8 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
   }
 
   public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
-    context = await super.init(context);
-
     await this.handler.init();
-
+    context = await super.init(context);
     return context;
   }
 
