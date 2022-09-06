@@ -125,7 +125,7 @@ jobs:
           name: coverage
           path: coverage/
   sqlite:
-    name: RedisProvider
+    name: SQLiteProvider
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Project

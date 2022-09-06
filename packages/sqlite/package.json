@@ -3,7 +3,9 @@
   "version": "2.0.0",
   "description": "A Josh provider for @joshdb/core which uses Sqlite",
   "author": "Évelyne Lachance <eslachance@gmail.com> (https://evie.codes/)",
-  "contributors": [],
+  "contributors": [
+    "Hezekiah Hendry <hezekiah.hendry@gmail.com>"
+  ],
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
