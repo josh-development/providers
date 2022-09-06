@@ -29,8 +29,8 @@ import { resolve } from 'node:path';
 import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 import { QueryHandler } from './QueryHandler';
 
-export class SqliteProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
-  public declare options: SqliteProvider.Options;
+export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
+  public declare options: SQLiteProvider.Options;
 
   public migrations: JoshProvider.Migration[] = [
     {
@@ -72,7 +72,7 @@ export class SqliteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 
   private _handler?: QueryHandler<StoredValue>;
 
-  public constructor(options: Partial<SqliteProvider.Options>) {
+  public constructor(options: Partial<SQLiteProvider.Options>) {
     super(options);
 
     this.options = {
@@ -93,7 +93,7 @@ export class SqliteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
   private get handler(): QueryHandler<StoredValue> {
     if (this._handler instanceof QueryHandler) return this._handler;
 
-    throw this.error(SqliteProvider.Identifiers.HandlerNotFound);
+    throw this.error(SQLiteProvider.Identifiers.HandlerNotFound);
   }
 
   public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
@@ -762,7 +762,7 @@ export class SqliteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     if (result !== null) return result;
 
     switch (identifier) {
-      case SqliteProvider.Identifiers.HandlerNotFound:
+      case SQLiteProvider.Identifiers.HandlerNotFound:
         return 'The "QueryHandler" was not found for this provider. This usually means the "init()" method was not invoked.';
     }
 
@@ -795,7 +795,7 @@ export class SqliteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
   }
 }
 
-export namespace SqliteProvider {
+export namespace SQLiteProvider {
   export interface Options extends JoshProvider.Options {
     tableName: string;
 

@@ -1,2 +1,2 @@
 export * from './lib/QueryHandler';
-export * from './lib/SqliteProvider';
+export * from './lib/SQLiteProvider';

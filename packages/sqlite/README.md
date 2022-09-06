@@ -16,7 +16,7 @@
 
 ## Description
 
-A Josh provider for @joshdb/core which uses Sqlite
+A Josh provider for @joshdb/core which uses SQLite
 
 ## Features
 
