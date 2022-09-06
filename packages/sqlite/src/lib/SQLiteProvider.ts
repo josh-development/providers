@@ -18,9 +18,9 @@ import {
   JoshProvider,
   MathOperator,
   Method,
-  Payloads,
-  resolveCommonIdentifier
+  Payloads
 } from '@joshdb/provider';
+import { toJSON } from '@joshdb/serialize';
 import { isPrimitive } from '@sapphire/utilities';
 import Database from 'better-sqlite3';
 import { existsSync } from 'node:fs';
@@ -36,7 +36,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     {
       version: { major: 1, minor: 0, patch: 0 },
       run: (context: JoshProvider.Context) => {
-        const { tableName = context.name, dataDirectory, persistent } = this.options;
+        const { tableName = context.name, dataDirectory, persistent, disableSerialization } = this.options;
 
         if (persistent && existsSync(resolve(dataDirectory, `${tableName}.sqlite`))) {
           const database = new Database(resolve(dataDirectory, `${tableName}.sqlite`));
@@ -44,25 +44,33 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 
           database.prepare(`DROP TABLE '${tableName}'`).run();
 
-          database.prepare(`CREATE TABLE '${tableName}' (key TEXT PRIMARY KEY, value TEXT NOT NULL, version TEXT NOT NULL)`).run();
+          database.prepare(`CREATE TABLE '${tableName}' (key TEXT PRIMARY KEY, value TEXT NOT NULL)`).run();
 
-          database
-            .prepare(`INSERT INTO '${tableName}' (key, value, version) VALUES ${entries.map(() => '(?, ?, ?)').join(', ')}`)
-            .run(entries.flatMap((entry: Omit<QueryHandler.Row, 'version'>) => [entry.key, entry.value, this.version]));
+          if (entries.length !== 0) {
+            database
+              .prepare(`INSERT INTO '${tableName}' (key, value) VALUES ${entries.map(() => '(?, ?)').join(', ')}`)
+              .run(...entries.flatMap((entry) => [entry.key, JSON.stringify(disableSerialization ? entry.value : toJSON(entry.value))]));
+          }
 
-          const autoNum = database.prepare(`SELECT lastnum FROM 'internal:autonum' WHERE josh = '${tableName}'`).get() as
+          const autoNum = database.prepare(`SELECT lastnum FROM 'internal::autonum' WHERE josh = '${tableName}'`).get() as
             | Pick<LegacyAutoNumRow, 'lastnum'>
             | undefined;
 
           if (autoNum?.lastnum) {
-            database.prepare(`CREATE TABLE IF NOT EXISTS 'internal:autoKey' (name TEXT PRIMARY KEY, lastKey INTEGER)`).run();
+            database
+              .prepare(`CREATE TABLE IF NOT EXISTS 'internal_metadata' (name TEXT PRIMARY KEY, version TEXT NOT NULL, autoKeyCount INTEGER)`)
+              .run();
+
+            const { major, minor, patch } = this.version;
 
             database
-              .prepare(`INSERT INTO 'internal:autoKey' (name, lastKey) VALUES (@name, @lastKey)`)
-              .run({ name: tableName, lastKey: autoNum.lastnum });
+              .prepare<QueryHandler.MetadataRow>(
+                `INSERT INTO 'internal_metadata' (name, version, autoKeyCount) VALUES (@name, @version, @autoKeyCount)`
+              )
+              .run({ name: tableName, version: `${major}.${minor}.${patch}`, autoKeyCount: autoNum.lastnum });
           }
 
-          database.prepare(`DELETE FROM 'internal:autonum' WHERE josh = '${tableName}'`).run();
+          database.prepare(`DELETE FROM 'internal::autonum' WHERE josh = '${tableName}'`).run();
 
           database.close();
         }
@@ -87,7 +95,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
   }
 
   public get version(): JoshProvider.Semver {
-    return this.resolveVersion('[VI]{version}[/VI]');
+    return process.env.NODE_ENV === 'test' ? { major: 2, minor: 0, patch: 0 } : this.resolveVersion('[VI]{version}[/VI]');
   }
 
   private get handler(): QueryHandler<StoredValue> {
@@ -757,20 +765,20 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
   }
 
   protected resolveIdentifier(identifier: string, metadata: Record<string, unknown>): string {
-    const result = resolveCommonIdentifier(identifier, metadata);
+    try {
+      return super.resolveIdentifier(identifier, metadata);
+    } catch {
+      switch (identifier) {
+        case SQLiteProvider.Identifiers.HandlerNotFound:
+          return 'The "QueryHandler" was not found for this provider. This usually means the "init()" method was not invoked.';
+      }
 
-    if (result !== null) return result;
-
-    switch (identifier) {
-      case SQLiteProvider.Identifiers.HandlerNotFound:
-        return 'The "QueryHandler" was not found for this provider. This usually means the "init()" method was not invoked.';
+      throw new Error(`Unknown identifier: ${identifier}`);
     }
-
-    throw new Error(`Unknown identifier: ${identifier}`);
   }
 
-  protected fetchVersion() {
-    const { tableName, dataDirectory, persistent } = this.options;
+  protected fetchVersion(context: JoshProvider.Context) {
+    const { tableName = context.name, dataDirectory, persistent } = this.options;
 
     if (!persistent) return this.version;
     if (!existsSync(resolve(dataDirectory, `${tableName}.sqlite`))) return this.version;
@@ -781,11 +789,13 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
       return { major: 1, minor: 0, patch: 0 };
     }
 
-    const table = database.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name = 'internal:autonum'`).get();
+    const table = database.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name = 'internal::autonum'`).get();
 
     if (table !== undefined) return { major: 1, minor: 0, patch: 0 };
 
-    const row = database.prepare(`SELECT version FROM '${tableName}' LIMIT 1`).get() as Pick<QueryHandler.Row, 'version'> | undefined;
+    const row = database.prepare(`SELECT version FROM 'internal_metadata' WHERE name = '${tableName}'`).get() as
+      | Pick<QueryHandler.MetadataRow, 'version'>
+      | undefined;
 
     database.close();
 

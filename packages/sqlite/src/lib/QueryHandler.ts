@@ -9,52 +9,56 @@ export class QueryHandler<StoredValue = unknown> {
   public constructor(options: QueryHandler.Options) {
     this.options = options;
 
-    const { database, tableName, wal } = options;
+    const { database, tableName, wal, version } = options;
 
     this.database = database;
 
-    this.database.prepare(`CREATE TABLE IF NOT EXISTS '${tableName}' (key TEXT PRIMARY KEY, value TEXT NOT NULL, version TEXT NOT NULL)`).run();
+    this.database.prepare(`CREATE TABLE IF NOT EXISTS '${tableName}' (key TEXT PRIMARY KEY, value TEXT NOT NULL)`).run();
 
     this.database.pragma('synchronous = 1');
 
     if (wal) this.database.pragma('journal_mode = wal');
     else this.database.pragma('journal_mode = delete');
 
-    this.database.prepare(`CREATE TABLE IF NOT EXISTS 'internal:autoKey' (name TEXT PRIMARY KEY, lastKey INTEGER)`).run();
+    this.database.prepare(`CREATE TABLE IF NOT EXISTS 'internal_metadata' (name TEXT PRIMARY KEY, version TEXT, autoKeyCount INTEGER)`).run();
 
     const result = this.database
-      .prepare<Pick<AutoKeyRow, 'name'>>(`SELECT EXISTS (SELECT 1 FROM 'internal:autoKey' WHERE name = @name)`)
-      .get({ name: tableName }) as AutoKeyRowExistsResult;
+      .prepare<Pick<QueryHandler.MetadataRow, 'name'>>(`SELECT EXISTS (SELECT 1 FROM 'internal_metadata' WHERE name = @name)`)
+      .get({ name: tableName }) as MetadataRowExistsResult;
 
-    if (result[Result.AutoKeyRowExists] === 0) {
-      this.database.prepare(`INSERT INTO 'internal:autoKey' (name, lastKey) VALUES (@name, @lastKey)`).run({
+    if (result[Result.MetadataRowExists] === 0) {
+      this.database.prepare(`INSERT INTO 'internal_metadata' (name, version, autoKeyCount) VALUES (@name, @version, @autoKeyCount)`).run({
         name: tableName,
-        lastKey: 0
+        version,
+        autoKeyCount: 0
       });
     }
   }
 
   public autoKey(): string {
-    const { tableName } = this.options;
-    let { lastKey } = this.database
-      .prepare<Pick<AutoKeyRow, 'name'>>(`SELECT lastKey FROM 'internal:autoKey' WHERE name = @name`)
-      .get({ name: tableName }) as Pick<AutoKeyRow, 'lastKey'>;
+    const { tableName, version } = this.options;
+    let { autoKeyCount } = this.database
+      .prepare<Pick<QueryHandler.MetadataRow, 'name'>>(`SELECT autoKeyCount FROM 'internal_metadata' WHERE name = @name`)
+      .get({ name: tableName }) as Pick<QueryHandler.MetadataRow, 'autoKeyCount'>;
 
-    lastKey++;
+    autoKeyCount++;
 
-    this.database.prepare<AutoKeyRow>(`UPDATE 'internal:autoKey' SET lastKey = @lastKey WHERE name = @name`).run({ name: tableName, lastKey });
+    this.database
+      .prepare<QueryHandler.MetadataRow>(`UPDATE 'internal_metadata' SET autoKeyCount = @autoKeyCount WHERE name = @name`)
+      .run({ name: tableName, version, autoKeyCount });
 
-    return lastKey.toString();
+    return autoKeyCount.toString();
   }
 
   public clear(): void {
-    const { tableName } = this.options;
+    const { tableName, version } = this.options;
 
     this.database.prepare(`DELETE FROM '${tableName}'`).run();
-    this.database.prepare<Pick<AutoKeyRow, 'name'>>(`DELETE FROM 'internal:autoKey' WHERE name = @name`).run({ name: tableName });
-    this.database.prepare<AutoKeyRow>(`INSERT INTO 'internal:autoKey' (name, lastKey) VALUES (@name, @lastKey)`).run({
+    this.database.prepare<Pick<QueryHandler.MetadataRow, 'name'>>(`DELETE FROM 'internal_metadata' WHERE name = @name`).run({ name: tableName });
+    this.database.prepare<QueryHandler.MetadataRow>(`INSERT INTO 'internal_metadata' (name, autoKeyCount) VALUES (@name, @autoKeyCount)`).run({
       name: tableName,
-      lastKey: 0
+      version,
+      autoKeyCount: 0
     });
   }
 
@@ -74,9 +78,9 @@ export class QueryHandler<StoredValue = unknown> {
     const { tableName, disableSerialization } = this.options;
 
     return this.database
-      .prepare(`SELECT key, value FROM '${tableName}'`)
+      .prepare(`SELECT * FROM '${tableName}'`)
       .all()
-      .map((row: Omit<QueryHandler.Row, 'version'>) => [row.key, disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value))]);
+      .map((row: QueryHandler.Row) => [row.key, disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value))]);
   }
 
   public has(key: string): boolean {
@@ -114,43 +118,42 @@ export class QueryHandler<StoredValue = unknown> {
     const { tableName, disableSerialization } = this.options;
 
     return this.database
-      .prepare(`SELECT key, value FROM '${tableName}' WHERE key IN (${keys.map(() => '?').join(', ')})`)
+      .prepare(`SELECT * FROM '${tableName}' WHERE key IN (${keys.map(() => '?').join(', ')})`)
       .all(keys)
-      .reduce<Record<string, StoredValue | null>>((obj, row: Omit<QueryHandler.Row, 'version'>) => {
+      .reduce<Record<string, StoredValue | null>>((obj, row: QueryHandler.Row) => {
         obj[row.key] = disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value));
         return obj;
       }, {});
   }
 
   public set<Value = StoredValue>(key: string, value: Value): void {
-    const { tableName, version, disableSerialization } = this.options;
+    const { tableName, disableSerialization } = this.options;
 
     this.database
-      .prepare(
-        `INSERT OR REPLACE INTO '${tableName}' (key, value, version) VALUES (@key, @value, @version) ON CONFLICT (key) DO UPDATE SET value = excluded.value`
+      .prepare<QueryHandler.Row>(
+        `INSERT OR REPLACE INTO '${tableName}' (key, value) VALUES (@key, @value) ON CONFLICT (key) DO UPDATE SET value = excluded.value`
       )
       .run({
         key,
-        value: JSON.stringify(disableSerialization ? value : toJSON(value)),
-        version
+        value: JSON.stringify(disableSerialization ? value : toJSON(value))
       });
   }
 
   public setMany(entries: [string, StoredValue][], overwrite: boolean): void {
-    const { tableName, version, disableSerialization } = this.options;
+    const { tableName, disableSerialization } = this.options;
 
     if (overwrite) {
       this.database
         .prepare(
-          `INSERT INTO '${tableName}' (key, value, version) VALUES ${entries
-            .map(() => '(?, ?, ?)')
+          `INSERT INTO '${tableName}' (key, value) VALUES ${entries
+            .map(() => '(?, ?)')
             .join(', ')} ON CONFLICT (key) DO UPDATE SET value = excluded.value`
         )
-        .run(entries.flatMap(([key, value]) => [key, JSON.stringify(disableSerialization ? value : toJSON(value)), version]));
+        .run(entries.flatMap(([key, value]) => [key, JSON.stringify(disableSerialization ? value : toJSON(value))]));
     } else {
       this.database
-        .prepare(`INSERT INTO '${tableName}' (key, value, version) VALUES ${entries.map(() => '(?, ?, ?)').join(', ')} ON CONFLICT DO NOTHING`)
-        .run(entries.flatMap(([key, value]) => [key, JSON.stringify(disableSerialization ? value : toJSON(value)), version]));
+        .prepare(`INSERT INTO '${tableName}' (key, value) VALUES ${entries.map(() => '(?, ?)').join(', ')} ON CONFLICT DO NOTHING`)
+        .run(entries.flatMap(([key, value]) => [key, JSON.stringify(disableSerialization ? value : toJSON(value))]));
     }
   }
 
@@ -188,27 +191,27 @@ export namespace QueryHandler {
     key: string;
 
     value: string;
+  }
+
+  export interface MetadataRow {
+    name: string;
 
     version: string;
+
+    autoKeyCount: number;
   }
 }
 
-export interface AutoKeyRow {
-  name: string;
-
-  lastKey: number;
-}
-
-export enum Result {
-  AutoKeyRowExists = "EXISTS (SELECT 1 FROM 'internal:autoKey' WHERE name = @name)",
+enum Result {
+  MetadataRowExists = "EXISTS (SELECT 1 FROM 'internal_metadata' WHERE name = @name)",
 
   Count = 'COUNT(*)'
 }
 
-export interface AutoKeyRowExistsResult {
-  [Result.AutoKeyRowExists]: number;
+interface MetadataRowExistsResult {
+  [Result.MetadataRowExists]: number;
 }
 
-export interface CountResult {
+interface CountResult {
   [Result.Count]: number;
 }
