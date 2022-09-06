@@ -723,9 +723,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   public static defaultConnectionConfig: MariaProvider.ConnectionConfig = {
+    database: 'josh',
     user: 'josh',
-    password: 'josh',
-    database: 'josh'
+    password: 'josh'
   };
 }
 
