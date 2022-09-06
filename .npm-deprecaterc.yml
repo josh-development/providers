@@ -5,3 +5,4 @@ package:
   - '@joshdb/mongo'
   - '@joshdb/redis'
   - '@joshdb/maria'
+  - '@joshdb/sqlite'
