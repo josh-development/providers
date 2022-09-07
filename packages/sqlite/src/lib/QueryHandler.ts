@@ -1,4 +1,4 @@
-import { toJSON, toRaw } from '@joshdb/serialize';
+import { SerializeJSON, toJSON, toRaw } from '@joshdb/serialize';
 import type Database from 'better-sqlite3';
 
 export class QueryHandler<StoredValue = unknown> {
@@ -9,7 +9,7 @@ export class QueryHandler<StoredValue = unknown> {
   public constructor(options: QueryHandler.Options) {
     this.options = options;
 
-    const { database, tableName, wal, version } = options;
+    const { database, tableName, wal, version, disableSerialization } = options;
 
     this.database = database;
 
@@ -20,23 +20,64 @@ export class QueryHandler<StoredValue = unknown> {
     if (wal) this.database.pragma('journal_mode = wal');
     else this.database.pragma('journal_mode = delete');
 
-    this.database.prepare(`CREATE TABLE IF NOT EXISTS 'internal_metadata' (name TEXT PRIMARY KEY, version TEXT, autoKeyCount INTEGER)`).run();
+    this.database
+      .prepare(`CREATE TABLE IF NOT EXISTS 'internal_metadata' (name TEXT PRIMARY KEY, version TEXT, autoKeyCount INTEGER, serializedKeys TEXT)`)
+      .run();
 
     const result = this.database
       .prepare<Pick<QueryHandler.MetadataRow, 'name'>>(`SELECT EXISTS (SELECT 1 FROM 'internal_metadata' WHERE name = @name)`)
       .get({ name: tableName }) as MetadataRowExistsResult;
 
     if (result[Result.MetadataRowExists] === 0) {
-      this.database.prepare(`INSERT INTO 'internal_metadata' (name, version, autoKeyCount) VALUES (@name, @version, @autoKeyCount)`).run({
-        name: tableName,
-        version,
-        autoKeyCount: 0
-      });
+      this.database
+        .prepare<QueryHandler.MetadataRow>(
+          `INSERT INTO 'internal_metadata' (name, version, autoKeyCount, serializedKeys) VALUES (@name, @version, @autoKeyCount, @serializedKeys)`
+        )
+        .run({
+          name: tableName,
+          version,
+          autoKeyCount: 0,
+          serializedKeys: JSON.stringify([])
+        });
+    }
+
+    const metadata = this.database
+      .prepare<Pick<QueryHandler.MetadataRow, 'name'>>(`SELECT serializedKeys FROM 'internal_metadata' WHERE name = @name`)
+      .get({
+        name: tableName
+      }) as Pick<QueryHandler.MetadataRow, 'serializedKeys'>;
+
+    const serializedKeys = JSON.parse(metadata.serializedKeys) as string[];
+
+    if (serializedKeys.length && disableSerialization) {
+      for (const [key, value] of this.entries()) this.set(key, toRaw(value as SerializeJSON));
+
+      this.database
+        .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>>(
+          `UPDATE 'internal_metadata' SET serializedKeys = @serializedKeys WHERE name = @name`
+        )
+        .run({
+          name: tableName,
+          serializedKeys: JSON.stringify([])
+        });
+    } else if (!serializedKeys.length && !disableSerialization) {
+      const entries = this.entries();
+
+      for (const [key, value] of this.entries()) this.set(key, toJSON(value));
+
+      this.database
+        .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>>(
+          `UPDATE 'internal_metadata' SET serializedKeys = @serializedKeys WHERE name = @name`
+        )
+        .run({
+          name: tableName,
+          serializedKeys: JSON.stringify(entries.map(([key]) => key))
+        });
     }
   }
 
   public autoKey(): string {
-    const { tableName, version } = this.options;
+    const { tableName } = this.options;
     let { autoKeyCount } = this.database
       .prepare<Pick<QueryHandler.MetadataRow, 'name'>>(`SELECT autoKeyCount FROM 'internal_metadata' WHERE name = @name`)
       .get({ name: tableName }) as Pick<QueryHandler.MetadataRow, 'autoKeyCount'>;
@@ -44,8 +85,10 @@ export class QueryHandler<StoredValue = unknown> {
     autoKeyCount++;
 
     this.database
-      .prepare<QueryHandler.MetadataRow>(`UPDATE 'internal_metadata' SET autoKeyCount = @autoKeyCount WHERE name = @name`)
-      .run({ name: tableName, version, autoKeyCount });
+      .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'autoKeyCount'>>(
+        `UPDATE 'internal_metadata' SET autoKeyCount = @autoKeyCount WHERE name = @name`
+      )
+      .run({ name: tableName, autoKeyCount });
 
     return autoKeyCount.toString();
   }
@@ -55,11 +98,16 @@ export class QueryHandler<StoredValue = unknown> {
 
     this.database.prepare(`DELETE FROM '${tableName}'`).run();
     this.database.prepare<Pick<QueryHandler.MetadataRow, 'name'>>(`DELETE FROM 'internal_metadata' WHERE name = @name`).run({ name: tableName });
-    this.database.prepare<QueryHandler.MetadataRow>(`INSERT INTO 'internal_metadata' (name, autoKeyCount) VALUES (@name, @autoKeyCount)`).run({
-      name: tableName,
-      version,
-      autoKeyCount: 0
-    });
+    this.database
+      .prepare<QueryHandler.MetadataRow>(
+        `INSERT INTO 'internal_metadata' (name, version, autoKeyCount, serializedKeys) VALUES (@name, @version, @autoKeyCount, @serializedKeys)`
+      )
+      .run({
+        name: tableName,
+        version,
+        autoKeyCount: 0,
+        serializedKeys: JSON.stringify([])
+      });
   }
 
   public delete(key: string): void {
@@ -137,6 +185,22 @@ export class QueryHandler<StoredValue = unknown> {
         key,
         value: JSON.stringify(disableSerialization ? value : toJSON(value))
       });
+
+    const row = this.database
+      .prepare<Pick<QueryHandler.MetadataRow, 'name'>>(`SELECT serializedKeys FROM 'internal_metadata' WHERE name = @name`)
+      .get({ name: tableName }) as Pick<QueryHandler.MetadataRow, 'serializedKeys'>;
+
+    const serializedKeys = JSON.parse(row.serializedKeys) as string[];
+
+    if (!serializedKeys.includes(key)) {
+      serializedKeys.push(key);
+
+      this.database
+        .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>>(
+          `UPDATE 'internal_metadata' SET serializedKeys = @serializedKeys WHERE name = @name`
+        )
+        .run({ name: tableName, serializedKeys: JSON.stringify(serializedKeys) });
+    }
   }
 
   public setMany(entries: [string, StoredValue][], overwrite: boolean): void {
@@ -154,6 +218,30 @@ export class QueryHandler<StoredValue = unknown> {
       this.database
         .prepare(`INSERT INTO '${tableName}' (key, value) VALUES ${entries.map(() => '(?, ?)').join(', ')} ON CONFLICT DO NOTHING`)
         .run(entries.flatMap(([key, value]) => [key, JSON.stringify(disableSerialization ? value : toJSON(value))]));
+    }
+
+    const row = this.database
+      .prepare<Pick<QueryHandler.MetadataRow, 'name'>>(`SELECT serializedKeys FROM 'internal_metadata' WHERE name = @name`)
+      .get({ name: tableName }) as Pick<QueryHandler.MetadataRow, 'serializedKeys'>;
+
+    const serializedKeys = JSON.parse(row.serializedKeys) as string[];
+    const { length } = serializedKeys;
+
+    for (const [key] of entries) {
+      if (!serializedKeys.includes(key)) {
+        serializedKeys.push(key);
+      }
+    }
+
+    if (serializedKeys.length !== length) {
+      this.database
+        .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>>(
+          `UPDATE 'internal_metadata' SET serializedKeys = @serializedKeys WHERE name = @name`
+        )
+        .run({
+          name: tableName,
+          serializedKeys: JSON.stringify(row.serializedKeys)
+        });
     }
   }
 
@@ -199,6 +287,8 @@ export namespace QueryHandler {
     version: string;
 
     autoKeyCount: number;
+
+    serializedKeys: string;
   }
 }
 

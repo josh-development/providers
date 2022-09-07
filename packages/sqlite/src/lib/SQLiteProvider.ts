@@ -40,7 +40,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 
         if (persistent && existsSync(resolve(dataDirectory, `${tableName}.sqlite`))) {
           const database = new Database(resolve(dataDirectory, `${tableName}.sqlite`));
-          const entries = database.prepare(`SELECT * FROM '${tableName}' WHERE path = '::NULL::'`).all();
+          const entries = database.prepare(`SELECT * FROM '${tableName}' WHERE path = '::NULL::'`).all() as Record<'key' | 'value', string>[];
 
           database.prepare(`DROP TABLE '${tableName}'`).run();
 
@@ -58,16 +58,23 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 
           if (autoNum?.lastnum) {
             database
-              .prepare(`CREATE TABLE IF NOT EXISTS 'internal_metadata' (name TEXT PRIMARY KEY, version TEXT NOT NULL, autoKeyCount INTEGER)`)
+              .prepare(
+                `CREATE TABLE IF NOT EXISTS 'internal_metadata' (name TEXT PRIMARY KEY, version TEXT NOT NULL, autoKeyCount INTEGER, serializedKeys TEXT)`
+              )
               .run();
 
             const { major, minor, patch } = this.version;
 
             database
               .prepare<QueryHandler.MetadataRow>(
-                `INSERT INTO 'internal_metadata' (name, version, autoKeyCount) VALUES (@name, @version, @autoKeyCount)`
+                `INSERT INTO 'internal_metadata' (name, version, autoKeyCount, serializedKeys) VALUES (@name, @version, @autoKeyCount, @serializedKeys)`
               )
-              .run({ name: tableName, version: `${major}.${minor}.${patch}`, autoKeyCount: autoNum.lastnum });
+              .run({
+                name: tableName,
+                version: `${major}.${minor}.${patch}`,
+                autoKeyCount: autoNum.lastnum,
+                serializedKeys: JSON.stringify(disableSerialization ? [] : entries.map((entry) => entry.key))
+              });
           }
 
           database.prepare(`DELETE FROM 'internal::autonum' WHERE josh = '${tableName}'`).run();
