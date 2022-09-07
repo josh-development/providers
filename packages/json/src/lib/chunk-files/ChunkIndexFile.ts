@@ -68,4 +68,14 @@ export namespace ChunkIndexFile {
 
     serialized: boolean;
   }
+
+  export interface LegacyData {
+    files: LegacyFileData[];
+  }
+
+  export interface LegacyFileData {
+    keys: string[];
+
+    location: string;
+  }
 }

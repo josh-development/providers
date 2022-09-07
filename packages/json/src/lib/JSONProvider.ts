@@ -42,7 +42,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
           : resolve(process.cwd(), dataDirectory ?? 'data', context.name);
 
         const index = new ChunkIndexFile({ directory, version: this.version });
-        const data = (await index.fetch()) as LegacyIndexData | ChunkIndexFile.Data;
+        const data = (await index.fetch()) as ChunkIndexFile.LegacyData | ChunkIndexFile.Data;
         const snowflake = epoch === undefined ? TwitterSnowflake : new Snowflake(epoch);
 
         if ('files' in data) {
@@ -779,10 +779,10 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return this.isLegacyIndexData(data) ? { major: 1, minor: 0, patch: 0 } : data.version;
   }
 
-  private isLegacyIndexData(data: unknown): data is LegacyIndexData {
+  private isLegacyIndexData(data: unknown): data is ChunkIndexFile.LegacyData {
     if (typeof data !== 'object' || data === null) return false;
 
-    const { files } = data as LegacyIndexData;
+    const { files } = data as ChunkIndexFile.LegacyData;
 
     return Array.isArray(files) && files.every((file) => typeof file === 'object' && Array.isArray(file.keys) && typeof file.location === 'string');
   }
@@ -808,14 +808,4 @@ export namespace JSONProvider {
   export enum Identifiers {
     ChunkHandlerNotFound = 'chunkHandlerNotFound'
   }
-}
-
-interface LegacyIndexData {
-  files: LegacyIndexFileData[];
-}
-
-interface LegacyIndexFileData {
-  keys: string[];
-
-  location: string;
 }
