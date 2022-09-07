@@ -165,12 +165,7 @@ export class QueryHandler<StoredValue = unknown> {
       )}
       ON CONFLICT (key)
       DO UPDATE SET
-      ${this.sql(
-        entries.map(([, value]) => ({
-          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value))
-        })),
-        'value'
-      )}
+      value = excluded.value
     `;
     } else {
       await this.sql`
