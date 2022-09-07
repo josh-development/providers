@@ -18,15 +18,16 @@ import {
   JoshProvider,
   MathOperator,
   Method,
-  Payloads,
-  resolveCommonIdentifier
+  Payloads
 } from '@joshdb/provider';
+import { Snowflake, TwitterSnowflake } from '@sapphire/snowflake';
 import { isPrimitive } from '@sapphire/utilities';
 import { resolve } from 'node:path';
 import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
+import { ChunkFile } from './chunk-files/ChunkFile';
 import { ChunkIndexFile } from './chunk-files/ChunkIndexFile';
 import { ChunkHandler } from './ChunkHandler';
-import { File } from './File';
+import type { File } from './File';
 
 export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: JSONProvider.Options;
@@ -35,23 +36,32 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     {
       version: { major: 1, minor: 0, patch: 0 },
       run: async (context) => {
-        const { dataDirectory, useAbsolutePath } = this.options;
-        const directory = useAbsolutePath ? resolve(dataDirectory ?? 'data') : resolve(process.cwd(), dataDirectory ?? 'data');
-        const file = new File({ name: context.name, directory, serialize: false });
+        const { dataDirectory, useAbsolutePath, epoch, disableSerialization } = this.options;
+        const directory = useAbsolutePath
+          ? resolve(dataDirectory ?? 'data', context.name)
+          : resolve(process.cwd(), dataDirectory ?? 'data', context.name);
 
-        if (file.exists) {
-          const data = await file.read<LegacyIndexData | ChunkIndexFile.Data>();
+        const index = new ChunkIndexFile({ directory, version: this.version });
+        const data = (await index.fetch()) as LegacyIndexData | ChunkIndexFile.Data;
+        const snowflake = epoch === undefined ? TwitterSnowflake : new Snowflake(epoch);
 
-          if ('files' in data) {
-            const index = new ChunkIndexFile({ directory, version: this.version });
+        if ('files' in data) {
+          const chunks = [];
 
-            await index.save({
-              name: context.name,
-              version: this.version,
-              autoKeyCount: 0,
-              chunks: data.files.map((file) => ({ id: file.location, keys: file.keys }))
-            });
+          for (const file of data.files) {
+            const id = snowflake.generate().toString();
+
+            await new ChunkFile({ directory, id: file.location, serialize: !disableSerialization }).rename(resolve(directory, `${id}.json`));
+
+            chunks.push({ id, keys: file.keys });
           }
+
+          await index.save({
+            name: context.name,
+            version: this.version,
+            autoKeyCount: 0,
+            chunks
+          });
         }
       }
     }
@@ -64,7 +74,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
   }
 
   public get version(): JoshProvider.Semver {
-    return this.resolveVersion('[VI]{version}[/VI]');
+    return process.env.NODE_ENV === 'test' ? { major: 2, minor: 0, patch: 0 } : this.resolveVersion('[VI]{version}[/VI]');
   }
 
   private get handler(): ChunkHandler<StoredValue> {
@@ -744,16 +754,16 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
   }
 
   protected resolveIdentifier(identifier: string, metadata: Record<string, unknown>): string {
-    const result = resolveCommonIdentifier(identifier, metadata);
+    try {
+      return super.resolveIdentifier(identifier, metadata);
+    } catch {
+      switch (identifier) {
+        case JSONProvider.Identifiers.ChunkHandlerNotFound:
+          return 'The "ChunkHandler" was not found for this provider. This usually means the "init()" method was not invoked.';
+      }
 
-    if (result !== null) return result;
-
-    switch (identifier) {
-      case JSONProvider.Identifiers.ChunkHandlerNotFound:
-        return 'The "ChunkHandler" was not found for this provider. This usually means the "init()" method was not invoked.';
+      throw new Error(`Unknown identifier: ${identifier}`);
     }
-
-    throw new Error(`Unknown identifier: ${identifier}`);
   }
 
   protected async fetchVersion(context: JoshProvider.Context) {
@@ -769,10 +779,12 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return this.isLegacyIndexData(data) ? { major: 1, minor: 0, patch: 0 } : data.version;
   }
 
-  private isLegacyIndexData(data: unknown): data is { files: { key: string; location: string }[] } {
-    return (
-      Array.isArray(data) && data.every((entry) => typeof entry === 'object' && typeof entry.key === 'string' && typeof entry.location === 'string')
-    );
+  private isLegacyIndexData(data: unknown): data is LegacyIndexData {
+    if (typeof data !== 'object' || data === null) return false;
+
+    const { files } = data as LegacyIndexData;
+
+    return Array.isArray(files) && files.every((file) => typeof file === 'object' && Array.isArray(file.keys) && typeof file.location === 'string');
   }
 }
 
