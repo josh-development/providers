@@ -53,7 +53,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
 
             await new ChunkFile({ directory, id: file.location, serialize: !disableSerialization }).rename(resolve(directory, `${id}.json`));
 
-            chunks.push({ id, keys: file.keys });
+            chunks.push({ id, keys: file.keys, serialized: !disableSerialization });
           }
 
           await index.save({

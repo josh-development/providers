@@ -1,4 +1,5 @@
 import type { JoshProvider } from '@joshdb/provider';
+import { SerializeJSON, toJSON, toRaw } from '@joshdb/serialize';
 import { AsyncQueue } from '@sapphire/async-queue';
 import { Snowflake, TwitterSnowflake } from '@sapphire/snowflake';
 import { mkdir } from 'node:fs/promises';
@@ -36,10 +37,28 @@ export class ChunkHandler<StoredValue = unknown> {
 
     this.queue.shift();
 
-    const { name, version, synchronize } = this.options;
+    const { name, version, synchronize, serialize } = this.options;
 
     if (!this.index.exists) await this.index.save({ name, version, autoKeyCount: 0, chunks: [] });
     if (synchronize) await this.synchronize();
+
+    const [index, done] = await this.useQueue();
+
+    for (const chunk of index.chunks) {
+      if (chunk.serialized && !serialize) {
+        const file = this.getChunkFile(chunk.id);
+        const data = await file.fetch();
+
+        for (const key of chunk.keys) data[key] = toRaw(data[key] as unknown as SerializeJSON) as StoredValue;
+      } else if (!chunk.serialized && serialize) {
+        const file = this.getChunkFile(chunk.id);
+        const data = await file.fetch();
+
+        for (const key of chunk.keys) data[key] = toJSON(data[key]) as StoredValue;
+      }
+    }
+
+    done();
 
     return this;
   }
@@ -74,6 +93,7 @@ export class ChunkHandler<StoredValue = unknown> {
     }
 
     await this.index.save({ name: index.name, version: index.version, autoKeyCount: index.autoKeyCount, chunks });
+
     done();
   }
 
@@ -156,20 +176,6 @@ export class ChunkHandler<StoredValue = unknown> {
     return entries;
   }
 
-  public async has(key: string): Promise<boolean> {
-    const index = await this.fetchIndex();
-
-    for (const chunk of index.chunks) if (chunk.keys.some((k) => k === key)) return true;
-
-    return false;
-  }
-
-  public async keys(): Promise<string[]> {
-    const index = await this.fetchIndex();
-
-    return index.chunks.reduce<string[]>((keys, chunk) => [...keys, ...chunk.keys], []);
-  }
-
   public async get(key: string): Promise<StoredValue | undefined> {
     const chunkId = await this.locateChunkId(key);
 
@@ -209,8 +215,22 @@ export class ChunkHandler<StoredValue = unknown> {
     return entries;
   }
 
+  public async has(key: string): Promise<boolean> {
+    const index = await this.fetchIndex();
+
+    for (const chunk of index.chunks) if (chunk.keys.some((k) => k === key)) return true;
+
+    return false;
+  }
+
+  public async keys(): Promise<string[]> {
+    const index = await this.fetchIndex();
+
+    return index.chunks.reduce<string[]>((keys, chunk) => [...keys, ...chunk.keys], []);
+  }
+
   public async set<Value = StoredValue>(key: string, value: Value): Promise<void> {
-    const { maxChunkSize } = this.options;
+    const { maxChunkSize, serialize } = this.options;
     const chunkId = await this.locateChunkId(key);
     const [index, done] = await this.useQueue();
     const chunk = index.chunks.find((chunk) => chunk.keys.length < maxChunkSize);
@@ -224,7 +244,7 @@ export class ChunkHandler<StoredValue = unknown> {
     } else if (chunk === undefined) {
       const chunkId = this.snowflake.generate().toString();
 
-      index.chunks.push({ keys: [key], id: chunkId });
+      index.chunks.push({ keys: [key], id: chunkId, serialized: serialize });
       await this.index.save(index);
       // @ts-expect-error 2345
       await this.getChunkFile(chunkId).save({ [key]: value });
@@ -245,7 +265,7 @@ export class ChunkHandler<StoredValue = unknown> {
 
   public async setMany(entries: [string, StoredValue][], overwrite: boolean): Promise<void> {
     const [index, done] = await this.useQueue();
-    const { maxChunkSize } = this.options;
+    const { maxChunkSize, serialize } = this.options;
 
     for (const chunk of index.chunks) {
       const file = this.getChunkFile(chunk.id);
@@ -273,7 +293,7 @@ export class ChunkHandler<StoredValue = unknown> {
       for (const chunk of chunks) {
         const chunkId = this.snowflake.generate().toString();
 
-        index.chunks.push({ keys: chunk.map(([key]) => key), id: chunkId });
+        index.chunks.push({ keys: chunk.map(([key]) => key), id: chunkId, serialized: serialize });
         await this.index.save(index);
 
         const file = this.getChunkFile(chunkId);

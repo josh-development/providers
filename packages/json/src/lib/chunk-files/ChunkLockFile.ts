@@ -1,19 +1,19 @@
 import { File } from '../File';
 
 export class ChunkLockFile<StoredValue = unknown> extends File<StoredValue> {
-  public constructor(options: ChunkLockFileOptions) {
-    const { directory, id, serialize, retry } = options;
+  public constructor(options: ChunkLockFile.Options) {
+    const { directory, id, retry } = options;
 
-    super({ directory, name: `.temp-${id}.json.lock`, serialize, retry });
+    super({ directory, name: `.temp-${id}.json.lock`, retry });
   }
 }
 
-export interface ChunkLockFileOptions {
-  directory: string;
+export namespace ChunkLockFile {
+  export interface Options {
+    directory: string;
 
-  id: string;
+    id: string;
 
-  serialize: boolean;
-
-  retry?: File.RetryOptions;
+    retry?: File.RetryOptions;
+  }
 }

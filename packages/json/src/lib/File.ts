@@ -1,4 +1,3 @@
-import { toJSON, toRaw } from '@joshdb/serialize';
 import type { Awaitable } from '@sapphire/utilities';
 import { existsSync } from 'node:fs';
 import { copyFile, readFile, rename, rm, writeFile } from 'node:fs/promises';
@@ -27,15 +26,11 @@ export class File<StoredValue = unknown> {
   }
 
   public async read<Data = File.Data<StoredValue>>(): Promise<Data> {
-    return this.attempt<Data>(async () =>
-      this.options.serialize
-        ? toRaw(JSON.parse(await readFile(this.path, { encoding: 'utf-8' })))
-        : JSON.parse(await readFile(this.path, { encoding: 'utf-8' }))
-    );
+    return this.attempt<Data>(async () => JSON.parse(await readFile(this.path, { encoding: 'utf-8' })));
   }
 
   public async write<Data = File.Data<StoredValue>>(data: Data): Promise<void> {
-    await this.attempt(() => writeFile(this.path, JSON.stringify(this.options.serialize ? toJSON(data) : data)));
+    await this.attempt(() => writeFile(this.path, JSON.stringify(data)));
   }
 
   public async copy(to: string): Promise<void> {
@@ -68,8 +63,6 @@ export namespace File {
     directory: string;
 
     name: string;
-
-    serialize: boolean;
 
     retry?: RetryOptions;
   }

@@ -11,9 +11,9 @@ export class ChunkIndexFile extends File {
   public constructor(options: ChunkIndexFile.Options) {
     const { version, directory, retry } = options;
 
-    super({ directory, name: 'index.json', serialize: false, retry });
+    super({ directory, name: 'index.json', retry });
     this.version = version;
-    this.lock = new ChunkLockFile({ directory, id: 'index', serialize: false, retry });
+    this.lock = new ChunkLockFile({ directory, id: 'index', retry });
   }
 
   public async fetch(): Promise<ChunkIndexFile.Data> {
@@ -65,5 +65,7 @@ export namespace ChunkIndexFile {
     keys: string[];
 
     id: string;
+
+    serialized: boolean;
   }
 }
