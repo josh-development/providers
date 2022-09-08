@@ -283,6 +283,8 @@ export class ChunkHandler<StoredValue = unknown> {
           entries = entries.filter(([k]) => k !== key);
         }
       }
+
+      await file.save(data);
     }
 
     if (entries.length > 0) {
