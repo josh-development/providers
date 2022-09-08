@@ -471,7 +471,7 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
   }
 
   public [Method.Random](payload: Payloads.Random<StoredValue>): Payloads.Random<StoredValue> {
-    if (this.cache.size === 0) return payload;
+    if (this.cache.size === 0) return { ...payload, data: [] };
 
     const { count, duplicates } = payload;
 
@@ -503,7 +503,7 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
   }
 
   public [Method.RandomKey](payload: Payloads.RandomKey): Payloads.RandomKey {
-    if (this.cache.size === 0) return payload;
+    if (this.cache.size === 0) return { ...payload, data: [] };
 
     const { count, duplicates } = payload;
 

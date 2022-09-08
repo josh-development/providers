@@ -1,5 +1,5 @@
 import type { JoshProvider } from '@joshdb/provider';
-import { SerializeJSON, toJSON, toRaw } from '@joshdb/serialize';
+import { Serialize } from '@joshdb/serialize';
 import { AsyncQueue } from '@sapphire/async-queue';
 import { Snowflake, TwitterSnowflake } from '@sapphire/snowflake';
 import { mkdir } from 'node:fs/promises';
@@ -49,12 +49,12 @@ export class ChunkHandler<StoredValue = unknown> {
         const file = this.getChunkFile(chunk.id);
         const data = await file.fetch();
 
-        for (const key of chunk.keys) data[key] = toRaw(data[key] as unknown as SerializeJSON) as StoredValue;
+        for (const key of chunk.keys) data[key] = Serialize.fromJSON(data[key] as unknown as Serialize.JSON) as StoredValue;
       } else if (!chunk.serialized && serialize) {
         const file = this.getChunkFile(chunk.id);
         const data = await file.fetch();
 
-        for (const key of chunk.keys) data[key] = toJSON(data[key]) as StoredValue;
+        for (const key of chunk.keys) data[key] = Serialize.toJSON(data[key]) as StoredValue;
       }
     }
 
@@ -283,6 +283,8 @@ export class ChunkHandler<StoredValue = unknown> {
           entries = entries.filter(([k]) => k !== key);
         }
       }
+
+      await file.save(data);
     }
 
     if (entries.length > 0) {

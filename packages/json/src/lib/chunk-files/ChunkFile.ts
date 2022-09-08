@@ -1,4 +1,4 @@
-import { SerializeJSON, toJSON, toRaw } from '@joshdb/serialize';
+import { Serialize } from '@joshdb/serialize';
 import { writeFile } from 'node:fs/promises';
 import { File } from '../File';
 import { ChunkLockFile } from './ChunkLockFile';
@@ -25,13 +25,13 @@ export class ChunkFile<StoredValue = unknown> extends File<StoredValue> {
 
     const { serialize } = this.options;
 
-    return (serialize ? toRaw(data as unknown as SerializeJSON) : data) as File.Data<StoredValue>;
+    return (serialize ? Serialize.fromJSON(data as unknown as Serialize.JSON) : data) as File.Data<StoredValue>;
   }
 
   public async save(data: File.Data<StoredValue>): Promise<void> {
     const { serialize } = this.options;
 
-    if (serialize) await this.attempt(() => writeFile(this.lock.path, JSON.stringify(toJSON(data))));
+    if (serialize) await this.attempt(() => writeFile(this.lock.path, JSON.stringify(Serialize.toJSON(data))));
     else await this.lock.write(data);
 
     await this.lock.rename(this.path);
