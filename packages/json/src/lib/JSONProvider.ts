@@ -535,7 +535,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     const { count, duplicates } = payload;
     const size = await this.handler.size();
 
-    if (size === 0) return payload;
+    if (size === 0) return { ...payload, data: [] };
     if (size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { size }));
 
@@ -567,7 +567,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     const { count, duplicates } = payload;
     const size = await this.handler.size();
 
-    if (size === 0) return payload;
+    if (size === 0) return { ...payload, data: [] };
     if (size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }, { size }));
 

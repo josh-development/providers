@@ -20,7 +20,7 @@ import {
   Method,
   Payloads
 } from '@joshdb/provider';
-import { SerializeJSON, toJSON, toRaw } from '@joshdb/serialize';
+import { Serialize } from '@joshdb/serialize';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
 import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 import { createClient, RedisClientOptions, RedisClientType } from 'redis';
@@ -527,7 +527,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Random](payload: Payloads.Random<StoredValue>): Promise<Payloads.Random<StoredValue>> {
     const docCount = (await this[Method.Size]({ method: Method.Size, errors: [] })).data || 0;
 
-    if (docCount === 0) return payload;
+    if (docCount === 0) return { ...payload, data: [] };
     if (docCount < payload.count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { count: payload.count, docCount }));
 
@@ -552,7 +552,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.RandomKey](payload: Payloads.RandomKey): Promise<Payloads.RandomKey> {
     const docCount = (await this[Method.Size]({ method: Method.Size, errors: [] })).data || 0;
 
-    if (docCount === 0) return payload;
+    if (docCount === 0) return { ...payload, data: [] };
     if (docCount < payload.count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }, { count: payload.count, docCount }));
 
@@ -751,14 +751,14 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     }
   }
 
-  private deserialize(value: SerializeJSON | StoredValue): StoredValue {
+  private deserialize(value: Serialize.JSON | StoredValue): StoredValue {
     if (this.options.disableSerialization) return value as StoredValue;
-    return toRaw(value as SerializeJSON) as StoredValue;
+    return Serialize.fromJSON(value as Serialize.JSON) as StoredValue;
   }
 
   private serialize<StoredValue>(value: StoredValue) {
     if (this.options.disableSerialization) return value;
-    return toJSON(value) as SerializeJSON;
+    return Serialize.toJSON(value) as Serialize.JSON;
   }
 }
 
@@ -772,7 +772,7 @@ export namespace RedisProvider {
   }
 
   export interface Row<StoredValue> {
-    value: StoredValue | SerializeJSON;
+    value: StoredValue | Serialize.JSON;
 
     version: JoshProvider.Semver;
   }
