@@ -27,8 +27,8 @@
     "check-update": "cliff-jumper --dry-run"
   },
   "dependencies": {
-    "@joshdb/provider": "2.0.0-next.31cd4f0.0",
-    "@joshdb/serialize": "1.1.0-next.31cd4f0.0",
+    "@joshdb/provider": "2.0.0-next.1a837f5.0",
+    "@joshdb/serialize": "1.1.0-next.1a837f5.0",
     "@sapphire/async-queue": "^1.5.0",
     "@sapphire/snowflake": "^3.2.2",
     "@sapphire/utilities": "^3.9.3",
