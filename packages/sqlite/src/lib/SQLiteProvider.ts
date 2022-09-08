@@ -20,7 +20,7 @@ import {
   Method,
   Payloads
 } from '@joshdb/provider';
-import { toJSON } from '@joshdb/serialize';
+import { Serialize } from '@joshdb/serialize';
 import { isPrimitive } from '@sapphire/utilities';
 import Database from 'better-sqlite3';
 import { existsSync } from 'node:fs';
@@ -49,7 +49,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
           if (entries.length !== 0) {
             database
               .prepare(`INSERT INTO '${tableName}' (key, value) VALUES ${entries.map(() => '(?, ?)').join(', ')}`)
-              .run(...entries.flatMap((entry) => [entry.key, JSON.stringify(disableSerialization ? entry.value : toJSON(entry.value))]));
+              .run(...entries.flatMap((entry) => [entry.key, JSON.stringify(disableSerialization ? entry.value : Serialize.toJSON(entry.value))]));
           }
 
           const autoNum = database.prepare(`SELECT lastnum FROM 'internal::autonum' WHERE josh = '${tableName}'`).get() as
@@ -553,7 +553,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     const { count, duplicates } = payload;
     const size = this.handler.size();
 
-    if (size === 0) return payload;
+    if (size === 0) return { ...payload, data: [] };
     if (size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { size }));
 
@@ -585,7 +585,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     const { count, duplicates } = payload;
     const size = this.handler.size();
 
-    if (size === 0) return payload;
+    if (size === 0) return { ...payload, data: [] };
     if (size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }, { size }));
 

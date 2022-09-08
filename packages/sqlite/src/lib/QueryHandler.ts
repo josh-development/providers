@@ -1,4 +1,4 @@
-import { SerializeJSON, toJSON, toRaw } from '@joshdb/serialize';
+import { Serialize } from '@joshdb/serialize';
 import type Database from 'better-sqlite3';
 
 export class QueryHandler<StoredValue = unknown> {
@@ -50,7 +50,7 @@ export class QueryHandler<StoredValue = unknown> {
     const serializedKeys = JSON.parse(metadata.serializedKeys) as string[];
 
     if (serializedKeys.length && disableSerialization) {
-      for (const [key, value] of this.entries()) this.set(key, toRaw(value as SerializeJSON));
+      for (const [key, value] of this.entries()) this.set(key, Serialize.fromJSON(value as Serialize.JSON));
 
       this.database
         .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>>(
@@ -63,7 +63,7 @@ export class QueryHandler<StoredValue = unknown> {
     } else if (!serializedKeys.length && !disableSerialization) {
       const entries = this.entries();
 
-      for (const [key, value] of this.entries()) this.set(key, toJSON(value));
+      for (const [key, value] of this.entries()) this.set(key, Serialize.toJSON(value));
 
       this.database
         .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>>(
@@ -128,7 +128,7 @@ export class QueryHandler<StoredValue = unknown> {
     return this.database
       .prepare(`SELECT * FROM '${tableName}'`)
       .all()
-      .map((row: QueryHandler.Row) => [row.key, disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value))]);
+      .map((row: QueryHandler.Row) => [row.key, disableSerialization ? JSON.parse(row.value) : Serialize.fromJSON(JSON.parse(row.value))]);
   }
 
   public has(key: string): boolean {
@@ -159,7 +159,7 @@ export class QueryHandler<StoredValue = unknown> {
 
     if (!row) return undefined;
 
-    return disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value));
+    return disableSerialization ? JSON.parse(row.value) : Serialize.fromJSON(JSON.parse(row.value));
   }
 
   public getMany(keys: string[]): Record<string, StoredValue | null> {
@@ -169,7 +169,7 @@ export class QueryHandler<StoredValue = unknown> {
       .prepare(`SELECT * FROM '${tableName}' WHERE key IN (${keys.map(() => '?').join(', ')})`)
       .all(keys)
       .reduce<Record<string, StoredValue | null>>((obj, row: QueryHandler.Row) => {
-        obj[row.key] = disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value));
+        obj[row.key] = disableSerialization ? JSON.parse(row.value) : Serialize.fromJSON(JSON.parse(row.value));
         return obj;
       }, {});
   }
@@ -183,7 +183,7 @@ export class QueryHandler<StoredValue = unknown> {
       )
       .run({
         key,
-        value: JSON.stringify(disableSerialization ? value : toJSON(value))
+        value: JSON.stringify(disableSerialization ? value : Serialize.toJSON(value))
       });
 
     const row = this.database
@@ -213,11 +213,11 @@ export class QueryHandler<StoredValue = unknown> {
             .map(() => '(?, ?)')
             .join(', ')} ON CONFLICT (key) DO UPDATE SET value = excluded.value`
         )
-        .run(entries.flatMap(([key, value]) => [key, JSON.stringify(disableSerialization ? value : toJSON(value))]));
+        .run(entries.flatMap(([key, value]) => [key, JSON.stringify(disableSerialization ? value : Serialize.toJSON(value))]));
     } else {
       this.database
         .prepare(`INSERT INTO '${tableName}' (key, value) VALUES ${entries.map(() => '(?, ?)').join(', ')} ON CONFLICT DO NOTHING`)
-        .run(entries.flatMap(([key, value]) => [key, JSON.stringify(disableSerialization ? value : toJSON(value))]));
+        .run(entries.flatMap(([key, value]) => [key, JSON.stringify(disableSerialization ? value : Serialize.toJSON(value))]));
     }
 
     const row = this.database
@@ -258,7 +258,7 @@ export class QueryHandler<StoredValue = unknown> {
     return this.database
       .prepare(`SELECT value FROM '${tableName}'`)
       .all()
-      .map((row: Pick<QueryHandler.Row, 'value'>) => (disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value))));
+      .map((row: Pick<QueryHandler.Row, 'value'>) => (disableSerialization ? JSON.parse(row.value) : Serialize.fromJSON(JSON.parse(row.value))));
   }
 }
 
