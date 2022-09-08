@@ -45,7 +45,7 @@ describe('ChunkHandler', () => {
       });
 
       test('GIVEN chunks THEN clears chunks', async () => {
-        await handler.set('test:clear', 'value');
+        await handler.set('key', 'value');
         await expect(handler.size()).resolves.toBe(1);
         await expect(handler.clear()).resolves.toBeUndefined();
         await expect(handler.size()).resolves.toBe(0);
@@ -54,36 +54,36 @@ describe('ChunkHandler', () => {
 
     describe('with delete method', () => {
       test('GIVEN no chunks THEN returns false', async () => {
-        await expect(handler.delete('test:delete')).resolves.toBe(false);
+        await expect(handler.delete('key')).resolves.toBe(false);
       });
 
       test('GIVEN chunks THEN returns true AND deletes value', async () => {
-        await handler.set('test:delete', 'value');
-        await expect(handler.delete('test:delete')).resolves.toBe(true);
+        await handler.set('key', 'value');
+        await expect(handler.delete('key')).resolves.toBe(true);
       });
     });
 
     describe('with deleteMany method', () => {
       test('GIVEN no chunks THEN does nothing', async () => {
-        await expect(handler.deleteMany(['test:deleteMany'])).resolves.toBeUndefined();
+        await expect(handler.deleteMany(['key'])).resolves.toBeUndefined();
       });
 
       test('GIVEN chunk THEN deletes value', async () => {
-        await handler.set('test:deleteMany', 'value');
+        await handler.set('key', 'value');
 
-        await expect(handler.deleteMany(['test:deleteMany'])).resolves.toBeUndefined();
+        await expect(handler.deleteMany(['key'])).resolves.toBeUndefined();
 
-        await expect(handler.has('test:deleteMany')).resolves.toBe(false);
+        await expect(handler.has('key')).resolves.toBe(false);
       });
 
       test('GIVEN chunks THEN deletes values', async () => {
-        await handler.set('test:deleteMany', 'value');
-        await handler.set('test:deleteMany2', 'value');
+        await handler.set('key', 'value');
+        await handler.set('key2', 'value');
 
-        await expect(handler.deleteMany(['test:deleteMany', 'test:deleteMany2'])).resolves.toBeUndefined();
+        await expect(handler.deleteMany(['key', 'key2'])).resolves.toBeUndefined();
 
-        await expect(handler.has('test:deleteMany')).resolves.toBe(false);
-        await expect(handler.has('test:deleteMany2')).resolves.toBe(false);
+        await expect(handler.has('key')).resolves.toBe(false);
+        await expect(handler.has('key2')).resolves.toBe(false);
       });
     });
 
@@ -93,47 +93,47 @@ describe('ChunkHandler', () => {
       });
 
       test('GIVEN chunks THEN returns array', async () => {
-        await handler.set('test:entries', 'value');
-        await expect(handler.entries()).resolves.toEqual([['test:entries', 'value']]);
+        await handler.set('key', 'value');
+        await expect(handler.entries()).resolves.toEqual([['key', 'value']]);
       });
     });
 
     describe('with get method', () => {
       test('GIVEN no chunks THEN returns undefined', async () => {
-        await expect(handler.get('test:get')).resolves.toBeUndefined();
+        await expect(handler.get('key')).resolves.toBeUndefined();
       });
 
       test('GIVEN chunks THEN returns value', async () => {
-        await handler.set('test:get', 'value');
-        await expect(handler.get('test:get')).resolves.toBe('value');
+        await handler.set('key', 'value');
+        await expect(handler.get('key')).resolves.toBe('value');
       });
     });
 
     describe('with getMany method', () => {
       test('GIVEN no chunks THEN returns empty array', async () => {
-        await expect(handler.getMany(['test:getMany'])).resolves.toEqual({ 'test:getMany': null });
+        await expect(handler.getMany(['key'])).resolves.toEqual({ key: null });
       });
 
       test('GIVEN chunk THEN returns value', async () => {
-        await handler.set('test:getMany', 'value');
-        await expect(handler.getMany(['test:getMany'])).resolves.toEqual({ 'test:getMany': 'value' });
+        await handler.set('key', 'value');
+        await expect(handler.getMany(['key'])).resolves.toEqual({ key: 'value' });
       });
 
       test('GIVEN chunks THEN returns values', async () => {
-        await handler.set('test:getMany', 'value');
-        await handler.set('test:getMany2', 'value');
-        await expect(handler.getMany(['test:getMany', 'test:getMany2'])).resolves.toEqual({ 'test:getMany': 'value', 'test:getMany2': 'value' });
+        await handler.set('key', 'value');
+        await handler.set('key2', 'value');
+        await expect(handler.getMany(['key', 'key2'])).resolves.toEqual({ key: 'value', key2: 'value' });
       });
     });
 
     describe('with has method', () => {
       test('GIVEN no chunks THEN returns false', async () => {
-        await expect(handler.has('test:has')).resolves.toBe(false);
+        await expect(handler.has('key')).resolves.toBe(false);
       });
 
       test('GIVEN chunks THEN returns true', async () => {
-        await handler.set('test:has', 'value');
-        await expect(handler.has('test:has')).resolves.toBe(true);
+        await handler.set('key', 'value');
+        await expect(handler.has('key')).resolves.toBe(true);
       });
     });
 
@@ -143,52 +143,52 @@ describe('ChunkHandler', () => {
       });
 
       test('with chunks THEN returns array', async () => {
-        await handler.set('test:keys', 'value');
-        await expect(handler.keys()).resolves.toEqual(['test:keys']);
+        await handler.set('key', 'value');
+        await expect(handler.keys()).resolves.toEqual(['key']);
       });
     });
 
     describe('with set method', () => {
       test('GIVEN no chunks THEN sets value', async () => {
-        await expect(handler.set('test:set', 'value')).resolves.toBeUndefined();
-        await expect(handler.has('test:set')).resolves.toBe(true);
+        await expect(handler.set('key', 'value')).resolves.toBeUndefined();
+        await expect(handler.has('key')).resolves.toBe(true);
       });
     });
 
     describe('with setMany method', () => {
       test('GIVEN no chunks THEN sets values', async () => {
-        await expect(handler.setMany([['test:setMany', 'value']], true)).resolves.toBeUndefined();
+        await expect(handler.setMany([['key', 'value']], true)).resolves.toBeUndefined();
 
-        await expect(handler.has('test:setMany')).resolves.toBe(true);
+        await expect(handler.has('key')).resolves.toBe(true);
       });
 
       test('GIVEN chunk THEN sets value', async () => {
-        await handler.set('test:setMany', 'value');
-        await expect(handler.setMany([['test:setMany', 'value']], true)).resolves.toBeUndefined();
+        await handler.set('key', 'value');
+        await expect(handler.setMany([['key', 'value']], true)).resolves.toBeUndefined();
 
-        await expect(handler.has('test:setMany')).resolves.toBe(true);
+        await expect(handler.has('key')).resolves.toBe(true);
       });
 
       test('GIVEN chunk THEN skips value', async () => {
-        await handler.set('test:setMany', 'value');
-        await expect(handler.setMany([['test:setMany', 'value2']], false)).resolves.toBeUndefined();
+        await handler.set('key', 'value');
+        await expect(handler.setMany([['key', 'value2']], false)).resolves.toBeUndefined();
 
-        await expect(handler.get('test:setMany')).resolves.toBe('value');
+        await expect(handler.get('key')).resolves.toBe('value');
       });
 
       test('GIVEN chunks THEN sets values', async () => {
         await expect(
           handler.setMany(
             [
-              ['test:setMany', 'value'],
-              ['test:setMany2', 'value']
+              ['key', 'value'],
+              ['key2', 'value']
             ],
             true
           )
         ).resolves.toBeUndefined();
 
-        await expect(handler.has('test:setMany')).resolves.toBe(true);
-        await expect(handler.has('test:setMany2')).resolves.toBe(true);
+        await expect(handler.has('key')).resolves.toBe(true);
+        await expect(handler.has('key2')).resolves.toBe(true);
       });
     });
 
@@ -198,7 +198,7 @@ describe('ChunkHandler', () => {
       });
 
       test('GIVEN chunks THEN returns 1', async () => {
-        await handler.set('test:size', 'value');
+        await handler.set('key', 'value');
         await expect(handler.size()).resolves.toBe(1);
       });
     });
@@ -209,7 +209,7 @@ describe('ChunkHandler', () => {
       });
 
       test('GIVEN chunks THEN returns array', async () => {
-        await handler.set('test:values', 'value');
+        await handler.set('key', 'value');
         await expect(handler.values()).resolves.toEqual(['value']);
       });
     });
