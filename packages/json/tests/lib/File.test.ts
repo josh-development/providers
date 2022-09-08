@@ -1,4 +1,3 @@
-import { toJSON } from '@joshdb/serialize';
 import { TwitterSnowflake } from '@sapphire/snowflake';
 import { existsSync } from 'fs';
 import { mkdir, rm, writeFile } from 'fs/promises';
@@ -19,7 +18,7 @@ describe('File', () => {
   describe('can manipulate file', () => {
     const id = TwitterSnowflake.generate().toString();
     const path = resolve(process.cwd(), '.tests', 'file', `${TwitterSnowflake.generate().toString()}.json`);
-    const file = new File({ directory: resolve(process.cwd(), '.tests', 'file'), name: `${id}.json`, serialize: true });
+    const file = new File({ directory: resolve(process.cwd(), '.tests', 'file'), name: `${id}.json` });
 
     beforeAll(async () => {
       await mkdir(file.options.directory, { recursive: true });
@@ -36,7 +35,7 @@ describe('File', () => {
       });
 
       test('GIVEN file present THEN returns parsed value', async () => {
-        await writeFile(file.path, JSON.stringify(toJSON({ key: 'value' })));
+        await writeFile(file.path, JSON.stringify({ key: 'value' }));
         await expect(file.read()).resolves.toStrictEqual({ key: 'value' });
       });
     });
