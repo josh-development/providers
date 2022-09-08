@@ -1,4 +1,4 @@
-import { toJSON, toRaw } from '@joshdb/serialize';
+import { Serialize } from '@joshdb/serialize';
 import type { Sql } from 'postgres';
 import postgres from 'postgres';
 import type { PostgreSQLProvider } from './PostgreSQLProvider';
@@ -77,7 +77,7 @@ export class QueryHandler<StoredValue = unknown> {
       FROM ${this.sql(tableName)}
     `;
 
-    return rows.map((row) => [row.key, disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value))]);
+    return rows.map((row) => [row.key, disableSerialization ? JSON.parse(row.value) : Serialize.fromJSON(JSON.parse(row.value))]);
   }
 
   public async has(key: string): Promise<boolean> {
@@ -114,7 +114,7 @@ export class QueryHandler<StoredValue = unknown> {
       WHERE key = ${key}
     `;
 
-    return disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value));
+    return disableSerialization ? JSON.parse(row.value) : Serialize.fromJSON(JSON.parse(row.value));
   }
 
   public async getMany(keys: string[]): Promise<Record<string, StoredValue | null>> {
@@ -131,7 +131,7 @@ export class QueryHandler<StoredValue = unknown> {
 
       const row = rows.find((row) => row.key === key)!;
 
-      return { ...data, [key]: disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value)) };
+      return { ...data, [key]: disableSerialization ? JSON.parse(row.value) : Serialize.fromJSON(JSON.parse(row.value)) };
     }, {});
   }
 
@@ -140,12 +140,12 @@ export class QueryHandler<StoredValue = unknown> {
 
     await this.sql`
       INSERT INTO ${this.sql(tableName)} ${this.sql(
-      { key, value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)) },
+      { key, value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJSON(value)) },
       'key',
       'value'
     )}
       ON CONFLICT (key)
-      DO UPDATE SET ${this.sql({ value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value)) }, 'value')}
+      DO UPDATE SET ${this.sql({ value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJSON(value)) }, 'value')}
     `;
   }
 
@@ -158,7 +158,7 @@ export class QueryHandler<StoredValue = unknown> {
       ${this.sql(
         entries.map(([key, value]) => ({
           key,
-          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value))
+          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJSON(value))
         })),
         'key',
         'value'
@@ -173,7 +173,7 @@ export class QueryHandler<StoredValue = unknown> {
       ${this.sql(
         entries.map(([key, value]) => ({
           key,
-          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(toJSON(value))
+          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJSON(value))
         })),
         'key',
         'value'
@@ -200,7 +200,7 @@ export class QueryHandler<StoredValue = unknown> {
       FROM ${this.sql(tableName)}
     `;
 
-    return rows.map((row) => (disableSerialization ? JSON.parse(row.value) : toRaw(JSON.parse(row.value))));
+    return rows.map((row) => (disableSerialization ? JSON.parse(row.value) : Serialize.fromJSON(JSON.parse(row.value))));
   }
 
   public async fetchMetadata(): Promise<QueryHandler.MetadataRow> {
