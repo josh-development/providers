@@ -8,7 +8,6 @@
   "scripts": {
     "clean": "rimraf .bench \"packages/**/.tests\"  \"packages/**/dist\" \"packages/**/build\" \"packages/**/.turbo\" \"packages/**/node_modules/.cache\" node_modules/.cache",
     "benchmark": "tsc -b benchmarks/src && node benchmarks/dist/benchmarks/src/index.js",
-    "generate": "node scripts/generate/generate.mjs",
     "docs": "turbo run docs",
     "lint": "eslint packages scripts --ext mjs,js,ts --fix",
     "format": "prettier --write \"packages/**/{src,tests}/**/*.{mjs,js,ts}\"",
