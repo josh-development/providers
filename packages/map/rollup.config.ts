@@ -17,18 +17,6 @@ export default {
       format: 'es',
       exports: 'named',
       sourcemap: true
-    },
-    {
-      file: './dist/index.umd.js',
-      format: 'umd',
-      name: 'JoshMap',
-      exports: 'named',
-      sourcemap: true,
-      globals: {
-        '@joshdb/provider': 'JoshProvider',
-        '@sapphire/utilities': 'SapphireUtilities',
-        'property-helpers': 'PropertyHelpers'
-      }
     }
   ],
   external: ['@joshdb/provider', '@sapphire/utilities', 'property-helpers'],
