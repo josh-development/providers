@@ -17,21 +17,6 @@ export default {
       format: 'es',
       exports: 'named',
       sourcemap: true
-    },
-    {
-      file: './dist/index.umd.js',
-      format: 'umd',
-      name: 'JoshPostgreSQLProvider',
-      exports: 'named',
-      sourcemap: true,
-      globals: {
-        '@joshdb/provider': 'JoshProvider',
-        '@joshdb/serialize': 'JoshSerialize',
-        '@sapphire/snowflake': 'SapphireSnowflake',
-        '@sapphire/utilities': 'SapphireUtilities',
-        postgres: 'Postgres',
-        'property-helpers': 'PropertyHelpers'
-      }
     }
   ],
   external: ['@joshdb/provider', '@joshdb/serialize', '@sapphire/snowflake', '@sapphire/utilities', 'postgres', 'property-helpers'],
