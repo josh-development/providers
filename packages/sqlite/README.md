@@ -16,7 +16,7 @@
 
 ## Description
 
-A Josh provider for @joshdb/core which uses SQLite
+A Josh provider for @joshdb/core which uses [better-sqlite3](https://npmjs.com/package/better-sqlite3)
 
 ## Features
 
