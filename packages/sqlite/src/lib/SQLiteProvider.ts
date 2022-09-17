@@ -20,73 +20,129 @@ import {
   Method,
   Payloads
 } from '@joshdb/provider';
-import { Snowflake, TwitterSnowflake } from '@sapphire/snowflake';
+import { Serialize } from '@joshdb/serialize';
 import { isPrimitive } from '@sapphire/utilities';
-import type { ConnectionConfig as MariaConnectionConfig } from 'mariadb';
+import Database from 'better-sqlite3';
+import { existsSync } from 'node:fs';
+import { mkdir } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 import { QueryHandler } from './QueryHandler';
 
-export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
-  public declare options: MariaProvider.Options;
+export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
+  public declare options: SQLiteProvider.Options;
 
-  private handler: QueryHandler<StoredValue>;
+  public migrations: JoshProvider.Migration[] = [
+    {
+      version: { major: 1, minor: 0, patch: 0 },
+      run: (context: JoshProvider.Context) => {
+        const { tableName = context.name, dataDirectory, persistent, disableSerialization } = this.options;
 
-  private snowflake: Snowflake | typeof TwitterSnowflake;
+        if (persistent && existsSync(resolve(dataDirectory, `${tableName}.sqlite`))) {
+          const database = new Database(resolve(dataDirectory, `${tableName}.sqlite`));
+          const entries = database.prepare(`SELECT * FROM '${tableName}' WHERE path = '::NULL::'`).all() as Record<'key' | 'value', string>[];
 
-  public constructor(options: MariaProvider.Options) {
+          database.prepare(`DROP TABLE '${tableName}'`).run();
+
+          database.prepare(`CREATE TABLE '${tableName}' (key TEXT PRIMARY KEY, value TEXT NOT NULL)`).run();
+
+          if (entries.length !== 0) {
+            database
+              .prepare(`INSERT INTO '${tableName}' (key, value) VALUES ${entries.map(() => '(?, ?)').join(', ')}`)
+              .run(...entries.flatMap((entry) => [entry.key, JSON.stringify(disableSerialization ? entry.value : Serialize.toJSON(entry.value))]));
+          }
+
+          const autoNum = database.prepare(`SELECT lastnum FROM 'internal::autonum' WHERE josh = '${tableName}'`).get() as
+            | Pick<LegacyAutoNumRow, 'lastnum'>
+            | undefined;
+
+          if (autoNum?.lastnum) {
+            database
+              .prepare(
+                `CREATE TABLE IF NOT EXISTS 'internal_metadata' (name TEXT PRIMARY KEY, version TEXT NOT NULL, autoKeyCount INTEGER, serializedKeys TEXT)`
+              )
+              .run();
+
+            const { major, minor, patch } = this.version;
+
+            database
+              .prepare<QueryHandler.MetadataRow>(
+                `INSERT INTO 'internal_metadata' (name, version, autoKeyCount, serializedKeys) VALUES (@name, @version, @autoKeyCount, @serializedKeys)`
+              )
+              .run({
+                name: tableName,
+                version: `${major}.${minor}.${patch}`,
+                autoKeyCount: autoNum.lastnum,
+                serializedKeys: JSON.stringify(disableSerialization ? [] : entries.map((entry) => entry.key))
+              });
+          }
+
+          database.prepare(`DELETE FROM 'internal::autonum' WHERE josh = '${tableName}'`).run();
+
+          database.close();
+        }
+      }
+    }
+  ];
+
+  private _handler?: QueryHandler<StoredValue>;
+
+  public constructor(options: Partial<SQLiteProvider.Options>) {
     super(options);
 
-    const { connectionConfig = MariaProvider.defaultConnectionConfig, epoch, disableSerialization } = options;
-
-    this.snowflake = epoch === undefined ? TwitterSnowflake : new Snowflake(epoch);
-
-    const { major, minor, patch } = this.version;
-
-    if (typeof connectionConfig === 'object') {
-      connectionConfig.user ??= MariaProvider.defaultConnectionConfig.user;
-      connectionConfig.password ??= MariaProvider.defaultConnectionConfig.password;
-      connectionConfig.database ??= MariaProvider.defaultConnectionConfig.database;
-    }
-
-    this.handler = new QueryHandler<StoredValue>({
-      connectionConfig,
-      tableName: 'data',
-      version: `${major}.${minor}.${patch}`,
-      disableSerialization
-    });
+    this.options = {
+      ...this.options,
+      dataDirectory: this.options.useAbsolutePath
+        ? resolve(this.options.dataDirectory ?? 'data')
+        : resolve(process.cwd(), this.options.dataDirectory ?? 'data'),
+      wal: this.options.wal ?? true,
+      persistent: this.options.persistent ?? true,
+      disableSerialization: this.options.disableSerialization ?? false
+    };
   }
 
   public get version(): JoshProvider.Semver {
-    return this.resolveVersion('[VI]{version}[/VI]');
+    return process.env.NODE_ENV === 'test' ? { major: 2, minor: 0, patch: 0 } : this.resolveVersion('[VI]{version}[/VI]');
+  }
+
+  private get handler(): QueryHandler<StoredValue> {
+    if (this._handler instanceof QueryHandler) return this._handler;
+
+    throw this.error(SQLiteProvider.Identifiers.HandlerNotFound);
   }
 
   public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
-    this.handler.options.tableName = context.name;
-    await this.handler.init();
-
     context = await super.init(context);
+
+    this.options.tableName = this.options.tableName ?? context.name;
+
+    const { tableName, dataDirectory, wal, persistent, disableSerialization } = this.options;
+
+    if (persistent && !existsSync(dataDirectory)) await mkdir(dataDirectory, { recursive: true });
+
+    const database = persistent ? new Database(resolve(dataDirectory, `${tableName}.sqlite`)) : new Database(':memory:');
+    const { major, minor, patch } = this.version;
+
+    this._handler = new QueryHandler({ database, tableName, wal, version: `${major}.${minor}.${patch}`, disableSerialization });
+
     return context;
   }
 
-  public close(): Promise<void> {
-    return this.handler.close();
-  }
-
   public [Method.AutoKey](payload: Payloads.AutoKey): Payloads.AutoKey {
-    payload.data = this.snowflake.generate().toString();
+    payload.data = this.handler.autoKey();
 
     return payload;
   }
 
-  public async [Method.Clear](payload: Payloads.Clear): Promise<Payloads.Clear> {
-    await this.handler.clear();
+  public [Method.Clear](payload: Payloads.Clear): Payloads.Clear {
+    this.handler.clear();
 
     return payload;
   }
 
-  public async [Method.Dec](payload: Payloads.Dec): Promise<Payloads.Dec> {
+  public [Method.Dec](payload: Payloads.Dec): Payloads.Dec {
     const { key, path } = payload;
-    const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
+    const getPayload = this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
     if (!isPayloadWithData(getPayload)) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Dec }, { key, path }));
@@ -102,29 +158,29 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       return payload;
     }
 
-    await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data - 1 });
+    this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data - 1 });
 
     return payload;
   }
 
-  public async [Method.Delete](payload: Payloads.Delete): Promise<Payloads.Delete> {
+  public [Method.Delete](payload: Payloads.Delete): Payloads.Delete {
     const { key, path } = payload;
 
-    if (path.length === 0) await this.handler.delete(key);
-    else if ((await this[Method.Has]({ method: Method.Has, errors: [], key, path })).data) {
-      const { data } = await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
+    if (path.length === 0) this.handler.delete(key);
+    else if (this[Method.Has]({ method: Method.Has, errors: [], key, path }).data) {
+      const { data } = this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
 
       deleteProperty(data, path);
-      await this.handler.set(key, data);
+      this.handler.set(key, data);
     }
 
     return payload;
   }
 
-  public async [Method.DeleteMany](payload: Payloads.DeleteMany): Promise<Payloads.DeleteMany> {
+  public [Method.DeleteMany](payload: Payloads.DeleteMany): Payloads.DeleteMany {
     const { keys } = payload;
 
-    await this.handler.deleteMany(keys);
+    this.handler.deleteMany(keys);
 
     return payload;
   }
@@ -132,29 +188,24 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Each](payload: Payloads.Each<StoredValue>): Promise<Payloads.Each<StoredValue>> {
     const { hook } = payload;
 
-    for (const key of await this.handler.keys()) await hook((await this.handler.get(key))!, key);
+    for (const key of this.handler.keys()) await hook(this.handler.get(key)!, key);
 
     return payload;
   }
 
-  public async [Method.Ensure](payload: Payloads.Ensure<StoredValue>): Promise<Payloads.Ensure<StoredValue>> {
-    const { key } = payload;
+  public [Method.Ensure](payload: Payloads.Ensure<StoredValue>): Payloads.Ensure<StoredValue> {
+    const { key, defaultValue } = payload;
 
-    if (!(await this[Method.Has]({ method: Method.Has, errors: [], key, path: [] })).data) {
-      await this[Method.Set]({ method: Method.Set, errors: [], key, path: [], value: payload.defaultValue });
-    }
+    payload.data = defaultValue;
 
-    payload.data = (await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] })).data as StoredValue;
+    if (this[Method.Has]({ method: Method.Has, errors: [], key, path: [] }).data) payload.data = this.handler.get(key);
+    else this.handler.set(key, defaultValue);
 
     return payload;
   }
 
-  public async [Method.Entries](payload: Payloads.Entries<StoredValue>): Promise<Payloads.Entries<StoredValue>> {
-    payload.data = {};
-
-    for (const [key, value] of await this.handler.entries()) {
-      payload.data[key] = value;
-    }
+  public [Method.Entries](payload: Payloads.Entries<StoredValue>): Payloads.Entries<StoredValue> {
+    payload.data = this.handler.entries().reduce((data, [key, value]) => ({ ...data, [key]: value }), {});
 
     return payload;
   }
@@ -164,11 +215,11 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Every](payload: Payloads.Every<StoredValue>): Promise<Payloads.Every<StoredValue>> {
     payload.data = true;
 
-    if ((await this[Method.Size]({ method: Method.Size, errors: [] })).data === 0) return payload;
+    if (this.handler.size() === 0) return payload;
     if (isEveryByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const [key, value] of await this.handler.entries()) {
+      for (const [key, value] of this.handler.entries()) {
         const result = await hook(value, key);
 
         if (result) continue;
@@ -180,7 +231,7 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isEveryByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for (const [key, storedValue] of await this.handler.entries()) {
+      for (const [key, storedValue] of this.handler.entries()) {
         const data = getProperty(storedValue, path);
 
         if (data === PROPERTY_NOT_FOUND) {
@@ -212,20 +263,14 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isFilterByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const [key, value] of await this.handler.entries()) {
-        const filterValue = await hook(value, key);
-
-        if (!filterValue) continue;
-
-        payload.data[key] = value;
-      }
+      for (const [key, value] of this.handler.entries()) if (await hook(value, key)) payload.data[key] = value;
     }
 
     if (isFilterByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for (const [key, storedValue] of await this.handler.entries()) {
-        const data = getProperty(storedValue, path);
+      for (const [key, storedValue] of this.handler.entries()) {
+        const data = getProperty(storedValue, path, false);
 
         if (data === PROPERTY_NOT_FOUND) {
           payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Filter }, { key, path }));
@@ -254,7 +299,7 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isFindByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const [key, value] of await this.handler.entries()) {
+      for (const [key, value] of this.handler.entries()) {
         const result = await hook(value, key);
 
         if (!result) continue;
@@ -268,7 +313,13 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isFindByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for (const [key, storedValue] of await this.handler.entries()) {
+      if (!isPrimitive(value)) {
+        payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Find }, { path, type: 'primitive' }));
+
+        return payload;
+      }
+
+      for (const [key, storedValue] of this.handler.entries()) {
         if (payload.data[0] !== null && payload.data[1] !== null) break;
 
         const data = getProperty(storedValue, path, false);
@@ -296,13 +347,13 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Get]<Value = StoredValue>(payload: Payloads.Get<Value>): Promise<Payloads.Get<Value>> {
+  public [Method.Get]<Value = StoredValue>(payload: Payloads.Get<Value>): Payloads.Get<Value> {
     const { key, path } = payload;
 
     if (path.length === 0) {
-      if (await this.handler.has(key)) payload.data = (await this.handler.get(key)) as unknown as Value;
+      if (this.handler.has(key)) payload.data = this.handler.get(key) as unknown as Value;
     } else {
-      const data = getProperty<Value>(await this.handler.get(key), path);
+      const data = getProperty<Value>(this.handler.get(key), path);
 
       if (data !== PROPERTY_NOT_FOUND) payload.data = data;
     }
@@ -310,23 +361,23 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.GetMany](payload: Payloads.GetMany<StoredValue>): Promise<Payloads.GetMany<StoredValue>> {
+  public [Method.GetMany](payload: Payloads.GetMany<StoredValue>): Payloads.GetMany<StoredValue> {
     const { keys } = payload;
 
-    payload.data = await this.handler.getMany(keys);
+    payload.data = this.handler.getMany(keys);
 
     return payload;
   }
 
-  public async [Method.Has](payload: Payloads.Has): Promise<Payloads.Has> {
-    payload.data = (await this.handler.has(payload.key)) && hasProperty(await this.handler.get(payload.key), payload.path);
+  public [Method.Has](payload: Payloads.Has): Payloads.Has {
+    payload.data = this.handler.has(payload.key) && hasProperty(this.handler.get(payload.key), payload.path);
 
     return payload;
   }
 
-  public async [Method.Inc](payload: Payloads.Inc): Promise<Payloads.Inc> {
+  public [Method.Inc](payload: Payloads.Inc): Payloads.Inc {
     const { key, path } = payload;
-    const getPayload = await this[Method.Get]<StoredValue>({ method: Method.Get, errors: [], key, path });
+    const getPayload = this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
     if (!isPayloadWithData(getPayload)) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Inc }, { key, path }));
@@ -342,13 +393,13 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       return payload;
     }
 
-    await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data + 1 });
+    this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data + 1 });
 
     return payload;
   }
 
-  public async [Method.Keys](payload: Payloads.Keys): Promise<Payloads.Keys> {
-    payload.data = await this.handler.keys();
+  public [Method.Keys](payload: Payloads.Keys): Payloads.Keys {
+    payload.data = this.handler.keys();
 
     return payload;
   }
@@ -361,13 +412,13 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isMapByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const [key, value] of await this.handler.entries()) payload.data.push(await hook(value, key));
+      for (const [key, value] of this.handler.entries()) payload.data.push(await hook(value, key));
     }
 
     if (isMapByPathPayload(payload)) {
       const { path } = payload;
 
-      for (const value of await this.handler.values()) {
+      for (const value of this.handler.values()) {
         const data = getProperty<Value>(value, path);
 
         if (data !== PROPERTY_NOT_FOUND) payload.data.push(data);
@@ -377,9 +428,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Math](payload: Payloads.Math): Promise<Payloads.Math> {
+  public [Method.Math](payload: Payloads.Math): Payloads.Math {
     const { key, path, operator, operand } = payload;
-    const getPayload = await this[Method.Get]<number>({ method: Method.Get, errors: [], key, path });
+    const getPayload = this[Method.Get]<number>({ method: Method.Get, errors: [], key, path });
 
     if (!isPayloadWithData(getPayload)) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Math }, { key, path }));
@@ -427,7 +478,7 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         break;
     }
 
-    await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data });
+    this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data });
 
     return payload;
   }
@@ -440,7 +491,7 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isPartitionByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const [key, value] of await this.handler.entries()) {
+      for (const [key, value] of this.handler.entries()) {
         const result = await hook(value, key);
 
         payload.data[result ? 'truthy' : 'falsy'][key] = value;
@@ -450,7 +501,7 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isPartitionByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for (const [key, storedValue] of await this.handler.entries()) {
+      for (const [key, storedValue] of this.handler.entries()) {
         const data = getProperty(storedValue, path);
 
         if (data === PROPERTY_NOT_FOUND) {
@@ -474,9 +525,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Push]<Value = StoredValue>(payload: Payloads.Push<Value>): Promise<Payloads.Push<Value>> {
+  public [Method.Push]<Value = StoredValue>(payload: Payloads.Push<Value>): Payloads.Push<Value> {
     const { key, path, value } = payload;
-    const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
+    const getPayload = this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
     if (!isPayloadWithData(getPayload)) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Push }, { key, path }));
@@ -488,61 +539,62 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     if (!Array.isArray(data)) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Push }, { key, path, type: 'array' }));
+
       return payload;
     }
 
     data.push(value);
-    await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data });
+    this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data });
 
     return payload;
   }
 
-  public async [Method.Random](payload: Payloads.Random<StoredValue>): Promise<Payloads.Random<StoredValue>> {
+  public [Method.Random](payload: Payloads.Random<StoredValue>): Payloads.Random<StoredValue> {
     const { count, duplicates } = payload;
-    const size = await this.handler.size();
+    const size = this.handler.size();
 
     if (size === 0) return { ...payload, data: [] };
     if (size < count) {
-      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }));
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { size }));
 
       return payload;
     }
 
     payload.data = [];
 
-    const keys = await this.handler.keys();
+    const keys = this.handler.keys();
 
     if (duplicates) {
       while (payload.data.length < count) {
         const key = keys[Math.floor(Math.random() * size)];
 
-        payload.data.push((await this.handler.get(key))!);
+        payload.data.push(this.handler.get(key)!);
       }
     } else {
       const randomKeys = new Set<string>();
 
       while (randomKeys.size < count) randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
 
-      for (const key of randomKeys) payload.data.push((await this.handler.get(key))!);
+      for (const key of randomKeys) payload.data.push(this.handler.get(key)!);
     }
 
     return payload;
   }
 
-  public async [Method.RandomKey](payload: Payloads.RandomKey): Promise<Payloads.RandomKey> {
+  public [Method.RandomKey](payload: Payloads.RandomKey): Payloads.RandomKey {
     const { count, duplicates } = payload;
-    const size = await this.handler.size();
+    const size = this.handler.size();
 
     if (size === 0) return { ...payload, data: [] };
     if (size < count) {
-      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }));
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }, { size }));
 
       return payload;
     }
 
     payload.data = [];
 
-    const keys = await this.handler.keys();
+    const keys = this.handler.keys();
 
     if (duplicates) {
       while (payload.data.length < count) payload.data.push(keys[Math.floor(Math.random() * size)]);
@@ -562,7 +614,7 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Remove]<Value = StoredValue>(payload: Payloads.Remove<Value>): Promise<Payloads.Remove<Value>> {
     if (isRemoveByHookPayload(payload)) {
       const { key, path, hook } = payload;
-      const getPayload = await this[Method.Get]<Value[]>({ method: Method.Get, errors: [], key, path });
+      const getPayload = this[Method.Get]<Value[]>({ method: Method.Get, errors: [], key, path });
 
       if (!isPayloadWithData(getPayload)) {
         payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Remove }, { key, path }));
@@ -580,12 +632,12 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
       const filterValues = await Promise.all(data.map((value) => hook(value, key)));
 
-      await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data.filter((_, index) => !filterValues[index]) });
+      this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data.filter((_, index) => !filterValues[index]) });
     }
 
     if (isRemoveByValuePayload(payload)) {
       const { key, path, value } = payload;
-      const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
+      const getPayload = this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
       if (!isPayloadWithData(getPayload)) {
         payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Remove }, { key, path }));
@@ -601,40 +653,40 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         return payload;
       }
 
-      await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data.filter((storedValue) => storedValue !== value) });
+      this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data.filter((storedValue) => storedValue !== value) });
     }
 
     return payload;
   }
 
-  public async [Method.Set]<Value = StoredValue>(payload: Payloads.Set<Value>): Promise<Payloads.Set<Value>> {
+  public [Method.Set]<Value = StoredValue>(payload: Payloads.Set<Value>): Payloads.Set<Value> {
     const { key, path, value } = payload;
 
-    if (path.length === 0) await this.handler.set(key, value as unknown as StoredValue);
+    if (path.length === 0) this.handler.set(key, value as unknown as StoredValue);
     else {
-      const storedValue = await this.handler.get(key);
+      const storedValue = this.handler.get(key);
 
-      await this.handler.set(key, setProperty(storedValue, path, value));
+      this.handler.set(key, setProperty(storedValue, path, value));
     }
 
     return payload;
   }
 
-  public async [Method.SetMany](payload: Payloads.SetMany): Promise<Payloads.SetMany> {
+  public [Method.SetMany](payload: Payloads.SetMany): Payloads.SetMany {
     const { entries, overwrite } = payload;
-    const withPath = entries.filter(({ path }) => path.length > 0);
-    const withoutPath = entries.filter(({ path }) => path.length === 0);
+    const withPath = entries.filter((entry) => entry.path.length > 0);
+    const withoutPath = entries.filter((entry) => entry.path.length === 0);
 
     for (const { key, path, value } of withPath) {
-      if (overwrite) await this[Method.Set]({ method: Method.Set, key, path, value, errors: [] });
-      else if (!(await this[Method.Has]({ method: Method.Has, key, path, errors: [] })).data) {
-        await this[Method.Set]({ method: Method.Set, key, path, value, errors: [] });
+      if (overwrite) this[Method.Set]({ method: Method.Set, errors: [], key, path, value });
+      else if (!this[Method.Has]({ method: Method.Has, errors: [], key, path }).data) {
+        this[Method.Set]({ method: Method.Set, errors: [], key, path, value });
       }
     }
 
     if (withoutPath.length > 0) {
-      await this.handler.setMany(
-        withoutPath.map(({ key, value }) => [key, value as unknown as StoredValue]),
+      this.handler.setMany(
+        withoutPath.map((entry) => [entry.key, entry.value as StoredValue]),
         overwrite
       );
     }
@@ -642,8 +694,8 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Size](payload: Payloads.Size): Promise<Payloads.Size> {
-    payload.data = await this.handler.size();
+  public [Method.Size](payload: Payloads.Size): Payloads.Size {
+    payload.data = this.handler.size();
 
     return payload;
   }
@@ -652,13 +704,14 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Some](payload: Payloads.Some.ByValue): Promise<Payloads.Some.ByValue>;
   public async [Method.Some](payload: Payloads.Some<StoredValue>): Promise<Payloads.Some<StoredValue>> {
     payload.data = false;
+
     if (isSomeByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const [key, value] of await this.handler.entries()) {
-        const someValue = await hook(value, key);
+      for (const [key, value] of this.handler.entries()) {
+        const result = await hook(value, key);
 
-        if (!someValue) continue;
+        if (!result) continue;
 
         payload.data = true;
 
@@ -669,7 +722,7 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isSomeByValuePayload(payload)) {
       const { path, value } = payload;
 
-      for (const [key, storedValue] of await this.handler.entries()) {
+      for (const [key, storedValue] of this.handler.entries()) {
         const data = getProperty(storedValue, path);
 
         if (data === PROPERTY_NOT_FOUND) {
@@ -697,46 +750,104 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Update]<Value = StoredValue>(payload: Payloads.Update<StoredValue, Value>): Promise<Payloads.Update<StoredValue, Value>> {
     const { key, hook } = payload;
-    const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
+    const getPayload = this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
 
     if (!isPayloadWithData<StoredValue>(getPayload)) {
-      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Update }, { key, path: [] }));
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Update }, { key }));
 
       return payload;
     }
 
     const { data } = getPayload;
 
-    await this[Method.Set]({ method: Method.Set, errors: [], key, path: [], value: await hook(data, key) });
+    this[Method.Set]({ method: Method.Set, errors: [], key, path: [], value: await hook(data, key) });
 
     return payload;
   }
 
-  public async [Method.Values](payload: Payloads.Values<StoredValue>): Promise<Payloads.Values<StoredValue>> {
-    payload.data = await this.handler.values();
+  public [Method.Values](payload: Payloads.Values<StoredValue>): Payloads.Values<StoredValue> {
+    payload.data = this.handler.values();
 
     return payload;
   }
 
-  protected fetchVersion() {
-    return this.version;
+  protected resolveIdentifier(identifier: string, metadata: Record<string, unknown>): string {
+    try {
+      return super.resolveIdentifier(identifier, metadata);
+    } catch {
+      switch (identifier) {
+        case SQLiteProvider.Identifiers.HandlerNotFound:
+          return 'The "QueryHandler" was not found for this provider. This usually means the "init()" method was not invoked.';
+      }
+
+      throw new Error(`Unknown identifier: ${identifier}`);
+    }
   }
 
-  public static defaultConnectionConfig: MariaProvider.ConnectionConfig = {
-    database: 'josh',
-    user: 'josh',
-    password: 'josh'
-  };
+  protected fetchVersion(context: JoshProvider.Context) {
+    const { tableName = context.name, dataDirectory, persistent } = this.options;
+
+    if (!persistent) return this.version;
+    if (!existsSync(resolve(dataDirectory, `${tableName}.sqlite`))) return this.version;
+
+    const database = new Database(resolve(dataDirectory, `${tableName}.sqlite`), { fileMustExist: true });
+
+    if (!(database.pragma(`table_info(${tableName})`) as TableInfo[]).some((info) => info.name === 'version')) {
+      return { major: 1, minor: 0, patch: 0 };
+    }
+
+    const table = database.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name = 'internal::autonum'`).get();
+
+    if (table !== undefined) return { major: 1, minor: 0, patch: 0 };
+
+    const row = database.prepare(`SELECT version FROM 'internal_metadata' WHERE name = '${tableName}'`).get() as
+      | Pick<QueryHandler.MetadataRow, 'version'>
+      | undefined;
+
+    database.close();
+
+    if (row === undefined) return this.version;
+
+    return this.resolveVersion(row.version);
+  }
 }
 
-export namespace MariaProvider {
+export namespace SQLiteProvider {
   export interface Options extends JoshProvider.Options {
-    connectionConfig?: ConnectionConfig | string;
+    tableName: string;
 
-    disableSerialization?: boolean;
+    useAbsolutePath?: boolean;
 
-    epoch?: number | bigint | Date;
+    dataDirectory: string;
+
+    wal: boolean;
+
+    persistent: boolean;
+
+    disableSerialization: boolean;
   }
 
-  export type ConnectionConfig = MariaConnectionConfig;
+  export enum Identifiers {
+    HandlerNotFound = 'handlerNotFound'
+  }
+}
+
+interface TableInfo {
+  cid: number;
+
+  name: string;
+
+  type: string;
+
+  notnull: number;
+
+  dflt_value: string | null;
+
+  pk: number;
+}
+
+interface LegacyAutoNumRow {
+  josh: string;
+
+  lastnum: number;
 }

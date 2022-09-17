@@ -19,9 +19,12 @@ export class Benchmark {
     this.providers.push([
       toTitleCase(name ?? provider.constructor.name, {
         additionalVariants: {
-          mapProvider: 'MapProvider',
           jsonProvider: 'JSONProvider',
+          mapProvider: 'MapProvider',
           mongoProvider: 'MongoProvider',
+          mariaProvider: 'MariaProvider',
+          redisProvider: 'RedisProvider',
+          sqliteProvider: 'SQLiteProvider',
           autoKey: 'AutoKey',
           deleteMany: 'DeleteMany',
           getAll: 'GetAll',
@@ -43,9 +46,12 @@ export class Benchmark {
         ...test,
         name: toTitleCase(test.name, {
           additionalVariants: {
-            mapProvider: 'MapProvider',
             jsonProvider: 'JSONProvider',
+            mapProvider: 'MapProvider',
             mongoProvider: 'MongoProvider',
+            mariaProvider: 'MariaProvider',
+            redisProvider: 'RedisProvider',
+            sqliteProvider: 'SQLiteProvider',
             autoKey: 'AutoKey',
             deleteMany: 'DeleteMany',
             getAll: 'GetAll',
