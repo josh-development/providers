@@ -101,6 +101,40 @@ jobs:
         with:
           name: coverage
           path: coverage/
+  postgresql:
+    name: PostgreSQLProvider
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
+      - name: Use Node.js v16
+        uses: actions/setup-node@2fddd8803e2f5c9604345a0b591c3020ee971a93 # tag=v3
+        with:
+          node-version: 16
+          cache: yarn
+          registry-url: https://registry.yarnpkg.com/
+      - name: Install Dependencies
+        run: yarn --immutable
+      - name: Run Tests
+        run: yarn workspace @joshdb/postgresql run test --coverage
+      - name: Store Code Coverage Report
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
+        with:
+          name: coverage
+          path: coverage/
   redis:
     name: RedisProvider
     runs-on: ubuntu-latest
@@ -146,7 +180,7 @@ jobs:
 
   upload-coverage-report:
     name: Upload Code Coverage Report
-    needs: [json, map, maria, mongo, redis, sqlite]
+    needs: [json, map, maria, mongo, postgresql, redis, sqlite]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Project

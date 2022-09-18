@@ -3,8 +3,8 @@ import { JSONProvider } from '../../packages/json/src';
 import { MapProvider } from '../../packages/map/src';
 import { MariaProvider } from '../../packages/maria/src';
 import { MongoProvider } from '../../packages/mongo/src';
+import { PostgreSQLProvider } from '../../packages/postgresql/src';
 import { RedisProvider } from '../../packages/redis/src';
-import { SQLiteProvider } from '../../packages/sqlite/src';
 import { Benchmark } from './lib/Benchmark';
 import { BASIC_BENCHMARK_TESTS, BENCHMARK_TESTS } from './lib/constants/benchmark-tests';
 import { BenchmarkType } from './lib/types/BenchmarkType';
@@ -15,14 +15,18 @@ async function main() {
     .add(new JSONProvider({ dataDirectory: '.bench' }), 'JSONProvider (Serialize)')
     .add(new JSONProvider({ dataDirectory: '.bench', disableSerialization: true }))
     .add(new MapProvider())
+    .add(new MariaProvider({}), 'MariaProvider (Serialize)')
+    .add(new MariaProvider({ disableSerialization: true }))
     .add(new MongoProvider({ collectionName: 'benchmark' }), 'MongoProvider (Serialize)')
     .add(new MongoProvider({ collectionName: 'benchmark', disableSerialization: true }))
+    .add(new PostgreSQLProvider({}), 'PostgreSQLProvider (Serialize)')
+    .add(new PostgreSQLProvider({ disableSerialization: true }))
     .add(new MariaProvider({}), 'MariaDBProvider (Serialize)')
     .add(new MariaProvider({ disableSerialization: true }))
     .add(new RedisProvider({}), 'RedisProvider (Serialize)')
     .add(new RedisProvider({ disableSerialization: true }))
-    .add(new SQLiteProvider({ dataDirectory: '.bench', wal: false }), 'SQLiteProvider (Serialize)')
-    .add(new SQLiteProvider({ dataDirectory: '.bench', wal: false, disableSerialization: true }));
+    .add(new MariaProvider({}), 'MariaDBProvider (Serialize)')
+    .add(new MariaProvider({ disableSerialization: true }));
 
   if (process.env.CI === 'true') prompts.inject([100, 50, BenchmarkType.All, PickType.No]);
 
