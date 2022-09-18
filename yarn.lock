@@ -418,7 +418,7 @@ __metadata:
     "@sapphire/snowflake": ^3.2.2
     "@sapphire/utilities": ^3.9.3
     "@vitest/coverage-c8": ^0.23.4
-    property-helpers: ^1.1.0
+    property-helpers: ^2.0.0
     typedoc: ^0.23.14
     typedoc-json-parser: ^3.2.0
     vitest: ^0.23.4
@@ -434,7 +434,7 @@ __metadata:
     "@joshdb/provider": 2.0.0-next.d32662f.0
     "@sapphire/utilities": ^3.9.3
     "@vitest/coverage-c8": ^0.23.4
-    property-helpers: ^1.1.0
+    property-helpers: ^2.0.0
     typedoc: ^0.23.14
     typedoc-json-parser: ^3.2.0
     vitest: ^0.23.4
@@ -468,7 +468,7 @@ __metadata:
     "@sapphire/utilities": ^3.9.3
     "@vitest/coverage-c8": ^0.23.4
     mongodb: ~4.9.1
-    property-helpers: ^1.1.0
+    property-helpers: ^2.0.0
     typedoc: ^0.23.14
     typedoc-json-parser: ^3.2.0
     vitest: ^0.23.4
@@ -521,7 +521,7 @@ __metadata:
     "@sapphire/utilities": ^3.9.3
     "@vitest/coverage-c8": ^0.23.4
     better-sqlite3: ^7.6.2
-    property-helpers: ^1.1.0
+    property-helpers: ^2.0.0
     typedoc: ^0.23.14
     typedoc-json-parser: ^3.2.0
     vitest: ^0.23.4
@@ -4493,10 +4493,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"property-helpers@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "property-helpers@npm:1.1.0"
-  checksum: c49de69e85a6611fed22cf5368c649e73c33bc00564be1ccdff500b366f239eab081b3a1afd08e47642dd97d64fbb172fe9fcf6aa01022aeb902f8164d7d295b
+"property-helpers@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "property-helpers@npm:2.0.0"
+  checksum: add616b9c4c555315089dcf7259f16614939b94bec37cc3ce4dae135180936dbaa984ada88b769670329b1f06abfbf36a4cdde8e5cf15b3553cbc81664cf11a6
   languageName: node
   linkType: hard
 
