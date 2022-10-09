@@ -31,8 +31,8 @@
     "@joshdb/provider": "2.0.0-next.d32662f.0",
     "@joshdb/serialize": "1.1.0-next.1a837f5.0",
     "@sapphire/snowflake": "^3.2.2",
-    "@sapphire/utilities": "^3.9.3",
-    "postgres": "^3.3.0",
+    "@sapphire/utilities": "^3.11.0",
+    "postgres": "^3.3.1",
     "property-helpers": "^1.1.0"
   },
   "devDependencies": {
