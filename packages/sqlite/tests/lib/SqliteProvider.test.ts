@@ -42,7 +42,7 @@ describe('migrations', () => {
     test('GIVEN allowMigrations as false THEN throws', async () => {
       const provider = new SQLiteProvider({ dataDirectory, persistent: true });
 
-      await expect(provider.init({ name: 'provider' })).rejects.toThrowError(provider['error'](JoshProvider.CommonIdentifiers.NeedsMigrations));
+      await expect(provider.init({ name: 'provider' })).rejects.toThrowError(provider['error'](JoshProvider.CommonIdentifiers.NeedsMigration));
     });
 
     test('GIVEN allowMigrations as true THEN runs migration successfully', async () => {
