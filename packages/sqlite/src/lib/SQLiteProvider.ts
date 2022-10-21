@@ -18,7 +18,9 @@ import {
   JoshProvider,
   MathOperator,
   Method,
-  Payloads
+  Payload,
+  resolveVersion,
+  Semver
 } from '@joshdb/provider';
 import { Serialize } from '@joshdb/serialize';
 import { isPrimitive } from '@sapphire/utilities';
@@ -73,7 +75,8 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
                 name: tableName,
                 version: `${major}.${minor}.${patch}`,
                 autoKeyCount: autoNum.lastnum,
-                serializedKeys: JSON.stringify(disableSerialization ? [] : entries.map((entry) => entry.key))
+                serializedKeys: JSON.stringify(disableSerialization ? [] : entries.map((entry) => entry.key)),
+                metadata: JSON.stringify({})
               });
           }
 
@@ -101,8 +104,8 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     };
   }
 
-  public get version(): JoshProvider.Semver {
-    return process.env.NODE_ENV === 'test' ? { major: 2, minor: 0, patch: 0 } : this.resolveVersion('[VI]{version}[/VI]');
+  public get version(): Semver {
+    return process.env.NODE_ENV === 'test' ? { major: 2, minor: 0, patch: 0 } : resolveVersion('[VI]{version}[/VI]');
   }
 
   private get handler(): QueryHandler<StoredValue> {
@@ -128,19 +131,31 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return context;
   }
 
-  public [Method.AutoKey](payload: Payloads.AutoKey): Payloads.AutoKey {
+  public deleteMetadata(key: string): void {
+    this.handler.deleteMetadata(key);
+  }
+
+  public getMetadata(key: string): unknown {
+    return this.handler.getMetadata(key);
+  }
+
+  public setMetadata(key: string, value: unknown): void {
+    this.handler.setMetadata(key, value);
+  }
+
+  public [Method.AutoKey](payload: Payload.AutoKey): Payload.AutoKey {
     payload.data = this.handler.autoKey();
 
     return payload;
   }
 
-  public [Method.Clear](payload: Payloads.Clear): Payloads.Clear {
+  public [Method.Clear](payload: Payload.Clear): Payload.Clear {
     this.handler.clear();
 
     return payload;
   }
 
-  public [Method.Dec](payload: Payloads.Dec): Payloads.Dec {
+  public [Method.Dec](payload: Payload.Dec): Payload.Dec {
     const { key, path } = payload;
     const getPayload = this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
@@ -163,7 +178,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.Delete](payload: Payloads.Delete): Payloads.Delete {
+  public [Method.Delete](payload: Payload.Delete): Payload.Delete {
     const { key, path } = payload;
 
     if (path.length === 0) this.handler.delete(key);
@@ -177,7 +192,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.DeleteMany](payload: Payloads.DeleteMany): Payloads.DeleteMany {
+  public [Method.DeleteMany](payload: Payload.DeleteMany): Payload.DeleteMany {
     const { keys } = payload;
 
     this.handler.deleteMany(keys);
@@ -185,7 +200,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public async [Method.Each](payload: Payloads.Each<StoredValue>): Promise<Payloads.Each<StoredValue>> {
+  public async [Method.Each](payload: Payload.Each<StoredValue>): Promise<Payload.Each<StoredValue>> {
     const { hook } = payload;
 
     for (const key of this.handler.keys()) await hook(this.handler.get(key)!, key);
@@ -193,7 +208,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.Ensure](payload: Payloads.Ensure<StoredValue>): Payloads.Ensure<StoredValue> {
+  public [Method.Ensure](payload: Payload.Ensure<StoredValue>): Payload.Ensure<StoredValue> {
     const { key, defaultValue } = payload;
 
     payload.data = defaultValue;
@@ -204,15 +219,15 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.Entries](payload: Payloads.Entries<StoredValue>): Payloads.Entries<StoredValue> {
+  public [Method.Entries](payload: Payload.Entries<StoredValue>): Payload.Entries<StoredValue> {
     payload.data = this.handler.entries().reduce((data, [key, value]) => ({ ...data, [key]: value }), {});
 
     return payload;
   }
 
-  public async [Method.Every](payload: Payloads.Every.ByHook<StoredValue>): Promise<Payloads.Every.ByHook<StoredValue>>;
-  public async [Method.Every](payload: Payloads.Every.ByValue): Promise<Payloads.Every.ByValue>;
-  public async [Method.Every](payload: Payloads.Every<StoredValue>): Promise<Payloads.Every<StoredValue>> {
+  public async [Method.Every](payload: Payload.Every.ByHook<StoredValue>): Promise<Payload.Every.ByHook<StoredValue>>;
+  public async [Method.Every](payload: Payload.Every.ByValue): Promise<Payload.Every.ByValue>;
+  public async [Method.Every](payload: Payload.Every<StoredValue>): Promise<Payload.Every<StoredValue>> {
     payload.data = true;
 
     if (this.handler.size() === 0) return payload;
@@ -255,9 +270,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public async [Method.Filter](payload: Payloads.Filter.ByHook<StoredValue>): Promise<Payloads.Filter.ByHook<StoredValue>>;
-  public async [Method.Filter](payload: Payloads.Filter.ByValue<StoredValue>): Promise<Payloads.Filter.ByValue<StoredValue>>;
-  public async [Method.Filter](payload: Payloads.Filter<StoredValue>): Promise<Payloads.Filter<StoredValue>> {
+  public async [Method.Filter](payload: Payload.Filter.ByHook<StoredValue>): Promise<Payload.Filter.ByHook<StoredValue>>;
+  public async [Method.Filter](payload: Payload.Filter.ByValue<StoredValue>): Promise<Payload.Filter.ByValue<StoredValue>>;
+  public async [Method.Filter](payload: Payload.Filter<StoredValue>): Promise<Payload.Filter<StoredValue>> {
     payload.data = {};
 
     if (isFilterByHookPayload(payload)) {
@@ -291,9 +306,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public async [Method.Find](payload: Payloads.Find.ByHook<StoredValue>): Promise<Payloads.Find.ByHook<StoredValue>>;
-  public async [Method.Find](payload: Payloads.Find.ByValue<StoredValue>): Promise<Payloads.Find.ByValue<StoredValue>>;
-  public async [Method.Find](payload: Payloads.Find<StoredValue>): Promise<Payloads.Find<StoredValue>> {
+  public async [Method.Find](payload: Payload.Find.ByHook<StoredValue>): Promise<Payload.Find.ByHook<StoredValue>>;
+  public async [Method.Find](payload: Payload.Find.ByValue<StoredValue>): Promise<Payload.Find.ByValue<StoredValue>>;
+  public async [Method.Find](payload: Payload.Find<StoredValue>): Promise<Payload.Find<StoredValue>> {
     payload.data = [null, null];
 
     if (isFindByHookPayload(payload)) {
@@ -347,7 +362,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.Get]<Value = StoredValue>(payload: Payloads.Get<Value>): Payloads.Get<Value> {
+  public [Method.Get]<Value = StoredValue>(payload: Payload.Get<Value>): Payload.Get<Value> {
     const { key, path } = payload;
 
     if (path.length === 0) {
@@ -361,7 +376,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.GetMany](payload: Payloads.GetMany<StoredValue>): Payloads.GetMany<StoredValue> {
+  public [Method.GetMany](payload: Payload.GetMany<StoredValue>): Payload.GetMany<StoredValue> {
     const { keys } = payload;
 
     payload.data = this.handler.getMany(keys);
@@ -369,13 +384,13 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.Has](payload: Payloads.Has): Payloads.Has {
+  public [Method.Has](payload: Payload.Has): Payload.Has {
     payload.data = this.handler.has(payload.key) && hasProperty(this.handler.get(payload.key), payload.path);
 
     return payload;
   }
 
-  public [Method.Inc](payload: Payloads.Inc): Payloads.Inc {
+  public [Method.Inc](payload: Payload.Inc): Payload.Inc {
     const { key, path } = payload;
     const getPayload = this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
@@ -398,15 +413,15 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.Keys](payload: Payloads.Keys): Payloads.Keys {
+  public [Method.Keys](payload: Payload.Keys): Payload.Keys {
     payload.data = this.handler.keys();
 
     return payload;
   }
 
-  public async [Method.Map]<Value = StoredValue>(payload: Payloads.Map.ByHook<StoredValue, Value>): Promise<Payloads.Map.ByHook<StoredValue, Value>>;
-  public async [Method.Map]<Value = StoredValue>(payload: Payloads.Map.ByPath<Value>): Promise<Payloads.Map.ByPath<Value>>;
-  public async [Method.Map]<Value = StoredValue>(payload: Payloads.Map<StoredValue, Value>): Promise<Payloads.Map<StoredValue, Value>> {
+  public async [Method.Map]<Value = StoredValue>(payload: Payload.Map.ByHook<StoredValue, Value>): Promise<Payload.Map.ByHook<StoredValue, Value>>;
+  public async [Method.Map]<Value = StoredValue>(payload: Payload.Map.ByPath<Value>): Promise<Payload.Map.ByPath<Value>>;
+  public async [Method.Map]<Value = StoredValue>(payload: Payload.Map<StoredValue, Value>): Promise<Payload.Map<StoredValue, Value>> {
     payload.data = [];
 
     if (isMapByHookPayload(payload)) {
@@ -428,7 +443,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.Math](payload: Payloads.Math): Payloads.Math {
+  public [Method.Math](payload: Payload.Math): Payload.Math {
     const { key, path, operator, operand } = payload;
     const getPayload = this[Method.Get]<number>({ method: Method.Get, errors: [], key, path });
 
@@ -483,9 +498,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public async [Method.Partition](payload: Payloads.Partition.ByHook<StoredValue>): Promise<Payloads.Partition.ByHook<StoredValue>>;
-  public async [Method.Partition](payload: Payloads.Partition.ByValue<StoredValue>): Promise<Payloads.Partition.ByValue<StoredValue>>;
-  public async [Method.Partition](payload: Payloads.Partition<StoredValue>): Promise<Payloads.Partition<StoredValue>> {
+  public async [Method.Partition](payload: Payload.Partition.ByHook<StoredValue>): Promise<Payload.Partition.ByHook<StoredValue>>;
+  public async [Method.Partition](payload: Payload.Partition.ByValue<StoredValue>): Promise<Payload.Partition.ByValue<StoredValue>>;
+  public async [Method.Partition](payload: Payload.Partition<StoredValue>): Promise<Payload.Partition<StoredValue>> {
     payload.data = { truthy: {}, falsy: {} };
 
     if (isPartitionByHookPayload(payload)) {
@@ -525,7 +540,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.Push]<Value = StoredValue>(payload: Payloads.Push<Value>): Payloads.Push<Value> {
+  public [Method.Push]<Value = StoredValue>(payload: Payload.Push<Value>): Payload.Push<Value> {
     const { key, path, value } = payload;
     const getPayload = this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
@@ -549,7 +564,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.Random](payload: Payloads.Random<StoredValue>): Payloads.Random<StoredValue> {
+  public [Method.Random](payload: Payload.Random<StoredValue>): Payload.Random<StoredValue> {
     const { count, duplicates } = payload;
     const size = this.handler.size();
 
@@ -581,7 +596,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.RandomKey](payload: Payloads.RandomKey): Payloads.RandomKey {
+  public [Method.RandomKey](payload: Payload.RandomKey): Payload.RandomKey {
     const { count, duplicates } = payload;
     const size = this.handler.size();
 
@@ -609,9 +624,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public async [Method.Remove]<Value = StoredValue>(payload: Payloads.Remove.ByHook<Value>): Promise<Payloads.Remove.ByHook<Value>>;
-  public async [Method.Remove](payload: Payloads.Remove.ByValue): Promise<Payloads.Remove.ByValue>;
-  public async [Method.Remove]<Value = StoredValue>(payload: Payloads.Remove<Value>): Promise<Payloads.Remove<Value>> {
+  public async [Method.Remove]<Value = StoredValue>(payload: Payload.Remove.ByHook<Value>): Promise<Payload.Remove.ByHook<Value>>;
+  public async [Method.Remove](payload: Payload.Remove.ByValue): Promise<Payload.Remove.ByValue>;
+  public async [Method.Remove]<Value = StoredValue>(payload: Payload.Remove<Value>): Promise<Payload.Remove<Value>> {
     if (isRemoveByHookPayload(payload)) {
       const { key, path, hook } = payload;
       const getPayload = this[Method.Get]<Value[]>({ method: Method.Get, errors: [], key, path });
@@ -659,7 +674,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.Set]<Value = StoredValue>(payload: Payloads.Set<Value>): Payloads.Set<Value> {
+  public [Method.Set]<Value = StoredValue>(payload: Payload.Set<Value>): Payload.Set<Value> {
     const { key, path, value } = payload;
 
     if (path.length === 0) this.handler.set(key, value as unknown as StoredValue);
@@ -672,7 +687,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.SetMany](payload: Payloads.SetMany): Payloads.SetMany {
+  public [Method.SetMany](payload: Payload.SetMany): Payload.SetMany {
     const { entries, overwrite } = payload;
     const withPath = entries.filter((entry) => entry.path.length > 0);
     const withoutPath = entries.filter((entry) => entry.path.length === 0);
@@ -694,15 +709,15 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.Size](payload: Payloads.Size): Payloads.Size {
+  public [Method.Size](payload: Payload.Size): Payload.Size {
     payload.data = this.handler.size();
 
     return payload;
   }
 
-  public async [Method.Some](payload: Payloads.Some.ByHook<StoredValue>): Promise<Payloads.Some.ByHook<StoredValue>>;
-  public async [Method.Some](payload: Payloads.Some.ByValue): Promise<Payloads.Some.ByValue>;
-  public async [Method.Some](payload: Payloads.Some<StoredValue>): Promise<Payloads.Some<StoredValue>> {
+  public async [Method.Some](payload: Payload.Some.ByHook<StoredValue>): Promise<Payload.Some.ByHook<StoredValue>>;
+  public async [Method.Some](payload: Payload.Some.ByValue): Promise<Payload.Some.ByValue>;
+  public async [Method.Some](payload: Payload.Some<StoredValue>): Promise<Payload.Some<StoredValue>> {
     payload.data = false;
 
     if (isSomeByHookPayload(payload)) {
@@ -748,7 +763,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public async [Method.Update]<Value = StoredValue>(payload: Payloads.Update<StoredValue, Value>): Promise<Payloads.Update<StoredValue, Value>> {
+  public async [Method.Update]<Value = StoredValue>(payload: Payload.Update<StoredValue, Value>): Promise<Payload.Update<StoredValue, Value>> {
     const { key, hook } = payload;
     const getPayload = this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
 
@@ -765,7 +780,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  public [Method.Values](payload: Payloads.Values<StoredValue>): Payloads.Values<StoredValue> {
+  public [Method.Values](payload: Payload.Values<StoredValue>): Payload.Values<StoredValue> {
     payload.data = this.handler.values();
 
     return payload;
@@ -808,7 +823,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 
     if (row === undefined) return this.version;
 
-    return this.resolveVersion(row.version);
+    return resolveVersion(row.version);
   }
 }
 

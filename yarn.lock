@@ -1242,7 +1242,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^1.8.8
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/provider": 2.0.0-next.d32662f.0
+    "@joshdb/provider": 2.0.0-next.aff5bcd.0
     "@joshdb/serialize": 1.1.0-next.1a837f5.0
     "@sapphire/async-queue": ^1.5.0
     "@sapphire/snowflake": ^3.2.2
@@ -1261,7 +1261,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^1.8.8
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/provider": 2.0.0-next.d32662f.0
+    "@joshdb/provider": 2.0.0-next.aff5bcd.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.24.4
     property-helpers: ^2.0.0
@@ -1277,7 +1277,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^1.8.8
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/provider": 2.0.0-next.d32662f.0
+    "@joshdb/provider": 2.0.0-next.aff5bcd.0
     "@sapphire/snowflake": ^3.2.2
     "@vitest/coverage-c8": ^0.24.4
     mariadb: ^3.0.2
@@ -1293,7 +1293,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^1.8.8
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/provider": 2.0.0-next.d32662f.0
+    "@joshdb/provider": 2.0.0-next.aff5bcd.0
     "@joshdb/serialize": 1.1.0-next.1a837f5.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.24.4
@@ -1311,7 +1311,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^1.8.8
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/provider": 2.0.0-next.d32662f.0
+    "@joshdb/provider": 2.0.0-next.aff5bcd.0
     "@joshdb/serialize": 1.1.0-next.1a837f5.0
     "@sapphire/snowflake": ^3.2.2
     "@sapphire/utilities": ^3.11.0
@@ -1324,13 +1324,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/provider@npm:2.0.0-next.d32662f.0":
-  version: 2.0.0-next.d32662f.0
-  resolution: "@joshdb/provider@npm:2.0.0-next.d32662f.0"
+"@joshdb/provider@npm:2.0.0-next.039d9c7.0":
+  version: 2.0.0-next.039d9c7.0
+  resolution: "@joshdb/provider@npm:2.0.0-next.039d9c7.0"
   dependencies:
-    "@sapphire/utilities": ^3.9.3
+    "@sapphire/utilities": ^3.11.0
     reflect-metadata: ^0.1.13
-  checksum: 2e1b84266f8b50ae2ee68af14d91df6a427ae42ff8058671ec4e20e16040b5cae05369996d20a77e93b722dd2315c1743e0360e1896b6b76381e124b71699a38
+  checksum: cf463974cc6e3161b94a8b22ecdbbe2ae4d928b74a9dcf3deb9ffc5b808652ee771a47e46701dd1b740c6167dfe8223e16adbef20d803ee3d2cfa73efad8f63a
+  languageName: node
+  linkType: hard
+
+"@joshdb/provider@npm:2.0.0-next.aff5bcd.0":
+  version: 2.0.0-next.aff5bcd.0
+  resolution: "@joshdb/provider@npm:2.0.0-next.aff5bcd.0"
+  dependencies:
+    "@sapphire/utilities": ^3.11.0
+    reflect-metadata: ^0.1.13
+  checksum: 6c4184bcc138debc189046e3e301dda0c73839047d0dba92f166179694a3841b40fbcea733ec0d34f1aa334aefce9b76dbec9f0b194ce52f6b7672583505db20
   languageName: node
   linkType: hard
 
@@ -1340,7 +1350,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^1.8.8
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/provider": 2.0.0-next.d32662f.0
+    "@joshdb/provider": 2.0.0-next.aff5bcd.0
     "@joshdb/serialize": 1.1.0-next.1a837f5.0
     "@types/uuid": ^8.3.4
     "@vitest/coverage-c8": ^0.24.4
@@ -1365,7 +1375,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^1.8.8
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/provider": 2.0.0-next.d32662f.0
+    "@joshdb/provider": 2.0.0-next.aff5bcd.0
     "@joshdb/serialize": 1.1.0-next.1a837f5.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.24.4
@@ -2266,7 +2276,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "benchmarks@workspace:benchmarks"
   dependencies:
-    "@joshdb/provider": 2.0.0-next.d32662f.0
+    "@joshdb/provider": 2.0.0-next.039d9c7.0
     "@sapphire/utilities": ^3.11.0
   languageName: unknown
   linkType: soft

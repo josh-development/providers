@@ -18,13 +18,19 @@ import {
   JoshProvider,
   MathOperator,
   Method,
-  Payloads
+  Payload,
+  resolveVersion,
+  Semver
 } from '@joshdb/provider';
 import { Serialize } from '@joshdb/serialize';
 import { isNullOrUndefined, isPrimitive } from '@sapphire/utilities';
 import { Collection, Document, Filter, MongoClient, MongoClientOptions, ObjectId } from 'mongodb';
 import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 
+/**
+ * A provider that uses MongoDB as a database.
+ * @since 2.0.0
+ */
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: MongoProvider.Options;
 
@@ -55,8 +61,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     super(options);
   }
 
-  public get version(): JoshProvider.Semver {
-    return this.resolveVersion('[VI]{version}[/VI]');
+  public get version(): Semver {
+    return resolveVersion('[VI]{version}[/VI]');
   }
 
   private get client(): MongoClient {
@@ -118,18 +124,18 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return this.client.close();
   }
 
-  public [Method.AutoKey](payload: Payloads.AutoKey): Payloads.AutoKey {
+  public [Method.AutoKey](payload: Payload.AutoKey): Payload.AutoKey {
     payload.data = new ObjectId().toString();
 
     return payload;
   }
 
-  public async [Method.Clear](payload: Payloads.Clear): Promise<Payloads.Clear> {
+  public async [Method.Clear](payload: Payload.Clear): Promise<Payload.Clear> {
     await this.collection.deleteMany({});
     return payload;
   }
 
-  public async [Method.Dec](payload: Payloads.Dec): Promise<Payloads.Dec> {
+  public async [Method.Dec](payload: Payload.Dec): Promise<Payload.Dec> {
     const { key, path } = payload;
     const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
@@ -152,7 +158,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Delete](payload: Payloads.Delete): Promise<Payloads.Delete> {
+  public async [Method.Delete](payload: Payload.Delete): Promise<Payload.Delete> {
     const { key, path } = payload;
 
     if (path.length === 0) {
@@ -173,7 +179,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.DeleteMany](payload: Payloads.DeleteMany): Promise<Payloads.DeleteMany> {
+  public async [Method.DeleteMany](payload: Payload.DeleteMany): Promise<Payload.DeleteMany> {
     const { keys } = payload;
 
     await this.collection.deleteMany({ key: { $in: keys } });
@@ -181,7 +187,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Each](payload: Payloads.Each<StoredValue>): Promise<Payloads.Each<StoredValue>> {
+  public async [Method.Each](payload: Payload.Each<StoredValue>): Promise<Payload.Each<StoredValue>> {
     const { hook } = payload;
 
     for await (const { key, value } of this.iterate()) {
@@ -191,7 +197,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Ensure](payload: Payloads.Ensure<StoredValue>): Promise<Payloads.Ensure<StoredValue>> {
+  public async [Method.Ensure](payload: Payload.Ensure<StoredValue>): Promise<Payload.Ensure<StoredValue>> {
     const { key } = payload;
 
     if (!(await this[Method.Has]({ method: Method.Has, errors: [], key, path: [] })).data) {
@@ -203,7 +209,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Entries](payload: Payloads.Entries<StoredValue>): Promise<Payloads.Entries<StoredValue>> {
+  public async [Method.Entries](payload: Payload.Entries<StoredValue>): Promise<Payload.Entries<StoredValue>> {
     payload.data = {};
 
     const docs = await this._getAll();
@@ -213,9 +219,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Every](payload: Payloads.Every.ByHook<StoredValue>): Promise<Payloads.Every.ByHook<StoredValue>>;
-  public async [Method.Every](payload: Payloads.Every.ByValue): Promise<Payloads.Every.ByValue>;
-  public async [Method.Every](payload: Payloads.Every<StoredValue>): Promise<Payloads.Every<StoredValue>> {
+  public async [Method.Every](payload: Payload.Every.ByHook<StoredValue>): Promise<Payload.Every.ByHook<StoredValue>>;
+  public async [Method.Every](payload: Payload.Every.ByValue): Promise<Payload.Every.ByValue>;
+  public async [Method.Every](payload: Payload.Every<StoredValue>): Promise<Payload.Every<StoredValue>> {
     payload.data = true;
 
     if ((await this[Method.Size]({ method: Method.Size, errors: [] })).data === 0) return payload;
@@ -260,9 +266,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Filter](payload: Payloads.Filter.ByHook<StoredValue>): Promise<Payloads.Filter.ByHook<StoredValue>>;
-  public async [Method.Filter](payload: Payloads.Filter.ByValue<StoredValue>): Promise<Payloads.Filter.ByValue<StoredValue>>;
-  public async [Method.Filter](payload: Payloads.Filter<StoredValue>): Promise<Payloads.Filter<StoredValue>> {
+  public async [Method.Filter](payload: Payload.Filter.ByHook<StoredValue>): Promise<Payload.Filter.ByHook<StoredValue>>;
+  public async [Method.Filter](payload: Payload.Filter.ByValue<StoredValue>): Promise<Payload.Filter.ByValue<StoredValue>>;
+  public async [Method.Filter](payload: Payload.Filter<StoredValue>): Promise<Payload.Filter<StoredValue>> {
     payload.data = {};
 
     if (isFilterByHookPayload(payload)) {
@@ -304,9 +310,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Find](payload: Payloads.Find.ByHook<StoredValue>): Promise<Payloads.Find.ByHook<StoredValue>>;
-  public async [Method.Find](payload: Payloads.Find.ByValue<StoredValue>): Promise<Payloads.Find.ByValue<StoredValue>>;
-  public async [Method.Find](payload: Payloads.Find<StoredValue>): Promise<Payloads.Find<StoredValue>> {
+  public async [Method.Find](payload: Payload.Find.ByHook<StoredValue>): Promise<Payload.Find.ByHook<StoredValue>>;
+  public async [Method.Find](payload: Payload.Find.ByValue<StoredValue>): Promise<Payload.Find.ByValue<StoredValue>>;
+  public async [Method.Find](payload: Payload.Find<StoredValue>): Promise<Payload.Find<StoredValue>> {
     payload.data = [null, null];
 
     if (isFindByHookPayload(payload)) {
@@ -357,7 +363,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Get]<StoredValue>(payload: Payloads.Get<StoredValue>): Promise<Payloads.Get<StoredValue>> {
+  public async [Method.Get]<StoredValue>(payload: Payload.Get<StoredValue>): Promise<Payload.Get<StoredValue>> {
     const { key, path } = payload;
     const doc = await this.collection.findOne({ key }, { projection: { value: 1 } });
 
@@ -376,7 +382,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.GetMany](payload: Payloads.GetMany<StoredValue>): Promise<Payloads.GetMany<StoredValue>> {
+  public async [Method.GetMany](payload: Payload.GetMany<StoredValue>): Promise<Payload.GetMany<StoredValue>> {
     payload.data = {};
 
     const { keys } = payload;
@@ -387,7 +393,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Has](payload: Payloads.Has): Promise<Payloads.Has> {
+  public async [Method.Has](payload: Payload.Has): Promise<Payload.Has> {
     const { key, path } = payload;
     let isThere = (await this.collection.countDocuments({ key })) !== 0;
 
@@ -402,7 +408,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Inc](payload: Payloads.Inc): Promise<Payloads.Inc> {
+  public async [Method.Inc](payload: Payload.Inc): Promise<Payload.Inc> {
     const { key, path } = payload;
     const getPayload = await this[Method.Get]<StoredValue>({ method: Method.Get, errors: [], key, path });
 
@@ -425,7 +431,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Keys](payload: Payloads.Keys): Promise<Payloads.Keys> {
+  public async [Method.Keys](payload: Payload.Keys): Promise<Payload.Keys> {
     const docs = await this._getAll({ key: 1 });
 
     payload.data = docs.map((doc) => doc.key);
@@ -433,9 +439,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Map]<Value = StoredValue>(payload: Payloads.Map.ByHook<StoredValue, Value>): Promise<Payloads.Map.ByHook<StoredValue, Value>>;
-  public async [Method.Map]<Value = StoredValue>(payload: Payloads.Map.ByPath<Value>): Promise<Payloads.Map.ByPath<Value>>;
-  public async [Method.Map]<Value = StoredValue>(payload: Payloads.Map<StoredValue, Value>): Promise<Payloads.Map<StoredValue, Value>> {
+  public async [Method.Map]<Value = StoredValue>(payload: Payload.Map.ByHook<StoredValue, Value>): Promise<Payload.Map.ByHook<StoredValue, Value>>;
+  public async [Method.Map]<Value = StoredValue>(payload: Payload.Map.ByPath<Value>): Promise<Payload.Map.ByPath<Value>>;
+  public async [Method.Map]<Value = StoredValue>(payload: Payload.Map<StoredValue, Value>): Promise<Payload.Map<StoredValue, Value>> {
     payload.data = [];
 
     if (isMapByHookPayload(payload)) {
@@ -458,7 +464,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Math](payload: Payloads.Math): Promise<Payloads.Math> {
+  public async [Method.Math](payload: Payload.Math): Promise<Payload.Math> {
     const { key, path, operator, operand } = payload;
     const getPayload = await this[Method.Get]<number>({ method: Method.Get, errors: [], key, path });
 
@@ -513,9 +519,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Partition](payload: Payloads.Partition.ByHook<StoredValue>): Promise<Payloads.Partition.ByHook<StoredValue>>;
-  public async [Method.Partition](payload: Payloads.Partition.ByValue<StoredValue>): Promise<Payloads.Partition.ByValue<StoredValue>>;
-  public async [Method.Partition](payload: Payloads.Partition<StoredValue>): Promise<Payloads.Partition<StoredValue>> {
+  public async [Method.Partition](payload: Payload.Partition.ByHook<StoredValue>): Promise<Payload.Partition.ByHook<StoredValue>>;
+  public async [Method.Partition](payload: Payload.Partition.ByValue<StoredValue>): Promise<Payload.Partition.ByValue<StoredValue>>;
+  public async [Method.Partition](payload: Payload.Partition<StoredValue>): Promise<Payload.Partition<StoredValue>> {
     payload.data = { truthy: {}, falsy: {} };
 
     if (isPartitionByHookPayload(payload)) {
@@ -559,7 +565,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Push]<Value = StoredValue>(payload: Payloads.Push<Value>): Promise<Payloads.Push<Value>> {
+  public async [Method.Push]<Value = StoredValue>(payload: Payload.Push<Value>): Promise<Payload.Push<Value>> {
     const { key, path, value } = payload;
     const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
@@ -583,7 +589,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   // Due to the use of $sample, the output will never have duplicates
-  public async [Method.Random](payload: Payloads.Random<StoredValue>): Promise<Payloads.Random<StoredValue>> {
+  public async [Method.Random](payload: Payload.Random<StoredValue>): Promise<Payload.Random<StoredValue>> {
     const docCount = await this.collection.countDocuments({});
 
     if (docCount === 0) return { ...payload, data: [] };
@@ -601,7 +607,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.RandomKey](payload: Payloads.RandomKey): Promise<Payloads.RandomKey> {
+  public async [Method.RandomKey](payload: Payload.RandomKey): Promise<Payload.RandomKey> {
     const docCount = await this.collection.countDocuments({});
 
     if (docCount === 0) return { ...payload, data: [] };
@@ -619,9 +625,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Remove]<HookValue = StoredValue>(payload: Payloads.Remove.ByHook<HookValue>): Promise<Payloads.Remove.ByHook<HookValue>>;
-  public async [Method.Remove](payload: Payloads.Remove.ByValue): Promise<Payloads.Remove.ByValue>;
-  public async [Method.Remove]<HookValue = StoredValue>(payload: Payloads.Remove<HookValue>): Promise<Payloads.Remove<HookValue>> {
+  public async [Method.Remove]<HookValue = StoredValue>(payload: Payload.Remove.ByHook<HookValue>): Promise<Payload.Remove.ByHook<HookValue>>;
+  public async [Method.Remove](payload: Payload.Remove.ByValue): Promise<Payload.Remove.ByValue>;
+  public async [Method.Remove]<HookValue = StoredValue>(payload: Payload.Remove<HookValue>): Promise<Payload.Remove<HookValue>> {
     if (isRemoveByHookPayload(payload)) {
       const { key, path, hook } = payload;
       const getPayload = await this[Method.Get]<HookValue[]>({ method: Method.Get, errors: [], key, path });
@@ -669,7 +675,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Set]<Value = StoredValue>(payload: Payloads.Set<Value>): Promise<Payloads.Set<Value>> {
+  public async [Method.Set]<Value = StoredValue>(payload: Payload.Set<Value>): Promise<Payload.Set<Value>> {
     const { key, path, value } = payload;
     const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] })).data, path, value) : value;
 
@@ -688,7 +694,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.SetMany](payload: Payloads.SetMany): Promise<Payloads.SetMany> {
+  public async [Method.SetMany](payload: Payload.SetMany): Promise<Payload.SetMany> {
     const { entries } = payload;
     const operations = [];
 
@@ -723,15 +729,15 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Size](payload: Payloads.Size): Promise<Payloads.Size> {
+  public async [Method.Size](payload: Payload.Size): Promise<Payload.Size> {
     payload.data = (await this.collection.countDocuments({})) ?? payload.data;
 
     return payload;
   }
 
-  public async [Method.Some](payload: Payloads.Some.ByHook<StoredValue>): Promise<Payloads.Some.ByHook<StoredValue>>;
-  public async [Method.Some](payload: Payloads.Some.ByValue): Promise<Payloads.Some.ByValue>;
-  public async [Method.Some](payload: Payloads.Some<StoredValue>): Promise<Payloads.Some<StoredValue>> {
+  public async [Method.Some](payload: Payload.Some.ByHook<StoredValue>): Promise<Payload.Some.ByHook<StoredValue>>;
+  public async [Method.Some](payload: Payload.Some.ByValue): Promise<Payload.Some.ByValue>;
+  public async [Method.Some](payload: Payload.Some<StoredValue>): Promise<Payload.Some<StoredValue>> {
     payload.data = false;
     if (isSomeByHookPayload(payload)) {
       const { hook } = payload;
@@ -778,7 +784,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Update]<Value = StoredValue>(payload: Payloads.Update<StoredValue, Value>): Promise<Payloads.Update<StoredValue, Value>> {
+  public async [Method.Update]<Value = StoredValue>(payload: Payload.Update<StoredValue, Value>): Promise<Payload.Update<StoredValue, Value>> {
     const { key, hook } = payload;
     const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
 
@@ -795,7 +801,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  public async [Method.Values](payload: Payloads.Values<StoredValue>): Promise<Payloads.Values<StoredValue>> {
+  public async [Method.Values](payload: Payload.Values<StoredValue>): Promise<Payload.Values<StoredValue>> {
     const docs = await this._getAll({ value: 1 });
 
     payload.data = docs.map((doc) => this.deserialize(doc.value));
@@ -803,7 +809,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  protected async fetchVersion(): Promise<JoshProvider.Semver> {
+  protected async fetchVersion(): Promise<Semver> {
     const doc = await this.collection.findOne({}, { projection: { version: 1 } });
 
     if (!doc) return this.version;
@@ -858,14 +864,34 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
 export namespace MongoProvider {
   export interface Options extends JoshProvider.Options {
+    /**
+     * The collection name to use.
+     * @since 2.0.0
+     */
     collectionName?: string;
 
+    /**
+     * The connection options to use.
+     * @since 2.0.0
+     */
     connectOptions?: MongoClientOptions;
 
+    /**
+     * Whether to enforce the collection name for compatibility with MongoDB.
+     * @since 2.0.0
+     */
     enforceCollectionName?: boolean;
 
+    /**
+     * The authentication to use.
+     * @since 2.0.0
+     */
     authentication?: Partial<Authentication> | string;
 
+    /**
+     * Whether to disable serialization.
+     * @since 2.0.0
+     */
     disableSerialization?: boolean;
   }
 
@@ -886,7 +912,7 @@ export namespace MongoProvider {
 
     value: Serialize.JSON | StoredValue;
 
-    version: JoshProvider.Semver;
+    version: Semver;
   }
 
   export interface IterateOptions<StoredValue = unknown> {
