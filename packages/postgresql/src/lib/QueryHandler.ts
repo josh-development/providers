@@ -34,7 +34,7 @@ export class QueryHandler<StoredValue = unknown> {
     await this.sql`
       CREATE TABLE IF NOT EXISTS internal_metadata (
         name VARCHAR(255) PRIMARY KEY,
-        version VARCHAR(255) NOT NULL
+        version VARCHAR(255) NOT NULL,
         metadata TEXT NOT NULL
       )
     `;
