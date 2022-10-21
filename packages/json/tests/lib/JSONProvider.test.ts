@@ -31,7 +31,7 @@ describe('migrations', () => {
     test('GIVEN allowMigrations as false THEN throws', async () => {
       const provider = new JSONProvider({ dataDirectory: '.tests' });
 
-      await expect(provider.init({ name: 'migrations' })).rejects.toThrowError(provider['error'](JoshProvider.CommonIdentifiers.NeedsMigrations));
+      await expect(provider.init({ name: 'migrations' })).rejects.toThrowError(provider['error'](JoshProvider.CommonIdentifiers.NeedsMigration));
     });
 
     test('GIVEN allowMigrations as true THEN migrates', async () => {
