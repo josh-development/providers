@@ -35,35 +35,49 @@ npm install @joshdb/json
 ## Provider Options
 
 ```typescript
-interface Options {
+export interface Options extends JoshProvider.Options {
   /**
-   * The directory name for data. Defaults to "data".
+   * Whether to use treat the data directory as an absolute path.
+   * @since 2.0.0
+   */
+  useAbsolutePath?: boolean;
+
+  /**
+   * The data directory to use.
    * @since 2.0.0
    */
   dataDirectory?: string;
 
   /**
-   * The max amount of keys in a single chunk. Defaults to 100.
+   * Whether to disable data serialization with `@joshdb/serialize`.
    * @since 2.0.0
    */
-  maxChunkSize?: number;
+  disableSerialization?: boolean;
 
   /**
-   * The epoch for chunk generation.
+   * The epoch used for `@sapphire/snowflake`.
    * @since 2.0.0
    */
   epoch?: number | bigint | Date;
 
   /**
-   * Whether to synchronize data when the provider is initiated.
+   * The max chunk size to use.
+   *
+   * This is the maximum number of entries that can be stored in a single chunk file.
    * @since 2.0.0
    */
-  synchronize?: boolean;
+  maxChunkSize?: number;
 
   /**
-   * The retry options for this provider to use.
+   * The retry options to use.
    * @since 2.0.0
    */
   retry?: File.RetryOptions;
+
+  /**
+   * Whether to synchronize all data when the provider is initialized.
+   * @since 2.0.0
+   */
+  synchronize?: boolean;
 }
 ```

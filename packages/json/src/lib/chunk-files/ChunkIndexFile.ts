@@ -1,10 +1,10 @@
-import type { JoshProvider } from '@joshdb/provider';
+import type { Semver } from '@joshdb/provider';
 import { mkdir } from 'node:fs/promises';
 import { File } from '../File';
 import { ChunkLockFile } from './ChunkLockFile';
 
 export class ChunkIndexFile extends File {
-  public version: JoshProvider.Semver;
+  public version: Semver;
 
   public lock: ChunkLockFile;
 
@@ -22,7 +22,7 @@ export class ChunkIndexFile extends File {
 
       await mkdir(directory, { recursive: true });
 
-      await this.save({ name: this.options.name, version: this.version, autoKeyCount: 0, chunks: [] });
+      await this.save({ name: this.options.name, version: this.version, autoKeyCount: 0, chunks: [], metadata: {} });
 
       return this.fetch();
     }
@@ -44,7 +44,7 @@ export class ChunkIndexFile extends File {
 
 export namespace ChunkIndexFile {
   export interface Options {
-    version: JoshProvider.Semver;
+    version: Semver;
 
     directory: string;
 
@@ -54,11 +54,13 @@ export namespace ChunkIndexFile {
   export interface Data {
     name: string;
 
-    version: JoshProvider.Semver;
+    version: Semver;
 
     autoKeyCount: number;
 
     chunks: Chunk[];
+
+    metadata: Record<string, unknown>;
   }
 
   export interface Chunk {

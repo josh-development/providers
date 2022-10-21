@@ -1,11 +1,10 @@
 /packages/json/**/*.ts @RealShadowNova
-/packages/json/README.md @RealShadowNova
+/packages/maria/**/*.ts @j122j
 /packages/map/**/*.ts @RealShadowNova
-/packages/map/README.md @RealShadowNova
 /packages/mongo/**/*.ts @dan-online
-/packages/mongo/REAMDE.md @dan-online
+/packages/postgresql/**/*.ts @RealShadowNova
 /packages/redis/**/*.ts @dan-online
-/packages/redis/README.md @dan-online
+/packages/sqlite/**/*.ts @RealShadowNova
 
 /.github/ @RealShadowNova
 /.husky/ @RealShadowNova

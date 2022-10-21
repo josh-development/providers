@@ -1,4 +1,4 @@
-import type { JoshProvider } from '@joshdb/provider';
+import type { Semver } from '@joshdb/provider';
 import { Serialize } from '@joshdb/serialize';
 import { AsyncQueue } from '@sapphire/async-queue';
 import { Snowflake, TwitterSnowflake } from '@sapphire/snowflake';
@@ -39,7 +39,7 @@ export class ChunkHandler<StoredValue = unknown> {
 
     const { name, version, synchronize, serialize } = this.options;
 
-    if (!this.index.exists) await this.index.save({ name, version, autoKeyCount: 0, chunks: [] });
+    if (!this.index.exists) await this.index.save({ name, version, autoKeyCount: 0, chunks: [], metadata: {} });
     if (synchronize) await this.synchronize();
 
     const [index, done] = await this.useQueue();
@@ -92,7 +92,35 @@ export class ChunkHandler<StoredValue = unknown> {
       chunks.push(chunk);
     }
 
-    await this.index.save({ name: index.name, version: index.version, autoKeyCount: index.autoKeyCount, chunks });
+    await this.index.save({ name: index.name, version: index.version, autoKeyCount: index.autoKeyCount, chunks, metadata: {} });
+
+    done();
+  }
+
+  public async deleteMetadata(key: string): Promise<void> {
+    const [index, done] = await this.useQueue();
+
+    Reflect.deleteProperty(index.metadata, key);
+
+    await this.index.save(index);
+
+    done();
+  }
+
+  public async getMetadata(key: string): Promise<unknown> {
+    const [index, done] = await this.useQueue();
+
+    done();
+
+    return index.metadata[key];
+  }
+
+  public async setMetadata(key: string, value: unknown): Promise<void> {
+    const [index, done] = await this.useQueue();
+
+    index.metadata[key] = value;
+
+    await this.index.save(index);
 
     done();
   }
@@ -381,7 +409,7 @@ export class ChunkHandler<StoredValue = unknown> {
 export interface ChunkHandlerOptions {
   name: string;
 
-  version: JoshProvider.Semver;
+  version: Semver;
 
   useAbsolutePath?: boolean;
 

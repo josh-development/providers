@@ -60,7 +60,9 @@ jobs:
           - map
           - maria
           - mongo
+          - postgresql
           - redis
+          - sqlite
     runs-on: ubuntu-latest
     env:
       NAME: ${{ needs.build.outputs.NAME }}

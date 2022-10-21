@@ -31,3 +31,27 @@ You can use the following command to install this package, or replace `npm insta
 ```sh
 npm install @joshdb/maria
 ```
+
+## Provider Options
+
+```typescript
+export interface Options extends JoshProvider.Options {
+  /**
+   * The connection config for the MariaDB connection
+   * @since 1.0.0
+   */
+  connectionConfig?: ConnectionConfig | string;
+
+  /**
+   * Whether to disable automatic data serialization with `@joshdb/serialize`.
+   * @since 1.0.0
+   */
+  disableSerialization?: boolean;
+
+  /**
+   * The epoch used for `@sapphire/snowflake`.
+   * @since 1.0.0
+   */
+  epoch?: number | bigint | Date;
+}
+```

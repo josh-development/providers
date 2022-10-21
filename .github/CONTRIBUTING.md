@@ -3,7 +3,7 @@
 ## Workflow
 
 1. Fork and clone this repository.
-2. Create a new branch in your fork based off the **main** branch. Please make sure your branch's name is relative to what the PR is for (e.g. `feat/implement-myprovider`).
+2. Create a new branch in your fork based off the **main** branch. Please make sure your branch's name is relative to what the PR is for (e.g. `feat/add-database`).
 3. Submit a Pull Request [here](https://github.com/josh-development/providerspulls)!
 
 ## Contributing to the code
