@@ -24,7 +24,7 @@ jobs:
       - name: Run Tests
         run: yarn workspace @joshdb/json run test --coverage
       - name: Store Code Coverage Report
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # tag=v3
         with:
           name: coverage
           path: coverage/
@@ -45,7 +45,7 @@ jobs:
       - name: Run Tests
         run: yarn workspace @joshdb/map run test --coverage
       - name: Store Code Coverage Report
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # tag=v3
         with:
           name: coverage
           path: coverage/
@@ -72,7 +72,7 @@ jobs:
       - name: Run Tests
         run: yarn workspace @joshdb/maria run test --coverage
       - name: Store Code Coverage Report
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # tag=v3
         with:
           name: coverage
           path: coverage/
@@ -97,7 +97,7 @@ jobs:
       - name: Run Tests
         run: yarn workspace @joshdb/mongo run test --coverage
       - name: Store Code Coverage Report
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # tag=v3
         with:
           name: coverage
           path: coverage/
@@ -131,7 +131,7 @@ jobs:
       - name: Run Tests
         run: yarn workspace @joshdb/postgresql run test --coverage
       - name: Store Code Coverage Report
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # tag=v3
         with:
           name: coverage
           path: coverage/
@@ -154,7 +154,7 @@ jobs:
       - name: Run Tests
         run: yarn workspace @joshdb/redis run test --coverage
       - name: Store Code Coverage Report
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # tag=v3
         with:
           name: coverage
           path: coverage/
@@ -173,7 +173,7 @@ jobs:
       - name: Run Tests
         run: yarn workspace @joshdb/sqlite run test --coverage
       - name: Store Code Coverage Report
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # tag=v3
         with:
           name: coverage
           path: coverage/
