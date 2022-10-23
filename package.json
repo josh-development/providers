@@ -34,7 +34,7 @@
     "@typescript-eslint/parser": "^5.40.1",
     "@vitest/coverage-c8": "^0.24.3",
     "colorette": "^2.0.19",
-    "eslint": "^8.25.0",
+    "eslint": "^8.26.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^8.0.1",
@@ -48,7 +48,7 @@
     "rollup-plugin-typescript2": "^0.34.1",
     "rollup-plugin-version-injector": "^1.3.3",
     "tslib": "^2.4.0",
-    "turbo": "^1.6.0",
+    "turbo": "^1.6.1",
     "typescript": "^4.8.4",
     "vitest": "^0.24.3"
   },
