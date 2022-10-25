@@ -831,7 +831,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.16.7":
+"@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.18.6":
   version: 7.18.6
   resolution: "@babel/code-frame@npm:7.18.6"
   dependencies:
@@ -1168,21 +1168,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@favware/rollup-type-bundler@npm:^1.0.11":
-  version: 1.0.11
-  resolution: "@favware/rollup-type-bundler@npm:1.0.11"
+"@favware/rollup-type-bundler@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@favware/rollup-type-bundler@npm:2.0.0"
   dependencies:
-    "@sapphire/utilities": ^3.9.2
+    "@sapphire/utilities": ^3.11.0
     colorette: ^2.0.19
-    commander: ^9.4.0
+    commander: ^9.4.1
     js-yaml: ^4.1.0
-    rollup: ^2.78.1
-    rollup-plugin-dts: ^4.2.2
-    typescript: ^4.7.4
+    rollup: ^3.2.1
+    rollup-plugin-dts: ^5.0.0
+    typescript: ^4.8.4
   bin:
     rollup-type-bundler: ./dist/cli.js
     rtb: ./dist/cli.js
-  checksum: f2f6b42d2cd5a67d1e9aabb25cfe925a00e922a2b17c0c0ae9b2f0bd574bbb2073e8e8824bbd5072fdf3a8f91c3eb6fbe2d582014222fd2ddeffbfa9950bf1fd
+  checksum: 382244abb06434b9a1486337d9257464cc79afdb3da699373ca3d356951b95183206c3bac052a6491184436b10b41a8639b6ef155c58eed5b6f54be95d898918
   languageName: node
   linkType: hard
 
@@ -1248,7 +1248,7 @@ __metadata:
   resolution: "@joshdb/json@workspace:packages/json"
   dependencies:
     "@favware/cliff-jumper": ^1.8.8
-    "@favware/rollup-type-bundler": ^1.0.11
+    "@favware/rollup-type-bundler": ^2.0.0
     "@joshdb/provider": 2.0.0-next.d32662f.0
     "@joshdb/serialize": 1.1.0-next.1a837f5.0
     "@sapphire/async-queue": ^1.5.0
@@ -1267,7 +1267,7 @@ __metadata:
   resolution: "@joshdb/map@workspace:packages/map"
   dependencies:
     "@favware/cliff-jumper": ^1.8.8
-    "@favware/rollup-type-bundler": ^1.0.11
+    "@favware/rollup-type-bundler": ^2.0.0
     "@joshdb/provider": 2.0.0-next.d32662f.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.24.3
@@ -1283,7 +1283,7 @@ __metadata:
   resolution: "@joshdb/maria@workspace:packages/maria"
   dependencies:
     "@favware/cliff-jumper": ^1.8.8
-    "@favware/rollup-type-bundler": ^1.0.11
+    "@favware/rollup-type-bundler": ^2.0.0
     "@joshdb/provider": 2.0.0-next.d32662f.0
     "@sapphire/snowflake": ^3.2.2
     "@vitest/coverage-c8": ^0.24.3
@@ -1299,7 +1299,7 @@ __metadata:
   resolution: "@joshdb/mongo@workspace:packages/mongo"
   dependencies:
     "@favware/cliff-jumper": ^1.8.8
-    "@favware/rollup-type-bundler": ^1.0.11
+    "@favware/rollup-type-bundler": ^2.0.0
     "@joshdb/provider": 2.0.0-next.d32662f.0
     "@joshdb/serialize": 1.1.0-next.1a837f5.0
     "@sapphire/utilities": ^3.11.0
@@ -1317,7 +1317,7 @@ __metadata:
   resolution: "@joshdb/postgresql@workspace:packages/postgresql"
   dependencies:
     "@favware/cliff-jumper": ^1.8.8
-    "@favware/rollup-type-bundler": ^1.0.11
+    "@favware/rollup-type-bundler": ^2.0.0
     "@joshdb/provider": 2.0.0-next.d32662f.0
     "@joshdb/serialize": 1.1.0-next.1a837f5.0
     "@sapphire/snowflake": ^3.2.2
@@ -1346,7 +1346,7 @@ __metadata:
   resolution: "@joshdb/redis@workspace:packages/redis"
   dependencies:
     "@favware/cliff-jumper": ^1.8.8
-    "@favware/rollup-type-bundler": ^1.0.11
+    "@favware/rollup-type-bundler": ^2.0.0
     "@joshdb/provider": 2.0.0-next.d32662f.0
     "@joshdb/serialize": 1.1.0-next.1a837f5.0
     "@types/uuid": ^8.3.4
@@ -1371,7 +1371,7 @@ __metadata:
   resolution: "@joshdb/sqlite@workspace:packages/sqlite"
   dependencies:
     "@favware/cliff-jumper": ^1.8.8
-    "@favware/rollup-type-bundler": ^1.0.11
+    "@favware/rollup-type-bundler": ^2.0.0
     "@joshdb/provider": 2.0.0-next.d32662f.0
     "@joshdb/serialize": 1.1.0-next.1a837f5.0
     "@sapphire/utilities": ^3.11.0
@@ -1600,7 +1600,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/utilities@npm:^3.8.0, @sapphire/utilities@npm:^3.9.2, @sapphire/utilities@npm:^3.9.3":
+"@sapphire/utilities@npm:^3.8.0, @sapphire/utilities@npm:^3.9.3":
   version: 3.9.3
   resolution: "@sapphire/utilities@npm:3.9.3"
   checksum: 9f3f977fd5c0677d5f79136e9cb68ade3317cfba3e87bb58689f4af68233a807af34eb6092ad262c946d5eaf5c4a76cd534b0b395ebbaf0f0912dd80e174f912
@@ -4526,12 +4526,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"magic-string@npm:^0.26.1":
-  version: 0.26.3
-  resolution: "magic-string@npm:0.26.3"
+"magic-string@npm:^0.26.7":
+  version: 0.26.7
+  resolution: "magic-string@npm:0.26.7"
   dependencies:
     sourcemap-codec: ^1.4.8
-  checksum: e72c9b3d90ccbde088acc5937109f73fa4be8b6a2c2ea9bf9c3c01974f1ebf09842259a74ff2ba4081008a7d49941d883cfef8c460e6c33a6eb564b58482b750
+  checksum: 89b0d60cbb32bbf3d1e23c46ea93db082d18a8230b972027aecb10a40bba51be519ecce0674f995571e3affe917b76b09f59d8dbc9a1b2c9c4102a2b6e8a2b01
   languageName: node
   linkType: hard
 
@@ -5674,19 +5674,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rollup-plugin-dts@npm:^4.2.2":
-  version: 4.2.2
-  resolution: "rollup-plugin-dts@npm:4.2.2"
+"rollup-plugin-dts@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "rollup-plugin-dts@npm:5.0.0"
   dependencies:
-    "@babel/code-frame": ^7.16.7
-    magic-string: ^0.26.1
+    "@babel/code-frame": ^7.18.6
+    magic-string: ^0.26.7
   peerDependencies:
-    rollup: ^2.55
+    rollup: ^3.0.0
     typescript: ^4.1
   dependenciesMeta:
     "@babel/code-frame":
       optional: true
-  checksum: cf4b45f6cca442a5f44af0f0fb567c8fc540ecb792c763571d1bcda9bf495803bcc8d4eaef451a2dd32f7f391eb822e2b96cc6b86b096db54a4d3935236fd8da
+  checksum: feb2d614528c255ee698120be0fd404b0a4fa312362a3d687d76551157464decc66be6dfecb624c42bc64a9e6298ed21e13e689dc9b144acab8294cd08a53455
   languageName: node
   linkType: hard
 
@@ -5717,20 +5717,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rollup@npm:^2.78.1":
-  version: 2.79.0
-  resolution: "rollup@npm:2.79.0"
-  dependencies:
-    fsevents: ~2.3.2
-  dependenciesMeta:
-    fsevents:
-      optional: true
-  bin:
-    rollup: dist/bin/rollup
-  checksum: 166f1ffea1898e157003920065b3a328e7012ea6808860ee8fe5d1ce94804fcce9985c95a3c0f7fe9c611aff0d09a70f073f1d6f715c8faba28e4e40f71ee3bb
-  languageName: node
-  linkType: hard
-
 "rollup@npm:^2.79.1":
   version: 2.79.1
   resolution: "rollup@npm:2.79.1"
@@ -5742,6 +5728,20 @@ __metadata:
   bin:
     rollup: dist/bin/rollup
   checksum: 6a2bf167b3587d4df709b37d149ad0300692cc5deb510f89ac7bdc77c8738c9546ae3de9322b0968e1ed2b0e984571f5f55aae28fa7de4cfcb1bc5402a4e2be6
+  languageName: node
+  linkType: hard
+
+"rollup@npm:^3.2.1":
+  version: 3.2.3
+  resolution: "rollup@npm:3.2.3"
+  dependencies:
+    fsevents: ~2.3.2
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  bin:
+    rollup: dist/bin/rollup
+  checksum: e4b4f3b70fad4b8f7dabc579fb8bbe14399d5aed0cc1fcee39f15ae81804d6acd0e1063b653e6cf5ef50e8e954801689e2c822e99ed31ca18f1b1fbbea8075e5
   languageName: node
   linkType: hard
 
@@ -5769,7 +5769,7 @@ __metadata:
     "@favware/cliff-jumper": ^1.8.8
     "@favware/colorette-spinner": ^1.0.1
     "@favware/npm-deprecate": ^1.0.5
-    "@favware/rollup-type-bundler": ^1.0.11
+    "@favware/rollup-type-bundler": ^2.0.0
     "@sapphire/eslint-config": ^4.3.8
     "@sapphire/ts-config": ^3.3.4
     "@types/better-sqlite3": ^7.6.2
