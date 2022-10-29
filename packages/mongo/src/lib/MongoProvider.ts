@@ -870,6 +870,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     this._client = await client.connect();
     this._collection = this.generateMongoDoc(enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName);
+    this._metadata = this.generateMongoDoc<MongoProvider.MetadataDocType>('metadata');
   }
 
   private _getAll(projection: { [key: string]: 1 | 0 } = { key: 1, value: 1 }) {
@@ -894,7 +895,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return Serialize.toJSON(value) as Serialize.JSON;
   }
 
-  private generateMongoDoc<StoredValue>(collectionName: string): Collection<MongoProvider.DocType<StoredValue>> {
+  private generateMongoDoc<T extends Document = MongoProvider.DocType<StoredValue>>(collectionName: string): Collection<T> {
     return this.client.db().collection(collectionName);
   }
 
