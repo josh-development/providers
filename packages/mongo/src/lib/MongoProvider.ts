@@ -57,6 +57,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   private _collection?: Collection<MongoProvider.DocType<StoredValue>>;
 
+  private _metadata?: Collection<MongoProvider.MetadataDocType>;
+
   public constructor(options?: MongoProvider.Options) {
     super(options);
   }
@@ -85,6 +87,17 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     }
 
     return this._collection;
+  }
+
+  private get metadata(): Collection<MongoProvider.MetadataDocType> {
+    if (isNullOrUndefined(this._metadata)) {
+      throw this.error({
+        message: 'Client is not connected, most likely due to `init` not being called or the server not being available',
+        identifier: MongoProvider.Identifiers.NotConnected
+      });
+    }
+
+    return this._metadata;
   }
 
   public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
@@ -809,6 +822,32 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
+  public async deleteMetadata(key: string): Promise<void> {
+    await this.metadata.deleteOne({ key });
+  }
+
+  public async getMetadata(key: string): Promise<unknown> {
+    const doc = await this.metadata.findOne({ key });
+
+    if (!doc) return;
+
+    return doc.value;
+  }
+
+  public async setMetadata(key: string, value: unknown): Promise<void> {
+    await this.metadata.findOneAndUpdate(
+      {
+        key: { $eq: key }
+      },
+      {
+        $set: { value }
+      },
+      {
+        upsert: true
+      }
+    );
+  }
+
   protected async fetchVersion(): Promise<Semver> {
     const doc = await this.collection.findOne({}, { projection: { version: 1 } });
 
@@ -913,6 +952,12 @@ export namespace MongoProvider {
     value: Serialize.JSON | StoredValue;
 
     version: Semver;
+  }
+
+  export interface MetadataDocType extends Document {
+    key: string;
+
+    value: unknown;
   }
 
   export interface IterateOptions<StoredValue = unknown> {
