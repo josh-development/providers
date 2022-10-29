@@ -5,7 +5,9 @@
   "author": "@joshdb",
   "private": true,
   "dependencies": {
+    "@joshdb/core": "^1.2.7",
     "@joshdb/provider": "2.0.0-next.039d9c7.0",
+    "@realware/utilities": "^2.1.1",
     "@sapphire/utilities": "^3.11.0"
   }
 }
