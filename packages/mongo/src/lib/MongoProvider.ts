@@ -44,9 +44,11 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         for await (const doc of collection.aggregate([{ $match: {} }])) {
           const { key, value, _id } = doc;
 
-          await collection.insertOne({ key, value: this.serialize(value), version: this.version });
+          await collection.insertOne({ key, value: this.serialize(value) });
           await collection.deleteOne({ _id });
         }
+
+        await this.setMetadata('version', this.version);
       }
     }
   ];
@@ -697,7 +699,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         key: { $eq: key }
       },
       {
-        $set: { value: this.serialize(val as StoredValue), version: this.version }
+        $set: { value: this.serialize(val as StoredValue) }
       },
       {
         upsert: true
@@ -729,8 +731,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           upsert: true,
           update: {
             $set: {
-              value: this.serialize(val as StoredValue),
-              version: this.version
+              value: this.serialize(val as StoredValue)
             }
           }
         }
@@ -826,12 +827,12 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     await this.metadata.deleteOne({ key });
   }
 
-  public async getMetadata(key: string): Promise<unknown> {
+  public async getMetadata<T = unknown>(key: string): Promise<T | undefined> {
     const doc = await this.metadata.findOne({ key });
 
     if (!doc) return;
 
-    return doc.value;
+    return doc.value as T;
   }
 
   public async setMetadata(key: string, value: unknown): Promise<void> {
@@ -849,10 +850,19 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   protected async fetchVersion(): Promise<Semver> {
-    const doc = await this.collection.findOne({}, { projection: { version: 1 } });
+    const metadataVersion = await this.getMetadata<Semver>('version');
 
-    if (!doc) return this.version;
-    return doc && doc.version ? doc.version : { major: 1, minor: 0, patch: 0 };
+    if (!metadataVersion) {
+      return { major: 1, minor: 0, patch: 0 };
+    }
+
+    const docs = await this.collection.countDocuments();
+
+    if (docs === 0) {
+      await this.setMetadata('version', this.version);
+    }
+
+    return metadataVersion;
   }
 
   private async connect({
@@ -951,8 +961,6 @@ export namespace MongoProvider {
     key: string;
 
     value: Serialize.JSON | StoredValue;
-
-    version: Semver;
   }
 
   export interface MetadataDocType extends Document {
