@@ -28,7 +28,7 @@
   "dependencies": {
     "@joshdb/provider": "2.0.0-next.d32662f.0",
     "@sapphire/snowflake": "^3.2.2",
-    "mariadb": "^3.0.1"
+    "mariadb": "^3.0.2"
   },
   "devDependencies": {
     "@favware/cliff-jumper": "^1.8.8",
