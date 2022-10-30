@@ -66,7 +66,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   public get version(): Semver {
-    return resolveVersion('[VI]{version}[/VI]');
+    return process.env.NODE_ENV === 'test' ? { major: 2, minor: 0, patch: 0 } : resolveVersion('[VI]{version}[/VI]');
   }
 
   private get client(): MongoClient {
@@ -852,8 +852,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   protected async fetchVersion(): Promise<Semver> {
     const metadataVersion = await this.getMetadata<Semver>('version');
 
-    if (!metadataVersion) {
-      return { major: 1, minor: 0, patch: 0 };
+    if (metadataVersion) {
+      return metadataVersion;
     }
 
     const docs = await this.collection.countDocuments();
@@ -862,7 +862,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       await this.setMetadata('version', this.version);
     }
 
-    return metadataVersion;
+    return { major: 1, minor: 0, patch: 0 };
   }
 
   private async connect({
@@ -880,6 +880,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     this._client = await client.connect();
     this._collection = this.generateMongoDoc(enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName);
+    await this._collection.createIndex({ key: 1 }, { unique: true });
     this._metadata = this.generateMongoDoc<MongoProvider.MetadataDocType>('metadata');
   }
 
