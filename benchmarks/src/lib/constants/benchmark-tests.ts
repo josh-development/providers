@@ -143,7 +143,6 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
     run: async ({ provider }) => {
       await provider[Method.Every]({
         method: Method.Every,
-        value: '0',
         type: Payload.Type.Hook,
         hook: (card: Benchmark.TestCard) => card.net === 0,
         errors: []
@@ -211,7 +210,7 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
     },
 
     run: async ({ provider }) => {
-      await provider[Method.Find]({ method: Method.Find, errors: [], path: ['net'], type: Payload.Type.Hook, hook: (card) => card.net === 0 });
+      await provider[Method.Find]({ method: Method.Find, errors: [], type: Payload.Type.Hook, hook: (card) => card.net === 0 });
     }
   },
   {
@@ -369,7 +368,6 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
       await provider[Method.Partition]({
         method: Method.Partition,
         errors: [],
-        path: ['net'],
         type: Payload.Type.Hook,
         hook: (card) => card.net === 0
       });

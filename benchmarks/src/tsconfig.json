@@ -8,5 +8,6 @@
     "module": "CommonJS",
     "target": "ESNext"
   },
-  "include": [".", "../../packages/**/src"]
+  "include": [".", "../../packages/**/src"],
+  "exclude": ["../../packages/maria"]
 }

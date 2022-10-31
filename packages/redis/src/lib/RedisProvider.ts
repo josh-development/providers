@@ -155,7 +155,19 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Entries](payload: Payload.Entries<StoredValue>): Promise<Payload.Entries<StoredValue>> {
     payload.data = {};
 
-    for await (const doc of this.iterate()) payload.data[doc.key] = doc.value;
+    const keys = await this.client.keys('*');
+
+    if (keys.length > 0) {
+      const values = await this.client.mGet(keys);
+
+      for (const key of keys) {
+        const idx = keys.indexOf(key);
+        const parsed = JSON.parse(values[idx] as string);
+        const deserialized = this.deserialize(parsed.value);
+
+        payload.data[key] = deserialized;
+      }
+    }
 
     return payload;
   }
@@ -765,9 +777,19 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   protected async fetchVersion(): Promise<Semver> {
-    for await (const { version } of this.iterate()) return version;
+    const metadataVersion = await this.getMetadata<Semver>('version');
 
-    return this.version;
+    if (metadataVersion) {
+      return metadataVersion;
+    }
+
+    const docs = await this.client.dbSize();
+
+    if (docs === 0) {
+      await this.setMetadata('version', this.version);
+    }
+
+    return { major: 1, minor: 0, patch: 0 };
   }
 
   private async *iterate(): AsyncIterableIterator<RedisProvider.IterateReturn<StoredValue>> {
