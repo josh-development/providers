@@ -63,12 +63,14 @@ export class QueryHandler<StoredValue = unknown> {
   }
 
   public async setMetadata(key: string, value: unknown): Promise<void> {
+    const { tableName } = this.options;
     const metadata = JSON.parse((await this.fetchMetadata()).metadata) as Record<string, unknown>;
 
     metadata[key] = value;
 
     await this.sql`
       UPDATE internal_metadata
+      WHERE name = $${tableName}
       SET ${this.sql({ metadata: JSON.stringify(metadata) }, 'metadata')}
     `;
   }
