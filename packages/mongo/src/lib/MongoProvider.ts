@@ -880,7 +880,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     this._client = await client.connect();
     this._collection = this.generateMongoDoc(enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName);
-    await this._collection.createIndex({ key: 1 }, { unique: true });
+    await this._collection.createIndex({ key: 'text' }, { unique: true });
     this._metadata = this.generateMongoDoc<MongoProvider.MetadataDocType>('metadata');
   }
 
