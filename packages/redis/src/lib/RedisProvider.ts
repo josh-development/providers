@@ -628,6 +628,12 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { key, path, value } = payload;
     const val = path.length > 0 ? setProperty((await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] })).data, path, value) : value;
 
+    if (key.startsWith('__')) {
+      payload.errors.push(this.error({ identifier: 'invalidKey', method: Method.Set }, { key }));
+
+      return payload;
+    }
+
     await this.client.set(key, JSON.stringify({ value: this.serialize(val as StoredValue), version: this.version }), { EX: this.options.expiry });
 
     return payload;
@@ -733,6 +739,29 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     payload.data = values;
 
     return payload;
+  }
+
+  public async deleteMetadata(key: string): Promise<void> {
+    const metadata = (await this.client.get('__metadata__')) || '{}';
+    const parsed = JSON.parse(metadata) as { [key: string]: unknown };
+
+    delete parsed[key];
+    await this.client.set('__metadata__', JSON.stringify(parsed));
+  }
+
+  public async setMetadata(key: string, value: unknown): Promise<void> {
+    const metadata = (await this.client.get('__metadata__')) || '{}';
+    const parsed = JSON.parse(metadata) as { [key: string]: unknown };
+
+    parsed[key] = value;
+    await this.client.set('__metadata__', JSON.stringify(parsed));
+  }
+
+  public async getMetadata<Value = unknown>(key: string): Promise<Value> {
+    const metadata = (await this.client.get('__metadata__')) || '{}';
+    const parsed = JSON.parse(metadata) as { [key: string]: unknown };
+
+    return parsed[key] as Value;
   }
 
   protected async fetchVersion(): Promise<Semver> {
