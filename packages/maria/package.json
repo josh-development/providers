@@ -33,10 +33,10 @@
   "devDependencies": {
     "@favware/cliff-jumper": "^1.8.8",
     "@favware/rollup-type-bundler": "^1.0.11",
-    "@vitest/coverage-c8": "^0.24.3",
-    "typedoc": "^0.23.17",
+    "@vitest/coverage-c8": "^0.24.4",
+    "typedoc": "^0.23.19",
     "typedoc-json-parser": "^7.0.1",
-    "vitest": "^0.24.3"
+    "vitest": "^0.24.4"
   },
   "repository": {
     "type": "git",
