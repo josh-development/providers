@@ -106,7 +106,7 @@ export class QueryHandler<StoredValue = unknown> {
     const rows = (await this.connection.query(`
       SELECT \`key\`
       FROM \`${this.options.tableName}\`
-    `)) as Omit<QueryHandler.RowData, 'value' | 'version'>[];
+    `)) as Omit<QueryHandler.RowData, 'value'>[];
 
     return rows.map((row) => row.key);
   }
@@ -140,48 +140,51 @@ export class QueryHandler<StoredValue = unknown> {
       [keys]
     )) as QueryHandler.RowData[];
 
-    return keys.reduce<Record<string, StoredValue | null>>((data, key) => {
-      if (!rows.some((row) => row.key === key)) return { ...data, [key]: null };
+    const data: Record<string, StoredValue | null> = {};
 
-      const row = rows.find((row) => row.key === key)!;
+    for (const { key, value } of rows) {
+      data[key] = disableSerialization ? JSON.parse(value) : Serialize.fromJSON(JSON.parse(value));
+    }
 
-      return { ...data, [key]: disableSerialization ? JSON.parse(row.value) : Serialize.fromJSON(JSON.parse(row.value)) };
-    }, {});
+    for (const key of keys) {
+      if (!data[key]) data[key] = null;
+    }
+
+    return data;
   }
 
   public async set<Value = StoredValue>(key: string, value: Value): Promise<void> {
-    const { disableSerialization, version } = this.options;
+    const { disableSerialization } = this.options;
 
     await this.connection.query(
       {
         namedPlaceholders: true,
         sql: `
-      INSERT INTO \`${this.options.tableName}\` (\`key\`, \`value\`, \`version\`)
-      VALUES (:key, :value, :version)
+      INSERT INTO \`${this.options.tableName}\` (\`key\`, \`value\`)
+      VALUES (:key, :value)
       ON DUPLICATE KEY
-      UPDATE \`value\` = :value, \`version\` = :version;`
+      UPDATE \`value\` = :value;`
       },
-      { key, value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJSON(value)), version }
+      { key, value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJSON(value)) }
     );
   }
 
   public async setMany(entries: [string, StoredValue][], overwrite: boolean): Promise<void> {
-    const { disableSerialization, version } = this.options;
+    const { disableSerialization } = this.options;
 
     if (overwrite) {
       await this.connection.batch(
         {
           namedPlaceholders: true,
           sql: `
-      INSERT INTO \`${this.options.tableName}\` (\`key\`, \`value\`, \`version\`)
-      VALUES (:key, :value, :version)
+      INSERT INTO \`${this.options.tableName}\` (\`key\`, \`value\`)
+      VALUES (:key, :value)
       ON DUPLICATE KEY
       UPDATE \`value\` = :value;`
         },
         entries.map(([key, value]) => ({
           key,
-          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJSON(value)),
-          version
+          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJSON(value))
         }))
       );
     } else {
@@ -189,15 +192,14 @@ export class QueryHandler<StoredValue = unknown> {
         {
           namedPlaceholders: true,
           sql: `
-      INSERT INTO \`${this.options.tableName}\` (\`key\`, \`value\`, \`version\`)
-      VALUES (:key, :value, :version)
+      INSERT INTO \`${this.options.tableName}\` (\`key\`, \`value\`)
+      VALUES (:key, :value)
       ON DUPLICATE KEY
       UPDATE \`key\` = \`key\`;`
         },
         entries.map(([key, value]) => ({
           key,
-          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJSON(value)),
-          version
+          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJSON(value))
         }))
       );
     }
@@ -217,7 +219,7 @@ export class QueryHandler<StoredValue = unknown> {
     const rows = (await this.connection.query(`
       SELECT \`value\`
       FROM \`${this.options.tableName}\`
-    `)) as Omit<QueryHandler.RowData, 'key' | 'version'>[];
+    `)) as Omit<QueryHandler.RowData, 'key'>[];
 
     return rows.map((row) => (disableSerialization ? JSON.parse(row.value) : Serialize.fromJSON(JSON.parse(row.value))));
   }
@@ -237,8 +239,7 @@ export class QueryHandler<StoredValue = unknown> {
     await this.connection.query(`
       CREATE TABLE IF NOT EXISTS \`${this.options.tableName}\` (
         \`key\` VARCHAR(512) PRIMARY KEY,
-        \`value\` TEXT NOT NULL,
-        \`version\` VARCHAR(255) NOT NULL
+        \`value\` TEXT NOT NULL
       );
     `);
 
