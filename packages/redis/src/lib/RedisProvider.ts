@@ -646,7 +646,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       return payload;
     }
 
-    await this.client.set(key, JSON.stringify({ value: this.serialize(val as StoredValue), version: this.version }), { EX: this.options.expiry });
+    await this.client.set(key, JSON.stringify({ value: this.serialize(val as StoredValue) }), { EX: this.options.expiry });
 
     return payload;
   }
@@ -800,7 +800,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
       const row = JSON.parse(rowString) as RedisProvider.Row<StoredValue>;
 
-      yield { key, value: this.deserialize(row.value), version: row.version };
+      yield { key, value: this.deserialize(row.value) };
     }
   }
 
@@ -834,8 +834,6 @@ export namespace RedisProvider {
     key: string;
 
     value: StoredValue;
-
-    version: Semver;
   }
 
   export enum Identifiers {
