@@ -860,6 +860,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     if (docs === 0) {
       await this.setMetadata('version', this.version);
+      return this.version;
     }
 
     return { major: 1, minor: 0, patch: 0 };
