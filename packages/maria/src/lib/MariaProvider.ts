@@ -80,6 +80,18 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return this.handler.close();
   }
 
+  public async deleteMetadata(key: string): Promise<void> {
+    await this.handler.deleteMetadata(key);
+  }
+
+  public async getMetadata(key: string): Promise<unknown> {
+    return this.handler.getMetadata(key);
+  }
+
+  public async setMetadata(key: string, value: unknown): Promise<void> {
+    await this.handler.setMetadata(key, value);
+  }
+
   public [Method.AutoKey](payload: Payload.AutoKey): Payload.AutoKey {
     payload.data = this.snowflake.generate().toString();
 
@@ -726,8 +738,10 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  protected fetchVersion() {
-    return this.version;
+  protected async fetchVersion() {
+    const metadata = await this.handler.fetchMetadata();
+
+    return resolveVersion(metadata.version);
   }
 
   /**
