@@ -61,7 +61,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
           if (autoNum?.lastnum) {
             database
               .prepare(
-                `CREATE TABLE IF NOT EXISTS 'internal_metadata' (name TEXT PRIMARY KEY, version TEXT NOT NULL, autoKeyCount INTEGER, serializedKeys TEXT)`
+                `CREATE TABLE IF NOT EXISTS 'internal_metadata' (name TEXT PRIMARY KEY, version TEXT NOT NULL, autoKeyCount INTEGER, serializedKeys TEXT, metadata TEXT)`
               )
               .run();
 
@@ -69,7 +69,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 
             database
               .prepare<QueryHandler.MetadataRow>(
-                `INSERT INTO 'internal_metadata' (name, version, autoKeyCount, serializedKeys) VALUES (@name, @version, @autoKeyCount, @serializedKeys)`
+                `INSERT INTO 'internal_metadata' (name, version, autoKeyCount, serializedKeys, metadata) VALUES (@name, @version, @autoKeyCount, @serializedKeys, @metadata)`
               )
               .run({
                 name: tableName,

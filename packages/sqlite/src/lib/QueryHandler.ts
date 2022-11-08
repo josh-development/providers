@@ -21,7 +21,9 @@ export class QueryHandler<StoredValue = unknown> {
     else this.database.pragma('journal_mode = delete');
 
     this.database
-      .prepare(`CREATE TABLE IF NOT EXISTS 'internal_metadata' (name TEXT PRIMARY KEY, version TEXT, autoKeyCount INTEGER, serializedKeys TEXT)`)
+      .prepare(
+        `CREATE TABLE IF NOT EXISTS 'internal_metadata' (name TEXT PRIMARY KEY, version TEXT, autoKeyCount INTEGER, serializedKeys TEXT, metadata TEXT)`
+      )
       .run();
 
     const result = this.database
@@ -31,7 +33,7 @@ export class QueryHandler<StoredValue = unknown> {
     if (result[Result.MetadataRowExists] === 0) {
       this.database
         .prepare<QueryHandler.MetadataRow>(
-          `INSERT INTO 'internal_metadata' (name, version, autoKeyCount, serializedKeys) VALUES (@name, @version, @autoKeyCount, @serializedKeys)`
+          `INSERT INTO 'internal_metadata' (name, version, autoKeyCount, serializedKeys, metadata) VALUES (@name, @version, @autoKeyCount, @serializedKeys, @metadata)`
         )
         .run({
           name: tableName,
@@ -148,7 +150,7 @@ export class QueryHandler<StoredValue = unknown> {
     this.database.prepare<Pick<QueryHandler.MetadataRow, 'name'>>(`DELETE FROM 'internal_metadata' WHERE name = @name`).run({ name: tableName });
     this.database
       .prepare<QueryHandler.MetadataRow>(
-        `INSERT INTO 'internal_metadata' (name, version, autoKeyCount, serializedKeys) VALUES (@name, @version, @autoKeyCount, @serializedKeys)`
+        `INSERT INTO 'internal_metadata' (name, version, autoKeyCount, serializedKeys, metadata) VALUES (@name, @version, @autoKeyCount, @serializedKeys, @metadata)`
       )
       .run({
         name: tableName,
