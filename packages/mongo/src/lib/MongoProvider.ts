@@ -43,9 +43,10 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
         for await (const doc of collection.aggregate([{ $match: {} }])) {
           const { key, value, _id } = doc;
+          const serialized = this.serialize(value);
 
           await collection.deleteOne({ _id });
-          await collection.insertOne({ key, value: this.serialize(value) });
+          await collection.insertOne({ key, value: serialized });
         }
 
         await this.setMetadata('version', this.version);
