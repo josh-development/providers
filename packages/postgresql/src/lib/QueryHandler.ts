@@ -34,13 +34,46 @@ export class QueryHandler<StoredValue = unknown> {
     await this.sql`
       CREATE TABLE IF NOT EXISTS internal_metadata (
         name VARCHAR(255) PRIMARY KEY,
-        version VARCHAR(255) NOT NULL
+        version VARCHAR(255) NOT NULL,
+        metadata TEXT NOT NULL
       )
     `;
 
     await this.sql`
-      INSERT INTO internal_metadata ${this.sql({ name: tableName, version }, 'name', 'version')}
+      INSERT INTO internal_metadata ${this.sql({ name: tableName, version, metadata: JSON.stringify({}) }, 'name', 'version', 'metadata')}
       ON CONFLICT DO NOTHING
+    `;
+  }
+
+  public async deleteMetadata(key: string): Promise<void> {
+    const { tableName } = this.options;
+    const metadata = JSON.parse((await this.fetchMetadata()).metadata) as Record<string, unknown>;
+
+    Reflect.deleteProperty(metadata, key);
+
+    await this.sql`
+      UPDATE internal_metadata
+      SET ${this.sql({ metadata: JSON.stringify(metadata) }, 'metadata')}
+      WHERE name = ${tableName}
+    `;
+  }
+
+  public async getMetadata(key: string): Promise<unknown> {
+    const metadata = JSON.parse((await this.fetchMetadata()).metadata) as Record<string, unknown>;
+
+    return metadata[key];
+  }
+
+  public async setMetadata(key: string, value: unknown): Promise<void> {
+    const { tableName } = this.options;
+    const metadata = JSON.parse((await this.fetchMetadata()).metadata) as Record<string, unknown>;
+
+    metadata[key] = value;
+
+    await this.sql`
+      UPDATE internal_metadata
+      SET ${this.sql({ metadata: JSON.stringify(metadata) }, 'metadata')}
+      WHERE name = ${tableName}
     `;
   }
 
@@ -236,6 +269,8 @@ export namespace QueryHandler {
     name: string;
 
     version: string;
+
+    metadata: string;
   }
 
   export interface RowExists {

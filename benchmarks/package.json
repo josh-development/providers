@@ -1,11 +1,13 @@
 {
   "name": "benchmarks",
-  "private": true,
   "version": "1.0.0",
   "description": "Benchmark for @joshdb providers",
   "author": "@joshdb",
+  "private": true,
   "dependencies": {
-    "@joshdb/provider": "2.0.0-next.d32662f.0",
+    "@joshdb/core": "^1.2.7",
+    "@joshdb/provider": "2.0.0-next.f40a41e.0",
+    "@realware/utilities": "^2.1.1",
     "@sapphire/utilities": "^3.11.0"
   }
 }

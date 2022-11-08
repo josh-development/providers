@@ -22,7 +22,7 @@ jobs:
       - name: Install Dependencies
         run: yarn --immutable
       - name: Run Tests
-        run: yarn workspace @joshdb/json run test --coverage
+        run: yarn workspace @joshdb/json run test
       - name: Store Code Coverage Report
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
         with:
@@ -43,7 +43,7 @@ jobs:
       - name: Install Dependencies
         run: yarn --immutable
       - name: Run Tests
-        run: yarn workspace @joshdb/map run test --coverage
+        run: yarn workspace @joshdb/map run test
       - name: Store Code Coverage Report
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
         with:
@@ -70,7 +70,7 @@ jobs:
       - name: Install Dependencies
         run: yarn --immutable
       - name: Run Tests
-        run: yarn workspace @joshdb/maria run test --coverage
+        run: yarn workspace @joshdb/maria run test
       - name: Store Code Coverage Report
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
         with:
@@ -95,7 +95,7 @@ jobs:
       - name: Install Dependencies
         run: yarn --immutable
       - name: Run Tests
-        run: yarn workspace @joshdb/mongo run test --coverage
+        run: yarn workspace @joshdb/mongo run test
       - name: Store Code Coverage Report
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
         with:

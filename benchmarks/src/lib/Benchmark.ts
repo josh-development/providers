@@ -22,9 +22,8 @@ export class Benchmark {
           jsonProvider: 'JSONProvider',
           mapProvider: 'MapProvider',
           mongoProvider: 'MongoProvider',
-          postgresqlProvider: 'PostgreSQLProvider',
-          redisProvider: 'RedisProvider',
           mariaProvider: 'MariaProvider',
+          postgresqlProvider: 'PostgreSQLProvider',
           redisProvider: 'RedisProvider',
           sqliteProvider: 'SQLiteProvider',
           autoKey: 'AutoKey',
@@ -52,10 +51,9 @@ export class Benchmark {
             mapProvider: 'MapProvider',
             mongoProvider: 'MongoProvider',
             mariaProvider: 'MariaProvider',
-            redisProvider: 'RedisProvider',
-            sqliteProvider: 'SQLiteProvider',
             postgresqlProvider: 'PostgreSQLProvider',
             redisProvider: 'RedisProvider',
+            sqliteProvider: 'SQLiteProvider',
             autoKey: 'AutoKey',
             deleteMany: 'DeleteMany',
             getAll: 'GetAll',
@@ -85,10 +83,8 @@ export class Benchmark {
     for (const [name, provider] of this.providers) {
       console.log(`${blueBright('Benchmark:')} ${cyanBright(name)}\n`);
 
-      const josh = provider;
-
-      await josh.init({ name: 'benchmark' });
-      await josh[Method.Clear]({ method: Method.Clear, errors: [] });
+      await provider.init({ name: 'benchmark' });
+      await provider[Method.Clear]({ method: Method.Clear, errors: [] });
 
       const result: Benchmark.PerformanceProviderResult = {
         name,
@@ -105,7 +101,7 @@ export class Benchmark {
         };
 
         const runOptions: Benchmark.TestRunOptions = {
-          josh,
+          provider,
 
           keys: Object.keys(cards),
 
@@ -135,7 +131,7 @@ export class Benchmark {
           spinner.update({ text: `${test.name} (${id}/${cardCount})` });
         }
 
-        await josh[Method.Clear]({ method: Method.Clear, errors: [] });
+        await provider[Method.Clear]({ method: Method.Clear, errors: [] });
         spinner.success({ text: test.name });
         result.tests.push(testResult);
       }
@@ -265,7 +261,7 @@ export namespace Benchmark {
   }
 
   export interface TestRunOptions {
-    josh: JoshProvider<TestCard>;
+    provider: JoshProvider<TestCard>;
 
     keys: string[];
 

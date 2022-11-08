@@ -29,7 +29,7 @@ jobs:
         with:
           node-version: 16
           cache: yarn
-          registry-url: https://registry.npmjs.org/
+          registry-url: https://registry.yarnpkg.com/
       - name: Install Dependencies
         run: yarn --immutable
       - name: Build Packages
@@ -60,7 +60,9 @@ jobs:
           - map
           - maria
           - mongo
+          - postgresql
           - redis
+          - sqlite
     runs-on: ubuntu-latest
     env:
       NAME: ${{ needs.build.outputs.NAME }}
@@ -74,7 +76,7 @@ jobs:
         with:
           node-version: 16
           cache: yarn
-          registry-url: https://registry.npmjs.org/
+          registry-url: https://registry.yarnpkg.com/
       - name: Install Dependencies
         run: yarn --immutable
       - name: Download Documentation Artifacts

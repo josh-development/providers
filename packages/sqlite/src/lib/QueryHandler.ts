@@ -21,7 +21,9 @@ export class QueryHandler<StoredValue = unknown> {
     else this.database.pragma('journal_mode = delete');
 
     this.database
-      .prepare(`CREATE TABLE IF NOT EXISTS 'internal_metadata' (name TEXT PRIMARY KEY, version TEXT, autoKeyCount INTEGER, serializedKeys TEXT)`)
+      .prepare(
+        `CREATE TABLE IF NOT EXISTS 'internal_metadata' (name TEXT PRIMARY KEY, version TEXT, autoKeyCount INTEGER, serializedKeys TEXT, metadata TEXT)`
+      )
       .run();
 
     const result = this.database
@@ -31,13 +33,14 @@ export class QueryHandler<StoredValue = unknown> {
     if (result[Result.MetadataRowExists] === 0) {
       this.database
         .prepare<QueryHandler.MetadataRow>(
-          `INSERT INTO 'internal_metadata' (name, version, autoKeyCount, serializedKeys) VALUES (@name, @version, @autoKeyCount, @serializedKeys)`
+          `INSERT INTO 'internal_metadata' (name, version, autoKeyCount, serializedKeys, metadata) VALUES (@name, @version, @autoKeyCount, @serializedKeys, @metadata)`
         )
         .run({
           name: tableName,
           version,
           autoKeyCount: 0,
-          serializedKeys: JSON.stringify([])
+          serializedKeys: JSON.stringify([]),
+          metadata: JSON.stringify({})
         });
     }
 
@@ -76,6 +79,53 @@ export class QueryHandler<StoredValue = unknown> {
     }
   }
 
+  public deleteMetadata(key: string): void {
+    const { tableName } = this.options;
+    const metadata = JSON.parse(
+      (
+        this.database
+          .prepare<Pick<QueryHandler.MetadataRow, 'name'>>(`SELECT metadata FROM 'internal_metadata' WHERE name = @name`)
+          .get({ name: tableName }) as Pick<QueryHandler.MetadataRow, 'metadata'>
+      ).metadata
+    );
+
+    Reflect.deleteProperty(metadata, key);
+
+    this.database
+      .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'metadata'>>(`UPDATE 'internal_metadata' SET metadata = @metadata WHERE name = @name`)
+      .run({ name: tableName, metadata: JSON.stringify(metadata) });
+  }
+
+  public getMetadata(key: string): unknown {
+    const { tableName } = this.options;
+    const metadata = JSON.parse(
+      (
+        this.database
+          .prepare<Pick<QueryHandler.MetadataRow, 'name'>>(`SELECT metadata FROM 'internal_metadata' WHERE name = @name`)
+          .get({ name: tableName }) as Pick<QueryHandler.MetadataRow, 'metadata'>
+      ).metadata
+    );
+
+    return metadata[key];
+  }
+
+  public setMetadata(key: string, value: unknown): void {
+    const { tableName } = this.options;
+    const metadata = JSON.parse(
+      (
+        this.database
+          .prepare<Pick<QueryHandler.MetadataRow, 'name'>>(`SELECT metadata FROM 'internal_metadata' WHERE name = @name`)
+          .get({ name: tableName }) as Pick<QueryHandler.MetadataRow, 'metadata'>
+      ).metadata
+    );
+
+    metadata[key] = value;
+
+    this.database
+      .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'metadata'>>(`UPDATE 'internal_metadata' SET metadata = @metadata WHERE name = @name`)
+      .run({ name: tableName, metadata: JSON.stringify(metadata) });
+  }
+
   public autoKey(): string {
     const { tableName } = this.options;
     let { autoKeyCount } = this.database
@@ -100,13 +150,14 @@ export class QueryHandler<StoredValue = unknown> {
     this.database.prepare<Pick<QueryHandler.MetadataRow, 'name'>>(`DELETE FROM 'internal_metadata' WHERE name = @name`).run({ name: tableName });
     this.database
       .prepare<QueryHandler.MetadataRow>(
-        `INSERT INTO 'internal_metadata' (name, version, autoKeyCount, serializedKeys) VALUES (@name, @version, @autoKeyCount, @serializedKeys)`
+        `INSERT INTO 'internal_metadata' (name, version, autoKeyCount, serializedKeys, metadata) VALUES (@name, @version, @autoKeyCount, @serializedKeys, @metadata)`
       )
       .run({
         name: tableName,
         version,
         autoKeyCount: 0,
-        serializedKeys: JSON.stringify([])
+        serializedKeys: JSON.stringify([]),
+        metadata: JSON.stringify({})
       });
   }
 
@@ -289,6 +340,8 @@ export namespace QueryHandler {
     autoKeyCount: number;
 
     serializedKeys: string;
+
+    metadata: string;
   }
 }
 
