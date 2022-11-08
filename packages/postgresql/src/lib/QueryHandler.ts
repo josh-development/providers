@@ -46,6 +46,7 @@ export class QueryHandler<StoredValue = unknown> {
   }
 
   public async deleteMetadata(key: string): Promise<void> {
+    const { tableName } = this.options;
     const metadata = JSON.parse((await this.fetchMetadata()).metadata) as Record<string, unknown>;
 
     Reflect.deleteProperty(metadata, key);
@@ -53,6 +54,7 @@ export class QueryHandler<StoredValue = unknown> {
     await this.sql`
       UPDATE internal_metadata
       SET ${this.sql({ metadata: JSON.stringify(metadata) }, 'metadata')}
+      WHERE name = ${tableName}
     `;
   }
 
@@ -70,8 +72,8 @@ export class QueryHandler<StoredValue = unknown> {
 
     await this.sql`
       UPDATE internal_metadata
-      WHERE name = $${tableName}
       SET ${this.sql({ metadata: JSON.stringify(metadata) }, 'metadata')}
+      WHERE name = ${tableName}
     `;
   }
 
