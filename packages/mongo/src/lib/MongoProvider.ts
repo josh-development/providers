@@ -36,7 +36,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public migrations: JoshProvider.Migration[] = [
     {
-      version: { major: 2, minor: 0, patch: 0 },
+      version: { major: 1, minor: 0, patch: 0 },
       run: async (context: JoshProvider.Context) => {
         const { collectionName = context.name, enforceCollectionName } = this.options;
         const collection = this.generateMongoDoc(enforceCollectionName ? collectionName.replace(/[^a-z0-9]/gi, '_').toLowerCase() : collectionName);
@@ -44,8 +44,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         for await (const doc of collection.aggregate([{ $match: {} }])) {
           const { key, value, _id } = doc;
 
-          await collection.insertOne({ key, value: this.serialize(value) });
           await collection.deleteOne({ _id });
+          await collection.insertOne({ key, value: this.serialize(value) });
         }
 
         await this.setMetadata('version', this.version);
@@ -109,13 +109,6 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       authentication = MongoProvider.defaultAuthentication,
       connectOptions = {}
     } = this.options;
-
-    if (typeof collectionName === 'undefined') {
-      throw this.error({
-        message: 'A collection name must be provided if using this class without Josh.',
-        identifier: MongoProvider.Identifiers.InitMissingCollectionName
-      });
-    }
 
     if (typeof authentication === 'string') this.connectionURI = authentication;
     else {
