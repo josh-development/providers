@@ -1235,7 +1235,7 @@ __metadata:
     "@favware/cliff-jumper": ^1.8.8
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.f40a41e.0
-    "@joshdb/serialize": 1.1.0-next.1a837f5.0
+    "@joshdb/serialize": 1.1.0-next.24b745c.0
     "@sapphire/async-queue": ^1.5.0
     "@sapphire/snowflake": ^3.2.2
     "@sapphire/utilities": ^3.11.0
@@ -1254,6 +1254,7 @@ __metadata:
     "@favware/cliff-jumper": ^1.8.8
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.f40a41e.0
+    "@joshdb/serialize": 1.1.0-next.24b745c.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.25.0
     property-helpers: ^2.0.0
@@ -1270,6 +1271,7 @@ __metadata:
     "@favware/cliff-jumper": ^1.8.8
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.f40a41e.0
+    "@joshdb/serialize": 1.1.0-next.24b745c.0
     "@sapphire/snowflake": ^3.2.2
     "@vitest/coverage-c8": ^0.25.0
     mariadb: ^3.0.2
@@ -1286,7 +1288,7 @@ __metadata:
     "@favware/cliff-jumper": ^1.8.8
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.f40a41e.0
-    "@joshdb/serialize": 1.1.0-next.1a837f5.0
+    "@joshdb/serialize": 1.1.0-next.24b745c.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.25.0
     mongodb: ~4.11.0
@@ -1304,7 +1306,7 @@ __metadata:
     "@favware/cliff-jumper": ^1.8.8
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.f40a41e.0
-    "@joshdb/serialize": 1.1.0-next.1a837f5.0
+    "@joshdb/serialize": 1.1.0-next.24b745c.0
     "@sapphire/snowflake": ^3.2.2
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.25.0
@@ -1333,7 +1335,7 @@ __metadata:
     "@favware/cliff-jumper": ^1.8.8
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.f40a41e.0
-    "@joshdb/serialize": 1.1.0-next.1a837f5.0
+    "@joshdb/serialize": 1.1.0-next.24b745c.0
     "@types/uuid": ^8.3.4
     "@vitest/coverage-c8": ^0.25.0
     redis: ^4.4.0
@@ -1344,10 +1346,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/serialize@npm:1.1.0-next.1a837f5.0":
-  version: 1.1.0-next.1a837f5.0
-  resolution: "@joshdb/serialize@npm:1.1.0-next.1a837f5.0"
-  checksum: f0040466fcc81d0d0319b087a011764c0aebc3b2abff01bcf2c9522686e0ad3cdd08fd0a37ee15c6bed957cea0fb04f328beddb9c0e47eddc45f45e1404aefcc
+"@joshdb/serialize@npm:1.1.0-next.24b745c.0":
+  version: 1.1.0-next.24b745c.0
+  resolution: "@joshdb/serialize@npm:1.1.0-next.24b745c.0"
+  checksum: ed8ecbb8af1782e4ec514fb27adb7b0d62615ae36dd1037be5ee569c28cd462955baff26bf8c7fa43672f804434c6b2a732904da8709917634373709dd49a073
   languageName: node
   linkType: hard
 
@@ -1358,7 +1360,7 @@ __metadata:
     "@favware/cliff-jumper": ^1.8.8
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.f40a41e.0
-    "@joshdb/serialize": 1.1.0-next.1a837f5.0
+    "@joshdb/serialize": 1.1.0-next.24b745c.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.25.0
     better-sqlite3: ^7.6.2
