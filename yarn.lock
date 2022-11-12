@@ -1243,7 +1243,6 @@ __metadata:
     property-helpers: ^2.0.0
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
-    typescript: ^4.8.4
     vitest: ^0.25.0
   languageName: unknown
   linkType: soft
@@ -1261,7 +1260,6 @@ __metadata:
     property-helpers: ^2.0.0
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
-    typescript: ^4.8.4
     vitest: ^0.25.0
   languageName: unknown
   linkType: soft
@@ -1279,7 +1277,6 @@ __metadata:
     mariadb: ^3.0.2
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
-    typescript: ^4.8.4
     vitest: ^0.25.0
   languageName: unknown
   linkType: soft
@@ -1298,7 +1295,6 @@ __metadata:
     property-helpers: ^2.0.0
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
-    typescript: ^4.8.4
     vitest: ^0.25.0
   languageName: unknown
   linkType: soft
@@ -1318,7 +1314,6 @@ __metadata:
     property-helpers: ^2.0.0
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
-    typescript: ^4.8.4
     vitest: ^0.25.0
   languageName: unknown
   linkType: soft
@@ -1356,7 +1351,6 @@ __metadata:
     redis: ^4.4.0
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
-    typescript: ^4.8.4
     uuid: ^9.0.0
     vitest: ^0.25.0
   languageName: unknown
@@ -1383,7 +1377,6 @@ __metadata:
     property-helpers: ^2.0.0
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
-    typescript: ^4.8.4
     vitest: ^0.25.0
   languageName: unknown
   linkType: soft
