@@ -24,7 +24,7 @@
     "check-update": "cliff-jumper --dry-run"
   },
   "dependencies": {
-    "@joshdb/provider": "2.0.0-next.f40a41e.0",
+    "@joshdb/provider": "2.0.0-next.24b745c.0",
     "@joshdb/serialize": "1.1.0-next.24b745c.0",
     "redis": "^4.4.0",
     "uuid": "^9.0.0"
@@ -36,6 +36,7 @@
     "@vitest/coverage-c8": "^0.25.0",
     "typedoc": "^0.23.20",
     "typedoc-json-parser": "^7.0.1",
+    "typescript": "^4.8.4",
     "vitest": "^0.25.0"
   },
   "repository": {
