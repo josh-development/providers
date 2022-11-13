@@ -1239,11 +1239,11 @@ __metadata:
     "@sapphire/async-queue": ^1.5.0
     "@sapphire/snowflake": ^3.2.2
     "@sapphire/utilities": ^3.11.0
-    "@vitest/coverage-c8": ^0.25.0
+    "@vitest/coverage-c8": ^0.25.1
     property-helpers: ^2.0.0
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
-    vitest: ^0.25.0
+    vitest: ^0.25.1
   languageName: unknown
   linkType: soft
 
@@ -1256,11 +1256,11 @@ __metadata:
     "@joshdb/provider": 2.0.0-next.24b745c.0
     "@joshdb/serialize": 1.1.0-next.24b745c.0
     "@sapphire/utilities": ^3.11.0
-    "@vitest/coverage-c8": ^0.25.0
+    "@vitest/coverage-c8": ^0.25.1
     property-helpers: ^2.0.0
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
-    vitest: ^0.25.0
+    vitest: ^0.25.1
   languageName: unknown
   linkType: soft
 
@@ -1273,11 +1273,11 @@ __metadata:
     "@joshdb/provider": 2.0.0-next.24b745c.0
     "@joshdb/serialize": 1.1.0-next.24b745c.0
     "@sapphire/snowflake": ^3.2.2
-    "@vitest/coverage-c8": ^0.25.0
+    "@vitest/coverage-c8": ^0.25.1
     mariadb: ^3.0.2
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
-    vitest: ^0.25.0
+    vitest: ^0.25.1
   languageName: unknown
   linkType: soft
 
@@ -1290,12 +1290,12 @@ __metadata:
     "@joshdb/provider": 2.0.0-next.24b745c.0
     "@joshdb/serialize": 1.1.0-next.24b745c.0
     "@sapphire/utilities": ^3.11.0
-    "@vitest/coverage-c8": ^0.25.0
+    "@vitest/coverage-c8": ^0.25.1
     mongodb: ~4.11.0
     property-helpers: ^2.0.0
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
-    vitest: ^0.25.0
+    vitest: ^0.25.1
   languageName: unknown
   linkType: soft
 
@@ -1309,12 +1309,12 @@ __metadata:
     "@joshdb/serialize": 1.1.0-next.24b745c.0
     "@sapphire/snowflake": ^3.2.2
     "@sapphire/utilities": ^3.11.0
-    "@vitest/coverage-c8": ^0.25.0
+    "@vitest/coverage-c8": ^0.25.1
     postgres: ^3.3.1
     property-helpers: ^2.0.0
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
-    vitest: ^0.25.0
+    vitest: ^0.25.1
   languageName: unknown
   linkType: soft
 
@@ -1347,12 +1347,12 @@ __metadata:
     "@joshdb/provider": 2.0.0-next.24b745c.0
     "@joshdb/serialize": 1.1.0-next.24b745c.0
     "@types/uuid": ^8.3.4
-    "@vitest/coverage-c8": ^0.25.0
+    "@vitest/coverage-c8": ^0.25.1
     redis: ^4.4.0
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
     uuid: ^9.0.0
-    vitest: ^0.25.0
+    vitest: ^0.25.1
   languageName: unknown
   linkType: soft
 
@@ -1372,12 +1372,12 @@ __metadata:
     "@joshdb/provider": 2.0.0-next.24b745c.0
     "@joshdb/serialize": 1.1.0-next.24b745c.0
     "@sapphire/utilities": ^3.11.0
-    "@vitest/coverage-c8": ^0.25.0
+    "@vitest/coverage-c8": ^0.25.1
     better-sqlite3: ^7.6.2
     property-helpers: ^2.0.0
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
-    vitest: ^0.25.0
+    vitest: ^0.25.1
   languageName: unknown
   linkType: soft
 
@@ -1894,7 +1894,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/coverage-c8@npm:^0.25.0":
+"@vitest/coverage-c8@npm:^0.25.1":
   version: 0.25.1
   resolution: "@vitest/coverage-c8@npm:0.25.1"
   dependencies:
@@ -5578,7 +5578,7 @@ __metadata:
     "@types/prompts": ^2
     "@typescript-eslint/eslint-plugin": ^5.42.1
     "@typescript-eslint/parser": ^5.42.1
-    "@vitest/coverage-c8": ^0.25.0
+    "@vitest/coverage-c8": ^0.25.1
     colorette: ^2.0.19
     eslint: ^8.27.0
     eslint-config-prettier: ^8.5.0
@@ -5596,7 +5596,7 @@ __metadata:
     tslib: ^2.4.1
     turbo: ^1.6.3
     typescript: ^4.8.4
-    vitest: ^0.25.0
+    vitest: ^0.25.1
   languageName: unknown
   linkType: soft
 
@@ -6560,7 +6560,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vitest@npm:0.25.1, vitest@npm:^0.25.0":
+"vitest@npm:0.25.1, vitest@npm:^0.25.1":
   version: 0.25.1
   resolution: "vitest@npm:0.25.1"
   dependencies:
