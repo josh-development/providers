@@ -1291,7 +1291,7 @@ __metadata:
     "@joshdb/serialize": 1.1.0-next.24b745c.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.25.1
-    mongodb: ~4.11.0
+    mongodb: ~4.12.1
     property-helpers: ^2.0.0
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
@@ -1310,7 +1310,7 @@ __metadata:
     "@sapphire/snowflake": ^3.2.2
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.25.1
-    postgres: ^3.3.1
+    postgres: ^3.3.2
     property-helpers: ^2.0.0
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
@@ -4685,13 +4685,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:~4.11.0":
-  version: 4.11.0
-  resolution: "mongodb@npm:4.11.0"
+"mongodb@npm:~4.12.1":
+  version: 4.12.1
+  resolution: "mongodb@npm:4.12.1"
   dependencies:
     "@aws-sdk/credential-providers": ^3.186.0
     bson: ^4.7.0
-    denque: ^2.1.0
     mongodb-connection-string-url: ^2.5.4
     saslprep: ^1.0.3
     socks: ^2.7.1
@@ -4700,7 +4699,7 @@ __metadata:
       optional: true
     saslprep:
       optional: true
-  checksum: 3080c2f58dc712ca6d0a34b0f4101c3ca66fbf86360b2a5ea2b64a9f757b4a0d7b77851688657fc3240ac748ddcd69c21ec2f7c785f10cb7d41e00e863f415ec
+  checksum: 84590484b2c93bce849ec1e334b064e983444ed73942061c91e09556348c80db9d4a40544b927cd795bdfbfc51d1b713a7df5ced4ecf13cd00fab5e3c3e32ada
   languageName: node
   linkType: hard
 
@@ -5130,10 +5129,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postgres@npm:^3.3.1":
-  version: 3.3.1
-  resolution: "postgres@npm:3.3.1"
-  checksum: 3a279758ce7ef1d567f9936a34cdbbacd8fba901c3e8f84784717755a9919b2ceb111fe3be290c5f555f7ce879b2ed6a1a17a9f0c71fae762a3e833aa96ea533
+"postgres@npm:^3.3.2":
+  version: 3.3.2
+  resolution: "postgres@npm:3.3.2"
+  checksum: 6de16e5c8854ebe95f344a7fae2d4f667f319fce76bf8c9657269fe5c60ba315aade59e91808ca6729a50de09d494d24f403d96697f731b457aad04f43ab65d5
   languageName: node
   linkType: hard
 
