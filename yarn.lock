@@ -1291,7 +1291,7 @@ __metadata:
     "@joshdb/serialize": 1.1.0-next.24b745c.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.25.1
-    mongodb: ~4.12.1
+    mongodb: ~4.13.0
     property-helpers: ^2.0.0
     typedoc: ^0.23.20
     typedoc-json-parser: ^7.0.1
@@ -4685,9 +4685,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:~4.12.1":
-  version: 4.12.1
-  resolution: "mongodb@npm:4.12.1"
+"mongodb@npm:~4.13.0":
+  version: 4.13.0
+  resolution: "mongodb@npm:4.13.0"
   dependencies:
     "@aws-sdk/credential-providers": ^3.186.0
     bson: ^4.7.0
@@ -4699,7 +4699,7 @@ __metadata:
       optional: true
     saslprep:
       optional: true
-  checksum: 84590484b2c93bce849ec1e334b064e983444ed73942061c91e09556348c80db9d4a40544b927cd795bdfbfc51d1b713a7df5ced4ecf13cd00fab5e3c3e32ada
+  checksum: 4c30eed40f639ac64069623cf7a4954e98eab81b91d61df90e7813dd2a745259cdc698f3b60bd7f37c123242b7eb0aaae6ee4e29ff2e48f5d13f187931d51f36
   languageName: node
   linkType: hard
 
