@@ -922,7 +922,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/cli@npm:^17.2.0":
+"@commitlint/cli@npm:^17.3.0":
   version: 17.3.0
   resolution: "@commitlint/cli@npm:17.3.0"
   dependencies:
@@ -942,7 +942,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/config-conventional@npm:^17.2.0":
+"@commitlint/config-conventional@npm:^17.3.0":
   version: 17.3.0
   resolution: "@commitlint/config-conventional@npm:17.3.0"
   dependencies:
@@ -1306,7 +1306,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@favware/cliff-jumper@npm:^1.8.8":
+"@favware/cliff-jumper@npm:^1.9.0":
   version: 1.9.0
   resolution: "@favware/cliff-jumper@npm:1.9.0"
   dependencies:
@@ -1335,7 +1335,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@favware/npm-deprecate@npm:^1.0.5":
+"@favware/npm-deprecate@npm:^1.0.7":
   version: 1.0.7
   resolution: "@favware/npm-deprecate@npm:1.0.7"
   dependencies:
@@ -1441,18 +1441,18 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@joshdb/json@workspace:packages/json"
   dependencies:
-    "@favware/cliff-jumper": ^1.8.8
+    "@favware/cliff-jumper": ^1.9.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
     "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/async-queue": ^1.5.0
     "@sapphire/snowflake": ^3.3.0
     "@sapphire/utilities": ^3.11.0
-    "@vitest/coverage-c8": ^0.25.1
+    "@vitest/coverage-c8": ^0.26.2
     property-helpers: ^2.0.0
-    typedoc: ^0.23.20
-    typedoc-json-parser: ^7.0.1
-    vitest: ^0.25.1
+    typedoc: ^0.23.23
+    typedoc-json-parser: ^7.0.2
+    vitest: ^0.26.2
   languageName: unknown
   linkType: soft
 
@@ -1460,16 +1460,16 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@joshdb/map@workspace:packages/map"
   dependencies:
-    "@favware/cliff-jumper": ^1.8.8
+    "@favware/cliff-jumper": ^1.9.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
     "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/utilities": ^3.11.0
-    "@vitest/coverage-c8": ^0.25.1
+    "@vitest/coverage-c8": ^0.26.2
     property-helpers: ^2.0.0
-    typedoc: ^0.23.20
-    typedoc-json-parser: ^7.0.1
-    vitest: ^0.25.1
+    typedoc: ^0.23.23
+    typedoc-json-parser: ^7.0.2
+    vitest: ^0.26.2
   languageName: unknown
   linkType: soft
 
@@ -1477,16 +1477,16 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@joshdb/maria@workspace:packages/maria"
   dependencies:
-    "@favware/cliff-jumper": ^1.8.8
+    "@favware/cliff-jumper": ^1.9.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
     "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/snowflake": ^3.3.0
-    "@vitest/coverage-c8": ^0.25.1
+    "@vitest/coverage-c8": ^0.26.2
     mariadb: ^3.0.2
-    typedoc: ^0.23.20
-    typedoc-json-parser: ^7.0.1
-    vitest: ^0.25.1
+    typedoc: ^0.23.23
+    typedoc-json-parser: ^7.0.2
+    vitest: ^0.26.2
   languageName: unknown
   linkType: soft
 
@@ -1494,17 +1494,17 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@joshdb/mongo@workspace:packages/mongo"
   dependencies:
-    "@favware/cliff-jumper": ^1.8.8
+    "@favware/cliff-jumper": ^1.9.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
     "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/utilities": ^3.11.0
-    "@vitest/coverage-c8": ^0.25.1
+    "@vitest/coverage-c8": ^0.26.2
     mongodb: ~4.13.0
     property-helpers: ^2.0.0
-    typedoc: ^0.23.20
-    typedoc-json-parser: ^7.0.1
-    vitest: ^0.25.1
+    typedoc: ^0.23.23
+    typedoc-json-parser: ^7.0.2
+    vitest: ^0.26.2
   languageName: unknown
   linkType: soft
 
@@ -1512,18 +1512,18 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@joshdb/postgresql@workspace:packages/postgresql"
   dependencies:
-    "@favware/cliff-jumper": ^1.8.8
+    "@favware/cliff-jumper": ^1.9.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
     "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/snowflake": ^3.3.0
     "@sapphire/utilities": ^3.11.0
-    "@vitest/coverage-c8": ^0.25.1
+    "@vitest/coverage-c8": ^0.26.2
     postgres: ^3.3.2
     property-helpers: ^2.0.0
-    typedoc: ^0.23.20
-    typedoc-json-parser: ^7.0.1
-    vitest: ^0.25.1
+    typedoc: ^0.23.23
+    typedoc-json-parser: ^7.0.2
+    vitest: ^0.26.2
   languageName: unknown
   linkType: soft
 
@@ -1541,17 +1541,17 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@joshdb/redis@workspace:packages/redis"
   dependencies:
-    "@favware/cliff-jumper": ^1.8.8
+    "@favware/cliff-jumper": ^1.9.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
     "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@types/uuid": ^8.3.4
-    "@vitest/coverage-c8": ^0.25.1
+    "@vitest/coverage-c8": ^0.26.2
     redis: ^4.5.1
-    typedoc: ^0.23.20
-    typedoc-json-parser: ^7.0.1
+    typedoc: ^0.23.23
+    typedoc-json-parser: ^7.0.2
     uuid: ^9.0.0
-    vitest: ^0.25.1
+    vitest: ^0.26.2
   languageName: unknown
   linkType: soft
 
@@ -1566,17 +1566,17 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@joshdb/sqlite@workspace:packages/sqlite"
   dependencies:
-    "@favware/cliff-jumper": ^1.8.8
+    "@favware/cliff-jumper": ^1.9.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
     "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/utilities": ^3.11.0
-    "@vitest/coverage-c8": ^0.25.1
+    "@vitest/coverage-c8": ^0.26.2
     better-sqlite3: ^8.0.1
     property-helpers: ^2.0.0
-    typedoc: ^0.23.20
-    typedoc-json-parser: ^7.0.1
-    vitest: ^0.25.1
+    typedoc: ^0.23.23
+    typedoc-json-parser: ^7.0.2
+    vitest: ^0.26.2
   languageName: unknown
   linkType: soft
 
@@ -1856,7 +1856,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/better-sqlite3@npm:^7.6.2":
+"@types/better-sqlite3@npm:^7.6.3":
   version: 7.6.3
   resolution: "@types/better-sqlite3@npm:7.6.3"
   dependencies:
@@ -1916,7 +1916,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^18.11.9":
+"@types/node@npm:*, @types/node@npm:^18.11.18":
   version: 18.11.18
   resolution: "@types/node@npm:18.11.18"
   checksum: 03f17f9480f8d775c8a72da5ea7e9383db5f6d85aa5fefde90dd953a1449bd5e4ffde376f139da4f3744b4c83942166d2a7603969a6f8ea826edfb16e6e3b49d
@@ -1992,7 +1992,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:^5.33.1, @typescript-eslint/eslint-plugin@npm:^5.42.1, @typescript-eslint/eslint-plugin@npm:^5.47.0":
+"@typescript-eslint/eslint-plugin@npm:^5.33.1, @typescript-eslint/eslint-plugin@npm:^5.47.0, @typescript-eslint/eslint-plugin@npm:^5.47.1":
   version: 5.47.1
   resolution: "@typescript-eslint/eslint-plugin@npm:5.47.1"
   dependencies:
@@ -2015,7 +2015,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^5.33.1, @typescript-eslint/parser@npm:^5.42.1, @typescript-eslint/parser@npm:^5.47.0":
+"@typescript-eslint/parser@npm:^5.33.1, @typescript-eslint/parser@npm:^5.47.0, @typescript-eslint/parser@npm:^5.47.1":
   version: 5.47.1
   resolution: "@typescript-eslint/parser@npm:5.47.1"
   dependencies:
@@ -2112,13 +2112,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/coverage-c8@npm:^0.25.1":
-  version: 0.25.8
-  resolution: "@vitest/coverage-c8@npm:0.25.8"
+"@vitest/coverage-c8@npm:^0.26.2":
+  version: 0.26.2
+  resolution: "@vitest/coverage-c8@npm:0.26.2"
   dependencies:
     c8: ^7.12.0
-    vitest: 0.25.8
-  checksum: 189a7d8df0e4185d7f016184c70a65fc40bf661294de340b7c63991ffb494acf09769ce1bc4817d879f13b5b5e462ab4052ca35fa8315ca2723b69f9fce61a28
+    vitest: 0.26.2
+  checksum: dfd19251278e2fa16cc428142d860c3edffac5149c6884415be58ba76ed3f331a91aa2eab2499da54c5584a66016c61a45d8a1f8aab93356fc91fa537fa904f4
   languageName: node
   linkType: hard
 
@@ -3297,7 +3297,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^8.22.0, eslint@npm:^8.27.0, eslint@npm:^8.30.0":
+"eslint@npm:^8.22.0, eslint@npm:^8.30.0":
   version: 8.30.0
   resolution: "eslint@npm:8.30.0"
   dependencies:
@@ -4265,7 +4265,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsonc-parser@npm:^3.0.0":
+"jsonc-parser@npm:^3.0.0, jsonc-parser@npm:^3.2.0":
   version: 3.2.0
   resolution: "jsonc-parser@npm:3.2.0"
   checksum: 946dd9a5f326b745aa326d48a7257e3f4a4b62c5e98ec8e49fa2bdd8d96cef7e6febf1399f5c7016114fd1f68a1c62c6138826d5d90bc650448e3cf0951c53c7
@@ -4330,7 +4330,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lint-staged@npm:^13.0.3":
+"lint-staged@npm:^13.1.0":
   version: 13.1.0
   resolution: "lint-staged@npm:13.1.0"
   dependencies:
@@ -4871,6 +4871,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mlly@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "mlly@npm:1.0.0"
+  dependencies:
+    acorn: ^8.8.1
+    pathe: ^1.0.0
+    pkg-types: ^1.0.0
+    ufo: ^1.0.0
+  checksum: e9d8809a836f407fb0604f46ca12fd1671cb95a71fef35ba6af57022c75eb7555dcad3ed5524f6c53fdf1280ed35739837c7306c0e0201371943737091dde429
+  languageName: node
+  linkType: hard
+
 "modify-values@npm:^1.0.0":
   version: 1.0.1
   resolution: "modify-values@npm:1.0.1"
@@ -5298,6 +5310,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pathe@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "pathe@npm:0.2.0"
+  checksum: 9a8149ce152088f30d15b0b03a7c128ba21f16b4dc1f3f90fe38eee9f6d0f1d6da8e4e47bd2a4f9e14aaac7c30ed01cfc86216479011de2bdc598b65e6f19f41
+  languageName: node
+  linkType: hard
+
+"pathe@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "pathe@npm:1.0.0"
+  checksum: 7b71a4930a5b46111c92149632f74b0e87bade3eabe6c9168dcc4846857a4e124eacc0c2bf044fe0d2a8b7f87ae62b9b2cb11938c61899d485cc36dd1a243a23
+  languageName: node
+  linkType: hard
+
 "pathval@npm:^1.1.1":
   version: 1.1.1
   resolution: "pathval@npm:1.1.1"
@@ -5334,6 +5360,17 @@ __metadata:
   dependencies:
     find-up: ^4.0.0
   checksum: 9863e3f35132bf99ae1636d31ff1e1e3501251d480336edb1c211133c8d58906bed80f154a1d723652df1fda91e01c7442c2eeaf9dc83157c7ae89087e43c8d6
+  languageName: node
+  linkType: hard
+
+"pkg-types@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "pkg-types@npm:1.0.1"
+  dependencies:
+    jsonc-parser: ^3.2.0
+    mlly: ^1.0.0
+    pathe: ^1.0.0
+  checksum: fe73cc22fb72ddb09227e2837a7b2ed1e0706a18e69a58a6ce13cde2b7eab122cb98de44d5c54fca5715d203ef3d2eb004b3ec84a3c05decb11e7c49a80fe2f9
   languageName: node
   linkType: hard
 
@@ -5796,29 +5833,28 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "root@workspace:."
   dependencies:
-    "@commitlint/cli": ^17.2.0
-    "@commitlint/config-conventional": ^17.2.0
+    "@commitlint/cli": ^17.3.0
+    "@commitlint/config-conventional": ^17.3.0
     "@faker-js/faker": ^7.6.0
-    "@favware/cliff-jumper": ^1.8.8
+    "@favware/cliff-jumper": ^1.9.0
     "@favware/colorette-spinner": ^1.0.1
-    "@favware/npm-deprecate": ^1.0.5
+    "@favware/npm-deprecate": ^1.0.7
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/eslint-config": 1.1.0-next.7b50e88.0
-    "@joshdb/provider": 2.0.0-next.7b50e88.0
     "@joshdb/ts-config": ^1.1.0-next.7fbd1fd.0
-    "@types/better-sqlite3": ^7.6.2
-    "@types/node": ^18.11.9
+    "@types/better-sqlite3": ^7.6.3
+    "@types/node": ^18.11.18
     "@types/prompts": ^2
-    "@typescript-eslint/eslint-plugin": ^5.42.1
-    "@typescript-eslint/parser": ^5.42.1
-    "@vitest/coverage-c8": ^0.25.1
+    "@typescript-eslint/eslint-plugin": ^5.47.1
+    "@typescript-eslint/parser": ^5.47.1
+    "@vitest/coverage-c8": ^0.26.2
     colorette: ^2.0.19
-    eslint: ^8.27.0
+    eslint: ^8.30.0
     eslint-config-prettier: ^8.5.0
     eslint-plugin-prettier: ^4.2.1
     husky: ^8.0.2
-    lint-staged: ^13.0.3
-    prettier: ^2.7.1
+    lint-staged: ^13.1.0
+    prettier: ^2.8.1
     pretty-quick: ^3.1.3
     prompts: ^2.4.2
     rimraf: ^3.0.2
@@ -5828,8 +5864,8 @@ __metadata:
     rollup-plugin-version-injector: ^1.3.3
     tslib: ^2.4.1
     turbo: ^1.6.3
-    typescript: ^4.8.4
-    vitest: ^0.25.1
+    typescript: ^4.9.4
+    vitest: ^0.26.2
   languageName: unknown
   linkType: soft
 
@@ -6063,7 +6099,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"source-map@npm:^0.6.1":
+"source-map-support@npm:^0.5.21":
+  version: 0.5.21
+  resolution: "source-map-support@npm:0.5.21"
+  dependencies:
+    buffer-from: ^1.0.0
+    source-map: ^0.6.0
+  checksum: 43e98d700d79af1d36f859bdb7318e601dfc918c7ba2e98456118ebc4c4872b327773e5a1df09b0524e9e5063bb18f0934538eace60cca2710d1fa687645d137
+  languageName: node
+  linkType: hard
+
+"source-map@npm:^0.6.0, source-map@npm:^0.6.1":
   version: 0.6.1
   resolution: "source-map@npm:0.6.1"
   checksum: 59ce8640cf3f3124f64ac289012c2b8bd377c238e316fb323ea22fbfe83da07d81e000071d7242cad7a23cd91c7de98e4df8830ec3f133cb6133a5f6e9f67bc2
@@ -6615,7 +6661,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typedoc-json-parser@npm:^7.0.1":
+"typedoc-json-parser@npm:^7.0.2":
   version: 7.0.2
   resolution: "typedoc-json-parser@npm:7.0.2"
   dependencies:
@@ -6632,7 +6678,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typedoc@npm:^0.23.20":
+"typedoc@npm:^0.23.20, typedoc@npm:^0.23.23":
   version: 0.23.23
   resolution: "typedoc@npm:0.23.23"
   dependencies:
@@ -6665,6 +6711,13 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 1caaea6cb7f813e64345190fddc4e6c924d0b698ab81189b503763c4a18f7f5501c69362979d36e19c042d89d936443e768a78b0675690b35eb663d19e0eae71
+  languageName: node
+  linkType: hard
+
+"ufo@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "ufo@npm:1.0.1"
+  checksum: 63024876f21b7cc44267255a8043062046d3215e09212bd682787a13ccf1e0c5d23f7686a7f1bc7ac9f34c7e8a88100af234f42b509db50f17ce638af6ac87cc
   languageName: node
   linkType: hard
 
@@ -6782,6 +6835,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"vite-node@npm:0.26.2":
+  version: 0.26.2
+  resolution: "vite-node@npm:0.26.2"
+  dependencies:
+    debug: ^4.3.4
+    mlly: ^1.0.0
+    pathe: ^0.2.0
+    source-map: ^0.6.1
+    source-map-support: ^0.5.21
+    vite: ^3.0.0 || ^4.0.0
+  bin:
+    vite-node: vite-node.mjs
+  checksum: 83105cdf05c8a0673d1d939af864324d0468c225b2f126eaa8f039d16c66a6831ddf1367c62320f2ea0d8e987a872e5c67bddfa88ec7775fdf6433da23edc715
+  languageName: node
+  linkType: hard
+
 "vite@npm:^3.0.0 || ^4.0.0":
   version: 4.0.3
   resolution: "vite@npm:4.0.3"
@@ -6820,9 +6889,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vitest@npm:0.25.8, vitest@npm:^0.25.1":
-  version: 0.25.8
-  resolution: "vitest@npm:0.25.8"
+"vitest@npm:0.26.2, vitest@npm:^0.26.2":
+  version: 0.26.2
+  resolution: "vitest@npm:0.26.2"
   dependencies:
     "@types/chai": ^4.3.4
     "@types/chai-subset": ^1.3.3
@@ -6838,6 +6907,7 @@ __metadata:
     tinypool: ^0.3.0
     tinyspy: ^1.0.2
     vite: ^3.0.0 || ^4.0.0
+    vite-node: 0.26.2
   peerDependencies:
     "@edge-runtime/vm": "*"
     "@vitest/browser": "*"
@@ -6857,7 +6927,7 @@ __metadata:
       optional: true
   bin:
     vitest: vitest.mjs
-  checksum: 2444dc04c87c261fcd43e1e240e5c62d6e96d0b52c0142f30200fde1078e97afad7cc6dd3163aa520ef4b0584f02cecfcc676300cb839e4470751403f54d2623
+  checksum: 2adc5fcead5b8b942e87d2ea6b2183baf0dc4728136758646bb674441d10a809bb6ff5bd1dc8f6a6e019f133b8537ddef770c9a1705d4cc9714411083581ab6e
   languageName: node
   linkType: hard
 
