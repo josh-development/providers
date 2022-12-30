@@ -32,6 +32,8 @@ import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProper
  * @since 2.0.0
  */
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
+  public static defaultAuthentication: MongoProvider.Authentication = { dbName: 'josh', host: 'localhost', port: 27017 };
+
   public declare options: MongoProvider.Options;
 
   public migrations: JoshProvider.Migration[] = [
@@ -103,7 +105,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return this._metadata;
   }
 
-  public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
+  public override async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
     const {
       collectionName = context.name,
       enforceCollectionName,
@@ -904,8 +906,6 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   private generateMongoDoc<T extends Document = MongoProvider.DocType<StoredValue>>(collectionName: string): Collection<T> {
     return this.client.db().collection(collectionName);
   }
-
-  public static defaultAuthentication: MongoProvider.Authentication = { dbName: 'josh', host: 'localhost', port: 27017 };
 }
 
 export namespace MongoProvider {

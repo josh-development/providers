@@ -54,7 +54,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return this._client;
   }
 
-  public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
+  public override async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
     this._client = createClient(this.options.connectOptions) as RedisClientType;
     await this._client.connect();
     context = await super.init(context);

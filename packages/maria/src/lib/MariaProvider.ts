@@ -33,6 +33,16 @@ import { QueryHandler } from './QueryHandler';
  * @since 1.0.0
  */
 export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
+  /**
+   * The default connection configuration for this provider.
+   * @since 1.0.0
+   */
+  public static defaultConnectionConfig: MariaProvider.ConnectionConfig = {
+    database: 'josh',
+    user: 'josh',
+    password: 'josh'
+  };
+
   public declare options: MariaProvider.Options;
 
   public migrations: JoshProvider.Migration[] = [];
@@ -68,7 +78,7 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return resolveVersion('[VI]{version}[/VI]');
   }
 
-  public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
+  public override async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
     this.handler.options.tableName = context.name;
     await this.handler.init();
 
@@ -743,16 +753,6 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     return resolveVersion(metadata.version);
   }
-
-  /**
-   * The default connection configuration for this provider.
-   * @since 1.0.0
-   */
-  public static defaultConnectionConfig: MariaProvider.ConnectionConfig = {
-    database: 'josh',
-    user: 'josh',
-    password: 'josh'
-  };
 }
 
 export namespace MariaProvider {

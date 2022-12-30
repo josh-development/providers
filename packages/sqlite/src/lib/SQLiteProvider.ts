@@ -114,7 +114,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     throw this.error(SQLiteProvider.Identifiers.HandlerNotFound);
   }
 
-  public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
+  public override async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
     context = await super.init(context);
 
     this.options.tableName = this.options.tableName ?? context.name;
@@ -786,7 +786,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     return payload;
   }
 
-  protected resolveIdentifier(identifier: string, metadata: Record<string, unknown>): string {
+  protected override resolveIdentifier(identifier: string, metadata: Record<string, unknown>): string {
     try {
       return super.resolveIdentifier(identifier, metadata);
     } catch {

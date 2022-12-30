@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@joshdb/provider": "2.0.0-next.24b745c.0",
-    "@joshdb/serialize": "1.1.0-next.24b745c.0",
+    "@joshdb/serialize": "1.1.0-next.7b50e88.0",
     "@sapphire/snowflake": "^3.3.0",
     "mariadb": "^3.0.2"
   },

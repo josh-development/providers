@@ -90,7 +90,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     throw this.error(JSONProvider.Identifiers.ChunkHandlerNotFound);
   }
 
-  public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
+  public override async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
     context = await super.init(context);
 
     const { useAbsolutePath, dataDirectory, disableSerialization, epoch, maxChunkSize, retry, synchronize } = this.options;
@@ -772,7 +772,7 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     return payload;
   }
 
-  protected resolveIdentifier(identifier: string, metadata: Record<string, unknown>): string {
+  protected override resolveIdentifier(identifier: string, metadata: Record<string, unknown>): string {
     try {
       return super.resolveIdentifier(identifier, metadata);
     } catch {

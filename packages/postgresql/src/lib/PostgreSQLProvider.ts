@@ -28,6 +28,8 @@ import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProper
 import { QueryHandler } from './QueryHandler';
 
 export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
+  public static defaultConnectionDetails: PostgreSQLProvider.ConnectionDetails = { host: 'localhost', port: 5432, user: 'postgres' };
+
   public declare options: PostgreSQLProvider.Options;
 
   public migrations: JoshProvider.Migration[] = [];
@@ -69,7 +71,7 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
     return process.env.NODE_ENV === 'test' ? { major: 1, minor: 0, patch: 0 } : resolveVersion('[VI]{version}[/VI]');
   }
 
-  public async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
+  public override async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
     await this.handler.init();
 
     context = await super.init(context);
@@ -733,8 +735,6 @@ export class PostgreSQLProvider<StoredValue = unknown> extends JoshProvider<Stor
 
     return resolveVersion(metadata.version);
   }
-
-  public static defaultConnectionDetails: PostgreSQLProvider.ConnectionDetails = { host: 'localhost', port: 5432, user: 'postgres' };
 }
 
 export namespace PostgreSQLProvider {
