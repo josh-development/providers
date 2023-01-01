@@ -1446,7 +1446,7 @@ __metadata:
     "@joshdb/provider": 2.0.0-next.7b50e88.0
     "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/async-queue": ^1.5.0
-    "@sapphire/snowflake": ^3.3.0
+    "@sapphire/snowflake": ^3.4.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.26.2
     property-helpers: ^2.0.0
@@ -1481,7 +1481,7 @@ __metadata:
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
     "@joshdb/serialize": 1.1.0-next.7b50e88.0
-    "@sapphire/snowflake": ^3.3.0
+    "@sapphire/snowflake": ^3.4.0
     "@vitest/coverage-c8": ^0.26.2
     mariadb: ^3.0.2
     typedoc: ^0.23.23
@@ -1516,7 +1516,7 @@ __metadata:
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
     "@joshdb/serialize": 1.1.0-next.7b50e88.0
-    "@sapphire/snowflake": ^3.3.0
+    "@sapphire/snowflake": ^3.4.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.26.2
     postgres: ^3.3.2
@@ -1797,7 +1797,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/snowflake@npm:^3.3.0":
+"@sapphire/snowflake@npm:^3.4.0":
   version: 3.4.0
   resolution: "@sapphire/snowflake@npm:3.4.0"
   checksum: 556b7001f33d6edbbbcbca46f6abfa56c732a29e78b693161e358688e688edcb012d2c1bc944e7ffb41bd6c9950d261bc73f95656dc01643361a218b4f5ab985
