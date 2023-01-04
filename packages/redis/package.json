@@ -32,7 +32,7 @@
   "devDependencies": {
     "@favware/cliff-jumper": "^1.9.0",
     "@favware/rollup-type-bundler": "^1.0.11",
-    "@types/uuid": "^8.3.4",
+    "@types/uuid": "^9.0.0",
     "@vitest/coverage-c8": "^0.26.3",
     "typedoc": "^0.23.23",
     "typedoc-json-parser": "^7.0.2",
