@@ -33,16 +33,6 @@ import { QueryHandler } from './QueryHandler';
  * @since 1.0.0
  */
 export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
-  /**
-   * The default connection configuration for this provider.
-   * @since 1.0.0
-   */
-  public static defaultConnectionConfig: MariaProvider.ConnectionConfig = {
-    database: 'josh',
-    user: 'josh',
-    password: 'josh'
-  };
-
   public declare options: MariaProvider.Options;
 
   public migrations: JoshProvider.Migration[] = [];
@@ -753,6 +743,16 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     return resolveVersion(metadata.version);
   }
+
+  /**
+   * The default connection configuration for this provider.
+   * @since 1.0.0
+   */
+  public static defaultConnectionConfig: MariaProvider.ConnectionConfig = {
+    database: 'josh',
+    user: 'josh',
+    password: 'josh'
+  };
 }
 
 export namespace MariaProvider {
