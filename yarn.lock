@@ -1536,7 +1536,7 @@ __metadata:
     "@sapphire/snowflake": ^3.4.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.26.3
-    postgres: ^3.3.2
+    postgres: ^3.3.3
     property-helpers: ^2.0.0
     typedoc: ^0.23.23
     typedoc-json-parser: ^7.0.2
@@ -5582,10 +5582,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postgres@npm:^3.3.2":
-  version: 3.3.2
-  resolution: "postgres@npm:3.3.2"
-  checksum: 6de16e5c8854ebe95f344a7fae2d4f667f319fce76bf8c9657269fe5c60ba315aade59e91808ca6729a50de09d494d24f403d96697f731b457aad04f43ab65d5
+"postgres@npm:^3.3.3":
+  version: 3.3.3
+  resolution: "postgres@npm:3.3.3"
+  checksum: 9b4b5426fdb56abaf0b713e6c2762be06bac4aec4c618d50a8e63201d93b9b863f687b7141f6e6fa4b7a7cb4fae6b748f01a5b99ea574b33ae5603bf862d9d70
   languageName: node
   linkType: hard
 
