@@ -6154,6 +6154,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rimraf@npm:^4.0.5":
+  version: 4.0.5
+  resolution: "rimraf@npm:4.0.5"
+  bin:
+    rimraf: dist/cjs/src/bin.js
+  checksum: e99139d6460d4460125288565698ff43f5cb8734feda83694187a029b21bdd6e63c063a1cb899ae8deaccc4345fbb69fa45e655329b2fb93f21ad809da1948eb
+  languageName: node
+  linkType: hard
+
 "rollup-plugin-cleaner@npm:^1.0.0":
   version: 1.0.0
   resolution: "rollup-plugin-cleaner@npm:1.0.0"
@@ -6264,7 +6273,7 @@ __metadata:
     prettier: ^2.8.3
     pretty-quick: ^3.1.3
     prompts: ^2.4.2
-    rimraf: ^3.0.2
+    rimraf: ^4.0.5
     rollup: ^2.79.1
     rollup-plugin-cleaner: ^1.0.0
     rollup-plugin-typescript2: ^0.34.1
