@@ -1510,7 +1510,7 @@ __metadata:
     "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/snowflake": ^3.4.0
     "@vitest/coverage-c8": ^0.27.1
-    mariadb: ^3.0.2
+    mariadb: ^3.1.0
     typedoc: ^0.23.24
     typedoc-json-parser: ^7.1.0
     vitest: ^0.27.1
@@ -1527,7 +1527,7 @@ __metadata:
     "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.27.1
-    mongodb: ~4.13.0
+    mongodb: ~4.14.0
     property-helpers: ^2.0.0
     typedoc: ^0.23.24
     typedoc-json-parser: ^7.1.0
@@ -1599,7 +1599,7 @@ __metadata:
     "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.27.1
-    better-sqlite3: ^8.0.1
+    better-sqlite3: ^8.1.0
     property-helpers: ^2.0.0
     typedoc: ^0.23.24
     typedoc-json-parser: ^7.1.0
@@ -2626,14 +2626,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"better-sqlite3@npm:^8.0.1":
-  version: 8.0.1
-  resolution: "better-sqlite3@npm:8.0.1"
+"better-sqlite3@npm:^8.1.0":
+  version: 8.1.0
+  resolution: "better-sqlite3@npm:8.1.0"
   dependencies:
     bindings: ^1.5.0
     node-gyp: latest
     prebuild-install: ^7.1.0
-  checksum: 533b2cc32bd54e2a943a4f63e079f8cc8945879b7a0ebd2085b948824ea067792f6f903ab75ba75d7cafc5f8f973354cdf9a042fa6216e077925d07a8df1bead
+  checksum: 7e6b4c33142f4b2ee2e60d3926b4db682feb0d09554efdaf7bea53cd5bef406ca0a5115ab9b411458daa45ba14973252ebd6853a3cdf94e4fd49cc8291730ade
   languageName: node
   linkType: hard
 
@@ -5000,17 +5000,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mariadb@npm:^3.0.2":
-  version: 3.0.2
-  resolution: "mariadb@npm:3.0.2"
+"mariadb@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "mariadb@npm:3.1.0"
   dependencies:
     "@types/geojson": ^7946.0.10
     "@types/node": ^17.0.45
     denque: ^2.1.0
     iconv-lite: ^0.6.3
     lru-cache: ^7.14.0
-    moment-timezone: ^0.5.38
-  checksum: 1d84f9ab760b146eb6a4cd728cc84e34255f4c5d17a182d1f36f7d1738de32b3ace328d1d8f2e81dfb0df3f5a43844006b4b74bbeb5f7f92d6a9d862a513de40
+  checksum: d906ffc915567053e0c0227d087cfe9a3892490ee4ae505d2a0d45b293a3d8f6565376fad6e0622987f6a98b0a028a0d27e20faa3bc604b9987ecfecd194f3d4
   languageName: node
   linkType: hard
 
@@ -5288,22 +5287,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"moment-timezone@npm:^0.5.38":
-  version: 0.5.40
-  resolution: "moment-timezone@npm:0.5.40"
-  dependencies:
-    moment: ">= 2.9.0"
-  checksum: 6f6be5412b37fd937bb143efe74bf65b2c3f115fd967a6dc13b717a126ed6dd198bff6db6e179d69a089e20ac03ce7622c6b5598dd585005195554487a91b528
-  languageName: node
-  linkType: hard
-
-"moment@npm:>= 2.9.0":
-  version: 2.29.4
-  resolution: "moment@npm:2.29.4"
-  checksum: 0ec3f9c2bcba38dc2451b1daed5daded747f17610b92427bebe1d08d48d8b7bdd8d9197500b072d14e326dd0ccf3e326b9e3d07c5895d3d49e39b6803b76e80e
-  languageName: node
-  linkType: hard
-
 "mongodb-connection-string-url@npm:^2.5.4":
   version: 2.6.0
   resolution: "mongodb-connection-string-url@npm:2.6.0"
@@ -5314,9 +5297,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:~4.13.0":
-  version: 4.13.0
-  resolution: "mongodb@npm:4.13.0"
+"mongodb@npm:~4.14.0":
+  version: 4.14.0
+  resolution: "mongodb@npm:4.14.0"
   dependencies:
     "@aws-sdk/credential-providers": ^3.186.0
     bson: ^4.7.0
@@ -5328,7 +5311,7 @@ __metadata:
       optional: true
     saslprep:
       optional: true
-  checksum: 4c30eed40f639ac64069623cf7a4954e98eab81b91d61df90e7813dd2a745259cdc698f3b60bd7f37c123242b7eb0aaae6ee4e29ff2e48f5d13f187931d51f36
+  checksum: ab3b8f27e99fab4ea0c163067158ad360a161edf9ebf74368b9b561da7b75d23c09282d530cb4e2fac32ea30eae29620e861d837d334ddbdfa50d57240c1bd8e
   languageName: node
   linkType: hard
 
