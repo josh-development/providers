@@ -264,6 +264,7 @@ export class QueryHandler<StoredValue = unknown> {
 export namespace QueryHandler {
   export interface Options {
     connectionConfig: ConnectionConfig | string;
+
     tableName: string;
 
     disableSerialization?: boolean;
