@@ -13,14 +13,10 @@ jobs:
     steps:
       - name: Checkout Project
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # tag=v3
-      - name: Use Node.js v16
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # tag=v3
+      - name: Setup Node
+        uses: josh-development/.github/setup-node@main
         with:
-          node-version: 16
-          cache: yarn
-          registry-url: https://registry.yarnpkg.com/
-      - name: Install Dependencies
-        run: yarn --immutable
+          turbo: true
       - name: Run Tests
         run: yarn workspace @joshdb/json run test
       - name: Store Code Coverage Report
@@ -34,14 +30,10 @@ jobs:
     steps:
       - name: Checkout Project
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # tag=v3
-      - name: Use Node.js v16
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # tag=v3
+      - name: Setup Node
+        uses: josh-development/.github/setup-node@main
         with:
-          node-version: 16
-          cache: yarn
-          registry-url: https://registry.yarnpkg.com/
-      - name: Install Dependencies
-        run: yarn --immutable
+          turbo: true
       - name: Run Tests
         run: yarn workspace @joshdb/map run test
       - name: Store Code Coverage Report
@@ -55,10 +47,10 @@ jobs:
     steps:
       - name: Checkout Project
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # tag=v3
-      - name: Use Node.js v16
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # tag=v3
+      - name: Setup Node
+        uses: josh-development/.github/setup-node@main
         with:
-          node-version: 16
+          turbo: true
       - name: Shutdown MySQL
         run: sudo service mysql stop
       - name: Start MariaDB Instance
@@ -82,10 +74,10 @@ jobs:
     steps:
       - name: Checkout Project
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # tag=v3
-      - name: Use Node.js v16
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # tag=v3
+      - name: Setup Node
+        uses: josh-development/.github/setup-node@main
         with:
-          node-version: 16
+          turbo: true
           cache: yarn
           registry-url: https://registry.yarnpkg.com/
       - name: Start Mongo Database
@@ -120,14 +112,10 @@ jobs:
     steps:
       - name: Checkout Project
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # tag=v3
-      - name: Use Node.js v16
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # tag=v3
+      - name: Setup Node
+        uses: josh-development/.github/setup-node@main
         with:
-          node-version: 16
-          cache: yarn
-          registry-url: https://registry.yarnpkg.com/
-      - name: Install Dependencies
-        run: yarn --immutable
+          turbo: true
       - name: Run Tests
         run: yarn workspace @joshdb/postgresql run test --coverage
       - name: Store Code Coverage Report
@@ -141,10 +129,10 @@ jobs:
     steps:
       - name: Checkout Project
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # tag=v3
-      - name: Use Node.js v16
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # tag=v3
+      - name: Setup Node
+        uses: josh-development/.github/setup-node@main
         with:
-          node-version: 16
+          turbo: true
       - name: Start Redis Instance
         uses: supercharge/redis-github-action@4b67a313c69bc7a90f162e8d810392fffe10d3b5 # tag=1.4.0
         with:
@@ -164,10 +152,10 @@ jobs:
     steps:
       - name: Checkout Project
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # tag=v3
-      - name: Use Node.js v16
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # tag=v3
+      - name: Setup Node
+        uses: josh-development/.github/setup-node@main
         with:
-          node-version: 16
+          turbo: true
       - name: Install Dependencies
         run: yarn --immutable
       - name: Run Tests
