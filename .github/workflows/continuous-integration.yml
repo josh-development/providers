@@ -23,5 +23,5 @@ jobs:
         run: yarn lint --fix=false
       - name: Compile Source Code
         run: yarn build
-      - name: Run Docs
+      - name: Generate Documentation
         run: yarn docs
