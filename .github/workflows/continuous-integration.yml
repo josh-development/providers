@@ -7,11 +7,13 @@ on:
   pull_request:
 
 jobs:
-  linting:
-    uses: josh-development/.github/.github/workflows/lint.yml@main
-
-  building:
-    uses: josh-development/.github/.github/workflows/build.yml@main
-
-  docs:
-    uses: josh-development/.github/.github/workflows/docs.yml@main
+  ci:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node
+        uses: josh-development/.github/setup-node@main
+      - name: Add ESLint Problem Matcher
+        run: echo "::add-matcher::.github/problemMatchers/eslint.json"
+      - name: Run ESLint
+        run: yarn lint --fix=false
