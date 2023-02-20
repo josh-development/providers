@@ -10,16 +10,7 @@ jobs:
   linting:
     name: Linting
     runs-on: ubuntu-latest
-    uses: josh-development/.github/.github/workflows/setup-node.yml@main
-    steps:
-      - name: Checkout Project
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # tag=v3
-      - name: Add ESLint Problem Matcher
-        run: echo "::add-matcher::.github/problemMatchers/eslint.json"
-      - name: Install Dependencies
-        run: yarn --immutable
-      - name: Run ESLint
-        run: yarn lint --fix=false
+    uses: josh-development/.github/.github/workflows/lint.yml@main
 
   building:
     name: Compile Source Code
