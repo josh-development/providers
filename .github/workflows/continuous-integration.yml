@@ -9,7 +9,6 @@ on:
 jobs:
   linting:
     name: Linting
-    runs-on: ubuntu-latest
     uses: josh-development/.github/.github/workflows/lint.yml@main
 
   building:
