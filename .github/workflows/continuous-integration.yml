@@ -24,6 +24,6 @@ jobs:
       - name: Add TypeScript Problem Matcher
         run: echo "::add-matcher::.github/problemMatchers/tsc.json"
       - name: Compile Source Code
-        run: yarn build
+        run: yarn build --cache-dir=./.turbo
       - name: Generate Documentation
-        run: yarn docs
+        run: yarn docs --cache-dir=./.turbo
