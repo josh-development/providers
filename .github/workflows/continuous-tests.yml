@@ -81,7 +81,7 @@ jobs:
           cache: yarn
           registry-url: https://registry.yarnpkg.com/
       - name: Start Mongo Database
-        uses: supercharge/mongodb-github-action@538a4d2a1041920c47630172445cb688592d6e51 # tag=v1.8.0
+        uses: supercharge/mongodb-github-action@d26215f71b2ce60420a2a3776a25893d11a65f85 # v1.9.0
         with:
           mongodb-version: 5.0
       - name: Install Dependencies
