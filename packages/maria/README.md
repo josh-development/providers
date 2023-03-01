@@ -43,7 +43,7 @@ export interface Options extends JoshProvider.Options {
   connectionConfig?: ConnectionConfig | string;
 
   /**
-   * Whether to disable automatic data serialization with `@joshdb/serialize`.
+   * Whether to disable automatic data serialization with `better-serialize`.
    * @since 1.0.0
    */
   disableSerialization?: boolean;

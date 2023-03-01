@@ -50,7 +50,7 @@ interface Options {
   expiry?: number;
 
   /**
-   * Disable using `@joshdb/serialize` for document serialization
+   * Disable using `better-serialize` for document serialization
    * This can be faster in some cases, but may cause issues with complex data types
    * @since 1.0.0
    */

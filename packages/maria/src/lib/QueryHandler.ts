@@ -1,4 +1,4 @@
-import { Serialize } from '@joshdb/serialize';
+import { Serialize } from 'better-serialize';
 import { Connection, ConnectionConfig, createConnection } from 'mariadb';
 
 export class QueryHandler<StoredValue = unknown> {
@@ -86,7 +86,7 @@ export class QueryHandler<StoredValue = unknown> {
       SELECT * FROM \`${this.options.tableName}\`
     `)) as QueryHandler.RowData[];
 
-    return rows.map((row) => [row.key, disableSerialization ? JSON.parse(row.value) : Serialize.fromJSON(JSON.parse(row.value))]);
+    return rows.map((row) => [row.key, disableSerialization ? JSON.parse(row.value) : Serialize.fromJsonCompatible(JSON.parse(row.value))]);
   }
 
   public async has(key: string): Promise<boolean> {
@@ -125,7 +125,7 @@ export class QueryHandler<StoredValue = unknown> {
       [key]
     )) as QueryHandler.RowData[];
 
-    return disableSerialization ? JSON.parse(row.value) : Serialize.fromJSON(JSON.parse(row.value));
+    return disableSerialization ? JSON.parse(row.value) : Serialize.fromJsonCompatible(JSON.parse(row.value));
   }
 
   public async getMany(keys: string[]): Promise<Record<string, StoredValue | null>> {
@@ -143,7 +143,7 @@ export class QueryHandler<StoredValue = unknown> {
     const data: Record<string, StoredValue | null> = {};
 
     for (const { key, value } of rows) {
-      data[key] = disableSerialization ? JSON.parse(value) : Serialize.fromJSON(JSON.parse(value));
+      data[key] = disableSerialization ? JSON.parse(value) : Serialize.fromJsonCompatible(JSON.parse(value));
     }
 
     for (const key of keys) {
@@ -165,7 +165,7 @@ export class QueryHandler<StoredValue = unknown> {
       ON DUPLICATE KEY
       UPDATE \`value\` = :value;`
       },
-      { key, value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJSON(value)) }
+      { key, value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJsonCompatible(value)) }
     );
   }
 
@@ -184,7 +184,7 @@ export class QueryHandler<StoredValue = unknown> {
         },
         entries.map(([key, value]) => ({
           key,
-          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJSON(value))
+          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJsonCompatible(value))
         }))
       );
     } else {
@@ -199,7 +199,7 @@ export class QueryHandler<StoredValue = unknown> {
         },
         entries.map(([key, value]) => ({
           key,
-          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJSON(value))
+          value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJsonCompatible(value))
         }))
       );
     }
@@ -221,7 +221,7 @@ export class QueryHandler<StoredValue = unknown> {
       FROM \`${this.options.tableName}\`
     `)) as Omit<QueryHandler.RowData, 'key'>[];
 
-    return rows.map((row) => (disableSerialization ? JSON.parse(row.value) : Serialize.fromJSON(JSON.parse(row.value))));
+    return rows.map((row) => (disableSerialization ? JSON.parse(row.value) : Serialize.fromJsonCompatible(JSON.parse(row.value))));
   }
 
   public async fetchMetadata(): Promise<QueryHandler.MetadataRow> {

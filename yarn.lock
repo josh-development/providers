@@ -571,11 +571,11 @@ __metadata:
     "@favware/cliff-jumper": ^1.10.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
-    "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/async-queue": ^1.5.0
     "@sapphire/snowflake": ^3.4.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.28.5
+    better-serialize: ^1.0.0
     property-helpers: ^2.0.0
     typedoc: ^0.23.25
     typedoc-json-parser: ^7.1.0
@@ -590,9 +590,9 @@ __metadata:
     "@favware/cliff-jumper": ^1.10.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
-    "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.28.5
+    better-serialize: ^1.0.0
     property-helpers: ^2.0.0
     typedoc: ^0.23.25
     typedoc-json-parser: ^7.1.0
@@ -607,9 +607,9 @@ __metadata:
     "@favware/cliff-jumper": ^1.10.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
-    "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/snowflake": ^3.4.0
     "@vitest/coverage-c8": ^0.28.5
+    better-serialize: ^1.0.0
     mariadb: ^3.1.0
     typedoc: ^0.23.25
     typedoc-json-parser: ^7.1.0
@@ -624,9 +624,9 @@ __metadata:
     "@favware/cliff-jumper": ^1.10.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
-    "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.28.5
+    better-serialize: ^1.0.0
     mongodb: ~5.1.0
     property-helpers: ^2.0.0
     typedoc: ^0.23.25
@@ -642,10 +642,10 @@ __metadata:
     "@favware/cliff-jumper": ^1.10.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
-    "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/snowflake": ^3.4.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.28.5
+    better-serialize: ^1.0.0
     postgres: ^3.3.3
     property-helpers: ^2.0.0
     typedoc: ^0.23.25
@@ -671,9 +671,9 @@ __metadata:
     "@favware/cliff-jumper": ^1.10.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
-    "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@types/uuid": ^9.0.0
     "@vitest/coverage-c8": ^0.28.5
+    better-serialize: ^1.0.0
     redis: ^4.6.5
     typedoc: ^0.23.25
     typedoc-json-parser: ^7.1.0
@@ -682,13 +682,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/serialize@npm:1.1.0-next.7b50e88.0":
-  version: 1.1.0-next.7b50e88.0
-  resolution: "@joshdb/serialize@npm:1.1.0-next.7b50e88.0"
-  checksum: a973da5b78c5a7e6e735c25279c49542afc376c8a3b978b21847a9590d4554c8adf67e94c5b2301293647ae965b9a5ea87b59c2ed222ee72a33767656b734749
-  languageName: node
-  linkType: hard
-
 "@joshdb/sqlite@workspace:packages/sqlite":
   version: 0.0.0-use.local
   resolution: "@joshdb/sqlite@workspace:packages/sqlite"
@@ -696,9 +689,9 @@ __metadata:
     "@favware/cliff-jumper": ^1.10.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
-    "@joshdb/serialize": 1.1.0-next.7b50e88.0
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.28.5
+    better-serialize: ^1.0.0
     better-sqlite3: ^8.1.0
     property-helpers: ^2.0.0
     typedoc: ^0.23.25
@@ -1546,6 +1539,13 @@ __metadata:
     "@sapphire/utilities": ^3.11.0
   languageName: unknown
   linkType: soft
+
+"better-serialize@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "better-serialize@npm:1.0.0"
+  checksum: c7b0a1b8f06eb2c9b21788d12ada770bfa3b1a2e49c089e607cb7710676c52dc8ba8c79acbe064cb38ff12e5eff7a231decb570ddb38158abc850099c066a362
+  languageName: node
+  linkType: hard
 
 "better-sqlite3@npm:^8.1.0":
   version: 8.1.0

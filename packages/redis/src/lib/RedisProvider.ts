@@ -22,8 +22,8 @@ import {
   resolveVersion,
   Semver
 } from '@joshdb/provider';
-import { Serialize } from '@joshdb/serialize';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
+import { Serialize } from 'better-serialize';
 import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 import { createClient, RedisClientOptions, RedisClientType } from 'redis';
 import { v4 } from 'uuid';
@@ -804,14 +804,14 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     }
   }
 
-  private deserialize(value: Serialize.JSON | StoredValue): StoredValue {
+  private deserialize(value: Serialize.JsonCompatible | StoredValue): StoredValue {
     if (this.options.disableSerialization) return value as StoredValue;
-    return Serialize.fromJSON(value as Serialize.JSON) as StoredValue;
+    return Serialize.fromJsonCompatible(value as Serialize.JsonCompatible) as StoredValue;
   }
 
   private serialize<StoredValue>(value: StoredValue) {
     if (this.options.disableSerialization) return value;
-    return Serialize.toJSON(value) as Serialize.JSON;
+    return Serialize.toJsonCompatible(value) as Serialize.JsonCompatible;
   }
 }
 
@@ -825,7 +825,7 @@ export namespace RedisProvider {
   }
 
   export interface Row<StoredValue> {
-    value: StoredValue | Serialize.JSON;
+    value: StoredValue | Serialize.JsonCompatible;
 
     version: Semver;
   }

@@ -826,7 +826,7 @@ export namespace JSONProvider {
     dataDirectory?: string;
 
     /**
-     * Whether to disable data serialization with `@joshdb/serialize`.
+     * Whether to disable data serialization with `better-serialize`.
      * @since 2.0.0
      */
     disableSerialization?: boolean;

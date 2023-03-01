@@ -1,7 +1,7 @@
 import type { Semver } from '@joshdb/provider';
-import { Serialize } from '@joshdb/serialize';
 import { AsyncQueue } from '@sapphire/async-queue';
 import { Snowflake, TwitterSnowflake } from '@sapphire/snowflake';
+import { Serialize } from 'better-serialize';
 import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { ChunkFile } from './chunk-files/ChunkFile';
@@ -49,12 +49,14 @@ export class ChunkHandler<StoredValue = unknown> {
         const file = this.getChunkFile(chunk.id);
         const data = await file.fetch();
 
-        for (const key of chunk.keys) data[key] = Serialize.fromJSON(data[key] as unknown as Serialize.JSON) as StoredValue;
+        for (const key of chunk.keys) {
+          data[key] = Serialize.fromJsonCompatible(data[key] as unknown as Serialize.JsonCompatible) as StoredValue;
+        }
       } else if (!chunk.serialized && serialize) {
         const file = this.getChunkFile(chunk.id);
         const data = await file.fetch();
 
-        for (const key of chunk.keys) data[key] = Serialize.toJSON(data[key]) as StoredValue;
+        for (const key of chunk.keys) data[key] = Serialize.toJsonCompatible(data[key]) as StoredValue;
       }
     }
 
