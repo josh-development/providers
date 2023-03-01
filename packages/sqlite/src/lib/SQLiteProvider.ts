@@ -22,8 +22,8 @@ import {
   resolveVersion,
   Semver
 } from '@joshdb/provider';
-import { Serialize } from '@joshdb/serialize';
 import { isPrimitive } from '@sapphire/utilities';
+import { Serialize } from 'better-serialize';
 import Database from 'better-sqlite3';
 import { existsSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
@@ -51,7 +51,12 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
           if (entries.length !== 0) {
             database
               .prepare(`INSERT INTO '${tableName}' (key, value) VALUES ${entries.map(() => '(?, ?)').join(', ')}`)
-              .run(...entries.flatMap((entry) => [entry.key, JSON.stringify(disableSerialization ? entry.value : Serialize.toJSON(entry.value))]));
+              .run(
+                ...entries.flatMap((entry) => [
+                  entry.key,
+                  JSON.stringify(disableSerialization ? entry.value : Serialize.toJsonCompatible(entry.value))
+                ])
+              );
           }
 
           const autoNum = database.prepare(`SELECT lastnum FROM 'internal::autonum' WHERE josh = '${tableName}'`).get() as

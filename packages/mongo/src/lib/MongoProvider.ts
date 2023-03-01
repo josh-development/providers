@@ -22,8 +22,8 @@ import {
   resolveVersion,
   Semver
 } from '@joshdb/provider';
-import { Serialize } from '@joshdb/serialize';
 import { isNullOrUndefined, isPrimitive } from '@sapphire/utilities';
+import { Serialize } from 'better-serialize';
 import { Collection, Document, Filter, MongoClient, MongoClientOptions, ObjectId } from 'mongodb';
 import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 
@@ -891,14 +891,14 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     }
   }
 
-  private deserialize(value: Serialize.JSON | StoredValue): StoredValue {
+  private deserialize(value: Serialize.JsonCompatible | StoredValue): StoredValue {
     if (this.options.disableSerialization) return value as StoredValue;
-    return Serialize.fromJSON(value as Serialize.JSON) as StoredValue;
+    return Serialize.fromJsonCompatible(value as Serialize.JsonCompatible) as StoredValue;
   }
 
   private serialize(value: StoredValue) {
     if (this.options.disableSerialization) return value;
-    return Serialize.toJSON(value) as Serialize.JSON;
+    return Serialize.toJsonCompatible(value) as Serialize.JsonCompatible;
   }
 
   private generateMongoDoc<T extends Document = MongoProvider.DocType<StoredValue>>(collectionName: string): Collection<T> {
@@ -956,7 +956,7 @@ export namespace MongoProvider {
   export interface DocType<StoredValue> extends Document {
     key: string;
 
-    value: Serialize.JSON | StoredValue;
+    value: Serialize.JsonCompatible | StoredValue;
   }
 
   export interface MetadataDocType extends Document {

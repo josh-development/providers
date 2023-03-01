@@ -19,6 +19,6 @@ export default {
       sourcemap: true
     }
   ],
-  external: ['@joshdb/provider', '@joshdb/serialize', '@sapphire/utilities', 'property-helpers', 'redis', 'uuid'],
+  external: ['@joshdb/provider', 'better-serialize', '@sapphire/utilities', 'property-helpers', 'redis', 'uuid'],
   plugins: [cleaner({ targets: ['./dist'] }), typescript({ tsconfig: resolve(process.cwd(), 'src', 'tsconfig.json') }), versionInjector()]
 };

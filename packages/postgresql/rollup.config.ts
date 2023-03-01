@@ -19,6 +19,6 @@ export default {
       sourcemap: true
     }
   ],
-  external: ['@joshdb/provider', '@joshdb/serialize', '@sapphire/snowflake', '@sapphire/utilities', 'postgres', 'property-helpers'],
+  external: ['@joshdb/provider', 'better-serialize', '@sapphire/snowflake', '@sapphire/utilities', 'postgres', 'property-helpers'],
   plugins: [cleaner({ targets: ['./dist'] }), typescript({ tsconfig: resolve(process.cwd(), 'src', 'tsconfig.json') }), versionInjector()]
 };

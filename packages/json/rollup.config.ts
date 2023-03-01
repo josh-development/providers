@@ -21,7 +21,7 @@ export default {
   ],
   external: [
     '@joshdb/provider',
-    '@joshdb/serialize',
+    'better-serialize',
     '@sapphire/async-queue',
     '@sapphire/snowflake',
     '@sapphire/utilities',
