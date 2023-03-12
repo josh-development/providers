@@ -670,7 +670,7 @@ __metadata:
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.28.5
     better-serialize: ^1.0.0
-    postgres: ^3.3.3
+    postgres: ^3.3.4
     property-helpers: ^2.0.0
     typedoc: ^0.23.26
     typedoc-json-parser: ^7.2.0
@@ -716,7 +716,7 @@ __metadata:
     "@sapphire/utilities": ^3.11.0
     "@vitest/coverage-c8": ^0.28.5
     better-serialize: ^1.0.0
-    better-sqlite3: ^8.1.0
+    better-sqlite3: ^8.2.0
     property-helpers: ^2.0.0
     typedoc: ^0.23.26
     typedoc-json-parser: ^7.2.0
@@ -1699,14 +1699,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"better-sqlite3@npm:^8.1.0":
-  version: 8.1.0
-  resolution: "better-sqlite3@npm:8.1.0"
+"better-sqlite3@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "better-sqlite3@npm:8.2.0"
   dependencies:
     bindings: ^1.5.0
     node-gyp: latest
     prebuild-install: ^7.1.0
-  checksum: 7e6b4c33142f4b2ee2e60d3926b4db682feb0d09554efdaf7bea53cd5bef406ca0a5115ab9b411458daa45ba14973252ebd6853a3cdf94e4fd49cc8291730ade
+  checksum: ab8a00bcc33c4a7467f78fcbb103c784705cf170ecc9c8eb1149a89a2153c03a7f65681064667eb214fa7f555797abd8183380a0396ce04eaf36efef921ce103
   languageName: node
   linkType: hard
 
@@ -4778,10 +4778,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postgres@npm:^3.3.3":
-  version: 3.3.3
-  resolution: "postgres@npm:3.3.3"
-  checksum: 9b4b5426fdb56abaf0b713e6c2762be06bac4aec4c618d50a8e63201d93b9b863f687b7141f6e6fa4b7a7cb4fae6b748f01a5b99ea574b33ae5603bf862d9d70
+"postgres@npm:^3.3.4":
+  version: 3.3.4
+  resolution: "postgres@npm:3.3.4"
+  checksum: aafbf70d4a5fbaaf8c6804fc19d012845e7b832798c7dfcb2d472d672e99a4ae84b4103500cc1f3c178edec9cf9dae1a9d9a14eb6a6bc487c94b4d737c75289a
   languageName: node
   linkType: hard
 
