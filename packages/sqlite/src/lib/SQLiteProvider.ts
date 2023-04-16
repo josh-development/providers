@@ -1,5 +1,9 @@
+import type { Payload, Semver } from '@joshdb/provider';
 import {
   CommonIdentifiers,
+  JoshProvider,
+  MathOperator,
+  Method,
   isEveryByHookPayload,
   isEveryByValuePayload,
   isFilterByHookPayload,
@@ -15,12 +19,7 @@ import {
   isRemoveByValuePayload,
   isSomeByHookPayload,
   isSomeByValuePayload,
-  JoshProvider,
-  MathOperator,
-  Method,
-  Payload,
-  resolveVersion,
-  Semver
+  resolveVersion
 } from '@joshdb/provider';
 import { isPrimitive } from '@sapphire/utilities';
 import { Serialize } from 'better-serialize';
@@ -28,7 +27,7 @@ import Database from 'better-sqlite3';
 import { existsSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
+import { PROPERTY_NOT_FOUND, deleteProperty, getProperty, hasProperty, setProperty } from 'property-helpers';
 import { QueryHandler } from './QueryHandler';
 
 export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {

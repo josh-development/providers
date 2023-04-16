@@ -1,5 +1,9 @@
+import type { Payload, Semver } from '@joshdb/provider';
 import {
   CommonIdentifiers,
+  JoshProvider,
+  MathOperator,
+  Method,
   isEveryByHookPayload,
   isEveryByValuePayload,
   isFilterByHookPayload,
@@ -15,15 +19,10 @@ import {
   isRemoveByValuePayload,
   isSomeByHookPayload,
   isSomeByValuePayload,
-  JoshProvider,
-  MathOperator,
-  Method,
-  Payload,
-  resolveVersion,
-  Semver
+  resolveVersion
 } from '@joshdb/provider';
 import { isPrimitive } from '@sapphire/utilities';
-import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
+import { PROPERTY_NOT_FOUND, deleteProperty, getProperty, hasProperty, setProperty } from 'property-helpers';
 
 /**
  * A provider that uses the Node.js native [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) class.

@@ -1,5 +1,9 @@
+import type { Payload, Semver } from '@joshdb/provider';
 import {
   CommonIdentifiers,
+  JoshProvider,
+  MathOperator,
+  Method,
   isEveryByHookPayload,
   isEveryByValuePayload,
   isFilterByHookPayload,
@@ -15,21 +19,16 @@ import {
   isRemoveByValuePayload,
   isSomeByHookPayload,
   isSomeByValuePayload,
-  JoshProvider,
-  MathOperator,
-  Method,
-  Payload,
-  resolveVersion,
-  Semver
+  resolveVersion
 } from '@joshdb/provider';
 import { Snowflake, TwitterSnowflake } from '@sapphire/snowflake';
 import { isPrimitive } from '@sapphire/utilities';
 import { resolve } from 'node:path';
-import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
-import { ChunkFile } from './chunk-files/ChunkFile';
-import { ChunkIndexFile } from './chunk-files/ChunkIndexFile';
+import { PROPERTY_NOT_FOUND, deleteProperty, getProperty, hasProperty, setProperty } from 'property-helpers';
 import { ChunkHandler } from './ChunkHandler';
 import type { File } from './File';
+import { ChunkFile } from './chunk-files/ChunkFile';
+import { ChunkIndexFile } from './chunk-files/ChunkIndexFile';
 
 /**
  * A provider that uses JSON files to store data.

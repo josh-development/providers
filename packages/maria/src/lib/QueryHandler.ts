@@ -1,5 +1,6 @@
 import { Serialize } from 'better-serialize';
-import { Connection, ConnectionConfig, createConnection } from 'mariadb';
+import type { Connection, ConnectionConfig } from 'mariadb';
+import { createConnection } from 'mariadb';
 
 export class QueryHandler<StoredValue = unknown> {
   public options: QueryHandler.Options;
