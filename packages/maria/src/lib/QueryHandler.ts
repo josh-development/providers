@@ -17,7 +17,12 @@ export class QueryHandler<StoredValue = unknown> {
   }
 
   public async init(): Promise<void> {
-    this.#connection = await createConnection(this.options.connectionConfig);
+    try {
+      this.#connection = await createConnection(this.options.connectionConfig);
+    } catch (error) {
+      throw new Error(`Failed to connect to the database: ${(error as Error).message}`);
+    }
+
     await this.ensureTable();
   }
 
