@@ -596,8 +596,8 @@ __metadata:
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
     "@sapphire/async-queue": ^1.5.0
-    "@sapphire/snowflake": ^3.4.0
-    "@sapphire/utilities": ^3.11.0
+    "@sapphire/snowflake": ^3.4.2
+    "@sapphire/utilities": ^3.11.1
     "@vitest/coverage-c8": ^0.28.5
     better-serialize: ^1.0.0
     property-helpers: ^2.0.0
@@ -614,7 +614,7 @@ __metadata:
     "@favware/cliff-jumper": ^2.0.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
-    "@sapphire/utilities": ^3.11.0
+    "@sapphire/utilities": ^3.11.1
     "@vitest/coverage-c8": ^0.28.5
     better-serialize: ^1.0.0
     property-helpers: ^2.0.0
@@ -631,7 +631,7 @@ __metadata:
     "@favware/cliff-jumper": ^2.0.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
-    "@sapphire/snowflake": ^3.4.0
+    "@sapphire/snowflake": ^3.4.2
     "@vitest/coverage-c8": ^0.28.5
     better-serialize: ^1.0.0
     mariadb: ^3.1.1
@@ -648,7 +648,7 @@ __metadata:
     "@favware/cliff-jumper": ^2.0.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
-    "@sapphire/utilities": ^3.11.0
+    "@sapphire/utilities": ^3.11.1
     "@vitest/coverage-c8": ^0.28.5
     better-serialize: ^1.0.0
     mongodb: ~5.2.0
@@ -666,8 +666,8 @@ __metadata:
     "@favware/cliff-jumper": ^2.0.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
-    "@sapphire/snowflake": ^3.4.0
-    "@sapphire/utilities": ^3.11.0
+    "@sapphire/snowflake": ^3.4.2
+    "@sapphire/utilities": ^3.11.1
     "@vitest/coverage-c8": ^0.28.5
     better-serialize: ^1.0.0
     postgres: ^3.3.4
@@ -713,7 +713,7 @@ __metadata:
     "@favware/cliff-jumper": ^2.0.0
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.7b50e88.0
-    "@sapphire/utilities": ^3.11.0
+    "@sapphire/utilities": ^3.11.1
     "@vitest/coverage-c8": ^0.28.5
     better-serialize: ^1.0.0
     better-sqlite3: ^8.3.0
@@ -941,10 +941,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/snowflake@npm:^3.4.0":
-  version: 3.4.0
-  resolution: "@sapphire/snowflake@npm:3.4.0"
-  checksum: 556b7001f33d6edbbbcbca46f6abfa56c732a29e78b693161e358688e688edcb012d2c1bc944e7ffb41bd6c9950d261bc73f95656dc01643361a218b4f5ab985
+"@sapphire/snowflake@npm:^3.4.2":
+  version: 3.4.2
+  resolution: "@sapphire/snowflake@npm:3.4.2"
+  checksum: 3bcd05608a63f012538aa0a45bc6abe5b19e15979a1012a9b3af1e0901f897e4df83c80d484c87bd1dece1124f5a14a2f86427190b1dca7f116ee34f13c96788
   languageName: node
   linkType: hard
 
@@ -962,6 +962,13 @@ __metadata:
   version: 3.11.0
   resolution: "@sapphire/utilities@npm:3.11.0"
   checksum: 3c8521038b8879524e8114f39eefc8b3b06cf825995f709684238b5cb14bd7df06d232a26a88f79160df290a66f9aa3133f5ce4ff8e2398033db9f301ad31e0d
+  languageName: node
+  linkType: hard
+
+"@sapphire/utilities@npm:^3.11.1":
+  version: 3.11.1
+  resolution: "@sapphire/utilities@npm:3.11.1"
+  checksum: e70a7d1b8f0d5c810420a2113ed6f4f54956b3ede0afd7aab9f5cea32266ed0946f777838f73f3df8e75bc8d29026d287a5371f544ad28882acdcfd5eb092b69
   languageName: node
   linkType: hard
 
@@ -1688,7 +1695,7 @@ __metadata:
     "@joshdb/core": ^1.2.7
     "@joshdb/provider": 2.0.0-next.7b50e88.0
     "@realware/utilities": ^2.1.1
-    "@sapphire/utilities": ^3.11.0
+    "@sapphire/utilities": ^3.11.1
   languageName: unknown
   linkType: soft
 
