@@ -6,9 +6,9 @@ export const createVitestConfig = (options: UserConfig = {}) =>
     ...options,
     test: {
       ...options?.test,
-      deps: {
-        inline: true
-      },
+      // deps: {
+      //   inline: true
+      // },
       globals: true,
       coverage: {
         ...options.test?.coverage,

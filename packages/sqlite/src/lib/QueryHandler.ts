@@ -176,29 +176,25 @@ export class QueryHandler<StoredValue = unknown> {
   public entries(): [string, StoredValue][] {
     const { tableName, disableSerialization } = this.options;
 
-    return this.database
-      .prepare(`SELECT * FROM '${tableName}'`)
-      .all()
-      .map((row: QueryHandler.Row) => [row.key, disableSerialization ? JSON.parse(row.value) : Serialize.fromJsonCompatible(JSON.parse(row.value))]);
+    return (this.database.prepare(`SELECT * FROM '${tableName}'`).all() as QueryHandler.Row[]).map((row: QueryHandler.Row) => [
+      row.key,
+      disableSerialization ? JSON.parse(row.value) : Serialize.fromJsonCompatible(JSON.parse(row.value))
+    ]);
   }
 
   public has(key: string): boolean {
     const { tableName } = this.options;
+    const exists = `EXISTS (SELECT 1 FROM '${tableName}' WHERE key = @key)`;
 
-    return (
-      this.database.prepare<Pick<QueryHandler.Row, 'key'>>(`SELECT EXISTS (SELECT 1 FROM '${tableName}' WHERE key = @key)`).get({ key })[
-        `EXISTS (SELECT 1 FROM '${tableName}' WHERE key = @key)`
-      ] === 1
-    );
+    return (this.database.prepare<Pick<QueryHandler.Row, 'key'>>(`SELECT ${exists}`).get({ key }) as Record<string, number>)[exists] === 1;
   }
 
   public keys(): string[] {
     const { tableName } = this.options;
 
-    return this.database
-      .prepare(`SELECT key FROM '${tableName}'`)
-      .all()
-      .map((row: Pick<QueryHandler.Row, 'key'>) => row.key);
+    return (this.database.prepare(`SELECT key FROM '${tableName}'`).all() as Pick<QueryHandler.Row, 'key'>[]).map(
+      (row: Pick<QueryHandler.Row, 'key'>) => row.key
+    );
   }
 
   public get(key: string): StoredValue | undefined {
@@ -216,13 +212,12 @@ export class QueryHandler<StoredValue = unknown> {
   public getMany(keys: string[]): Record<string, StoredValue | null> {
     const { tableName, disableSerialization } = this.options;
 
-    return this.database
-      .prepare(`SELECT * FROM '${tableName}' WHERE key IN (${keys.map(() => '?').join(', ')})`)
-      .all(keys)
-      .reduce<Record<string, StoredValue | null>>((obj, row: QueryHandler.Row) => {
-        obj[row.key] = disableSerialization ? JSON.parse(row.value) : Serialize.fromJsonCompatible(JSON.parse(row.value));
-        return obj;
-      }, {});
+    return (
+      this.database.prepare(`SELECT * FROM '${tableName}' WHERE key IN (${keys.map(() => '?').join(', ')})`).all(keys) as QueryHandler.Row[]
+    ).reduce<Record<string, StoredValue | null>>((obj, row: QueryHandler.Row) => {
+      obj[row.key] = disableSerialization ? JSON.parse(row.value) : Serialize.fromJsonCompatible(JSON.parse(row.value));
+      return obj;
+    }, {});
   }
 
   public set<Value = StoredValue>(key: string, value: Value): void {
@@ -306,12 +301,9 @@ export class QueryHandler<StoredValue = unknown> {
   public values(): StoredValue[] {
     const { tableName, disableSerialization } = this.options;
 
-    return this.database
-      .prepare(`SELECT value FROM '${tableName}'`)
-      .all()
-      .map((row: Pick<QueryHandler.Row, 'value'>) =>
-        disableSerialization ? JSON.parse(row.value) : Serialize.fromJsonCompatible(JSON.parse(row.value))
-      );
+    return (this.database.prepare(`SELECT value FROM '${tableName}'`).all() as Pick<QueryHandler.Row, 'value'>[]).map((row) =>
+      disableSerialization ? JSON.parse(row.value) : Serialize.fromJsonCompatible(JSON.parse(row.value))
+    );
   }
 }
 
