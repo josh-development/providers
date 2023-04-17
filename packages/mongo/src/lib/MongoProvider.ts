@@ -1,5 +1,9 @@
+import type { Payload, Semver } from '@joshdb/provider';
 import {
   CommonIdentifiers,
+  JoshProvider,
+  MathOperator,
+  Method,
   isEveryByHookPayload,
   isEveryByValuePayload,
   isFilterByHookPayload,
@@ -15,23 +19,21 @@ import {
   isRemoveByValuePayload,
   isSomeByHookPayload,
   isSomeByValuePayload,
-  JoshProvider,
-  MathOperator,
-  Method,
-  Payload,
-  resolveVersion,
-  Semver
+  resolveVersion
 } from '@joshdb/provider';
 import { isNullOrUndefined, isPrimitive } from '@sapphire/utilities';
 import { Serialize } from 'better-serialize';
-import { Collection, Document, Filter, MongoClient, MongoClientOptions, ObjectId } from 'mongodb';
-import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
+import type { Collection, Document, Filter, MongoClientOptions } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
+import { PROPERTY_NOT_FOUND, deleteProperty, getProperty, hasProperty, setProperty } from 'property-helpers';
 
 /**
  * A provider that uses MongoDB as a database.
  * @since 2.0.0
  */
 export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
+  public static defaultAuthentication: MongoProvider.Authentication = { dbName: 'josh', host: 'localhost', port: 27017 };
+
   public declare options: MongoProvider.Options;
 
   public migrations: JoshProvider.Migration[] = [
@@ -904,8 +906,6 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   private generateMongoDoc<T extends Document = MongoProvider.DocType<StoredValue>>(collectionName: string): Collection<T> {
     return this.client.db().collection(collectionName);
   }
-
-  public static defaultAuthentication: MongoProvider.Authentication = { dbName: 'josh', host: 'localhost', port: 27017 };
 }
 
 export namespace MongoProvider {

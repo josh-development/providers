@@ -1,5 +1,6 @@
 import { Serialize } from 'better-serialize';
-import { Connection, ConnectionConfig, createConnection } from 'mariadb';
+import type { Connection, ConnectionConfig } from 'mariadb';
+import { createConnection } from 'mariadb';
 
 export class QueryHandler<StoredValue = unknown> {
   public options: QueryHandler.Options;
@@ -16,7 +17,12 @@ export class QueryHandler<StoredValue = unknown> {
   }
 
   public async init(): Promise<void> {
-    this.#connection = await createConnection(this.options.connectionConfig);
+    try {
+      this.#connection = await createConnection(this.options.connectionConfig);
+    } catch (error) {
+      throw new Error(`Failed to connect to the database: ${(error as Error).message}`);
+    }
+
     await this.ensureTable();
   }
 

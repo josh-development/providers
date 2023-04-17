@@ -1,5 +1,9 @@
+import type { Payload, Semver } from '@joshdb/provider';
 import {
   CommonIdentifiers,
+  JoshProvider,
+  MathOperator,
+  Method,
   isEveryByHookPayload,
   isEveryByValuePayload,
   isFilterByHookPayload,
@@ -15,17 +19,13 @@ import {
   isRemoveByValuePayload,
   isSomeByHookPayload,
   isSomeByValuePayload,
-  JoshProvider,
-  MathOperator,
-  Method,
-  Payload,
-  resolveVersion,
-  Semver
+  resolveVersion
 } from '@joshdb/provider';
 import { isNullOrUndefined, isNumber, isPrimitive } from '@sapphire/utilities';
 import { Serialize } from 'better-serialize';
-import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
-import { createClient, RedisClientOptions, RedisClientType } from 'redis';
+import { PROPERTY_NOT_FOUND, deleteProperty, getProperty, hasProperty, setProperty } from 'property-helpers';
+import type { RedisClientOptions, RedisClientType } from 'redis';
+import { createClient } from 'redis';
 import { v4 } from 'uuid';
 
 export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {

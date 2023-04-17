@@ -1,5 +1,9 @@
+import type { Payload, Semver } from '@joshdb/provider';
 import {
   CommonIdentifiers,
+  JoshProvider,
+  MathOperator,
+  Method,
   isEveryByHookPayload,
   isEveryByValuePayload,
   isFilterByHookPayload,
@@ -15,17 +19,12 @@ import {
   isRemoveByValuePayload,
   isSomeByHookPayload,
   isSomeByValuePayload,
-  JoshProvider,
-  MathOperator,
-  Method,
-  Payload,
-  resolveVersion,
-  Semver
+  resolveVersion
 } from '@joshdb/provider';
 import { Snowflake, TwitterSnowflake } from '@sapphire/snowflake';
 import { isPrimitive } from '@sapphire/utilities';
 import type { ConnectionConfig as MariaConnectionConfig } from 'mariadb';
-import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
+import { PROPERTY_NOT_FOUND, deleteProperty, getProperty, hasProperty, setProperty } from 'property-helpers';
 import { QueryHandler } from './QueryHandler';
 
 /**
@@ -33,6 +32,16 @@ import { QueryHandler } from './QueryHandler';
  * @since 1.0.0
  */
 export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
+  /**
+   * The default connection configuration for this provider.
+   * @since 1.0.0
+   */
+  public static defaultConnectionConfig: MariaProvider.ConnectionConfig = {
+    database: 'josh',
+    user: 'josh',
+    password: 'josh'
+  };
+
   public declare options: MariaProvider.Options;
 
   public migrations: JoshProvider.Migration[] = [];
@@ -743,16 +752,6 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     return resolveVersion(metadata.version);
   }
-
-  /**
-   * The default connection configuration for this provider.
-   * @since 1.0.0
-   */
-  public static defaultConnectionConfig: MariaProvider.ConnectionConfig = {
-    database: 'josh',
-    user: 'josh',
-    password: 'josh'
-  };
 }
 
 export namespace MariaProvider {
