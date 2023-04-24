@@ -37,7 +37,7 @@
     "@favware/cliff-jumper": "^2.0.0",
     "@favware/rollup-type-bundler": "^1.0.11",
     "@vitest/coverage-c8": "^0.30.1",
-    "typedoc": "^0.24.3",
+    "typedoc": "^0.24.6",
     "typedoc-json-parser": "^7.2.0",
     "vitest": "^0.30.1"
   },
