@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@joshdb/provider": "2.0.0-next.7b50e88.0",
-    "@sapphire/snowflake": "^3.4.2",
+    "@sapphire/snowflake": "^3.5.0",
     "better-serialize": "^1.0.0",
     "mariadb": "^3.1.2"
   },
