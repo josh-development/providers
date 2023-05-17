@@ -5,8 +5,6 @@ import { resolve } from 'node:path';
 import { setTimeout as wait } from 'timers/promises';
 
 export class File<StoredValue = unknown> {
-  public static defaultRetryOptions: File.RetryOptions = { delay: 100, attempts: 10 };
-
   public options: File.Options;
 
   public path: string;
@@ -56,6 +54,8 @@ export class File<StoredValue = unknown> {
       return wait(retry.delay, this.attempt(callback, { ...retry, attempts: retry.attempts - 1 }));
     }
   }
+
+  public static defaultRetryOptions: File.RetryOptions = { delay: 100, attempts: 10 };
 }
 
 export namespace File {
