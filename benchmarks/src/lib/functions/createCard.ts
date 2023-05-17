@@ -5,21 +5,21 @@ export function createCard(i: number) {
     id: i.toString(),
     net: 0,
     ids: [],
-    name: faker.name.fullName(),
+    name: faker.person.fullName(),
     username: faker.internet.userName(),
     email: faker.internet.email(),
     address: {
-      streetA: faker.address.street(),
-      streetB: faker.address.streetAddress(),
-      streetC: faker.address.streetAddress(true),
-      streetD: faker.address.secondaryAddress(),
-      city: faker.address.city(),
-      state: faker.address.state(),
-      country: faker.address.country(),
-      zipCode: faker.address.zipCode(),
+      streetA: faker.location.street(),
+      streetB: faker.location.streetAddress(),
+      streetC: faker.location.streetAddress(true),
+      streetD: faker.location.secondaryAddress(),
+      city: faker.location.city(),
+      state: faker.location.state(),
+      country: faker.location.country(),
+      zipCode: faker.location.zipCode(),
       geo: {
-        lat: faker.address.latitude(),
-        lng: faker.address.longitude()
+        lat: faker.location.latitude(),
+        lng: faker.location.longitude()
       }
     },
     phone: faker.phone.number(),
@@ -27,7 +27,7 @@ export function createCard(i: number) {
     company: {
       name: faker.company.name(),
       catchPhrase: faker.company.catchPhrase(),
-      bs: faker.company.bs()
+      bs: faker.company.name()
     },
     posts: [
       {
