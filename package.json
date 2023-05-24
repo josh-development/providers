@@ -20,7 +20,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.6.3",
     "@commitlint/config-conventional": "^17.6.3",
-    "@faker-js/faker": "^7.6.0",
+    "@faker-js/faker": "^8.0.1",
     "@favware/cliff-jumper": "^2.0.0",
     "@favware/colorette-spinner": "^1.0.1",
     "@favware/npm-deprecate": "^1.0.7",
