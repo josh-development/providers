@@ -586,19 +586,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@joshdb/eslint-config@npm:1.1.0-next.89e2358.0":
-  version: 1.1.0-next.89e2358.0
-  resolution: "@joshdb/eslint-config@npm:1.1.0-next.89e2358.0"
+"@joshdb/eslint-config@npm:1.1.0-next.a699598.0":
+  version: 1.1.0-next.a699598.0
+  resolution: "@joshdb/eslint-config@npm:1.1.0-next.a699598.0"
   dependencies:
     "@sapphire/eslint-config": ^4.4.2
-    "@typescript-eslint/eslint-plugin": ^5.59.6
-    "@typescript-eslint/parser": ^5.59.6
+    "@typescript-eslint/eslint-plugin": ^5.59.7
+    "@typescript-eslint/parser": ^5.59.7
     eslint: ^8.41.0
     eslint-config-prettier: ^8.8.0
     eslint-plugin-prettier: ^4.2.1
     prettier: ^2.8.8
     typescript: ^5.0.4
-  checksum: 6d5345791db02549e110c473160915ab30ddde4ab3725af19b2211023b0516b08581e94bf5ae7ecc3b92896566c00c3e1db6ecbbf13b0815e88645431cd0db15
+  checksum: 5b14ab507eaffe67197ee9365daa4f94674ffebc886ddeb03c17366b1f450d7fcd44fa8ba3174ab78780b623a52f3b17c6d63502bcdc9457e23590e47d3f9b62
   languageName: node
   linkType: hard
 
@@ -738,12 +738,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/ts-config@npm:1.1.0-next.89e2358.0":
-  version: 1.1.0-next.89e2358.0
-  resolution: "@joshdb/ts-config@npm:1.1.0-next.89e2358.0"
+"@joshdb/ts-config@npm:1.1.0-next.a699598.0":
+  version: 1.1.0-next.a699598.0
+  resolution: "@joshdb/ts-config@npm:1.1.0-next.a699598.0"
   dependencies:
     "@sapphire/ts-config": ^4.0.0
-  checksum: 2440bd09d2fb642790a569f4b2475d3a6394b23a11027b3ec2d6cdcb2c07836ecb9294a4adabaca4bce77e1acee5be7d9a3fcd3cd36120d3dcac5a03406be821
+  checksum: 273112d20008fcff3eb4974cbafea4ca449e89a0835ea83686e5663287e57efd1cb929c9e66dd289939522a52bc600dd0197ce965b30c344ed4a0b6538e1a673
   languageName: node
   linkType: hard
 
@@ -1175,7 +1175,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:^5.59.2, @typescript-eslint/eslint-plugin@npm:^5.59.6, @typescript-eslint/eslint-plugin@npm:^5.59.7":
+"@typescript-eslint/eslint-plugin@npm:^5.59.2, @typescript-eslint/eslint-plugin@npm:^5.59.7":
   version: 5.59.8
   resolution: "@typescript-eslint/eslint-plugin@npm:5.59.8"
   dependencies:
@@ -1199,7 +1199,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^5.59.2, @typescript-eslint/parser@npm:^5.59.6, @typescript-eslint/parser@npm:^5.59.7":
+"@typescript-eslint/parser@npm:^5.59.2, @typescript-eslint/parser@npm:^5.59.7":
   version: 5.59.8
   resolution: "@typescript-eslint/parser@npm:5.59.8"
   dependencies:
@@ -5297,8 +5297,8 @@ __metadata:
     "@favware/colorette-spinner": ^1.0.1
     "@favware/npm-deprecate": ^1.0.7
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/eslint-config": 1.1.0-next.89e2358.0
-    "@joshdb/ts-config": 1.1.0-next.89e2358.0
+    "@joshdb/eslint-config": 1.1.0-next.a699598.0
+    "@joshdb/ts-config": 1.1.0-next.a699598.0
     "@types/better-sqlite3": ^7.6.4
     "@types/node": ^18.16.14
     "@types/prompts": ^2.4.4
