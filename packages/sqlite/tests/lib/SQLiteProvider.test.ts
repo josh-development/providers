@@ -1,4 +1,5 @@
-import { JoshProvider, runProviderTest } from '@joshdb/provider';
+import { JoshProvider } from '@joshdb/provider';
+import { runProviderTest } from '@joshdb/provider/tests';
 import Database from 'better-sqlite3';
 import { mkdir, rm } from 'node:fs/promises';
 import { resolve } from 'node:path';

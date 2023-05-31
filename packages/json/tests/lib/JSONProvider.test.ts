@@ -1,4 +1,5 @@
-import { JoshProvider, runProviderTest } from '@joshdb/provider';
+import { JoshProvider } from '@joshdb/provider';
+import { runProviderTest } from '@joshdb/provider/tests';
 import { mkdirSync } from 'node:fs';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';

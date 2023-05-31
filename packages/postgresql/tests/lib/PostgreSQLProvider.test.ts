@@ -1,4 +1,4 @@
-import { runProviderTest } from '@joshdb/provider';
+import { runProviderTest } from '@joshdb/provider/tests';
 import { PostgreSQLProvider } from '../../src';
 
 runProviderTest<typeof PostgreSQLProvider, PostgreSQLProvider.Options>({
