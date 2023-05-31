@@ -34,12 +34,12 @@
     "property-helpers": "^2.0.0"
   },
   "devDependencies": {
-    "@favware/cliff-jumper": "^2.0.0",
+    "@favware/cliff-jumper": "^2.0.1",
     "@favware/rollup-type-bundler": "^1.0.11",
-    "@vitest/coverage-c8": "^0.31.1",
+    "@vitest/coverage-c8": "^0.31.3",
     "typedoc": "^0.24.7",
-    "typedoc-json-parser": "^8.1.0",
-    "vitest": "^0.31.1"
+    "typedoc-json-parser": "^8.1.2",
+    "vitest": "^0.31.3"
   },
   "repository": {
     "type": "git",
