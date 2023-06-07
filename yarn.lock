@@ -683,7 +683,7 @@ __metadata:
     "@sapphire/utilities": ^3.11.2
     "@vitest/coverage-v8": ^0.32.0
     better-serialize: ^1.0.0
-    mongodb: ~5.5.0
+    mongodb: ~5.6.0
     property-helpers: ^2.0.0
     typedoc: ^0.24.8
     typedoc-json-parser: ^8.1.2
@@ -4503,9 +4503,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:~5.5.0":
-  version: 5.5.0
-  resolution: "mongodb@npm:5.5.0"
+"mongodb@npm:~5.6.0":
+  version: 5.6.0
+  resolution: "mongodb@npm:5.6.0"
   dependencies:
     bson: ^5.3.0
     mongodb-connection-string-url: ^2.6.0
@@ -4525,7 +4525,7 @@ __metadata:
       optional: true
     snappy:
       optional: true
-  checksum: fafb75195d605767cf7269aa82a1f4704c3357240d0fef7296d55e83eab592158844988af3b94165769459ff1b2a0af2fc49bc44c9bbabd10d6ddc319668a0e0
+  checksum: 5b1594b24795b2a7824095a917ede2fc37aaef31e60320c833ee9b11cc2f3de9dd87d5afacea2e41eb5eb579ac9780f5bc4b0bb11d3b1be78e8bf0014528192a
   languageName: node
   linkType: hard
 
