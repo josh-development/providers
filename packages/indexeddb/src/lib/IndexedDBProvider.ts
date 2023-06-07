@@ -1,5 +1,5 @@
 import { CommonIdentifiers, JoshProvider, MathOperator, Method, Payloads } from '@joshdb/provider';
-import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
+import { PROPERTY_NOT_FOUND, deleteProperty, getProperty, hasProperty, setProperty } from 'property-helpers';
 import DbHandler from './DbHandler';
 
 export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
@@ -16,6 +16,7 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
 
     const { hook } = payload;
     const data = await this.db.getAll();
+
     // @ts-expect-error 2322 Start making sense.
     Object.entries(data).forEach(([key, value]) => hook(value, key));
 
@@ -39,6 +40,7 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
 
     if (path.length) {
       const value = await this.db.get(key);
+
       deleteProperty(value, path);
       await this.db.set(key, value);
     } else {
@@ -125,6 +127,7 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
 
     const { key, path } = payload;
     const getPayload = await this[Method.Get]({ method: Method.Get, key, path });
+
     // @ts-expect-error 2532 No it's not
     if (getPayload.data === undefined || getPayload.data === PROPERTY_NOT_FOUND) {
       payload.error = this.error({ identifier: CommonIdentifiers.MissingData });
@@ -148,6 +151,7 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
 
     const { key, path } = payload;
     const getPayload = await this[Method.Get]({ method: Method.Get, key, path });
+
     // @ts-expect-error 2532 No it's not
     if (getPayload.data === undefined || getPayload.data === PROPERTY_NOT_FOUND) {
       payload.error = this.error({ identifier: CommonIdentifiers.MissingData });
@@ -194,6 +198,7 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
 
     // @ts-expect-error 2532 STFU
     const key = await this.randomKey(payload);
+
     if (key.data) {
       payload.data = await Promise.all(key.data.map((key) => this.db.get(key)));
     }

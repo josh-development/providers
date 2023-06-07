@@ -4,6 +4,7 @@
     "rootDir": "./",
     "outDir": "./build",
     "tsBuildInfoFile": "./build/.tsbuildinfo",
+    "types": ["vitest/globals"],
     "lib": ["DOM"]
   },
   "include": ["./"],
