@@ -8,5 +8,8 @@
     "@joshdb/provider": "2.0.0-next.a699598.0",
     "@sapphire/utilities": "^3.11.2",
     "property-helpers": "^2.0.0"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^0.32.0"
   }
 }
