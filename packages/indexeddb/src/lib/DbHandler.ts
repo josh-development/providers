@@ -1,13 +1,13 @@
-export default class DbHandler {
+export default class DbHandler<StoredValue = unknown> {
   private idb: IDBFactory;
   private db!: IDBDatabase;
 
   public constructor() {
-    if (!indexedDB) {
+    if (!globalThis.indexedDB) {
       throw new Error("Your browser doesn't support a stable version of IndexedDB. Josh is unable to run without one.");
     }
 
-    this.idb = indexedDB;
+    this.idb = globalThis.indexedDB;
   }
 
   public init() {
@@ -31,7 +31,7 @@ export default class DbHandler {
     });
   }
 
-  public async set(key: string, value: unknown) {
+  public async set<Value = StoredValue>(key: string, value: Value) {
     const all = this.open();
     const doc = {
       key,
@@ -43,35 +43,34 @@ export default class DbHandler {
     await this.handleEvents(request);
   }
 
-  public async get(key: string) {
+  public async get<Value = StoredValue>(key: string): Promise<Value | undefined> {
     const all = this.open();
     const request = all.get(key);
-    const result = await this.handleEvents(request);
+    const result = (await this.handleEvents(request)) as {
+      value: Value | undefined; // Its shit like this why I don't like TS
+    };
 
-    // @ts-ignore it exists f you TS
     return result?.value;
   }
 
-  public async getAll() {
+  public async getAll<Value = StoredValue>(): Promise<{ [key: string]: Value }> {
     const all = this.open();
     const request = all.getAll();
-    const docs = await this.handleEvents(request);
-    const final = {};
+    const docs = (await this.handleEvents(request)) as { key: string; value: Value }[];
+    const final: { [key: string]: Value } = {}; // Why can't this be inferred from usage????
 
-    // @ts-ignore TS GO AWAY
     docs.forEach((x) => {
-      // @ts-ignore TS GO AWAY
       final[x.key] = x.value;
     });
 
     return final;
   }
 
-  public async getKeys() {
+  public async getKeys(): Promise<string[]> {
     const all = this.open();
     const request = all.getAllKeys();
 
-    return this.handleEvents(request);
+    return (await this.handleEvents(request)) as string[];
   }
 
   public async count() {
