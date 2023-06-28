@@ -629,7 +629,7 @@ __metadata:
     "@joshdb/provider": 2.0.0-next.a699598.0
     "@sapphire/async-queue": ^1.5.0
     "@sapphire/snowflake": ^3.5.1
-    "@sapphire/utilities": ^3.11.2
+    "@sapphire/utilities": ^3.12.0
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
     property-helpers: ^2.0.0
@@ -646,7 +646,7 @@ __metadata:
     "@favware/cliff-jumper": ^2.1.1
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.11.2
+    "@sapphire/utilities": ^3.12.0
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
     property-helpers: ^2.0.0
@@ -666,7 +666,7 @@ __metadata:
     "@sapphire/snowflake": ^3.5.1
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
-    mariadb: ^3.1.2
+    mariadb: ^3.2.0
     typedoc: ^0.24.8
     typedoc-json-parser: ^8.2.0
     vitest: ^0.32.2
@@ -680,7 +680,7 @@ __metadata:
     "@favware/cliff-jumper": ^2.1.1
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.11.2
+    "@sapphire/utilities": ^3.12.0
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
     mongodb: ~5.6.0
@@ -699,7 +699,7 @@ __metadata:
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.a699598.0
     "@sapphire/snowflake": ^3.5.1
-    "@sapphire/utilities": ^3.11.2
+    "@sapphire/utilities": ^3.12.0
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
     postgres: ^3.3.5
@@ -745,7 +745,7 @@ __metadata:
     "@favware/cliff-jumper": ^2.1.1
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.11.2
+    "@sapphire/utilities": ^3.12.0
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
     better-sqlite3: ^8.4.0
@@ -1022,7 +1022,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/utilities@npm:3.12.0":
+"@sapphire/utilities@npm:3.12.0, @sapphire/utilities@npm:^3.12.0":
   version: 3.12.0
   resolution: "@sapphire/utilities@npm:3.12.0"
   checksum: 002f15263f157fdbb0603c233a43a5660cd3b45a4f3fddaa9d7066d187eec23f473ee42c8d071b0e3dec4e22b08bed337fb7eb336a02b59743a78ebc8922004e
@@ -1776,7 +1776,7 @@ __metadata:
   resolution: "benchmarks@workspace:benchmarks"
   dependencies:
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.11.2
+    "@sapphire/utilities": ^3.12.0
     "@vitest/coverage-v8": ^0.32.2
     property-helpers: ^2.0.0
   languageName: unknown
@@ -4242,16 +4242,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mariadb@npm:^3.1.2":
-  version: 3.1.2
-  resolution: "mariadb@npm:3.1.2"
+"mariadb@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "mariadb@npm:3.2.0"
   dependencies:
     "@types/geojson": ^7946.0.10
     "@types/node": ^17.0.45
     denque: ^2.1.0
     iconv-lite: ^0.6.3
     lru-cache: ^7.14.0
-  checksum: 70079e09ecc2ae4113b317912419053645aabbcc3e584c7c1dba89306cb0af1a47438ccbf03f1c97f8fee07b952c33952edbc100847d55a30aa9d897b04c729f
+  checksum: 971a84cf42e026ddfd209450cbf98b2af00a6cf9a49fe245b2662e767196a7a8f26ab728cdc6b715aafbb40631f57754e19251f9e38e679106c7d190106d4eee
   languageName: node
   linkType: hard
 
