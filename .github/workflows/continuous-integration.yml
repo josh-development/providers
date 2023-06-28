@@ -7,23 +7,58 @@ on:
   pull_request:
 
 jobs:
-  ci:
-    name: Continuous Integration
+  linting:
+    name: Linting
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Project
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
-      - name: Setup Node
-        uses: josh-development/.github/setup-node@main
-        with:
-          turbo: true
       - name: Add ESLint Problem Matcher
         run: echo "::add-matcher::.github/problemMatchers/eslint.json"
+      - name: Use Node.js v16
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3
+        with:
+          node-version: 16
+          cache: yarn
+          registry-url: https://registry.yarnpkg.com
+      - name: Install Dependencies
+        run: yarn --immutable
       - name: Run ESLint
         run: yarn lint --fix=false
+
+  building:
+    name: Compile Source Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
       - name: Add TypeScript Problem Matcher
         run: echo "::add-matcher::.github/problemMatchers/tsc.json"
-      - name: Compile Source Code
-        run: yarn build --cache-dir=./.turbo
+      - name: Use Node.js v16
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3
+        with:
+          node-version: 16
+          cache: yarn
+          registry-url: https://registry.yarnpkg.com
+      - name: Install Dependencies
+        if: ${{ !steps.cache-restore.outputs.cache-hit }}
+        run: yarn --immutable
+      - name: Build Code
+        run: yarn build
+
+  docs:
+    name: Generate Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
+      - name: Use Node.js v16
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3
+        with:
+          node-version: 16
+          cache: yarn
+          registry-url: https://registry.yarnpkg.com/
+      - name: Install Dependencies
+        run: yarn --immutable
       - name: Generate Documentation
-        run: yarn docs --cache-dir=./.turbo
+        run: yarn docs
