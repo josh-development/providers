@@ -488,12 +488,16 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
   }
 
   public [Method.Random](payload: Payload.Random<StoredValue>): Payload.Random<StoredValue> {
-    if (this.cache.size === 0) return { ...payload, data: [] };
-
     const { count, duplicates } = payload;
 
-    if (this.cache.size < count) {
+    if (!duplicates && this.cache.size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }));
+
+      return payload;
+    }
+
+    if (this.cache.size === 0) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Random, context: { duplicates, count } }));
 
       return payload;
     }
