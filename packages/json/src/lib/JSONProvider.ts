@@ -553,11 +553,14 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
     const { count, duplicates } = payload;
     const size = await this.handler.size();
 
-    if (size === 0) return { ...payload, data: [] };
-    if (size < count) {
+    if (!duplicates && size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { size }));
 
       return payload;
+    }
+
+    if (size === 0) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Random }, { duplicates, count }));
     }
 
     payload.data = [];
