@@ -572,11 +572,14 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     const { count, duplicates } = payload;
     const size = this.handler.size();
 
-    if (size === 0) return { ...payload, data: [] };
     if (size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { size }));
 
       return payload;
+    }
+
+    if (size === 0) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Random }, { duplicates, count }));
     }
 
     payload.data = [];
