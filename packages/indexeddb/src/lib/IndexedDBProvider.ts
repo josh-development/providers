@@ -1,6 +1,10 @@
 // // @ts-nocheck
 import {
   CommonIdentifiers,
+  isFilterByHookPayload,
+  isFilterByValuePayload,
+  isFindByHookPayload,
+  isFindByValuePayload,
   isMapByHookPayload,
   isMapByPathPayload,
   JoshProvider,
@@ -12,7 +16,7 @@ import {
 } from '@joshdb/provider';
 import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 import DbHandler from './DbHandler';
-import { handleSubCallFail } from './helpers';
+import { handleSubCallFail, isPrimitive } from './helpers';
 
 export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public declare options: IndexedDBProvider.Options;
@@ -370,6 +374,36 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   public async [Method.Filter](payload: Payload.Filter.ByValue<StoredValue>): Promise<Payload.Filter.ByValue<StoredValue>>;
   public async [Method.Filter](payload: Payload.Filter<StoredValue>): Promise<Payload.Filter<StoredValue>> {
     await this.check();
+    payload.data = {};
+
+    if (isFilterByHookPayload(payload)) {
+      const { hook } = payload;
+
+      for (const [key, value] of Object.entries(await this.db.getAll())) if (await hook(value, key)) payload.data[key] = value;
+    }
+
+    if (isFilterByValuePayload(payload)) {
+      const { path, value } = payload;
+
+      for (const [key, storedValue] of Object.entries(await this.db.getAll())) {
+        const data = getProperty(storedValue, path, false);
+
+        if (data === PROPERTY_NOT_FOUND) {
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Filter }, { key, path }));
+
+          return payload;
+        }
+
+        if (!isPrimitive(data)) {
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Filter }, { key, path, type: 'primitive' }));
+
+          return payload;
+        }
+
+        if (data === value) payload.data[key] = storedValue;
+      }
+    }
+
     return payload;
   }
 
@@ -377,6 +411,56 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   public async [Method.Find](payload: Payload.Find.ByValue<StoredValue>): Promise<Payload.Find.ByValue<StoredValue>>;
   public async [Method.Find](payload: Payload.Find<StoredValue>): Promise<Payload.Find<StoredValue>> {
     await this.check();
+    payload.data = [null, null];
+
+    if (isFindByHookPayload(payload)) {
+      const { hook } = payload;
+
+      for (const [key, value] of Object.entries(await this.db.getAll())) {
+        const result = await hook(value, key);
+
+        if (!result) continue;
+
+        payload.data = [key, value];
+
+        break;
+      }
+    }
+
+    if (isFindByValuePayload(payload)) {
+      const { path, value } = payload;
+
+      if (!isPrimitive(value)) {
+        payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Find }, { path, type: 'primitive' }));
+
+        return payload;
+      }
+
+      for (const [key, storedValue] of Object.entries(await this.db.getAll())) {
+        if (payload.data[0] !== null && payload.data[1] !== null) break;
+
+        const data = getProperty(storedValue, path, false);
+
+        if (data === PROPERTY_NOT_FOUND) {
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Find }, { key, path }));
+
+          return payload;
+        }
+
+        if (!isPrimitive(data)) {
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Find }, { key, path, type: 'primitive' }));
+
+          return payload;
+        }
+
+        if (data !== value) continue;
+
+        payload.data = [key, storedValue];
+
+        break;
+      }
+    }
+
     return payload;
   }
 

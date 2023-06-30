@@ -12,4 +12,8 @@ const handleSubCallFail = (res: Payload, payload: Payload) => {
   return false;
 };
 
-export { handleSubCallFail };
+const isPrimitive = (val: any) => {
+  return (typeof val !== 'object' && typeof val !== 'function') || val === null;
+};
+
+export { handleSubCallFail, isPrimitive };
