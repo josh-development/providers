@@ -520,9 +520,14 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { count, duplicates } = payload;
     const size = await this.handler.size();
 
-    if (size === 0) return { ...payload, data: [] };
     if (size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }));
+
+      return payload;
+    }
+
+    if (size === 0) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Random, context: { duplicates, count } }));
 
       return payload;
     }
