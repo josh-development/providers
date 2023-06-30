@@ -177,21 +177,19 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
 
     const { count, duplicates } = payload;
     const unique = !duplicates; // Duplicates is too hard for my head to work around
-
-    payload.data = [];
-
     const keys = await this.db.getKeys();
 
-    console.log('Hey shitass', keys.length, count, unique && keys.length < count);
-
-    if (unique && keys.length > count) {
+    if (unique && keys.length < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount }));
       return payload;
     }
 
     if (keys.length === 0) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData }));
       return payload;
     }
+
+    payload.data = [];
 
     if (unique && keys.length === count) {
       payload.data = keys;
