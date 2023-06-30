@@ -1,5 +1,15 @@
 // // @ts-nocheck
-import { CommonIdentifiers, JoshProvider, MathOperator, Method, Payload, resolveVersion, type Semver } from '@joshdb/provider';
+import {
+  CommonIdentifiers,
+  isMapByHookPayload,
+  isMapByPathPayload,
+  JoshProvider,
+  MathOperator,
+  Method,
+  Payload,
+  resolveVersion,
+  type Semver
+} from '@joshdb/provider';
 import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 import DbHandler from './DbHandler';
 import { handleSubCallFail } from './helpers';
@@ -374,6 +384,24 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   public async [Method.Map]<Value = StoredValue>(payload: Payload.Map.ByPath<Value>): Promise<Payload.Map.ByPath<Value>>;
   public async [Method.Map]<Value = StoredValue>(payload: Payload.Map<StoredValue, Value>): Promise<Payload.Map<StoredValue, Value>> {
     await this.check();
+    payload.data = [];
+
+    if (isMapByHookPayload(payload)) {
+      const { hook } = payload;
+
+      for (const [key, value] of Object.entries(await this.db.getAll())) payload.data.push(await hook(value, key));
+    }
+
+    if (isMapByPathPayload(payload)) {
+      const { path } = payload;
+
+      for (const value of Object.values(await this.db.getAll())) {
+        const data = getProperty<Value>(value, path);
+
+        if (data !== PROPERTY_NOT_FOUND) payload.data.push(data);
+      }
+    }
+
     return payload;
   }
 
