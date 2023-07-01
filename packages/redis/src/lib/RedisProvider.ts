@@ -540,10 +540,16 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.Random](payload: Payload.Random<StoredValue>): Promise<Payload.Random<StoredValue>> {
     const docCount = (await this[Method.Size]({ method: Method.Size, errors: [] })).data || 0;
+    const { unique } = payload;
 
-    if (docCount === 0) return { ...payload, data: [] };
-    if (docCount < payload.count) {
+    if (unique && docCount < payload.count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { count: payload.count, docCount }));
+
+      return payload;
+    }
+
+    if (docCount === 0) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Random }, { count: payload.count, docCount }));
 
       return payload;
     }
@@ -553,11 +559,23 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     keys.data = keys.data || [];
     payload.data = [];
 
-    for (let i = 0; i < payload.count; i++) {
-      const key = keys.data[Math.floor(Math.random() * keys.data.length)];
-      const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
+    if (unique) {
+      const randomKeys = new Set<string>();
 
-      payload.data.push(getPayload.data as StoredValue);
+      while (randomKeys.size < docCount) randomKeys.add(keys.data[Math.floor(Math.random() * keys.data.length)]);
+
+      for (const key of randomKeys) {
+        const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
+
+        payload.data.push(getPayload.data as StoredValue);
+      }
+    } else {
+      for (let i = 0; i < payload.count; i++) {
+        const key = keys.data[Math.floor(Math.random() * keys.data.length)];
+        const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
+
+        payload.data.push(getPayload.data as StoredValue);
+      }
     }
 
     return payload;
@@ -565,10 +583,16 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   public async [Method.RandomKey](payload: Payload.RandomKey): Promise<Payload.RandomKey> {
     const docCount = (await this[Method.Size]({ method: Method.Size, errors: [] })).data || 0;
+    const { unique } = payload;
 
-    if (docCount === 0) return { ...payload, data: [] };
-    if (docCount < payload.count) {
+    if (unique && docCount < payload.count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }, { count: payload.count, docCount }));
+
+      return payload;
+    }
+
+    if (docCount === 0) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Random }, { count: payload.count, docCount }));
 
       return payload;
     }
@@ -577,10 +601,19 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     keys.data = keys.data || [];
     payload.data = [];
-    for (let i = 0; i < payload.count; i++) {
-      const key = keys.data[Math.floor(Math.random() * keys.data.length)];
 
-      payload.data.push(key);
+    if (unique) {
+      const randomKeys = new Set<string>();
+
+      while (randomKeys.size < docCount) randomKeys.add(keys.data[Math.floor(Math.random() * keys.data.length)]);
+
+      payload.data = Array.from(randomKeys);
+    } else {
+      for (let i = 0; i < payload.count; i++) {
+        const key = keys.data[Math.floor(Math.random() * keys.data.length)];
+
+        payload.data.push(key);
+      }
     }
 
     return payload;
