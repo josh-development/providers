@@ -599,7 +599,8 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
   // Due to the use of $sample, the output will never have duplicates
   public async [Method.Random](payload: Payload.Random<StoredValue>): Promise<Payload.Random<StoredValue>> {
-    const docCount = await this.collection.countDocuments({});
+    let { count, unique } = payload;
+    const size = await this.collection.countDocuments({});
 
     // TODO: @dan-online fix this yourself idk how this work
     // Basically just this:
@@ -607,35 +608,72 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     // if (size === 0) throw MissingData
     // Also try no to get an infinite loop with unique off and count > size
 
-    if (docCount === 0) return { ...payload, data: [] };
-    if (docCount < payload.count) {
-      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }));
+    if (unique && size < count) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { size }));
 
       return payload;
     }
 
-    const aggr: Document[] = [{ $sample: { size: payload.count } }];
-    const docs = (await this.collection.aggregate(aggr).toArray()) || [];
+    if (size === 0) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Random }, { unique, count }));
 
-    if (docs.length > 0) payload.data = docs.map((doc) => this.deserialize(doc.value));
+      return payload;
+    }
+
+    payload.data = [];
+
+    if (unique) {
+      const aggr: Document[] = [{ $sample: { size: payload.count } }];
+      const docs = (await this.collection.aggregate(aggr).toArray()) || [];
+
+      payload.data = docs.map((doc) => this.deserialize(doc.value));
+    } else {
+      while (count > 0) {
+        const aggr: Document[] = [{ $sample: { size: 1 } }];
+        const docs = (await this.collection.aggregate(aggr).toArray()) || [];
+
+        payload.data.push(this.deserialize(docs[0].value));
+
+        count--;
+      }
+    }
 
     return payload;
   }
 
   public async [Method.RandomKey](payload: Payload.RandomKey): Promise<Payload.RandomKey> {
-    const docCount = await this.collection.countDocuments({});
+    const size = await this.collection.countDocuments({});
+    let { count, unique } = payload;
 
-    if (docCount === 0) return { ...payload, data: [] };
-    if (docCount < payload.count) {
-      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }));
+    if (unique && size < count) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { size }));
 
       return payload;
     }
 
-    const aggr: Document[] = [{ $sample: { size: payload.count } }];
-    const docs = (await this.collection.aggregate(aggr).toArray()) || [];
+    if (size === 0) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Random }, { unique, count }));
 
-    if (docs.length > 0) payload.data = docs.map((doc) => doc.key);
+      return payload;
+    }
+
+    payload.data = [];
+
+    if (unique) {
+      const aggr: Document[] = [{ $sample: { size: payload.count } }];
+      const docs = (await this.collection.aggregate(aggr).toArray()) || [];
+
+      payload.data = docs.map((doc) => doc.key);
+    } else {
+      while (count > 0) {
+        const aggr: Document[] = [{ $sample: { size: 1 } }];
+        const docs = (await this.collection.aggregate(aggr).toArray()) || [];
+
+        payload.data.push(docs[0].key);
+
+        count--;
+      }
+    }
 
     return payload;
   }
