@@ -1,4 +1,4 @@
-import type { Payload } from '@joshdb/provider';
+import { resolveVersion, type Payload } from '@joshdb/provider';
 
 const handleSubCallFail = (res: Payload, payload: Payload) => {
   if (res.errors.length) {
@@ -16,4 +16,6 @@ const isPrimitive = (val: any) => {
   return (typeof val !== 'object' && typeof val !== 'function') || val === null;
 };
 
-export { handleSubCallFail, isPrimitive };
+const version = resolveVersion('[VI]{version}[/VI]');
+
+export { handleSubCallFail, isPrimitive, version };

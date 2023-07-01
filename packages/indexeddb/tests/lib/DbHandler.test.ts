@@ -16,7 +16,7 @@ describe('DbHandler', () => {
     const handler = new DbHandler();
 
     beforeAll(async () => {
-      await handler.init();
+      await handler.init({ name: 'test' });
     });
 
     beforeEach(async () => {
@@ -78,6 +78,39 @@ describe('DbHandler', () => {
       await handler.set('string3', 'hello world');
       await handler.clear();
       expect(await handler.count()).toEqual(0);
+    });
+  });
+
+  describe('Can manipulate metadata.', () => {
+    const handler = new DbHandler();
+
+    beforeAll(async () => {
+      await handler.init({ name: 'meta-test' });
+    });
+
+    beforeEach(async () => {
+      await handler.clear();
+    });
+
+    test('Can set and subsequently get metadata', async () => {
+      await handler.setMetadata('string', 'hello world');
+      await handler.setMetadata('num', 420);
+      await handler.setMetadata('obj', { hello: 'world' });
+      await handler.setMetadata('array', [1, 2, 3]);
+      expect(await handler.getMetadata('string')).toEqual('hello world');
+      expect(await handler.getMetadata('num')).toEqual(420);
+      expect(await handler.getMetadata('obj')).toEqual({ hello: 'world' });
+      expect(await handler.getMetadata('array')).toEqual([1, 2, 3]);
+    });
+
+    test('Can clear metadata', async () => {
+      await handler.setMetadata('string', 'hello world');
+      await handler.setMetadata('string2', 'hello world');
+      await handler.setMetadata('string3', 'hello world');
+      await handler.clearMetadata();
+      expect(await handler.getMetadata('string')).toBeUndefined();
+      expect(await handler.getMetadata('string2')).toBeUndefined();
+      expect(await handler.getMetadata('string3')).toBeUndefined();
     });
   });
 });

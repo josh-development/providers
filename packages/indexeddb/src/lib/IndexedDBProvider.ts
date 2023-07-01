@@ -11,24 +11,33 @@ import {
   MathOperator,
   Method,
   Payload,
-  resolveVersion,
   type Semver
 } from '@joshdb/provider';
 import { deleteProperty, getProperty, hasProperty, PROPERTY_NOT_FOUND, setProperty } from 'property-helpers';
 import DbHandler from './DbHandler';
-import { handleSubCallFail, isPrimitive } from './helpers';
+import { handleSubCallFail, isPrimitive, version } from './helpers';
 
 export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
+  public version: Semver = version;
   public declare options: IndexedDBProvider.Options;
 
   private db: DbHandler;
+
   public constructor(options: IndexedDBProvider.Options) {
     super(options);
     this.db = new DbHandler<StoredValue>();
   }
 
-  public get version(): Semver {
-    return resolveVersion('[VI]{version}[/VI]');
+  public deleteMetadata(key: string): void {
+    return this.db.deleteMetadata(key);
+  }
+
+  public getMetadata(key: string): unknown {
+    return this.db.getMetadata(key);
+  }
+
+  public setMetadata(key: string, value: unknown): void {
+    return this.db.setMetadata(key, value);
   }
 
   public async [Method.Each]<Value = StoredValue>(payload: Payload.Each<Value>): Promise<Payload.Each<Value>> {
@@ -189,8 +198,7 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   public async [Method.RandomKey](payload: Payload.RandomKey): Promise<Payload.RandomKey> {
     await this.check();
 
-    const { count, duplicates } = payload;
-    const unique = !duplicates; // Duplicates is too hard for my head to work around
+    const { count, unique } = payload;
     const keys = await this.db.getKeys();
 
     if (unique && keys.length < count) {
@@ -234,8 +242,8 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   }
 
   public override async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
+    await this.db.init(context);
     context = await super.init(context);
-    await this.db.init();
 
     return context;
   }
@@ -516,7 +524,7 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   }
 
   protected fetchVersion() {
-    return this.version;
+    return this.getMetadata('version');
   }
 
   private async check(key: string | null = null, type: string[] | null = null, path: string[] = []) {

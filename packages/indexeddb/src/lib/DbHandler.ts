@@ -1,3 +1,6 @@
+import type { JoshProvider, Semver } from '@joshdb/provider';
+import { version } from './helpers';
+
 export default class DbHandler<StoredValue = unknown> {
   private idb: IDBFactory;
   private db!: IDBDatabase;
@@ -10,8 +13,9 @@ export default class DbHandler<StoredValue = unknown> {
     this.idb = globalThis.indexedDB;
   }
 
-  public init() {
-    const request = this.idb.open('josh');
+  public init(context: JoshProvider.Context) {
+    const { name } = context;
+    const request = this.idb.open(`joshdb-${name}`, 1);
 
     return new Promise<void>((resolve, reject) => {
       request.onerror = reject;
@@ -19,13 +23,24 @@ export default class DbHandler<StoredValue = unknown> {
       request.onupgradeneeded = () => {
         const db = request.result;
 
+        if (!db.objectStoreNames.contains('meta')) {
+          db.createObjectStore('meta', { keyPath: 'key' });
+        }
+
         if (!db.objectStoreNames.contains('store')) {
           db.createObjectStore('store', { keyPath: 'key' });
         }
       };
 
-      request.onsuccess = () => {
+      request.onsuccess = async () => {
         this.db = request.result;
+
+        const storedVersion = (await this.getMetadata('version')) as Semver | undefined;
+
+        if (!storedVersion) {
+          await this.setMetadata('version', version);
+        }
+
         resolve();
       };
     });
@@ -101,6 +116,42 @@ export default class DbHandler<StoredValue = unknown> {
     return (await this.get(key)) !== undefined;
   }
 
+  public async getMetadata(key: string): Promise<unknown | undefined> {
+    const all = this.openMetadata();
+    const request = all.get(key);
+    const result = (await this.handleEvents(request)) as {
+      value: unknown | undefined; // Its shit like this why I don't like TS
+    };
+
+    return result?.value;
+  }
+
+  public async setMetadata(key: string, value: unknown) {
+    const all = this.openMetadata();
+    const doc = {
+      key,
+      value
+    };
+
+    const request = all.put(doc);
+
+    await this.handleEvents(request);
+  }
+
+  public async deleteMetadata(key: string) {
+    const all = this.openMetadata();
+    const request = all.delete(key);
+
+    return this.handleEvents(request);
+  }
+
+  public async clearMetadata() {
+    const all = this.openMetadata();
+    const request = all.clear();
+
+    return this.handleEvents(request);
+  }
+
   private handleEvents(request: IDBRequest) {
     return new Promise((res, rej) => {
       request.onsuccess = () => {
@@ -116,6 +167,13 @@ export default class DbHandler<StoredValue = unknown> {
   private open() {
     const transaction = this.db.transaction('store', 'readwrite');
     const all = transaction.objectStore('store');
+
+    return all;
+  }
+
+  private openMetadata() {
+    const transaction = this.db.transaction('meta', 'readwrite');
+    const all = transaction.objectStore('meta');
 
     return all;
   }
