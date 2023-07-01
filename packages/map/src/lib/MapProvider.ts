@@ -488,12 +488,16 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
   }
 
   public [Method.Random](payload: Payload.Random<StoredValue>): Payload.Random<StoredValue> {
-    if (this.cache.size === 0) return { ...payload, data: [] };
+    const { count, unique } = payload;
 
-    const { count, duplicates } = payload;
-
-    if (this.cache.size < count) {
+    if (unique && this.cache.size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }));
+
+      return payload;
+    }
+
+    if (this.cache.size === 0) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Random, context: { unique, count } }));
 
       return payload;
     }
@@ -502,30 +506,34 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
 
     const keys = Array.from(this.cache.keys());
 
-    if (duplicates) {
-      while (payload.data.length < count) {
-        const key = keys[Math.floor(Math.random() * keys.length)];
-
-        payload.data.push(this.cache.get(key)!);
-      }
-    } else {
+    if (unique) {
       const randomKeys = new Set<string>();
 
       while (randomKeys.size < count) randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
 
       for (const key of randomKeys) payload.data.push(this.cache.get(key)!);
+    } else {
+      while (payload.data.length < count) {
+        const key = keys[Math.floor(Math.random() * keys.length)];
+
+        payload.data.push(this.cache.get(key)!);
+      }
     }
 
     return payload;
   }
 
   public [Method.RandomKey](payload: Payload.RandomKey): Payload.RandomKey {
-    if (this.cache.size === 0) return { ...payload, data: [] };
+    const { count, unique } = payload;
 
-    const { count, duplicates } = payload;
-
-    if (this.cache.size < count) {
+    if (unique && this.cache.size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }));
+
+      return payload;
+    }
+
+    if (this.cache.size === 0) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.RandomKey }));
 
       return payload;
     }
@@ -534,14 +542,14 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
 
     const keys = Array.from(this.cache.keys());
 
-    if (duplicates) {
-      while (payload.data.length < count) payload.data.push(keys[Math.floor(Math.random() * keys.length)]);
-    } else {
+    if (unique) {
       const randomKeys = new Set<string>();
 
       while (randomKeys.size < count) randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
 
       for (const key of randomKeys) payload.data.push(key);
+    } else {
+      while (payload.data.length < count) payload.data.push(keys[Math.floor(Math.random() * keys.length)]);
     }
 
     return payload;

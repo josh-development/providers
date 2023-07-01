@@ -550,12 +550,17 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
   }
 
   public async [Method.Random](payload: Payload.Random<StoredValue>): Promise<Payload.Random<StoredValue>> {
-    const { count, duplicates } = payload;
+    const { count, unique } = payload;
     const size = await this.handler.size();
 
-    if (size === 0) return { ...payload, data: [] };
-    if (size < count) {
+    if (unique && size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { size }));
+
+      return payload;
+    }
+
+    if (size === 0) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Random }, { unique, count }));
 
       return payload;
     }
@@ -564,30 +569,35 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
 
     const keys = await this.handler.keys();
 
-    if (duplicates) {
-      while (payload.data.length < count) {
-        const key = keys[Math.floor(Math.random() * size)];
-
-        payload.data.push((await this.handler.get(key))!);
-      }
-    } else {
+    if (unique) {
       const randomKeys = new Set<string>();
 
       while (randomKeys.size < count) randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
 
       for (const key of randomKeys) payload.data.push((await this.handler.get(key))!);
+    } else {
+      while (payload.data.length < count) {
+        const key = keys[Math.floor(Math.random() * size)];
+
+        payload.data.push((await this.handler.get(key))!);
+      }
     }
 
     return payload;
   }
 
   public async [Method.RandomKey](payload: Payload.RandomKey): Promise<Payload.RandomKey> {
-    const { count, duplicates } = payload;
+    const { count, unique } = payload;
     const size = await this.handler.size();
 
-    if (size === 0) return { ...payload, data: [] };
-    if (size < count) {
+    if (unique && size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }, { size }));
+
+      return payload;
+    }
+
+    if (size === 0) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.RandomKey }, { size }));
 
       return payload;
     }
@@ -596,14 +606,14 @@ export class JSONProvider<StoredValue = unknown> extends JoshProvider<StoredValu
 
     const keys = await this.handler.keys();
 
-    if (duplicates) {
-      while (payload.data.length < count) payload.data.push(keys[Math.floor(Math.random() * size)]);
-    } else {
+    if (unique) {
       const randomKeys = new Set<string>();
 
       while (randomKeys.size < count) randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
 
       for (const key of randomKeys) payload.data.push(key);
+    } else {
+      while (payload.data.length < count) payload.data.push(keys[Math.floor(Math.random() * size)]);
     }
 
     return payload;
