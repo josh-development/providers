@@ -628,19 +628,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@joshdb/eslint-config@npm:1.1.0-next.a699598.0":
-  version: 1.1.0-next.a699598.0
-  resolution: "@joshdb/eslint-config@npm:1.1.0-next.a699598.0"
+"@joshdb/eslint-config@npm:1.1.0-next.7cbe4ac.0":
+  version: 1.1.0-next.7cbe4ac.0
+  resolution: "@joshdb/eslint-config@npm:1.1.0-next.7cbe4ac.0"
   dependencies:
     "@sapphire/eslint-config": ^4.4.2
-    "@typescript-eslint/eslint-plugin": ^5.59.7
-    "@typescript-eslint/parser": ^5.59.7
-    eslint: ^8.41.0
+    "@typescript-eslint/eslint-plugin": ^5.60.1
+    "@typescript-eslint/parser": ^5.60.1
+    eslint: ^8.44.0
     eslint-config-prettier: ^8.8.0
     eslint-plugin-prettier: ^4.2.1
     prettier: ^2.8.8
-    typescript: ^5.0.4
-  checksum: 5b14ab507eaffe67197ee9365daa4f94674ffebc886ddeb03c17366b1f450d7fcd44fa8ba3174ab78780b623a52f3b17c6d63502bcdc9457e23590e47d3f9b62
+    typescript: ^5.1.6
+  checksum: 451b5b560118024bf5f3a1140381a29d0b860736393e1507cf8e0954bb6026f3505313faa69216cd54d1d0f0b112a2c3c5ca6e5a9f0755957ccf20ed5599a43e
   languageName: node
   linkType: hard
 
@@ -650,7 +650,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.1.1
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.7cbe4ac.0
     "@sapphire/async-queue": ^1.5.0
     "@sapphire/snowflake": ^3.5.1
     "@sapphire/utilities": ^3.12.0
@@ -669,7 +669,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.1.1
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.7cbe4ac.0
     "@sapphire/utilities": ^3.12.0
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
@@ -686,7 +686,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.1.1
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.7cbe4ac.0
     "@sapphire/snowflake": ^3.5.1
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
@@ -703,7 +703,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.1.1
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.7cbe4ac.0
     "@sapphire/utilities": ^3.12.0
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
@@ -721,7 +721,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.1.1
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.7cbe4ac.0
     "@sapphire/snowflake": ^3.5.1
     "@sapphire/utilities": ^3.12.0
     "@vitest/coverage-v8": ^0.32.2
@@ -734,13 +734,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/provider@npm:2.0.0-next.a699598.0":
-  version: 2.0.0-next.a699598.0
-  resolution: "@joshdb/provider@npm:2.0.0-next.a699598.0"
+"@joshdb/provider@npm:2.0.0-next.7cbe4ac.0":
+  version: 2.0.0-next.7cbe4ac.0
+  resolution: "@joshdb/provider@npm:2.0.0-next.7cbe4ac.0"
   dependencies:
-    "@sapphire/utilities": ^3.11.2
+    "@sapphire/utilities": ^3.12.0
     reflect-metadata: ^0.1.13
-  checksum: 38585c16f83a7fe433102c0cbfcccfe1c5d42c8fbad2fd1d9d41d84ba08624637ef150a26cd434b4b5f6acaf710ee0c6418da7c4717f773f3a5dc5f3fb0f60c2
+  checksum: bcbb138378624f7c24b55c40f98cfc529d21430d743d9def7553b476e7a2db716d028079f39493b74e61104fa9f64157371a59dd0b13c3f1e7b7eec5b5c666fd
   languageName: node
   linkType: hard
 
@@ -750,7 +750,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.1.1
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.7cbe4ac.0
     "@types/uuid": ^9.0.2
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
@@ -768,7 +768,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.1.1
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.7cbe4ac.0
     "@sapphire/utilities": ^3.12.0
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
@@ -780,12 +780,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/ts-config@npm:1.1.0-next.a699598.0":
-  version: 1.1.0-next.a699598.0
-  resolution: "@joshdb/ts-config@npm:1.1.0-next.a699598.0"
+"@joshdb/ts-config@npm:1.1.0-next.2b7ee2c.0":
+  version: 1.1.0-next.2b7ee2c.0
+  resolution: "@joshdb/ts-config@npm:1.1.0-next.2b7ee2c.0"
   dependencies:
     "@sapphire/ts-config": ^4.0.0
-  checksum: 273112d20008fcff3eb4974cbafea4ca449e89a0835ea83686e5663287e57efd1cb929c9e66dd289939522a52bc600dd0197ce965b30c344ed4a0b6538e1a673
+  checksum: 67700d78be473a44e5c67752fa0d684ee9fe4099083833d0c913034884767789b9c2902dc61b2d555890c3d949e516eb0d76a9a57f1f221797edb14d1aeb717f
   languageName: node
   linkType: hard
 
@@ -1053,7 +1053,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/utilities@npm:^3.11.0, @sapphire/utilities@npm:^3.11.2, @sapphire/utilities@npm:^3.9.2":
+"@sapphire/utilities@npm:^3.11.0, @sapphire/utilities@npm:^3.9.2":
   version: 3.11.2
   resolution: "@sapphire/utilities@npm:3.11.2"
   checksum: af06b3f52156af397a3be564f992bedefd728ea2d44fee8ffdc00242de0454075e722091cc213d4ad2fb4ef5c3b78740bf5e7f75242851d31a56206f51a8f403
@@ -1224,7 +1224,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:^5.59.2, @typescript-eslint/eslint-plugin@npm:^5.59.7":
+"@typescript-eslint/eslint-plugin@npm:^5.59.2":
   version: 5.59.8
   resolution: "@typescript-eslint/eslint-plugin@npm:5.59.8"
   dependencies:
@@ -1272,7 +1272,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^5.59.2, @typescript-eslint/parser@npm:^5.59.7":
+"@typescript-eslint/parser@npm:^5.59.2":
   version: 5.59.8
   resolution: "@typescript-eslint/parser@npm:5.59.8"
   dependencies:
@@ -1808,7 +1808,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "benchmarks@workspace:benchmarks"
   dependencies:
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.7cbe4ac.0
     "@sapphire/utilities": ^3.12.0
     "@vitest/coverage-v8": ^0.32.2
     property-helpers: ^2.0.0
@@ -2764,7 +2764,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^8.39.0, eslint@npm:^8.41.0":
+"eslint@npm:^8.39.0":
   version: 8.41.0
   resolution: "eslint@npm:8.41.0"
   dependencies:
@@ -5571,8 +5571,8 @@ __metadata:
     "@favware/colorette-spinner": ^1.0.1
     "@favware/npm-deprecate": ^1.0.7
     "@favware/rollup-type-bundler": ^1.0.11
-    "@joshdb/eslint-config": 1.1.0-next.a699598.0
-    "@joshdb/ts-config": 1.1.0-next.a699598.0
+    "@joshdb/eslint-config": 1.1.0-next.7cbe4ac.0
+    "@joshdb/ts-config": 1.1.0-next.2b7ee2c.0
     "@types/better-sqlite3": ^7.6.4
     "@types/node": ^18.16.19
     "@types/prompts": ^2.4.4
@@ -6469,6 +6469,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript@npm:^5.1.6":
+  version: 5.1.6
+  resolution: "typescript@npm:5.1.6"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: b2f2c35096035fe1f5facd1e38922ccb8558996331405eb00a5111cc948b2e733163cc22fab5db46992aba7dd520fff637f2c1df4996ff0e134e77d3249a7350
+  languageName: node
+  linkType: hard
+
 "typescript@patch:typescript@^4.6.4 || ^5.0.0#~builtin<compat/typescript>, typescript@patch:typescript@^5.0.3#~builtin<compat/typescript>, typescript@patch:typescript@^5.0.4#~builtin<compat/typescript>, typescript@patch:typescript@~5.0.4#~builtin<compat/typescript>":
   version: 5.0.4
   resolution: "typescript@patch:typescript@npm%3A5.0.4#~builtin<compat/typescript>::version=5.0.4&hash=b5f058"
@@ -6486,6 +6496,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 1f8f3b6aaea19f0f67cba79057674ba580438a7db55057eb89cc06950483c5d632115c14077f6663ea76fd09fce3c190e6414bb98582ec80aa5a4eaf345d5b68
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@^5.1.6#~builtin<compat/typescript>":
+  version: 5.1.6
+  resolution: "typescript@patch:typescript@npm%3A5.1.6#~builtin<compat/typescript>::version=5.1.6&hash=5da071"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: f53bfe97f7c8b2b6d23cf572750d4e7d1e0c5fff1c36d859d0ec84556a827b8785077bc27676bf7e71fae538e517c3ecc0f37e7f593be913d884805d931bc8be
   languageName: node
   linkType: hard
 
