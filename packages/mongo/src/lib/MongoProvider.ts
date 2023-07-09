@@ -597,16 +597,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  // Due to the use of $sample, the output will never have duplicates
   public async [Method.Random](payload: Payload.Random<StoredValue>): Promise<Payload.Random<StoredValue>> {
     let { count, unique } = payload;
     const size = await this.collection.countDocuments({});
-
-    // TODO: @dan-online fix this yourself idk how this work
-    // Basically just this:
-    // if(unique && size < count) throw InvalidCount
-    // if (size === 0) throw MissingData
-    // Also try no to get an infinite loop with unique off and count > size
 
     if (unique && size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { size }));
