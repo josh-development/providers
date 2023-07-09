@@ -1,4 +1,3 @@
-// // @ts-nocheck
 import {
   CommonIdentifiers,
   isEveryByHookPayload,
@@ -27,42 +26,45 @@ import { handleSubCallFail, isPrimitive, version } from './helpers';
 
 export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<StoredValue> {
   public version: Semver = version;
+
   public declare options: IndexedDBProvider.Options;
 
-  private db: DbHandler;
+  public migrations: JoshProvider.Migration[] = [];
+
+  private _db: DbHandler<StoredValue>;
+
+  private get db(): DbHandler<StoredValue> {
+    if (!this._db) throw new Error('Database is not initialized. Make sure you called Josh.init();');
+
+    return this._db;
+  }
 
   public constructor(options: IndexedDBProvider.Options) {
     super(options);
-    this.db = new DbHandler<StoredValue>();
+    this._db = new DbHandler();
   }
 
-  public deleteMetadata(key: string): void {
-    return this.db.deleteMetadata(key);
+  public async deleteMetadata(key: string): Promise<void> {
+    await this.db.deleteMetadata(key);
   }
 
-  public getMetadata(key: string): unknown {
+  public async getMetadata(key: string): Promise<unknown> {
     return this.db.getMetadata(key);
   }
 
-  public setMetadata(key: string, value: unknown): void {
-    return this.db.setMetadata(key, value);
+  public async setMetadata(key: string, value: unknown): Promise<void> {
+    await this.db.setMetadata(key, value);
   }
 
   public async [Method.Each]<Value = StoredValue>(payload: Payload.Each<Value>): Promise<Payload.Each<Value>> {
-    await this.check();
-
     const { hook } = payload;
-    const data = await this.db.getAll();
 
-    // @ts-expect-error 2322 Start making sense.
-    Object.entries(data).forEach(([key, value]) => hook(value, key));
+    for (const [key, value] of Object.entries(await this.db.getAll())) await hook(value, key);
 
     return payload;
   }
 
   public async [Method.DeleteMany](payload: Payload.DeleteMany): Promise<Payload.DeleteMany> {
-    await this.check();
-
     for (const key of payload.keys) {
       await this.db.delete(key);
     }
@@ -71,8 +73,6 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   }
 
   public async [Method.Delete](payload: Payload.Delete): Promise<Payload.Delete> {
-    await this.check();
-
     const { key, path } = payload;
 
     if (path.length) {
@@ -88,24 +88,18 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   }
 
   public async [Method.AutoKey](payload: Payload.AutoKey): Promise<Payload.AutoKey> {
-    await this.check();
-
     payload.data = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
     return payload;
   }
 
   public async [Method.Values]<Value = StoredValue>(payload: Payload.Values<Value>): Promise<Payload.Values<Value>> {
-    await this.check();
-
     payload.data = Object.values(await this.db.getAll());
 
     return payload;
   }
 
   public async [Method.Math](payload: Payload.Math): Promise<Payload.Math> {
-    await this.check();
-
     const { key, path, operator, operand } = payload;
     const getPayload = await this[Method.Get]<number | typeof PROPERTY_NOT_FOUND>({ method: Method.Get, key, path, errors: [] });
 
@@ -160,8 +154,6 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   }
 
   public async [Method.Dec](payload: Payload.Dec): Promise<Payload.Dec> {
-    await this.check();
-
     const { key, path } = payload;
     const mathPayload = await this[Method.Math]({
       method: Method.Math,
@@ -178,8 +170,6 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   }
 
   public async [Method.Inc](payload: Payload.Inc): Promise<Payload.Inc> {
-    await this.check();
-
     const { key, path } = payload;
     const mathPayload = await this[Method.Math]({
       method: Method.Math,
@@ -196,16 +186,12 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   }
 
   public async [Method.Keys](payload: Payload.Keys): Promise<Payload.Keys> {
-    await this.check();
-
     payload.data = await this.db.getKeys();
 
     return payload;
   }
 
   public async [Method.RandomKey](payload: Payload.RandomKey): Promise<Payload.RandomKey> {
-    await this.check();
-
     const { count, unique } = payload;
     const keys = await this.db.getKeys();
 
@@ -237,13 +223,11 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   }
 
   public async [Method.Random]<Value = StoredValue>(payload: Payload.Random<Value>): Promise<Payload.Random<Value>> {
-    await this.check();
-
-    // @ts-expect-error 2532 STFU
-    const key = await this.randomKey(payload);
+    // @ts-expect-error 2345 I can do this
+    const key = await this[Method.RandomKey](payload);
 
     if (key.data) {
-      payload.data = await Promise.all(key.data.map((key) => this.db.get(key)));
+      payload.data = await Promise.all(key.data.map((key) => this.db.get(key) as Promise<Value>));
     }
 
     return payload;
@@ -257,26 +241,30 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   }
 
   public async [Method.Get]<Value = StoredValue>(payload: Payload.Get<Value>): Promise<Payload.Get<Value>> {
-    await this.check();
-
     const { key, path } = payload;
     const value = await this.db.get(key);
 
-    payload.data = path.length === 0 ? value : getProperty(value, path);
+    if (path.length === 0) {
+      payload.data = value;
+      return payload;
+    }
+
+    const val = getProperty(value, path);
+
+    if (val !== PROPERTY_NOT_FOUND) {
+      payload.data = val;
+    }
 
     return payload;
   }
 
   public async [Method.Entries](payload: Payload.Entries<StoredValue>): Promise<Payload.Entries<StoredValue>> {
-    await this.check();
-
     payload.data = await this.db.getAll();
 
     return payload;
   }
 
   public async [Method.GetMany](payload: Payload.GetMany<StoredValue>): Promise<Payload.GetMany<StoredValue>> {
-    await this.check();
     // according to old method this could be made into an index search
 
     const { keys } = payload;
@@ -284,10 +272,9 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
 
     payload.data = {};
 
-    Object.entries(data).forEach(([key, val]) => {
+    Object.entries(data).forEach(([key, value]) => {
       if (keys.includes(key)) {
-        // @ts-expect-error 2532 No it's not
-        payload.data[key] = val;
+        payload.data![key] = value;
       }
     });
 
@@ -295,25 +282,19 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   }
 
   public async [Method.Set]<Value = StoredValue>(payload: Payload.Set<Value>): Promise<Payload.Set<Value>> {
-    await this.check();
+    const { key, path, value } = payload;
 
-    const { key, value, path } = payload;
-    let data = (await this.db.get(key)) || {};
+    if (path.length === 0) await this.db.set(key, value as unknown as StoredValue);
+    else {
+      const storedValue = await this.db.get(key);
 
-    if (path.length === 0) {
-      data = value;
-    } else {
-      setProperty(data, path, value);
+      await this.db.set(key, setProperty(storedValue, path, value));
     }
-
-    await this.db.set(key, data);
 
     return payload;
   }
 
   public async [Method.SetMany](payload: Payload.SetMany): Promise<Payload.SetMany> {
-    await this.check();
-
     const { entries, overwrite } = payload;
 
     for (const { key, path, value } of entries) {
@@ -328,15 +309,12 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   }
 
   public async [Method.Clear](payload: Payload.Clear): Promise<Payload.Clear> {
-    await this.check();
     await this.db.clear();
 
     return payload;
   }
 
   public async [Method.Has](payload: Payload.Has): Promise<Payload.Has> {
-    await this.check();
-
     const { key, path } = payload;
 
     if (await this.db.has(key)) {
@@ -349,14 +327,12 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   }
 
   public async [Method.Size](payload: Payload.Size): Promise<Payload.Size> {
-    await this.check();
     payload.data = await this.db.count();
 
     return payload;
   }
 
   public async [Method.Push]<Value = StoredValue>(payload: Payload.Push<Value>): Promise<Payload.Push<Value>> {
-    await this.check();
     const { key, path, value } = payload;
     const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
 
@@ -381,8 +357,6 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   }
 
   public async [Method.Ensure]<Value = StoredValue>(payload: Payload.Ensure<Value>): Promise<Payload.Ensure<Value>> {
-    await this.check();
-
     const { key, defaultValue } = payload;
 
     payload.data = defaultValue;
@@ -402,7 +376,6 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   public async [Method.Every](payload: Payload.Every.ByHook<StoredValue>): Promise<Payload.Every.ByHook<StoredValue>>;
   public async [Method.Every](payload: Payload.Every.ByValue): Promise<Payload.Every.ByValue>;
   public async [Method.Every](payload: Payload.Every<StoredValue>): Promise<Payload.Every<StoredValue>> {
-    await this.check();
     payload.data = true;
 
     if ((await this.db.count()) === 0) return payload;
@@ -448,7 +421,6 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   public async [Method.Filter](payload: Payload.Filter.ByHook<StoredValue>): Promise<Payload.Filter.ByHook<StoredValue>>;
   public async [Method.Filter](payload: Payload.Filter.ByValue<StoredValue>): Promise<Payload.Filter.ByValue<StoredValue>>;
   public async [Method.Filter](payload: Payload.Filter<StoredValue>): Promise<Payload.Filter<StoredValue>> {
-    await this.check();
     payload.data = {};
 
     if (isFilterByHookPayload(payload)) {
@@ -485,7 +457,6 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   public async [Method.Find](payload: Payload.Find.ByHook<StoredValue>): Promise<Payload.Find.ByHook<StoredValue>>;
   public async [Method.Find](payload: Payload.Find.ByValue<StoredValue>): Promise<Payload.Find.ByValue<StoredValue>>;
   public async [Method.Find](payload: Payload.Find<StoredValue>): Promise<Payload.Find<StoredValue>> {
-    await this.check();
     payload.data = [null, null];
 
     if (isFindByHookPayload(payload)) {
@@ -542,7 +513,6 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   public async [Method.Map]<Value = StoredValue>(payload: Payload.Map.ByHook<StoredValue, Value>): Promise<Payload.Map.ByHook<StoredValue, Value>>;
   public async [Method.Map]<Value = StoredValue>(payload: Payload.Map.ByPath<Value>): Promise<Payload.Map.ByPath<Value>>;
   public async [Method.Map]<Value = StoredValue>(payload: Payload.Map<StoredValue, Value>): Promise<Payload.Map<StoredValue, Value>> {
-    await this.check();
     payload.data = [];
 
     if (isMapByHookPayload(payload)) {
@@ -567,7 +537,6 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   public async [Method.Partition](payload: Payload.Partition.ByHook<StoredValue>): Promise<Payload.Partition.ByHook<StoredValue>>;
   public async [Method.Partition](payload: Payload.Partition.ByValue<StoredValue>): Promise<Payload.Partition.ByValue<StoredValue>>;
   public async [Method.Partition](payload: Payload.Partition<StoredValue>): Promise<Payload.Partition<StoredValue>> {
-    await this.check();
     payload.data = { truthy: {}, falsy: {} };
 
     if (isPartitionByHookPayload(payload)) {
@@ -612,7 +581,6 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   public async [Method.Remove]<Value = StoredValue>(payload: Payload.Remove.ByHook<Value>): Promise<Payload.Remove.ByHook<Value>>;
   public async [Method.Remove](payload: Payload.Remove.ByValue): Promise<Payload.Remove.ByValue>;
   public async [Method.Remove]<Value = StoredValue>(payload: Payload.Remove<Value>): Promise<Payload.Remove<Value>> {
-    await this.check();
     if (isRemoveByHookPayload(payload)) {
       const { key, path, hook } = payload;
       const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
@@ -662,7 +630,6 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   public async [Method.Some](payload: Payload.Some.ByHook<StoredValue>): Promise<Payload.Some.ByHook<StoredValue>>;
   public async [Method.Some](payload: Payload.Some.ByValue): Promise<Payload.Some.ByValue>;
   public async [Method.Some](payload: Payload.Some<StoredValue>): Promise<Payload.Some<StoredValue>> {
-    await this.check();
     payload.data = false;
 
     if (isSomeByHookPayload(payload)) {
@@ -709,7 +676,6 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   }
 
   public async [Method.Update]<Value = StoredValue>(payload: Payload.Update<StoredValue, Value>): Promise<Payload.Update<StoredValue, Value>> {
-    await this.check();
     const { key, hook } = payload;
     const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
 
@@ -727,31 +693,7 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   }
 
   protected fetchVersion() {
-    return this.getMetadata('version') as Semver;
-  }
-
-  private async check(key: string | null = null, type: string[] | null = null, path: string[] = []) {
-    if (!this.db) throw new Error('Database has been closed');
-    if (!key || !type) return;
-
-    // I don't really know what exactly this check does.
-    const value = await this.get({ method: Method.Get, key, path, errors: [] });
-
-    if (value === null) {
-      throw new Error(
-        `The document "${key}" of path "${path}" was not found in the database`
-        // 'JoshTypeError',
-      );
-    }
-
-    const valueType = value.constructor.name;
-
-    if (!type.includes(valueType)) {
-      throw new Error(
-        `The property ${path ? `${path} ` : ''}in key "${key}" is not of type "${type.join('" or "')}"(key was of type "${valueType}")`
-        // 'JoshTypeError',
-      );
-    }
+    return (this.getMetadata('version') as Promise<Semver>) || version;
   }
 }
 
