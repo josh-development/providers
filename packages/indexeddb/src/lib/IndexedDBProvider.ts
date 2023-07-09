@@ -1,12 +1,20 @@
 // // @ts-nocheck
 import {
   CommonIdentifiers,
+  isEveryByHookPayload,
+  isEveryByValuePayload,
   isFilterByHookPayload,
   isFilterByValuePayload,
   isFindByHookPayload,
   isFindByValuePayload,
   isMapByHookPayload,
   isMapByPathPayload,
+  isPartitionByHookPayload,
+  isPartitionByValuePayload,
+  isRemoveByHookPayload,
+  isRemoveByValuePayload,
+  isSomeByHookPayload,
+  isSomeByValuePayload,
   JoshProvider,
   MathOperator,
   Method,
@@ -349,6 +357,26 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
 
   public async [Method.Push]<Value = StoredValue>(payload: Payload.Push<Value>): Promise<Payload.Push<Value>> {
     await this.check();
+    const { key, path, value } = payload;
+    const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
+
+    if (handleSubCallFail(getPayload, payload)) return payload;
+    if (getPayload.data === undefined || getPayload.data === PROPERTY_NOT_FOUND) {
+      payload.errors = [this.error({ identifier: CommonIdentifiers.MissingData })];
+      return payload;
+    }
+
+    const { data } = getPayload;
+
+    if (!Array.isArray(data)) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Push }, { key, path, type: 'array' }));
+
+      return payload;
+    }
+
+    data.push(value);
+    await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data });
+
     return payload;
   }
 
@@ -375,6 +403,45 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   public async [Method.Every](payload: Payload.Every.ByValue): Promise<Payload.Every.ByValue>;
   public async [Method.Every](payload: Payload.Every<StoredValue>): Promise<Payload.Every<StoredValue>> {
     await this.check();
+    payload.data = true;
+
+    if ((await this.db.count()) === 0) return payload;
+    if (isEveryByHookPayload(payload)) {
+      const { hook } = payload;
+
+      for (const [key, value] of Object.entries(await this.db.getAll())) {
+        const result = await hook(value, key);
+
+        if (result) continue;
+
+        payload.data = false;
+      }
+    }
+
+    if (isEveryByValuePayload(payload)) {
+      const { path, value } = payload;
+
+      for (const [key, storedValue] of Object.entries(await this.db.getAll())) {
+        const data = getProperty(storedValue, path);
+
+        if (data === PROPERTY_NOT_FOUND) {
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Every }, { key, path }));
+
+          return payload;
+        }
+
+        if (!isPrimitive(data)) {
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Every }, { key, path, type: 'primitive' }));
+
+          return payload;
+        }
+
+        if (data === value) continue;
+
+        payload.data = false;
+      }
+    }
+
     return payload;
   }
 
@@ -501,6 +568,44 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   public async [Method.Partition](payload: Payload.Partition.ByValue<StoredValue>): Promise<Payload.Partition.ByValue<StoredValue>>;
   public async [Method.Partition](payload: Payload.Partition<StoredValue>): Promise<Payload.Partition<StoredValue>> {
     await this.check();
+    payload.data = { truthy: {}, falsy: {} };
+
+    if (isPartitionByHookPayload(payload)) {
+      const { hook } = payload;
+
+      for (const [key, value] of Object.entries(await this.db.getAll())) {
+        const result = await hook(value, key);
+
+        if (result) payload.data.truthy[key] = value;
+        else payload.data.falsy[key] = value;
+      }
+    }
+
+    if (isPartitionByValuePayload(payload)) {
+      const { path, value } = payload;
+
+      for (const [key, storedValue] of Object.entries(await this.db.getAll())) {
+        const data = getProperty<StoredValue>(storedValue, path);
+
+        if (data === PROPERTY_NOT_FOUND) {
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Partition }, { key, path }));
+
+          return payload;
+        }
+
+        if (!isPrimitive(data)) {
+          payload.errors.push(
+            this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Partition }, { key, path, type: 'primitive' })
+          );
+
+          return payload;
+        }
+
+        if (value === data) payload.data.truthy[key] = storedValue;
+        else payload.data.falsy[key] = storedValue;
+      }
+    }
+
     return payload;
   }
 
@@ -508,6 +613,49 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   public async [Method.Remove](payload: Payload.Remove.ByValue): Promise<Payload.Remove.ByValue>;
   public async [Method.Remove]<Value = StoredValue>(payload: Payload.Remove<Value>): Promise<Payload.Remove<Value>> {
     await this.check();
+    if (isRemoveByHookPayload(payload)) {
+      const { key, path, hook } = payload;
+      const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
+
+      if (handleSubCallFail(getPayload, payload)) return payload;
+      if (getPayload.data === undefined || getPayload.data === PROPERTY_NOT_FOUND) {
+        payload.errors = [this.error({ identifier: CommonIdentifiers.MissingData })];
+        return payload;
+      }
+
+      const { data } = getPayload;
+
+      if (!Array.isArray(data)) {
+        payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Remove }, { key, path, type: 'array' }));
+
+        return payload;
+      }
+
+      const filterValues = await Promise.all(data.map((value) => hook(value, key)));
+
+      await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data.filter((_, index) => !filterValues[index]) });
+    }
+
+    if (isRemoveByValuePayload(payload)) {
+      const { key, path, value } = payload;
+      const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path });
+
+      if (handleSubCallFail(getPayload, payload)) return payload;
+      if (getPayload.data === undefined || getPayload.data === PROPERTY_NOT_FOUND) {
+        payload.errors = [this.error({ identifier: CommonIdentifiers.MissingData })];
+        return payload;
+      }
+      const { data } = getPayload;
+
+      if (!Array.isArray(data)) {
+        payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Remove }, { key, path, type: 'array' }));
+
+        return payload;
+      }
+
+      await this[Method.Set]({ method: Method.Set, errors: [], key, path, value: data.filter((storedValue) => value !== storedValue) });
+    }
+
     return payload;
   }
 
@@ -515,16 +663,71 @@ export class IndexedDBProvider<StoredValue = unknown> extends JoshProvider<Store
   public async [Method.Some](payload: Payload.Some.ByValue): Promise<Payload.Some.ByValue>;
   public async [Method.Some](payload: Payload.Some<StoredValue>): Promise<Payload.Some<StoredValue>> {
     await this.check();
+    payload.data = false;
+
+    if (isSomeByHookPayload(payload)) {
+      const { hook } = payload;
+
+      for (const [key, value] of Object.entries(await this.db.getAll())) {
+        const result = await hook(value, key);
+
+        if (!result) continue;
+
+        payload.data = true;
+
+        break;
+      }
+    }
+
+    if (isSomeByValuePayload(payload)) {
+      const { path, value } = payload;
+
+      for (const [key, storedValue] of Object.entries(await this.db.getAll())) {
+        const data = getProperty(storedValue, path);
+
+        if (data === PROPERTY_NOT_FOUND) {
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.MissingData, method: Method.Some }, { key, path }));
+
+          return payload;
+        }
+
+        if (!isPrimitive(data)) {
+          payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidDataType, method: Method.Some }, { key, path, type: 'primitive' }));
+
+          return payload;
+        }
+
+        if (data !== value) continue;
+
+        payload.data = true;
+
+        break;
+      }
+    }
+
     return payload;
   }
 
   public async [Method.Update]<Value = StoredValue>(payload: Payload.Update<StoredValue, Value>): Promise<Payload.Update<StoredValue, Value>> {
     await this.check();
+    const { key, hook } = payload;
+    const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
+
+    if (handleSubCallFail(getPayload, payload)) return payload;
+    if (getPayload.data === undefined || getPayload.data === PROPERTY_NOT_FOUND) {
+      payload.errors = [this.error({ identifier: CommonIdentifiers.MissingData })];
+      return payload;
+    }
+
+    const { data } = getPayload;
+
+    await this[Method.Set]({ method: Method.Set, errors: [], key, path: [], value: await hook(data, key) });
+
     return payload;
   }
 
   protected fetchVersion() {
-    return this.getMetadata('version');
+    return this.getMetadata('version') as Semver;
   }
 
   private async check(key: string | null = null, type: string[] | null = null, path: string[] = []) {
