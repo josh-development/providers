@@ -390,7 +390,7 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
     }
   },
   {
-    name: `${Method.Random} (Duplicates)`,
+    name: `${Method.Random} (Unique)`,
 
     beforeAll: async ({ provider, entries }) => {
       await provider[Method.SetMany]({
@@ -402,7 +402,7 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
     },
 
     run: async ({ provider }) => {
-      await provider[Method.Random]({ method: Method.Random, errors: [], count: 5, duplicates: true });
+      await provider[Method.Random]({ method: Method.Random, errors: [], count: 5, unique: true });
     }
   },
   {
@@ -418,11 +418,11 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
     },
 
     run: async ({ provider }) => {
-      await provider[Method.Random]({ method: Method.Random, errors: [], count: 5, duplicates: false });
+      await provider[Method.Random]({ method: Method.Random, errors: [], count: 5, unique: false });
     }
   },
   {
-    name: `${Method.RandomKey} (Duplicates)`,
+    name: `${Method.RandomKey} (Unique)`,
 
     beforeAll: async ({ provider, entries }) => {
       await provider[Method.SetMany]({
@@ -434,7 +434,7 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
     },
 
     run: async ({ provider }) => {
-      await provider[Method.RandomKey]({ method: Method.RandomKey, errors: [], count: 5, duplicates: true });
+      await provider[Method.RandomKey]({ method: Method.RandomKey, errors: [], count: 5, unique: true });
     }
   },
   {
@@ -450,7 +450,7 @@ export const BENCHMARK_TESTS: Benchmark.Test[] = [
     },
 
     run: async ({ provider }) => {
-      await provider[Method.RandomKey]({ method: Method.RandomKey, errors: [], count: 5, duplicates: false });
+      await provider[Method.RandomKey]({ method: Method.RandomKey, errors: [], count: 5, unique: false });
     }
   },
   {
