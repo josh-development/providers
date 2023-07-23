@@ -653,7 +653,7 @@ __metadata:
     "@joshdb/provider": 2.0.0-next.a699598.0
     "@sapphire/async-queue": ^1.5.0
     "@sapphire/snowflake": ^3.5.1
-    "@sapphire/utilities": ^3.12.0
+    "@sapphire/utilities": ^3.13.0
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
     property-helpers: ^2.0.0
@@ -670,7 +670,7 @@ __metadata:
     "@favware/cliff-jumper": ^2.1.1
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.12.0
+    "@sapphire/utilities": ^3.13.0
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
     property-helpers: ^2.0.0
@@ -704,7 +704,7 @@ __metadata:
     "@favware/cliff-jumper": ^2.1.1
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.12.0
+    "@sapphire/utilities": ^3.13.0
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
     mongodb: ~5.7.0
@@ -723,7 +723,7 @@ __metadata:
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.a699598.0
     "@sapphire/snowflake": ^3.5.1
-    "@sapphire/utilities": ^3.12.0
+    "@sapphire/utilities": ^3.13.0
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
     postgres: ^3.3.5
@@ -769,10 +769,10 @@ __metadata:
     "@favware/cliff-jumper": ^2.1.1
     "@favware/rollup-type-bundler": ^1.0.11
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.12.0
+    "@sapphire/utilities": ^3.13.0
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
-    better-sqlite3: ^8.4.0
+    better-sqlite3: ^8.5.0
     property-helpers: ^2.0.0
     typedoc: ^0.24.8
     typedoc-json-parser: ^8.2.0
@@ -1046,7 +1046,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/utilities@npm:3.12.0, @sapphire/utilities@npm:^3.12.0":
+"@sapphire/utilities@npm:3.12.0":
   version: 3.12.0
   resolution: "@sapphire/utilities@npm:3.12.0"
   checksum: 002f15263f157fdbb0603c233a43a5660cd3b45a4f3fddaa9d7066d187eec23f473ee42c8d071b0e3dec4e22b08bed337fb7eb336a02b59743a78ebc8922004e
@@ -1057,6 +1057,13 @@ __metadata:
   version: 3.11.2
   resolution: "@sapphire/utilities@npm:3.11.2"
   checksum: af06b3f52156af397a3be564f992bedefd728ea2d44fee8ffdc00242de0454075e722091cc213d4ad2fb4ef5c3b78740bf5e7f75242851d31a56206f51a8f403
+  languageName: node
+  linkType: hard
+
+"@sapphire/utilities@npm:^3.13.0":
+  version: 3.13.0
+  resolution: "@sapphire/utilities@npm:3.13.0"
+  checksum: c2f901c104459e01a24af71871294b700ff188925cf050558880486de6564792df2b7549796dd9fd6f309c12af7d4e2b2d2f4069ec9d4c27d9c3998eca3ac9a9
   languageName: node
   linkType: hard
 
@@ -1809,7 +1816,7 @@ __metadata:
   resolution: "benchmarks@workspace:benchmarks"
   dependencies:
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.12.0
+    "@sapphire/utilities": ^3.13.0
     "@vitest/coverage-v8": ^0.32.2
     property-helpers: ^2.0.0
   languageName: unknown
@@ -1822,14 +1829,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"better-sqlite3@npm:^8.4.0":
-  version: 8.4.0
-  resolution: "better-sqlite3@npm:8.4.0"
+"better-sqlite3@npm:^8.5.0":
+  version: 8.5.0
+  resolution: "better-sqlite3@npm:8.5.0"
   dependencies:
     bindings: ^1.5.0
     node-gyp: latest
     prebuild-install: ^7.1.0
-  checksum: f8b180c26428a2d381482e83b4519d0d81a918e00f92cafd255f42eb9583f49b2fed1015121ad49ebe1f3f790cc8c6f4697d1e805193d65e70dacf2e8abbd6af
+  checksum: 98243cb08a410fad0b5c443410428c8ea00376a4eb7d2c9a8a5a695970bc7a2a4007221930460939594d728e7d6bcb1889f46ec11a3bbb2257b996c80fbaacb1
   languageName: node
   linkType: hard
 
