@@ -134,7 +134,7 @@ jobs:
         with:
           turbo: true
       - name: Start Redis Instance
-        uses: supercharge/redis-github-action@f63fe516254d0af5df91755a4488274c2e71e38c # 1.5.0
+        uses: supercharge/redis-github-action@656b0b5cf954e2f1e716731e810b839d3050577d # 1.6.0
         with:
           redis-version: 6
       - name: Install Dependencies
