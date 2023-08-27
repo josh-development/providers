@@ -707,7 +707,7 @@ __metadata:
     "@sapphire/utilities": ^3.13.0
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
-    mongodb: ~5.7.0
+    mongodb: ~5.8.1
     property-helpers: ^2.0.0
     typedoc: ^0.24.8
     typedoc-json-parser: ^8.2.0
@@ -754,7 +754,7 @@ __metadata:
     "@types/uuid": ^9.0.2
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
-    redis: ^4.6.7
+    redis: ^4.6.8
     typedoc: ^0.24.8
     typedoc-json-parser: ^8.2.0
     uuid: ^9.0.0
@@ -772,7 +772,7 @@ __metadata:
     "@sapphire/utilities": ^3.13.0
     "@vitest/coverage-v8": ^0.32.2
     better-serialize: ^1.0.0
-    better-sqlite3: ^8.5.1
+    better-sqlite3: ^8.5.2
     property-helpers: ^2.0.0
     typedoc: ^0.24.8
     typedoc-json-parser: ^8.2.0
@@ -855,6 +855,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mongodb-js/saslprep@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@mongodb-js/saslprep@npm:1.1.0"
+  dependencies:
+    sparse-bitfield: ^3.0.3
+  checksum: 1479a43e216734672f8eb1a2a55165b6896841bd00fb5bd645390a24374ef6c29f0f6d19a43618a19b8f1912fcbd2b2cc2210a62361103d1f28dce6852cf31d4
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -927,14 +936,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@redis/client@npm:1.5.8":
-  version: 1.5.8
-  resolution: "@redis/client@npm:1.5.8"
+"@redis/client@npm:1.5.9":
+  version: 1.5.9
+  resolution: "@redis/client@npm:1.5.9"
   dependencies:
     cluster-key-slot: 1.1.2
     generic-pool: 3.9.0
     yallist: 4.0.0
-  checksum: ff4a6cbf4f132baad7e481cd4a60af7031a3528e290a646695a9a3be704ed5818f50e9676070c8bad5e4b18d99369b46fcdc052ef6c023fa2391be8696808ff1
+  checksum: 63ff34faca3ac076c76234901a47897a39bc971ab988508087d1513903b533620c54ee09a28f11b3d7b07464e239b6e756d76cc50694ed5b59418c514d2bf923
   languageName: node
   linkType: hard
 
@@ -965,12 +974,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@redis/time-series@npm:1.0.4":
-  version: 1.0.4
-  resolution: "@redis/time-series@npm:1.0.4"
+"@redis/time-series@npm:1.0.5":
+  version: 1.0.5
+  resolution: "@redis/time-series@npm:1.0.5"
   peerDependencies:
     "@redis/client": ^1.0.0
-  checksum: a5fca079deb04a2f204a7f9a375a6ff698a119d5dd53f7581fa8fd9e3bacacf1ecb0253b97fada484a012fea7a98014bc0f4f79707d4e92ff61c00318f2bfe04
+  checksum: 6bbdb0b793dcbd13518aa60a09a980f953554e4c745bfacc1611baa8098f360e0378e8ee6b7faf600a67f1de83f4b68bbec6f95a0740faee6164c14be3a30752
   languageName: node
   linkType: hard
 
@@ -1829,14 +1838,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"better-sqlite3@npm:^8.5.1":
-  version: 8.5.1
-  resolution: "better-sqlite3@npm:8.5.1"
+"better-sqlite3@npm:^8.5.2":
+  version: 8.5.2
+  resolution: "better-sqlite3@npm:8.5.2"
   dependencies:
     bindings: ^1.5.0
     node-gyp: latest
     prebuild-install: ^7.1.0
-  checksum: ba06e7ae5d150f8d9dc77daff6299689476337b820fd82dae5bd844d39009c605e595758145b453362dc68e37041c285ae4cc73d63028b9e4a085b5ad2d3a2c4
+  checksum: c9b3bdc1e2b8458d42769aa370d602206696d3dd5486b17f773dc4c39070effedb6c4bc0a3d3540d07db33965ec5a5a97567054e31b80d54ed81e6b0f01e7c6d
   languageName: node
   linkType: hard
 
@@ -4601,22 +4610,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:~5.7.0":
-  version: 5.7.0
-  resolution: "mongodb@npm:5.7.0"
+"mongodb@npm:~5.8.1":
+  version: 5.8.1
+  resolution: "mongodb@npm:5.8.1"
   dependencies:
+    "@mongodb-js/saslprep": ^1.1.0
     bson: ^5.4.0
     mongodb-connection-string-url: ^2.6.0
-    saslprep: ^1.0.3
     socks: ^2.7.1
   peerDependencies:
-    "@aws-sdk/credential-providers": ^3.201.0
-    "@mongodb-js/zstd": ^1.1.0
-    kerberos: ^2.0.1
+    "@aws-sdk/credential-providers": ^3.188.0
+    "@mongodb-js/zstd": ^1.0.0
+    kerberos: ^1.0.0 || ^2.0.0
     mongodb-client-encryption: ">=2.3.0 <3"
     snappy: ^7.2.2
   dependenciesMeta:
-    saslprep:
+    "@mongodb-js/saslprep":
       optional: true
   peerDependenciesMeta:
     "@aws-sdk/credential-providers":
@@ -4629,7 +4638,7 @@ __metadata:
       optional: true
     snappy:
       optional: true
-  checksum: 16357b6229abac165aecea15a6efa873ec8662a00411ecb9e49853f05a590be31aab63d404486125778eedaafe76d70e84eea682fa89b138decc247f4870d2ec
+  checksum: da8fc05952266f9b636000d74e6c8889306fc287922651526029a61ede3c75f793edb504a02c1f64fec9fea9aa17323bf95eb4902776778a1def5eba07b32b72
   languageName: node
   linkType: hard
 
@@ -5337,17 +5346,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redis@npm:^4.6.7":
-  version: 4.6.7
-  resolution: "redis@npm:4.6.7"
+"redis@npm:^4.6.8":
+  version: 4.6.8
+  resolution: "redis@npm:4.6.8"
   dependencies:
     "@redis/bloom": 1.2.0
-    "@redis/client": 1.5.8
+    "@redis/client": 1.5.9
     "@redis/graph": 1.1.0
     "@redis/json": 1.0.4
     "@redis/search": 1.1.3
-    "@redis/time-series": 1.0.4
-  checksum: d48ff22269d9f22962b40ecd7623c10ad18a26aaffea0987cf80d9ba4f5d72708c6d2782062e6fc1f4255e6aa111b3356e48f636ef26aa0cc75864470d1e60f8
+    "@redis/time-series": 1.0.5
+  checksum: 1626d0d739e5f2047824b77b472967af5938fba488a039bd0a5ad90814eb81cb29b7939e16adf0bc39b133165ec1bf147e4f944d0c54a2f9c32c8f004b015940
   languageName: node
   linkType: hard
 
@@ -5636,15 +5645,6 @@ __metadata:
   version: 2.1.2
   resolution: "safer-buffer@npm:2.1.2"
   checksum: cab8f25ae6f1434abee8d80023d7e72b598cf1327164ddab31003c51215526801e40b66c5e65d658a0af1e9d6478cadcb4c745f4bd6751f97d8644786c0978b0
-  languageName: node
-  linkType: hard
-
-"saslprep@npm:^1.0.3":
-  version: 1.0.3
-  resolution: "saslprep@npm:1.0.3"
-  dependencies:
-    sparse-bitfield: ^3.0.3
-  checksum: 4fdc0b70fb5e523f977de405e12cca111f1f10dd68a0cfae0ca52c1a7919a94d1556598ba2d35f447655c3b32879846c77f9274c90806f6673248ae3cea6ee43
   languageName: node
   linkType: hard
 
