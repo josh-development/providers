@@ -7,38 +7,32 @@ All notable changes to this project will be documented in this file.
 """
 body = """
 {% if version %}\
-    # [{{ version | trim_start_matches(pat="v") }}]\
-    {% if previous %}\
-        {% if previous.version %}\
-            (https://github.com/josh-development/utilities/compare/{{ previous.version }}...{{ version }})\
-        {% else %}\
-            (https://github.com/josh-development/utilities/tree/{{ version }})\
-        {% endif %}\
-    {% endif %} \
-    - ({{ timestamp | date(format="%Y-%m-%d") }})
+  # [{{ version | trim_start_matches(pat="v") }}]\
+	{% if previous %}\
+		{% if previous.version %}\
+			(https://github.com/josh-development/providers/compare/{{ previous.version }}...{{ version }})\
+		{% else %}\
+			(https://github.com/josh-development/providers/tree/{{ version }})\
+		{% endif %}\
+	{% endif %} \
+	- ({{ timestamp | date(format="%Y-%m-%d") }})
 {% else %}\
-    # [unreleased]
+	# [unreleased]
 {% endif %}\
 {% for group, commits in commits | group_by(attribute="group") %}
-    ## {{ group | upper_first }}
-    {% for commit in commits %}
-    - {% if commit.scope %}\
-      **{{commit.scope}}:** \
-      {% endif %}\
-            {{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/josh-development/utilities/commit/{{ commit.id }}))\
-    {% if commit.breaking %}\
-      
-
- {% raw %}  {% endraw %} ### 💥 Breaking Changes:
- \
-      {% for breakingChange in commit.footers %}\
-        {% raw %}  {% endraw %} - {{ breakingChange }}
-\
-      {% endfor %}\
-    {% endif %}\
-    {% endfor %}
-{% endfor %}
-
+	## {{ group | upper_first }}
+	{% for commit in commits %}
+		- {% if commit.scope %}\
+			**{{commit.scope}}:** \
+		{% endif %}\
+			{{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/josh-development/providers/commit/{{ commit.id }}))\
+		{% if commit.breaking %}\
+			{% for breakingChange in commit.footers %}\
+				\n{% raw %}  {% endraw %}- 💥 **{{ breakingChange.token }}{{ breakingChange.separator }}** {{ breakingChange.value }}\
+			{% endfor %}\
+		{% endif %}\
+	{% endfor %}
+{% endfor %}\n
 """
 trim = true
 footer = ""
