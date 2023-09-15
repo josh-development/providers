@@ -644,7 +644,7 @@ __metadata:
     "@sapphire/utilities": ^3.13.0
     "@vitest/coverage-v8": ^0.34.4
     better-serialize: ^1.0.0
-    mongodb: ~5.8.1
+    mongodb: ~6.1.0
     property-helpers: ^2.0.0
     typedoc: ^0.25.1
     typedoc-json-parser: ^9.0.0
@@ -1692,10 +1692,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bson@npm:^5.4.0":
-  version: 5.5.0
-  resolution: "bson@npm:5.5.0"
-  checksum: 61afd240dfcaaa07346c3278d42586606b4c09bd8dcf865f6d79e26ee9cf3d6b140b8347257c598f65340e26ba640f96f6a3b9b6ff2baef963a1d321fc4c281e
+"bson@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "bson@npm:6.1.0"
+  checksum: 8250c8158c22d2a0ca0e7677c0cbef9fa6341c176382b835dbf4c7f8aebdfd74d530f7225c6f3b98ca78a68aab4f1ad3d2fad54160a98b3e6ed9823b80db2e48
   languageName: node
   linkType: hard
 
@@ -4260,27 +4260,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:~5.8.1":
-  version: 5.8.1
-  resolution: "mongodb@npm:5.8.1"
+"mongodb@npm:~6.1.0":
+  version: 6.1.0
+  resolution: "mongodb@npm:6.1.0"
   dependencies:
     "@mongodb-js/saslprep": ^1.1.0
-    bson: ^5.4.0
+    bson: ^6.1.0
     mongodb-connection-string-url: ^2.6.0
-    socks: ^2.7.1
   peerDependencies:
     "@aws-sdk/credential-providers": ^3.188.0
-    "@mongodb-js/zstd": ^1.0.0
-    kerberos: ^1.0.0 || ^2.0.0
-    mongodb-client-encryption: ">=2.3.0 <3"
+    "@mongodb-js/zstd": ^1.1.0
+    gcp-metadata: ^5.2.0
+    kerberos: ^2.0.1
+    mongodb-client-encryption: ">=6.0.0 <7"
     snappy: ^7.2.2
-  dependenciesMeta:
-    "@mongodb-js/saslprep":
-      optional: true
+    socks: ^2.7.1
   peerDependenciesMeta:
     "@aws-sdk/credential-providers":
       optional: true
     "@mongodb-js/zstd":
+      optional: true
+    gcp-metadata:
       optional: true
     kerberos:
       optional: true
@@ -4288,7 +4288,9 @@ __metadata:
       optional: true
     snappy:
       optional: true
-  checksum: da8fc05952266f9b636000d74e6c8889306fc287922651526029a61ede3c75f793edb504a02c1f64fec9fea9aa17323bf95eb4902776778a1def5eba07b32b72
+    socks:
+      optional: true
+  checksum: ed60c14f0a7e2e9088ba58f29b0425bc5c00d81e3f692938e3bb887b2fdbb411935e845a8bab3faa7609e6e52e94b9705cf60fac61684d21b8bc92a5c3938964
   languageName: node
   linkType: hard
 
@@ -5329,7 +5331,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"socks@npm:^2.6.2, socks@npm:^2.7.1":
+"socks@npm:^2.6.2":
   version: 2.7.1
   resolution: "socks@npm:2.7.1"
   dependencies:
