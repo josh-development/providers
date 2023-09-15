@@ -50,7 +50,7 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
   private autoKeyCount = 0;
 
   public get version(): Semver {
-    return resolveVersion('[VI]{version}[/VI]');
+    return resolveVersion('[VI]{{inject}}[/VI]');
   }
 
   public deleteMetadata(key: string): void {
@@ -105,8 +105,11 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
   public [Method.Delete](payload: Payload.Delete): Payload.Delete {
     const { key, path } = payload;
 
-    if (path.length === 0) this.cache.delete(key);
-    else if (this[Method.Has]({ ...payload, method: Method.Has }).data) deleteProperty(this.cache.get(key), path);
+    if (path.length === 0) {
+      this.cache.delete(key);
+    } else if (this[Method.Has]({ ...payload, method: Method.Has }).data) {
+      deleteProperty(this.cache.get(key), path);
+    }
 
     return payload;
   }
@@ -114,7 +117,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
   public [Method.DeleteMany](payload: Payload.DeleteMany): Payload.DeleteMany {
     const { keys } = payload;
 
-    for (const key of keys) this.cache.delete(key);
+    for (const key of keys) {
+      this.cache.delete(key);
+    }
 
     return payload;
   }
@@ -122,7 +127,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
   public async [Method.Each](payload: Payload.Each<StoredValue>): Promise<Payload.Each<StoredValue>> {
     const { hook } = payload;
 
-    for (const key of this.cache.keys()) await hook(this.cache.get(key)!, key);
+    for (const key of this.cache.keys()) {
+      await hook(this.cache.get(key)!, key);
+    }
 
     return payload;
   }
@@ -132,8 +139,11 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
 
     payload.data = defaultValue;
 
-    if (this.cache.has(key)) payload.data = this.cache.get(key);
-    else this.cache.set(key, defaultValue);
+    if (this.cache.has(key)) {
+      payload.data = this.cache.get(key);
+    } else {
+      this.cache.set(key, defaultValue);
+    }
 
     return payload;
   }
@@ -149,14 +159,19 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
   public async [Method.Every](payload: Payload.Every<StoredValue>): Promise<Payload.Every<StoredValue>> {
     payload.data = true;
 
-    if (this.cache.size === 0) return payload;
+    if (this.cache.size === 0) {
+      return payload;
+    }
+
     if (isEveryByHookPayload(payload)) {
       const { hook } = payload;
 
       for (const [key, value] of this.cache) {
         const result = await hook(value, key);
 
-        if (result) continue;
+        if (result) {
+          continue;
+        }
 
         payload.data = false;
       }
@@ -180,7 +195,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
           return payload;
         }
 
-        if (data === value) continue;
+        if (data === value) {
+          continue;
+        }
 
         payload.data = false;
       }
@@ -197,7 +214,11 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
     if (isFilterByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const [key, value] of this.cache.entries()) if (await hook(value, key)) payload.data[key] = value;
+      for (const [key, value] of this.cache.entries()) {
+        if (await hook(value, key)) {
+          payload.data[key] = value;
+        }
+      }
     }
 
     if (isFilterByValuePayload(payload)) {
@@ -218,7 +239,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
           return payload;
         }
 
-        if (data === value) payload.data[key] = storedValue;
+        if (data === value) {
+          payload.data[key] = storedValue;
+        }
       }
     }
 
@@ -236,7 +259,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
       for (const [key, value] of this.cache.entries()) {
         const result = await hook(value, key);
 
-        if (!result) continue;
+        if (!result) {
+          continue;
+        }
 
         payload.data = [key, value];
 
@@ -254,7 +279,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
       }
 
       for (const [key, storedValue] of this.cache.entries()) {
-        if (payload.data[0] !== null && payload.data[1] !== null) break;
+        if (payload.data[0] !== null && payload.data[1] !== null) {
+          break;
+        }
 
         const data = getProperty(storedValue, path, false);
 
@@ -270,7 +297,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
           return payload;
         }
 
-        if (data !== value) continue;
+        if (data !== value) {
+          continue;
+        }
 
         payload.data = [key, storedValue];
 
@@ -285,11 +314,15 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
     const { key, path } = payload;
 
     if (path.length === 0) {
-      if (this.cache.has(key)) payload.data = this.cache.get(key) as unknown as Value;
+      if (this.cache.has(key)) {
+        payload.data = this.cache.get(key) as unknown as Value;
+      }
     } else {
       const data = getProperty<Value>(this.cache.get(key), path);
 
-      if (data !== PROPERTY_NOT_FOUND) payload.data = data;
+      if (data !== PROPERTY_NOT_FOUND) {
+        payload.data = data;
+      }
     }
 
     return payload;
@@ -348,7 +381,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
     if (isMapByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const [key, value] of this.cache) payload.data.push(await hook(value, key));
+      for (const [key, value] of this.cache) {
+        payload.data.push(await hook(value, key));
+      }
     }
 
     if (isMapByPathPayload(payload)) {
@@ -357,7 +392,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
       for (const value of this.cache.values()) {
         const data = getProperty<Value>(value, path);
 
-        if (data !== PROPERTY_NOT_FOUND) payload.data.push(data);
+        if (data !== PROPERTY_NOT_FOUND) {
+          payload.data.push(data);
+        }
       }
     }
 
@@ -430,8 +467,11 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
       for (const [key, value] of this.cache.entries()) {
         const result = await hook(value, key);
 
-        if (result) payload.data.truthy[key] = value;
-        else payload.data.falsy[key] = value;
+        if (result) {
+          payload.data.truthy[key] = value;
+        } else {
+          payload.data.falsy[key] = value;
+        }
       }
     }
 
@@ -455,8 +495,11 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
           return payload;
         }
 
-        if (value === data) payload.data.truthy[key] = storedValue;
-        else payload.data.falsy[key] = storedValue;
+        if (value === data) {
+          payload.data.truthy[key] = storedValue;
+        } else {
+          payload.data.falsy[key] = storedValue;
+        }
       }
     }
 
@@ -488,7 +531,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
   }
 
   public [Method.Random](payload: Payload.Random<StoredValue>): Payload.Random<StoredValue> {
-    if (this.cache.size === 0) return { ...payload, data: [] };
+    if (this.cache.size === 0) {
+      return { ...payload, data: [] };
+    }
 
     const { count, duplicates } = payload;
 
@@ -511,16 +556,22 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
     } else {
       const randomKeys = new Set<string>();
 
-      while (randomKeys.size < count) randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
+      while (randomKeys.size < count) {
+        randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
+      }
 
-      for (const key of randomKeys) payload.data.push(this.cache.get(key)!);
+      for (const key of randomKeys) {
+        payload.data.push(this.cache.get(key)!);
+      }
     }
 
     return payload;
   }
 
   public [Method.RandomKey](payload: Payload.RandomKey): Payload.RandomKey {
-    if (this.cache.size === 0) return { ...payload, data: [] };
+    if (this.cache.size === 0) {
+      return { ...payload, data: [] };
+    }
 
     const { count, duplicates } = payload;
 
@@ -535,13 +586,19 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
     const keys = Array.from(this.cache.keys());
 
     if (duplicates) {
-      while (payload.data.length < count) payload.data.push(keys[Math.floor(Math.random() * keys.length)]);
+      while (payload.data.length < count) {
+        payload.data.push(keys[Math.floor(Math.random() * keys.length)]);
+      }
     } else {
       const randomKeys = new Set<string>();
 
-      while (randomKeys.size < count) randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
+      while (randomKeys.size < count) {
+        randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
+      }
 
-      for (const key of randomKeys) payload.data.push(key);
+      for (const key of randomKeys) {
+        payload.data.push(key);
+      }
     }
 
     return payload;
@@ -600,8 +657,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
   public [Method.Set]<Value = StoredValue>(payload: Payload.Set<Value>): Payload.Set<Value> {
     const { key, path, value } = payload;
 
-    if (path.length === 0) this.cache.set(key, value as unknown as StoredValue);
-    else {
+    if (path.length === 0) {
+      this.cache.set(key, value as unknown as StoredValue);
+    } else {
       const storedValue = this.cache.get(key);
 
       this.cache.set(key, setProperty(storedValue, path, value));
@@ -614,8 +672,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
     const { entries, overwrite } = payload;
 
     for (const { key, path, value } of entries) {
-      if (overwrite) this[Method.Set]({ method: Method.Set, errors: [], key, path, value });
-      else if (!this[Method.Has]({ method: Method.Has, errors: [], key, path }).data) {
+      if (overwrite) {
+        this[Method.Set]({ method: Method.Set, errors: [], key, path, value });
+      } else if (!this[Method.Has]({ method: Method.Has, errors: [], key, path }).data) {
         this[Method.Set]({ method: Method.Set, errors: [], key, path, value });
       }
     }
@@ -640,7 +699,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
       for (const [key, value] of this.cache) {
         const result = await hook(value, key);
 
-        if (!result) continue;
+        if (!result) {
+          continue;
+        }
 
         payload.data = true;
 
@@ -666,7 +727,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
           return payload;
         }
 
-        if (data !== value) continue;
+        if (data !== value) {
+          continue;
+        }
 
         payload.data = true;
 

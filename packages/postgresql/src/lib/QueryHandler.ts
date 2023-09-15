@@ -13,8 +13,9 @@ export class QueryHandler<StoredValue = unknown> {
 
     this.options = options;
 
-    if (typeof connectionDetails === 'string') this.sql = postgres(connectionDetails);
-    else {
+    if (typeof connectionDetails === 'string') {
+      this.sql = postgres(connectionDetails);
+    } else {
       const { host, port, database, user, password } = connectionDetails;
 
       this.sql = postgres({ host, port, database, user, password, onnotice: () => null, transform: { undefined: null } });
@@ -139,7 +140,9 @@ export class QueryHandler<StoredValue = unknown> {
   public async get(key: string): Promise<StoredValue | undefined> {
     const { tableName, disableSerialization } = this.options;
 
-    if (!(await this.has(key))) return;
+    if (!(await this.has(key))) {
+      return;
+    }
 
     const [row] = await this.sql<QueryHandler.Row[]>`
       SELECT *
@@ -160,7 +163,9 @@ export class QueryHandler<StoredValue = unknown> {
     `;
 
     return keys.reduce<Record<string, StoredValue | null>>((data, key) => {
-      if (!rows.some((row) => row.key === key)) return { ...data, [key]: null };
+      if (!rows.some((row) => row.key === key)) {
+        return { ...data, [key]: null };
+      }
 
       const row = rows.find((row) => row.key === key)!;
 
@@ -173,10 +178,10 @@ export class QueryHandler<StoredValue = unknown> {
 
     await this.sql`
       INSERT INTO ${this.sql(tableName)} ${this.sql(
-      { key, value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJsonCompatible(value)) },
-      'key',
-      'value'
-    )}
+        { key, value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJsonCompatible(value)) },
+        'key',
+        'value'
+      )}
       ON CONFLICT (key)
       DO UPDATE SET ${this.sql({ value: disableSerialization ? JSON.stringify(value) : JSON.stringify(Serialize.toJsonCompatible(value)) }, 'value')}
     `;

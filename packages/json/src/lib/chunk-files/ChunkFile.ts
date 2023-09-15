@@ -15,7 +15,9 @@ export class ChunkFile<StoredValue = unknown> extends File<StoredValue> {
   }
 
   public async fetch(): Promise<File.Data<StoredValue>> {
-    if (!this.exists) return {};
+    if (!this.exists) {
+      return {};
+    }
 
     await this.copy(this.lock.path);
 
@@ -31,8 +33,11 @@ export class ChunkFile<StoredValue = unknown> extends File<StoredValue> {
   public async save(data: File.Data<StoredValue>): Promise<void> {
     const { serialize } = this.options;
 
-    if (serialize) await this.attempt(() => writeFile(this.lock.path, JSON.stringify(Serialize.toJsonCompatible(data))));
-    else await this.lock.write(data);
+    if (serialize) {
+      await this.attempt(() => writeFile(this.lock.path, JSON.stringify(Serialize.toJsonCompatible(data))));
+    } else {
+      await this.lock.write(data);
+    }
 
     await this.lock.rename(this.path);
   }

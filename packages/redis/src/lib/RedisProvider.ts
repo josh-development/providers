@@ -40,7 +40,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   public get version(): Semver {
-    return resolveVersion('[VI]{version}[/VI]');
+    return resolveVersion('[VI]{{inject}}[/VI]');
   }
 
   private get client(): RedisClientType {
@@ -177,14 +177,19 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Every](payload: Payload.Every<StoredValue>): Promise<Payload.Every<StoredValue>> {
     payload.data = true;
 
-    if ((await this[Method.Size]({ method: Method.Size, errors: [] })).data === 0) return payload;
+    if ((await this[Method.Size]({ method: Method.Size, errors: [] })).data === 0) {
+      return payload;
+    }
+
     if (isEveryByHookPayload(payload)) {
       const { hook } = payload;
 
       for await (const { key, value } of this.iterate()) {
         const result = await hook(value, key);
 
-        if (result) continue;
+        if (result) {
+          continue;
+        }
 
         payload.data = false;
       }
@@ -208,7 +213,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           return payload;
         }
 
-        if (data === value) continue;
+        if (data === value) {
+          continue;
+        }
 
         payload.data = false;
       }
@@ -228,7 +235,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       for await (const { key, value } of this.iterate()) {
         const filterValue = await hook(value, key);
 
-        if (!filterValue) continue;
+        if (!filterValue) {
+          continue;
+        }
 
         payload.data[key] = value;
       }
@@ -252,7 +261,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           return payload;
         }
 
-        if (data === value) payload.data[key] = storedValue;
+        if (data === value) {
+          payload.data[key] = storedValue;
+        }
       }
     }
 
@@ -270,7 +281,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       for await (const { key, value } of this.iterate()) {
         const result = await hook(value, key);
 
-        if (!result) continue;
+        if (!result) {
+          continue;
+        }
 
         payload.data = [key, value];
 
@@ -282,7 +295,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       const { path, value } = payload;
 
       for await (const { key, value: storedValue } of this.iterate()) {
-        if (payload.data[0] !== null && payload.data[1] !== null) break;
+        if (payload.data[0] !== null && payload.data[1] !== null) {
+          break;
+        }
 
         const data = getProperty(storedValue, path, false);
 
@@ -298,7 +313,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           return payload;
         }
 
-        if (data !== value) continue;
+        if (data !== value) {
+          continue;
+        }
 
         payload.data = [key, storedValue];
 
@@ -313,15 +330,20 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { key, path } = payload;
     const rowString = await this.client.get(key);
 
-    if (rowString === null) return payload;
+    if (rowString === null) {
+      return payload;
+    }
 
     const row = JSON.parse(rowString) as RedisProvider.Row<StoredValue>;
 
-    if (path.length === 0) payload.data = this.deserialize(row.value) as unknown as Value;
-    else {
+    if (path.length === 0) {
+      payload.data = this.deserialize(row.value) as unknown as Value;
+    } else {
       const data = getProperty<Value>(this.deserialize(row.value), path);
 
-      if (data !== PROPERTY_NOT_FOUND) payload.data = data;
+      if (data !== PROPERTY_NOT_FOUND) {
+        payload.data = data;
+      }
     }
 
     return payload;
@@ -335,8 +357,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     for (const key of keys) {
       const rowString = await this.client.get(key);
 
-      if (rowString === null) payload.data[key] = null;
-      else {
+      if (rowString === null) {
+        payload.data[key] = null;
+      } else {
         const row = JSON.parse(rowString) as RedisProvider.Row<StoredValue>;
 
         payload.data[key] = this.deserialize(row.value);
@@ -352,12 +375,16 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if ((await this.client.exists(key)) === 1) {
       const rowString = await this.client.get(key);
 
-      if (rowString === null) return payload;
+      if (rowString === null) {
+        return payload;
+      }
 
       const row = JSON.parse(rowString) as RedisProvider.Row<StoredValue>;
 
       payload.data = hasProperty(this.deserialize(row.value), path);
-    } else payload.data = false;
+    } else {
+      payload.data = false;
+    }
 
     return payload;
   }
@@ -399,7 +426,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isMapByHookPayload(payload)) {
       const { hook } = payload;
 
-      for await (const { key, value } of this.iterate()) payload.data.push(await hook(value, key));
+      for await (const { key, value } of this.iterate()) {
+        payload.data.push(await hook(value, key));
+      }
     }
 
     if (isMapByPathPayload(payload)) {
@@ -408,7 +437,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       for await (const { value } of this.iterate()) {
         const data = getProperty<Value>(value, path);
 
-        if (data !== PROPERTY_NOT_FOUND) payload.data.push(data);
+        if (data !== PROPERTY_NOT_FOUND) {
+          payload.data.push(data);
+        }
       }
     }
 
@@ -481,8 +512,11 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       for await (const { key, value } of this.iterate()) {
         const result = await hook(value, key);
 
-        if (result) payload.data.truthy[key] = value;
-        else payload.data.falsy[key] = value;
+        if (result) {
+          payload.data.truthy[key] = value;
+        } else {
+          payload.data.falsy[key] = value;
+        }
       }
     }
 
@@ -506,8 +540,11 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           return payload;
         }
 
-        if (value === data) payload.data.truthy[key] = storedValue;
-        else payload.data.falsy[key] = storedValue;
+        if (value === data) {
+          payload.data.truthy[key] = storedValue;
+        } else {
+          payload.data.falsy[key] = storedValue;
+        }
       }
     }
 
@@ -541,7 +578,10 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Random](payload: Payload.Random<StoredValue>): Promise<Payload.Random<StoredValue>> {
     const docCount = (await this[Method.Size]({ method: Method.Size, errors: [] })).data || 0;
 
-    if (docCount === 0) return { ...payload, data: [] };
+    if (docCount === 0) {
+      return { ...payload, data: [] };
+    }
+
     if (docCount < payload.count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { count: payload.count, docCount }));
 
@@ -566,7 +606,10 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.RandomKey](payload: Payload.RandomKey): Promise<Payload.RandomKey> {
     const docCount = (await this[Method.Size]({ method: Method.Size, errors: [] })).data || 0;
 
-    if (docCount === 0) return { ...payload, data: [] };
+    if (docCount === 0) {
+      return { ...payload, data: [] };
+    }
+
     if (docCount < payload.count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }, { count: payload.count, docCount }));
 
@@ -659,7 +702,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       if (!payload.overwrite) {
         const found = (await this[Method.Has]({ method: Method.Has, errors: [], key, path })).data;
 
-        if (found) continue;
+        if (found) {
+          continue;
+        }
       }
 
       const val =
@@ -689,7 +734,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       for await (const { key, value } of this.iterate()) {
         const someValue = await hook(value, key);
 
-        if (!someValue) continue;
+        if (!someValue) {
+          continue;
+        }
 
         payload.data = true;
 
@@ -715,7 +762,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           return payload;
         }
 
-        if (data !== value) continue;
+        if (data !== value) {
+          continue;
+        }
 
         payload.data = true;
 
@@ -746,7 +795,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Values](payload: Payload.Values<StoredValue>): Promise<Payload.Values<StoredValue>> {
     const values = [];
 
-    for await (const { value } of this.iterate()) values.push(value);
+    for await (const { value } of this.iterate()) {
+      values.push(value);
+    }
 
     payload.data = values;
 
@@ -796,7 +847,9 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     for await (const key of this.client.scanIterator()) {
       const rowString = await this.client.get(key);
 
-      if (rowString === null) continue;
+      if (rowString === null) {
+        continue;
+      }
 
       const row = JSON.parse(rowString) as RedisProvider.Row<StoredValue>;
 
@@ -805,12 +858,18 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   private deserialize(value: Serialize.JsonCompatible | StoredValue): StoredValue {
-    if (this.options.disableSerialization) return value as StoredValue;
+    if (this.options.disableSerialization) {
+      return value as StoredValue;
+    }
+
     return Serialize.fromJsonCompatible(value as Serialize.JsonCompatible) as StoredValue;
   }
 
   private serialize<StoredValue>(value: StoredValue) {
-    if (this.options.disableSerialization) return value;
+    if (this.options.disableSerialization) {
+      return value;
+    }
+
     return Serialize.toJsonCompatible(value) as Serialize.JsonCompatible;
   }
 }
