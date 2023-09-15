@@ -27,7 +27,7 @@
     "@joshdb/provider": "2.0.0-next.a699598.0",
     "better-serialize": "^1.0.0",
     "redis": "^4.6.8",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@favware/cliff-jumper": "^2.1.3",
