@@ -49,7 +49,9 @@ export class File<StoredValue = unknown> {
     try {
       return callback();
     } catch (error) {
-      if (retry.attempts === 0) throw error;
+      if (retry.attempts === 0) {
+        throw error;
+      }
 
       return wait(retry.delay, this.attempt(callback, { ...retry, attempts: retry.attempts - 1 }));
     }

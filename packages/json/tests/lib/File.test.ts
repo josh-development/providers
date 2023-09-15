@@ -25,8 +25,13 @@ describe('File', () => {
     });
 
     beforeEach(async () => {
-      if (existsSync(file.path)) await rm(file.path);
-      if (existsSync(path)) await rm(path);
+      if (existsSync(file.path)) {
+        await rm(file.path);
+      }
+
+      if (existsSync(path)) {
+        await rm(path);
+      }
     });
 
     describe('with read method', () => {

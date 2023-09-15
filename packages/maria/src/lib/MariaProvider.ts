@@ -64,7 +64,7 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   public get version(): Semver {
-    return resolveVersion('[VI]{version}[/VI]');
+    return resolveVersion('[VI]{{inject}}[/VI]');
   }
 
   public override async init(context: JoshProvider.Context): Promise<JoshProvider.Context> {
@@ -129,8 +129,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Delete](payload: Payload.Delete): Promise<Payload.Delete> {
     const { key, path } = payload;
 
-    if (path.length === 0) await this.handler.delete(key);
-    else if ((await this[Method.Has]({ method: Method.Has, errors: [], key, path })).data) {
+    if (path.length === 0) {
+      await this.handler.delete(key);
+    } else if ((await this[Method.Has]({ method: Method.Has, errors: [], key, path })).data) {
       const { data } = await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
 
       deleteProperty(data, path);
@@ -151,7 +152,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Each](payload: Payload.Each<StoredValue>): Promise<Payload.Each<StoredValue>> {
     const { hook } = payload;
 
-    for (const key of await this.handler.keys()) await hook((await this.handler.get(key))!, key);
+    for (const key of await this.handler.keys()) {
+      await hook((await this.handler.get(key))!, key);
+    }
 
     return payload;
   }
@@ -183,14 +186,19 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Every](payload: Payload.Every<StoredValue>): Promise<Payload.Every<StoredValue>> {
     payload.data = true;
 
-    if ((await this[Method.Size]({ method: Method.Size, errors: [] })).data === 0) return payload;
+    if ((await this[Method.Size]({ method: Method.Size, errors: [] })).data === 0) {
+      return payload;
+    }
+
     if (isEveryByHookPayload(payload)) {
       const { hook } = payload;
 
       for (const [key, value] of await this.handler.entries()) {
         const result = await hook(value, key);
 
-        if (result) continue;
+        if (result) {
+          continue;
+        }
 
         payload.data = false;
       }
@@ -214,7 +222,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           return payload;
         }
 
-        if (data === value) continue;
+        if (data === value) {
+          continue;
+        }
 
         payload.data = false;
       }
@@ -234,7 +244,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       for (const [key, value] of await this.handler.entries()) {
         const filterValue = await hook(value, key);
 
-        if (!filterValue) continue;
+        if (!filterValue) {
+          continue;
+        }
 
         payload.data[key] = value;
       }
@@ -258,7 +270,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           return payload;
         }
 
-        if (data === value) payload.data[key] = storedValue;
+        if (data === value) {
+          payload.data[key] = storedValue;
+        }
       }
     }
 
@@ -276,7 +290,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       for (const [key, value] of await this.handler.entries()) {
         const result = await hook(value, key);
 
-        if (!result) continue;
+        if (!result) {
+          continue;
+        }
 
         payload.data = [key, value];
 
@@ -288,7 +304,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       const { path, value } = payload;
 
       for (const [key, storedValue] of await this.handler.entries()) {
-        if (payload.data[0] !== null && payload.data[1] !== null) break;
+        if (payload.data[0] !== null && payload.data[1] !== null) {
+          break;
+        }
 
         const data = getProperty(storedValue, path, false);
 
@@ -304,7 +322,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           return payload;
         }
 
-        if (data !== value) continue;
+        if (data !== value) {
+          continue;
+        }
 
         payload.data = [key, storedValue];
 
@@ -319,11 +339,15 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { key, path } = payload;
 
     if (path.length === 0) {
-      if (await this.handler.has(key)) payload.data = (await this.handler.get(key)) as unknown as Value;
+      if (await this.handler.has(key)) {
+        payload.data = (await this.handler.get(key)) as unknown as Value;
+      }
     } else {
       const data = getProperty<Value>(await this.handler.get(key), path);
 
-      if (data !== PROPERTY_NOT_FOUND) payload.data = data;
+      if (data !== PROPERTY_NOT_FOUND) {
+        payload.data = data;
+      }
     }
 
     return payload;
@@ -380,7 +404,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isMapByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const [key, value] of await this.handler.entries()) payload.data.push(await hook(value, key));
+      for (const [key, value] of await this.handler.entries()) {
+        payload.data.push(await hook(value, key));
+      }
     }
 
     if (isMapByPathPayload(payload)) {
@@ -389,7 +415,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       for (const value of await this.handler.values()) {
         const data = getProperty<Value>(value, path);
 
-        if (data !== PROPERTY_NOT_FOUND) payload.data.push(data);
+        if (data !== PROPERTY_NOT_FOUND) {
+          payload.data.push(data);
+        }
       }
     }
 
@@ -520,7 +548,10 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { count, duplicates } = payload;
     const size = await this.handler.size();
 
-    if (size === 0) return { ...payload, data: [] };
+    if (size === 0) {
+      return { ...payload, data: [] };
+    }
+
     if (size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }));
 
@@ -540,9 +571,13 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     } else {
       const randomKeys = new Set<string>();
 
-      while (randomKeys.size < count) randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
+      while (randomKeys.size < count) {
+        randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
+      }
 
-      for (const key of randomKeys) payload.data.push((await this.handler.get(key))!);
+      for (const key of randomKeys) {
+        payload.data.push((await this.handler.get(key))!);
+      }
     }
 
     return payload;
@@ -552,7 +587,10 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { count, duplicates } = payload;
     const size = await this.handler.size();
 
-    if (size === 0) return { ...payload, data: [] };
+    if (size === 0) {
+      return { ...payload, data: [] };
+    }
+
     if (size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }));
 
@@ -564,13 +602,19 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const keys = await this.handler.keys();
 
     if (duplicates) {
-      while (payload.data.length < count) payload.data.push(keys[Math.floor(Math.random() * size)]);
+      while (payload.data.length < count) {
+        payload.data.push(keys[Math.floor(Math.random() * size)]);
+      }
     } else {
       const randomKeys = new Set<string>();
 
-      while (randomKeys.size < count) randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
+      while (randomKeys.size < count) {
+        randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
+      }
 
-      for (const key of randomKeys) payload.data.push(key);
+      for (const key of randomKeys) {
+        payload.data.push(key);
+      }
     }
 
     return payload;
@@ -629,8 +673,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Set]<Value = StoredValue>(payload: Payload.Set<Value>): Promise<Payload.Set<Value>> {
     const { key, path, value } = payload;
 
-    if (path.length === 0) await this.handler.set(key, value as unknown as StoredValue);
-    else {
+    if (path.length === 0) {
+      await this.handler.set(key, value as unknown as StoredValue);
+    } else {
       const storedValue = await this.handler.get(key);
 
       await this.handler.set(key, setProperty(storedValue, path, value));
@@ -645,8 +690,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const withoutPath = entries.filter(({ path }) => path.length === 0);
 
     for (const { key, path, value } of withPath) {
-      if (overwrite) await this[Method.Set]({ method: Method.Set, key, path, value, errors: [] });
-      else if (!(await this[Method.Has]({ method: Method.Has, key, path, errors: [] })).data) {
+      if (overwrite) {
+        await this[Method.Set]({ method: Method.Set, key, path, value, errors: [] });
+      } else if (!(await this[Method.Has]({ method: Method.Has, key, path, errors: [] })).data) {
         await this[Method.Set]({ method: Method.Set, key, path, value, errors: [] });
       }
     }
@@ -677,7 +723,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       for (const [key, value] of await this.handler.entries()) {
         const someValue = await hook(value, key);
 
-        if (!someValue) continue;
+        if (!someValue) {
+          continue;
+        }
 
         payload.data = true;
 
@@ -703,7 +751,9 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           return payload;
         }
 
-        if (data !== value) continue;
+        if (data !== value) {
+          continue;
+        }
 
         payload.data = true;
 

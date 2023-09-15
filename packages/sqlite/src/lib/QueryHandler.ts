@@ -17,8 +17,11 @@ export class QueryHandler<StoredValue = unknown> {
 
     this.database.pragma('synchronous = 1');
 
-    if (wal) this.database.pragma('journal_mode = wal');
-    else this.database.pragma('journal_mode = delete');
+    if (wal) {
+      this.database.pragma('journal_mode = wal');
+    } else {
+      this.database.pragma('journal_mode = delete');
+    }
 
     this.database
       .prepare(
@@ -53,7 +56,9 @@ export class QueryHandler<StoredValue = unknown> {
     const serializedKeys = JSON.parse(metadata.serializedKeys) as string[];
 
     if (serializedKeys.length && disableSerialization) {
-      for (const [key, value] of this.entries()) this.set(key, Serialize.fromJsonCompatible(value as Serialize.JsonCompatible));
+      for (const [key, value] of this.entries()) {
+        this.set(key, Serialize.fromJsonCompatible(value as Serialize.JsonCompatible));
+      }
 
       this.database
         .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>>(
@@ -66,7 +71,9 @@ export class QueryHandler<StoredValue = unknown> {
     } else if (!serializedKeys.length && !disableSerialization) {
       const entries = this.entries();
 
-      for (const [key, value] of this.entries()) this.set(key, Serialize.toJsonCompatible(value));
+      for (const [key, value] of this.entries()) {
+        this.set(key, Serialize.toJsonCompatible(value));
+      }
 
       this.database
         .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>>(
@@ -204,7 +211,9 @@ export class QueryHandler<StoredValue = unknown> {
       'value'
     >;
 
-    if (!row) return undefined;
+    if (!row) {
+      return undefined;
+    }
 
     return disableSerialization ? JSON.parse(row.value) : Serialize.fromJsonCompatible(JSON.parse(row.value));
   }

@@ -1,3 +1,3 @@
 export * from './lib/RedisProvider';
 
-export const version = '[VI]{version}[/VI]';
+export const version = '[VI]{{inject}}[/VI]';

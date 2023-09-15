@@ -39,8 +39,13 @@ export class ChunkHandler<StoredValue = unknown> {
 
     const { name, version, synchronize, serialize } = this.options;
 
-    if (!this.index.exists) await this.index.save({ name, version, autoKeyCount: 0, chunks: [], metadata: {} });
-    if (synchronize) await this.synchronize();
+    if (!this.index.exists) {
+      await this.index.save({ name, version, autoKeyCount: 0, chunks: [], metadata: {} });
+    }
+
+    if (synchronize) {
+      await this.synchronize();
+    }
 
     const [index, done] = await this.useQueue();
 
@@ -56,7 +61,9 @@ export class ChunkHandler<StoredValue = unknown> {
         const file = this.getChunkFile(chunk.id);
         const data = await file.fetch();
 
-        for (const key of chunk.keys) data[key] = Serialize.toJsonCompatible(data[key]) as StoredValue;
+        for (const key of chunk.keys) {
+          data[key] = Serialize.toJsonCompatible(data[key]) as StoredValue;
+        }
       }
     }
 
@@ -74,11 +81,16 @@ export class ChunkHandler<StoredValue = unknown> {
       const file = this.getChunkFile(chunk.id);
       const data = await file.fetch();
 
-      if (data === undefined) continue;
+      if (data === undefined) {
+        continue;
+      }
 
       let keys = Object.keys(data);
 
-      if (chunk.keys.length > maxChunkSize) chunk.keys = keys.slice(0, maxChunkSize);
+      if (chunk.keys.length > maxChunkSize) {
+        chunk.keys = keys.slice(0, maxChunkSize);
+      }
+
       if (keys.length > maxChunkSize) {
         for (let i = maxChunkSize + 1; i > 0; i--) {
           Reflect.deleteProperty(data, keys[i]);
@@ -88,8 +100,17 @@ export class ChunkHandler<StoredValue = unknown> {
         await file.save(data);
       }
 
-      for (const key of keys) if (!chunk.keys.includes(key)) keys.push(key);
-      for (const key of chunk.keys) if (!keys.includes(key)) chunk.keys = chunk.keys.filter((k) => k !== key);
+      for (const key of keys) {
+        if (!chunk.keys.includes(key)) {
+          keys.push(key);
+        }
+      }
+
+      for (const key of chunk.keys) {
+        if (!keys.includes(key)) {
+          chunk.keys = chunk.keys.filter((k) => k !== key);
+        }
+      }
 
       chunks.push(chunk);
     }
@@ -134,7 +155,9 @@ export class ChunkHandler<StoredValue = unknown> {
     for (const chunkId of chunks) {
       const file = this.getChunkFile(chunkId);
 
-      if (file.exists) await file.delete();
+      if (file.exists) {
+        await file.delete();
+      }
 
       Reflect.deleteProperty(this.files, chunkId);
     }
@@ -148,7 +171,9 @@ export class ChunkHandler<StoredValue = unknown> {
   public async delete(key: string): Promise<boolean> {
     const chunkId = await this.locateChunkId(key);
 
-    if (chunkId === undefined) return false;
+    if (chunkId === undefined) {
+      return false;
+    }
 
     const file = this.getChunkFile(chunkId);
     const [index, done] = await this.useQueue();
@@ -157,7 +182,11 @@ export class ChunkHandler<StoredValue = unknown> {
     Reflect.deleteProperty(data, key);
     await file.save(data);
 
-    for (const chunk of index.chunks) if (chunk.keys.some((k) => k === key)) chunk.keys = chunk.keys.filter((k) => k !== key);
+    for (const chunk of index.chunks) {
+      if (chunk.keys.some((k) => k === key)) {
+        chunk.keys = chunk.keys.filter((k) => k !== key);
+      }
+    }
 
     await this.index.save(index);
     done();
@@ -196,7 +225,9 @@ export class ChunkHandler<StoredValue = unknown> {
       const file = this.getChunkFile(chunk.id);
       const data = await file.fetch();
 
-      if (data === undefined) continue;
+      if (data === undefined) {
+        continue;
+      }
 
       entries.push(...Object.entries(data));
     }
@@ -209,18 +240,24 @@ export class ChunkHandler<StoredValue = unknown> {
   public async get(key: string): Promise<StoredValue | undefined> {
     const chunkId = await this.locateChunkId(key);
 
-    if (chunkId === undefined) return;
+    if (chunkId === undefined) {
+      return;
+    }
 
     await this.queue.wait();
 
     const file = this.getChunkFile(chunkId);
     const data = await file.fetch();
 
-    if (data === undefined) return;
+    if (data === undefined) {
+      return;
+    }
 
     this.queue.shift();
 
-    if (!(key in data)) return;
+    if (!(key in data)) {
+      return;
+    }
 
     return data[key];
   }
@@ -234,13 +271,21 @@ export class ChunkHandler<StoredValue = unknown> {
         const file = this.getChunkFile(chunk.id);
         const data = (await file.fetch()) ?? {};
 
-        for (const [key, value] of Object.entries(data)) if (keys.includes(key)) entries[key] = value;
+        for (const [key, value] of Object.entries(data)) {
+          if (keys.includes(key)) {
+            entries[key] = value;
+          }
+        }
       }
     }
 
     done();
 
-    for (const key of keys) if (!(key in entries)) entries[key] = null;
+    for (const key of keys) {
+      if (!(key in entries)) {
+        entries[key] = null;
+      }
+    }
 
     return entries;
   }
@@ -248,7 +293,11 @@ export class ChunkHandler<StoredValue = unknown> {
   public async has(key: string): Promise<boolean> {
     const index = await this.fetchIndex();
 
-    for (const chunk of index.chunks) if (chunk.keys.some((k) => k === key)) return true;
+    for (const chunk of index.chunks) {
+      if (chunk.keys.some((k) => k === key)) {
+        return true;
+      }
+    }
 
     return false;
   }
@@ -279,7 +328,11 @@ export class ChunkHandler<StoredValue = unknown> {
       // @ts-expect-error 2345
       await this.getChunkFile(chunkId).save({ [key]: value });
     } else {
-      for (const c of index.chunks) if (c.id === chunk.id) c.keys.push(key);
+      for (const c of index.chunks) {
+        if (c.id === chunk.id) {
+          c.keys.push(key);
+        }
+      }
 
       await this.index.save(index);
 
@@ -301,13 +354,19 @@ export class ChunkHandler<StoredValue = unknown> {
       const file = this.getChunkFile(chunk.id);
       const data = (await file.fetch()) ?? {};
 
-      for (const [key, value] of entries) if (overwrite || !(key in data)) data[key] = value;
+      for (const [key, value] of entries) {
+        if (overwrite || !(key in data)) {
+          data[key] = value;
+        }
+      }
 
       entries = entries.filter(([key]) => !chunk.keys.includes(key));
 
       if (Object.keys(data).length < maxChunkSize) {
         for (const [key, value] of entries) {
-          if (Object.keys(data).length >= maxChunkSize) break;
+          if (Object.keys(data).length >= maxChunkSize) {
+            break;
+          }
 
           data[key] = value;
           entries = entries.filter(([k]) => k !== key);
@@ -320,7 +379,9 @@ export class ChunkHandler<StoredValue = unknown> {
     if (entries.length > 0) {
       const chunks = [];
 
-      while (entries.length > 0) chunks.push(entries.splice(0, maxChunkSize));
+      while (entries.length > 0) {
+        chunks.push(entries.splice(0, maxChunkSize));
+      }
 
       for (const chunk of chunks) {
         const chunkId = this.snowflake.generate().toString();
@@ -351,7 +412,9 @@ export class ChunkHandler<StoredValue = unknown> {
       const file = this.getChunkFile(chunk.id);
       const data = await file.fetch();
 
-      if (data === undefined) continue;
+      if (data === undefined) {
+        continue;
+      }
 
       values.push(...Object.values(data));
     }
@@ -380,7 +443,11 @@ export class ChunkHandler<StoredValue = unknown> {
   private async locateChunkId(key: string): Promise<string | undefined> {
     const index = await this.fetchIndex();
 
-    for (const chunk of index.chunks) if (chunk.keys.some((k) => k === key)) return chunk.id;
+    for (const chunk of index.chunks) {
+      if (chunk.keys.some((k) => k === key)) {
+        return chunk.id;
+      }
+    }
 
     return undefined;
   }
@@ -393,7 +460,9 @@ export class ChunkHandler<StoredValue = unknown> {
     for (const chunk of index.chunks.filter((chunk) => !chunk.keys.length)) {
       const file = this.getChunkFile(chunk.id);
 
-      if (file.exists) await file.delete();
+      if (file.exists) {
+        await file.delete();
+      }
 
       Reflect.deleteProperty(this.files, chunk.id);
     }

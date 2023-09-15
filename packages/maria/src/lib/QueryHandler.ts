@@ -12,7 +12,10 @@ export class QueryHandler<StoredValue = unknown> {
   }
 
   public get connection() {
-    if (!this.#connection) throw new Error('Client is not connected, most likely due to `init` not being called or the server not being available');
+    if (!this.#connection) {
+      throw new Error('Client is not connected, most likely due to `init` not being called or the server not being available');
+    }
+
     return this.#connection;
   }
 
@@ -120,7 +123,9 @@ export class QueryHandler<StoredValue = unknown> {
   public async get(key: string): Promise<StoredValue | undefined> {
     const { disableSerialization } = this.options;
 
-    if (!(await this.has(key))) return;
+    if (!(await this.has(key))) {
+      return;
+    }
 
     const [row] = (await this.connection.query(
       `
@@ -153,7 +158,9 @@ export class QueryHandler<StoredValue = unknown> {
     }
 
     for (const key of keys) {
-      if (!data[key]) data[key] = null;
+      if (!data[key]) {
+        data[key] = null;
+      }
     }
 
     return data;

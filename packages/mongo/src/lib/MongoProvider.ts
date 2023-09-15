@@ -67,7 +67,7 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   public get version(): Semver {
-    return process.env.NODE_ENV === 'test' ? { major: 2, minor: 0, patch: 0 } : resolveVersion('[VI]{version}[/VI]');
+    return process.env.NODE_ENV === 'test' ? { major: 2, minor: 0, patch: 0 } : resolveVersion('[VI]{{inject}}[/VI]');
   }
 
   private get client(): MongoClient {
@@ -111,8 +111,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       connectOptions = {}
     } = this.options;
 
-    if (typeof authentication === 'string') this.connectionURI = authentication;
-    else {
+    if (typeof authentication === 'string') {
+      this.connectionURI = authentication;
+    } else {
       const { user, password, dbName, host, port }: MongoProvider.Authentication = {
         user: authentication.user ?? MongoProvider.defaultAuthentication.user,
         password: authentication.password ?? MongoProvider.defaultAuthentication.password,
@@ -223,7 +224,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     const docs = await this._getAll();
 
-    for (const doc of docs) payload.data[doc.key] = this.deserialize(doc.value);
+    for (const doc of docs) {
+      payload.data[doc.key] = this.deserialize(doc.value);
+    }
 
     return payload;
   }
@@ -233,7 +236,10 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Every](payload: Payload.Every<StoredValue>): Promise<Payload.Every<StoredValue>> {
     payload.data = true;
 
-    if ((await this[Method.Size]({ method: Method.Size, errors: [] })).data === 0) return payload;
+    if ((await this[Method.Size]({ method: Method.Size, errors: [] })).data === 0) {
+      return payload;
+    }
+
     if (isEveryByHookPayload(payload)) {
       const { hook } = payload;
 
@@ -241,7 +247,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         const deserialized = this.deserialize(value);
         const result = await hook(deserialized, key);
 
-        if (result) continue;
+        if (result) {
+          continue;
+        }
 
         payload.data = false;
       }
@@ -266,7 +274,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           return payload;
         }
 
-        if (data === value) continue;
+        if (data === value) {
+          continue;
+        }
 
         payload.data = false;
       }
@@ -287,7 +297,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         const deserialized = this.deserialize(value);
         const filterValue = await hook(deserialized, key);
 
-        if (!filterValue) continue;
+        if (!filterValue) {
+          continue;
+        }
 
         payload.data[key] = deserialized;
       }
@@ -312,7 +324,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           return payload;
         }
 
-        if (data === value) payload.data[key] = deserialized;
+        if (data === value) {
+          payload.data[key] = deserialized;
+        }
       }
     }
 
@@ -331,7 +345,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         const deserialized = this.deserialize(value);
         const result = await hook(deserialized, key);
 
-        if (!result) continue;
+        if (!result) {
+          continue;
+        }
 
         payload.data = [key, deserialized];
 
@@ -345,7 +361,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       for await (const { key, value: storedValue } of this.iterate()) {
         const deserialized = this.deserialize(storedValue);
 
-        if (payload.data[0] !== null && payload.data[1] !== null) break;
+        if (payload.data[0] !== null && payload.data[1] !== null) {
+          break;
+        }
 
         const data = getProperty(deserialized, path, false);
 
@@ -361,7 +379,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           return payload;
         }
 
-        if (data !== value) continue;
+        if (data !== value) {
+          continue;
+        }
 
         payload.data = [key, deserialized];
 
@@ -385,7 +405,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     } else {
       const data = getProperty<StoredValue>(this.deserialize(doc.value), path);
 
-      if (data !== PROPERTY_NOT_FOUND) payload.data = data;
+      if (data !== PROPERTY_NOT_FOUND) {
+        payload.data = data;
+      }
     }
 
     return payload;
@@ -397,7 +419,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const { keys } = payload;
     const docs = await this.collection.find({ key: { $in: keys } }).toArray();
 
-    for (const doc of docs) payload.data[doc.key] = this.deserialize(doc.value);
+    for (const doc of docs) {
+      payload.data[doc.key] = this.deserialize(doc.value);
+    }
 
     return payload;
   }
@@ -456,7 +480,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     if (isMapByHookPayload(payload)) {
       const { hook } = payload;
 
-      for await (const { key, value } of this.iterate()) payload.data.push(await hook(this.deserialize(value), key));
+      for await (const { key, value } of this.iterate()) {
+        payload.data.push(await hook(this.deserialize(value), key));
+      }
     }
 
     if (isMapByPathPayload(payload)) {
@@ -466,7 +492,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         const deserialized = this.deserialize(value);
         const data = getProperty<Value>(deserialized, path);
 
-        if (data !== PROPERTY_NOT_FOUND) payload.data.push(data);
+        if (data !== PROPERTY_NOT_FOUND) {
+          payload.data.push(data);
+        }
       }
     }
 
@@ -540,8 +568,11 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         const deserialized = this.deserialize(value);
         const result = await hook(deserialized, key);
 
-        if (result) payload.data.truthy[key] = deserialized;
-        else payload.data.falsy[key] = deserialized;
+        if (result) {
+          payload.data.truthy[key] = deserialized;
+        } else {
+          payload.data.falsy[key] = deserialized;
+        }
       }
     }
 
@@ -566,8 +597,11 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           return payload;
         }
 
-        if (value === data) payload.data.truthy[key] = deserialized;
-        else payload.data.falsy[key] = deserialized;
+        if (value === data) {
+          payload.data.truthy[key] = deserialized;
+        } else {
+          payload.data.falsy[key] = deserialized;
+        }
       }
     }
 
@@ -601,7 +635,10 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.Random](payload: Payload.Random<StoredValue>): Promise<Payload.Random<StoredValue>> {
     const docCount = await this.collection.countDocuments({});
 
-    if (docCount === 0) return { ...payload, data: [] };
+    if (docCount === 0) {
+      return { ...payload, data: [] };
+    }
+
     if (docCount < payload.count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }));
 
@@ -611,7 +648,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const aggr: Document[] = [{ $sample: { size: payload.count } }];
     const docs = (await this.collection.aggregate(aggr).toArray()) || [];
 
-    if (docs.length > 0) payload.data = docs.map((doc) => this.deserialize(doc.value));
+    if (docs.length > 0) {
+      payload.data = docs.map((doc) => this.deserialize(doc.value));
+    }
 
     return payload;
   }
@@ -619,7 +658,10 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async [Method.RandomKey](payload: Payload.RandomKey): Promise<Payload.RandomKey> {
     const docCount = await this.collection.countDocuments({});
 
-    if (docCount === 0) return { ...payload, data: [] };
+    if (docCount === 0) {
+      return { ...payload, data: [] };
+    }
+
     if (docCount < payload.count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }));
 
@@ -629,7 +671,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     const aggr: Document[] = [{ $sample: { size: payload.count } }];
     const docs = (await this.collection.aggregate(aggr).toArray()) || [];
 
-    if (docs.length > 0) payload.data = docs.map((doc) => doc.key);
+    if (docs.length > 0) {
+      payload.data = docs.map((doc) => doc.key);
+    }
 
     return payload;
   }
@@ -711,7 +755,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       if (!payload.overwrite) {
         const found = (await this[Method.Has]({ method: Method.Has, errors: [], key, path })).data;
 
-        if (found) continue;
+        if (found) {
+          continue;
+        }
       }
 
       const val =
@@ -732,7 +778,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       });
     }
 
-    if (operations.length > 0) await this.collection.bulkWrite(operations);
+    if (operations.length > 0) {
+      await this.collection.bulkWrite(operations);
+    }
 
     return payload;
   }
@@ -754,7 +802,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
         const deserialized = this.deserialize(value);
         const someValue = await hook(deserialized, key);
 
-        if (!someValue) continue;
+        if (!someValue) {
+          continue;
+        }
 
         payload.data = true;
 
@@ -781,7 +831,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
           return payload;
         }
 
-        if (data !== value) continue;
+        if (data !== value) {
+          continue;
+        }
 
         payload.data = true;
 
@@ -824,7 +876,9 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   public async getMetadata<T = unknown>(key: string): Promise<T | undefined> {
     const doc = await this.metadata.findOne({ key });
 
-    if (!doc) return;
+    if (!doc) {
+      return;
+    }
 
     return doc.value as T;
   }
@@ -892,12 +946,18 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   private deserialize(value: Serialize.JsonCompatible | StoredValue): StoredValue {
-    if (this.options.disableSerialization) return value as StoredValue;
+    if (this.options.disableSerialization) {
+      return value as StoredValue;
+    }
+
     return Serialize.fromJsonCompatible(value as Serialize.JsonCompatible) as StoredValue;
   }
 
   private serialize(value: StoredValue) {
-    if (this.options.disableSerialization) return value;
+    if (this.options.disableSerialization) {
+      return value;
+    }
+
     return Serialize.toJsonCompatible(value) as Serialize.JsonCompatible;
   }
 

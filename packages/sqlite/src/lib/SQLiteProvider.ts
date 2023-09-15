@@ -109,11 +109,13 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
   }
 
   public get version(): Semver {
-    return process.env.NODE_ENV === 'test' ? { major: 2, minor: 0, patch: 0 } : resolveVersion('[VI]{version}[/VI]');
+    return process.env.NODE_ENV === 'test' ? { major: 2, minor: 0, patch: 0 } : resolveVersion('[VI]{{inject}}[/VI]');
   }
 
   private get handler(): QueryHandler<StoredValue> {
-    if (this._handler instanceof QueryHandler) return this._handler;
+    if (this._handler instanceof QueryHandler) {
+      return this._handler;
+    }
 
     throw this.error(SQLiteProvider.Identifiers.HandlerNotFound);
   }
@@ -125,7 +127,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 
     const { tableName, dataDirectory, wal, persistent, disableSerialization } = this.options;
 
-    if (persistent && !existsSync(dataDirectory)) await mkdir(dataDirectory, { recursive: true });
+    if (persistent && !existsSync(dataDirectory)) {
+      await mkdir(dataDirectory, { recursive: true });
+    }
 
     const database = persistent ? new Database(resolve(dataDirectory, `${tableName}.sqlite`)) : new Database(':memory:');
     const { major, minor, patch } = this.version;
@@ -185,8 +189,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
   public [Method.Delete](payload: Payload.Delete): Payload.Delete {
     const { key, path } = payload;
 
-    if (path.length === 0) this.handler.delete(key);
-    else if (this[Method.Has]({ method: Method.Has, errors: [], key, path }).data) {
+    if (path.length === 0) {
+      this.handler.delete(key);
+    } else if (this[Method.Has]({ method: Method.Has, errors: [], key, path }).data) {
       const { data } = this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
 
       deleteProperty(data, path);
@@ -207,7 +212,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
   public async [Method.Each](payload: Payload.Each<StoredValue>): Promise<Payload.Each<StoredValue>> {
     const { hook } = payload;
 
-    for (const key of this.handler.keys()) await hook(this.handler.get(key)!, key);
+    for (const key of this.handler.keys()) {
+      await hook(this.handler.get(key)!, key);
+    }
 
     return payload;
   }
@@ -217,8 +224,11 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 
     payload.data = defaultValue;
 
-    if (this[Method.Has]({ method: Method.Has, errors: [], key, path: [] }).data) payload.data = this.handler.get(key);
-    else this.handler.set(key, defaultValue);
+    if (this[Method.Has]({ method: Method.Has, errors: [], key, path: [] }).data) {
+      payload.data = this.handler.get(key);
+    } else {
+      this.handler.set(key, defaultValue);
+    }
 
     return payload;
   }
@@ -234,14 +244,19 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
   public async [Method.Every](payload: Payload.Every<StoredValue>): Promise<Payload.Every<StoredValue>> {
     payload.data = true;
 
-    if (this.handler.size() === 0) return payload;
+    if (this.handler.size() === 0) {
+      return payload;
+    }
+
     if (isEveryByHookPayload(payload)) {
       const { hook } = payload;
 
       for (const [key, value] of this.handler.entries()) {
         const result = await hook(value, key);
 
-        if (result) continue;
+        if (result) {
+          continue;
+        }
 
         payload.data = false;
       }
@@ -265,7 +280,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
           return payload;
         }
 
-        if (data === value) continue;
+        if (data === value) {
+          continue;
+        }
 
         payload.data = false;
       }
@@ -282,7 +299,11 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     if (isFilterByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const [key, value] of this.handler.entries()) if (await hook(value, key)) payload.data[key] = value;
+      for (const [key, value] of this.handler.entries()) {
+        if (await hook(value, key)) {
+          payload.data[key] = value;
+        }
+      }
     }
 
     if (isFilterByValuePayload(payload)) {
@@ -303,7 +324,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
           return payload;
         }
 
-        if (data === value) payload.data[key] = storedValue;
+        if (data === value) {
+          payload.data[key] = storedValue;
+        }
       }
     }
 
@@ -321,7 +344,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
       for (const [key, value] of this.handler.entries()) {
         const result = await hook(value, key);
 
-        if (!result) continue;
+        if (!result) {
+          continue;
+        }
 
         payload.data = [key, value];
 
@@ -339,7 +364,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
       }
 
       for (const [key, storedValue] of this.handler.entries()) {
-        if (payload.data[0] !== null && payload.data[1] !== null) break;
+        if (payload.data[0] !== null && payload.data[1] !== null) {
+          break;
+        }
 
         const data = getProperty(storedValue, path, false);
 
@@ -355,7 +382,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
           return payload;
         }
 
-        if (data !== value) continue;
+        if (data !== value) {
+          continue;
+        }
 
         payload.data = [key, storedValue];
 
@@ -370,11 +399,15 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     const { key, path } = payload;
 
     if (path.length === 0) {
-      if (this.handler.has(key)) payload.data = this.handler.get(key) as unknown as Value;
+      if (this.handler.has(key)) {
+        payload.data = this.handler.get(key) as unknown as Value;
+      }
     } else {
       const data = getProperty<Value>(this.handler.get(key), path);
 
-      if (data !== PROPERTY_NOT_FOUND) payload.data = data;
+      if (data !== PROPERTY_NOT_FOUND) {
+        payload.data = data;
+      }
     }
 
     return payload;
@@ -431,7 +464,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     if (isMapByHookPayload(payload)) {
       const { hook } = payload;
 
-      for (const [key, value] of this.handler.entries()) payload.data.push(await hook(value, key));
+      for (const [key, value] of this.handler.entries()) {
+        payload.data.push(await hook(value, key));
+      }
     }
 
     if (isMapByPathPayload(payload)) {
@@ -440,7 +475,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
       for (const value of this.handler.values()) {
         const data = getProperty<Value>(value, path);
 
-        if (data !== PROPERTY_NOT_FOUND) payload.data.push(data);
+        if (data !== PROPERTY_NOT_FOUND) {
+          payload.data.push(data);
+        }
       }
     }
 
@@ -572,7 +609,10 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     const { count, duplicates } = payload;
     const size = this.handler.size();
 
-    if (size === 0) return { ...payload, data: [] };
+    if (size === 0) {
+      return { ...payload, data: [] };
+    }
+
     if (size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { size }));
 
@@ -592,9 +632,13 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     } else {
       const randomKeys = new Set<string>();
 
-      while (randomKeys.size < count) randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
+      while (randomKeys.size < count) {
+        randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
+      }
 
-      for (const key of randomKeys) payload.data.push(this.handler.get(key)!);
+      for (const key of randomKeys) {
+        payload.data.push(this.handler.get(key)!);
+      }
     }
 
     return payload;
@@ -604,7 +648,10 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     const { count, duplicates } = payload;
     const size = this.handler.size();
 
-    if (size === 0) return { ...payload, data: [] };
+    if (size === 0) {
+      return { ...payload, data: [] };
+    }
+
     if (size < count) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }, { size }));
 
@@ -616,13 +663,19 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     const keys = this.handler.keys();
 
     if (duplicates) {
-      while (payload.data.length < count) payload.data.push(keys[Math.floor(Math.random() * size)]);
+      while (payload.data.length < count) {
+        payload.data.push(keys[Math.floor(Math.random() * size)]);
+      }
     } else {
       const randomKeys = new Set<string>();
 
-      while (randomKeys.size < count) randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
+      while (randomKeys.size < count) {
+        randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
+      }
 
-      for (const key of randomKeys) payload.data.push(key);
+      for (const key of randomKeys) {
+        payload.data.push(key);
+      }
     }
 
     return payload;
@@ -681,8 +734,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
   public [Method.Set]<Value = StoredValue>(payload: Payload.Set<Value>): Payload.Set<Value> {
     const { key, path, value } = payload;
 
-    if (path.length === 0) this.handler.set(key, value as unknown as StoredValue);
-    else {
+    if (path.length === 0) {
+      this.handler.set(key, value as unknown as StoredValue);
+    } else {
       const storedValue = this.handler.get(key);
 
       this.handler.set(key, setProperty(storedValue, path, value));
@@ -697,8 +751,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
     const withoutPath = entries.filter((entry) => entry.path.length === 0);
 
     for (const { key, path, value } of withPath) {
-      if (overwrite) this[Method.Set]({ method: Method.Set, errors: [], key, path, value });
-      else if (!this[Method.Has]({ method: Method.Has, errors: [], key, path }).data) {
+      if (overwrite) {
+        this[Method.Set]({ method: Method.Set, errors: [], key, path, value });
+      } else if (!this[Method.Has]({ method: Method.Has, errors: [], key, path }).data) {
         this[Method.Set]({ method: Method.Set, errors: [], key, path, value });
       }
     }
@@ -730,7 +785,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
       for (const [key, value] of this.handler.entries()) {
         const result = await hook(value, key);
 
-        if (!result) continue;
+        if (!result) {
+          continue;
+        }
 
         payload.data = true;
 
@@ -756,7 +813,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
           return payload;
         }
 
-        if (data !== value) continue;
+        if (data !== value) {
+          continue;
+        }
 
         payload.data = true;
 
@@ -806,8 +865,13 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
   protected fetchVersion(context: JoshProvider.Context) {
     const { tableName = context.name, dataDirectory, persistent } = this.options;
 
-    if (!persistent) return this.version;
-    if (!existsSync(resolve(dataDirectory, `${tableName}.sqlite`))) return this.version;
+    if (!persistent) {
+      return this.version;
+    }
+
+    if (!existsSync(resolve(dataDirectory, `${tableName}.sqlite`))) {
+      return this.version;
+    }
 
     const database = new Database(resolve(dataDirectory, `${tableName}.sqlite`), { fileMustExist: true });
 
@@ -817,7 +881,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 
     const table = database.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name = 'internal::autonum'`).get();
 
-    if (table !== undefined) return { major: 1, minor: 0, patch: 0 };
+    if (table !== undefined) {
+      return { major: 1, minor: 0, patch: 0 };
+    }
 
     const row = database.prepare(`SELECT version FROM 'internal_metadata' WHERE name = '${tableName}'`).get() as
       | Pick<QueryHandler.MetadataRow, 'version'>
@@ -825,7 +891,9 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 
     database.close();
 
-    if (row === undefined) return this.version;
+    if (row === undefined) {
+      return this.version;
+    }
 
     return resolveVersion(row.version);
   }
