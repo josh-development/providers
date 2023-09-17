@@ -569,9 +569,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@joshdb/eslint-config@npm:1.1.0-next.038104a.0":
-  version: 1.1.0-next.038104a.0
-  resolution: "@joshdb/eslint-config@npm:1.1.0-next.038104a.0"
+"@joshdb/eslint-config@npm:1.1.0-next.e036bff.0":
+  version: 1.1.0-next.e036bff.0
+  resolution: "@joshdb/eslint-config@npm:1.1.0-next.e036bff.0"
   dependencies:
     "@sapphire/eslint-config": ^5.0.2
     "@typescript-eslint/eslint-plugin": ^6.7.0
@@ -581,7 +581,7 @@ __metadata:
     eslint-plugin-prettier: ^5.0.0
     prettier: ^3.0.3
     typescript: ^5.2.2
-  checksum: eeb4a82c508c67d87736140d835e6bcf0adef91ec74d574d3e80cae8d581e135586d21f08309edbf969a4277eb5fa8c68293cf7adac8519849eff92c34ea7b13
+  checksum: 2f16ef5e7dc5ffea0b68ed2f6ec0c96068e091f7f58319c57c21adb0c68e7b4aff9ea252e44f84052cf256bd95f0d91e928453941e298ff556418d214d179a8a
   languageName: node
   linkType: hard
 
@@ -670,12 +670,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/prettier-config@npm:1.1.0-next.038104a.0":
-  version: 1.1.0-next.038104a.0
-  resolution: "@joshdb/prettier-config@npm:1.1.0-next.038104a.0"
+"@joshdb/prettier-config@npm:1.1.0-next.e036bff.0":
+  version: 1.1.0-next.e036bff.0
+  resolution: "@joshdb/prettier-config@npm:1.1.0-next.e036bff.0"
   dependencies:
     prettier: ^3.0.3
-  checksum: 7a864ee49f7cc374d863f68db66033f0022883d0a7df630079f40afebc9b361d68812ed21016b36f82858beb6040d8fc55b2a03e4e271540d06c7ba94347a604
+  checksum: 1394fc162cfa56d0e3ab31533207174ba0c1d738220d230e986ae1b742e9ccd31a87a883b414f8067350275cb8cc3f116cd433a2f393b64c04a66f4f213be5e5
   languageName: node
   linkType: hard
 
@@ -723,14 +723,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/ts-config@npm:1.1.0-next.038104a.0":
-  version: 1.1.0-next.038104a.0
-  resolution: "@joshdb/ts-config@npm:1.1.0-next.038104a.0"
+"@joshdb/ts-config@npm:1.1.0-next.8eae637.0":
+  version: 1.1.0-next.8eae637.0
+  resolution: "@joshdb/ts-config@npm:1.1.0-next.8eae637.0"
   dependencies:
     "@sapphire/ts-config": ^5.0.0
     tslib: ^2.6.2
     typescript: ^5.2.2
-  checksum: 9fe60861284ad9026315d97539f31411bee43d54fbb80afcba31d83eb1cfaeef8224bb4108f734324f9f04b06a5394c9ff9dd1f8217e740f2ac28fceaa306d36
+  checksum: 7de3d2638923299aad0b1bada5c0497c61a1e2fb6b37824d0750244fab10231fcf33a52f7734b188fa2bd0007997052433d3f5f12fe9c93de45c7bae8b70e730
   languageName: node
   linkType: hard
 
@@ -5135,9 +5135,9 @@ __metadata:
     "@favware/cliff-jumper": ^2.1.3
     "@favware/colorette-spinner": ^1.0.1
     "@favware/npm-deprecate": ^1.0.7
-    "@joshdb/eslint-config": 1.1.0-next.038104a.0
-    "@joshdb/prettier-config": 1.1.0-next.038104a.0
-    "@joshdb/ts-config": 1.1.0-next.038104a.0
+    "@joshdb/eslint-config": 1.1.0-next.e036bff.0
+    "@joshdb/prettier-config": 1.1.0-next.e036bff.0
+    "@joshdb/ts-config": 1.1.0-next.8eae637.0
     "@types/better-sqlite3": ^7.6.4
     "@types/node": ^20.6.0
     "@types/prompts": ^2.4.4
