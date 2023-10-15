@@ -669,7 +669,7 @@ __metadata:
     "@sapphire/utilities": ^3.13.0
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
-    postgres: ^3.3.5
+    postgres: ^3.4.0
     property-helpers: ^2.0.0
     typedoc: ^0.25.2
     typedoc-json-parser: ^9.0.1
@@ -5011,10 +5011,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postgres@npm:^3.3.5":
-  version: 3.3.5
-  resolution: "postgres@npm:3.3.5"
-  checksum: 6c7f0503b5756b72d7024daf2fa583caedddc5b8dc3523418782db5353a2c164f80b05de4adf732d17a50992b27df0f9aecfaa97eea6dccd9300c22447d84c4f
+"postgres@npm:^3.4.0":
+  version: 3.4.0
+  resolution: "postgres@npm:3.4.0"
+  checksum: b512a352103d95aa7c92188da024e7ee4b95937345903b4d5be59f7a0d21464735e4d45f8ce26601d15026c9a6061b18fb5a96c027ca56cbc5fc0f3b95f05d54
   languageName: node
   linkType: hard
 
