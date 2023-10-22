@@ -653,7 +653,7 @@ __metadata:
     "@sapphire/snowflake": ^3.5.1
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
-    mariadb: ^3.2.1
+    mariadb: ^3.2.2
     typedoc: ^0.25.2
     typedoc-json-parser: ^9.0.1
     vitest: ^0.34.6
@@ -669,7 +669,7 @@ __metadata:
     "@sapphire/utilities": ^3.13.0
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
-    mongodb: ^6.1.0
+    mongodb: ^6.2.0
     property-helpers: ^2.0.0
     typedoc: ^0.25.2
     typedoc-json-parser: ^9.0.1
@@ -1855,10 +1855,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bson@npm:^6.1.0":
-  version: 6.1.0
-  resolution: "bson@npm:6.1.0"
-  checksum: 8250c8158c22d2a0ca0e7677c0cbef9fa6341c176382b835dbf4c7f8aebdfd74d530f7225c6f3b98ca78a68aab4f1ad3d2fad54160a98b3e6ed9823b80db2e48
+"bson@npm:^6.2.0":
+  version: 6.2.0
+  resolution: "bson@npm:6.2.0"
+  checksum: 950fccd2abd0ff5a1bd3637f4697631298f1538314994ab8c9e13f1c9851d0fd042b54fe8340e00151c2acee43917ea40e64b800ceeea811b00f2de3e900c77e
   languageName: node
   linkType: hard
 
@@ -4252,16 +4252,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mariadb@npm:^3.2.1":
-  version: 3.2.1
-  resolution: "mariadb@npm:3.2.1"
+"mariadb@npm:^3.2.2":
+  version: 3.2.2
+  resolution: "mariadb@npm:3.2.2"
   dependencies:
     "@types/geojson": ^7946.0.10
     "@types/node": ^17.0.45
     denque: ^2.1.0
     iconv-lite: ^0.6.3
     lru-cache: ^10.0.1
-  checksum: 6f167790ad498f842364c9f4f9d2d604f0405336ee922b6077376df2510ce65193b3a1f1815514c9b96b79d76d9999b3806030254463887bc60961ab21b93ccb
+  checksum: 87719e4092c1941b595b60e288f4a7a41d14d03d0fec24eabcf1e98715e9976986db5236861ef69c18de192ac53c47a658d754a1b55deb9ada7e3d0879b207a7
   languageName: node
   linkType: hard
 
@@ -4527,12 +4527,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:^6.1.0":
-  version: 6.1.0
-  resolution: "mongodb@npm:6.1.0"
+"mongodb@npm:^6.2.0":
+  version: 6.2.0
+  resolution: "mongodb@npm:6.2.0"
   dependencies:
     "@mongodb-js/saslprep": ^1.1.0
-    bson: ^6.1.0
+    bson: ^6.2.0
     mongodb-connection-string-url: ^2.6.0
   peerDependencies:
     "@aws-sdk/credential-providers": ^3.188.0
@@ -4557,7 +4557,7 @@ __metadata:
       optional: true
     socks:
       optional: true
-  checksum: ed60c14f0a7e2e9088ba58f29b0425bc5c00d81e3f692938e3bb887b2fdbb411935e845a8bab3faa7609e6e52e94b9705cf60fac61684d21b8bc92a5c3938964
+  checksum: dca058e497e4d70f84509b863db33a1126f182757bc389893b31086c49ff429257e62de06f7099aba8cef8790a497f50c98fdcead6e66c451c057ed1453b2049
   languageName: node
   linkType: hard
 
