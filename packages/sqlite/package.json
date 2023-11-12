@@ -26,7 +26,7 @@
     "check-update": "cliff-jumper --dry-run"
   },
   "dependencies": {
-    "@joshdb/provider": "2.0.0-next.a699598.0",
+    "@joshdb/provider": "2.0.0-next.e352520.0",
     "@sapphire/utilities": "^3.13.0",
     "better-serialize": "^1.0.0",
     "better-sqlite3": "^8.7.0",
