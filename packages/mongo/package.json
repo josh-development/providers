@@ -30,7 +30,7 @@
     "@joshdb/provider": "2.0.0-next.a699598.0",
     "@sapphire/utilities": "^3.13.0",
     "better-serialize": "^1.0.0",
-    "mongodb": "^6.2.0",
+    "mongodb": "^6.3.0",
     "property-helpers": "^2.0.0"
   },
   "devDependencies": {
