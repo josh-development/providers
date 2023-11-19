@@ -33,7 +33,7 @@
     "property-helpers": "^2.0.0"
   },
   "devDependencies": {
-    "@favware/cliff-jumper": "^2.2.1",
+    "@favware/cliff-jumper": "^2.2.3",
     "@vitest/coverage-v8": "^0.34.6",
     "typedoc": "^0.25.3",
     "typedoc-json-parser": "^9.0.1",
