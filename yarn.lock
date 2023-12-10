@@ -787,9 +787,9 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/async-queue": ^1.5.0
-    "@sapphire/snowflake": ^3.5.1
-    "@sapphire/utilities": ^3.13.0
+    "@sapphire/async-queue": ^1.5.1
+    "@sapphire/snowflake": ^3.5.2
+    "@sapphire/utilities": ^3.14.0
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
     property-helpers: ^2.0.0
@@ -805,7 +805,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.13.0
+    "@sapphire/utilities": ^3.14.0
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
     property-helpers: ^2.0.0
@@ -821,7 +821,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/snowflake": ^3.5.1
+    "@sapphire/snowflake": ^3.5.2
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
     mariadb: ^3.2.2
@@ -837,7 +837,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.13.0
+    "@sapphire/utilities": ^3.14.0
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
     mongodb: ^6.3.0
@@ -854,8 +854,8 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/snowflake": ^3.5.1
-    "@sapphire/utilities": ^3.13.0
+    "@sapphire/snowflake": ^3.5.2
+    "@sapphire/utilities": ^3.14.0
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
     postgres: ^3.4.3
@@ -908,7 +908,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.13.0
+    "@sapphire/utilities": ^3.14.0
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
     better-sqlite3: ^8.7.0
@@ -1195,10 +1195,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/async-queue@npm:^1.5.0":
-  version: 1.5.0
-  resolution: "@sapphire/async-queue@npm:1.5.0"
-  checksum: 983dbd1fd1b1798496e5edb6a0db7e4d90015160e1028f20475eab0a92625513f1e8d938bc0305811a9cec461c94e01b1e4191615ff03ba49356f568f3255250
+"@sapphire/async-queue@npm:^1.5.1":
+  version: 1.5.1
+  resolution: "@sapphire/async-queue@npm:1.5.1"
+  checksum: 1f64ab355b9f8cb861a779754d5fd01b51ada71bd2150f7b705ad3d3eee3b3d2655bc6df946dac47b7a756c406e3364178231eeab3c3cc5238b257707db781c5
   languageName: node
   linkType: hard
 
@@ -1240,10 +1240,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/snowflake@npm:^3.5.1":
-  version: 3.5.1
-  resolution: "@sapphire/snowflake@npm:3.5.1"
-  checksum: 8fc025020adab1a7a1a5d2cf07704d598cc1977b50e5fcd3a5dd239f00934dc936d3a4d5ae336e71d8bf1d88ec27aa814b34de79e38ff097b7b9ba5a7977a683
+"@sapphire/snowflake@npm:^3.5.2":
+  version: 3.5.2
+  resolution: "@sapphire/snowflake@npm:3.5.2"
+  checksum: f88ee6b167abd83868092b71d68ad36599e922948d1b77ba694c1e13afafc46d4b07914d86ad5af6841cb4b95ceaffd940affe56576362a1c7a5d28a4344f3e4
   languageName: node
   linkType: hard
 
@@ -1257,10 +1257,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/utilities@npm:3.13.0, @sapphire/utilities@npm:^3.11.0, @sapphire/utilities@npm:^3.11.2, @sapphire/utilities@npm:^3.13.0":
+"@sapphire/utilities@npm:3.13.0, @sapphire/utilities@npm:^3.11.0, @sapphire/utilities@npm:^3.11.2":
   version: 3.13.0
   resolution: "@sapphire/utilities@npm:3.13.0"
   checksum: c2f901c104459e01a24af71871294b700ff188925cf050558880486de6564792df2b7549796dd9fd6f309c12af7d4e2b2d2f4069ec9d4c27d9c3998eca3ac9a9
+  languageName: node
+  linkType: hard
+
+"@sapphire/utilities@npm:^3.14.0":
+  version: 3.14.0
+  resolution: "@sapphire/utilities@npm:3.14.0"
+  checksum: 98bea8dc12ac60696c499dbfd76cdaf2d3a04eeea73d14512e3f91808d8dd2609a3a4d9b0d4c4a76e666dfd1d2e8fa69995d34d562ae412316d013a1db5820d8
   languageName: node
   linkType: hard
 
@@ -2014,7 +2021,7 @@ __metadata:
   resolution: "benchmarks@workspace:benchmarks"
   dependencies:
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.13.0
+    "@sapphire/utilities": ^3.14.0
     "@vitest/coverage-v8": ^0.34.6
     property-helpers: ^2.0.0
   languageName: unknown
