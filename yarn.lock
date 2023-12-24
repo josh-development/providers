@@ -824,7 +824,7 @@ __metadata:
     "@sapphire/snowflake": ^3.5.2
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
-    mariadb: ^3.2.2
+    mariadb: ^3.2.3
     typedoc: ^0.25.4
     typedoc-json-parser: ^9.0.1
     vitest: ^0.34.6
@@ -894,7 +894,7 @@ __metadata:
     "@types/uuid": ^9.0.7
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
-    redis: ^4.6.11
+    redis: ^4.6.12
     typedoc: ^0.25.4
     typedoc-json-parser: ^9.0.1
     uuid: ^9.0.1
@@ -1064,14 +1064,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@redis/client@npm:1.5.12":
-  version: 1.5.12
-  resolution: "@redis/client@npm:1.5.12"
+"@redis/client@npm:1.5.13":
+  version: 1.5.13
+  resolution: "@redis/client@npm:1.5.13"
   dependencies:
     cluster-key-slot: 1.1.2
     generic-pool: 3.9.0
     yallist: 4.0.0
-  checksum: 7a095e8248130ac3e1f6a3144daf00271eec3a3fcbea2fce4088a7f893074c4e0a3845566f74f3d59beec34f212197e16ac27003bd47ed846ecd96b879893a07
+  checksum: d0ff78e8839141639c999f0e7f0507520a4a21609b57e0df30d0726dbdbdcc1dbbb15a0269ca6c04e353e4b9db186c8ab0534b47a8e5aa9453c0971541023c97
   languageName: node
   linkType: hard
 
@@ -4609,16 +4609,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mariadb@npm:^3.2.2":
-  version: 3.2.2
-  resolution: "mariadb@npm:3.2.2"
+"mariadb@npm:^3.2.3":
+  version: 3.2.3
+  resolution: "mariadb@npm:3.2.3"
   dependencies:
     "@types/geojson": ^7946.0.10
     "@types/node": ^17.0.45
     denque: ^2.1.0
     iconv-lite: ^0.6.3
     lru-cache: ^10.0.1
-  checksum: 87719e4092c1941b595b60e288f4a7a41d14d03d0fec24eabcf1e98715e9976986db5236861ef69c18de192ac53c47a658d754a1b55deb9ada7e3d0879b207a7
+  checksum: e21c2280e3f67f8934be14ae91edeaba1656b9dd48da132d6bc27a27824d65b443264c68da81231233504d4e4c6912b950466c71eafcee0744c27eac5981a321
   languageName: node
   linkType: hard
 
@@ -5614,17 +5614,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redis@npm:^4.6.11":
-  version: 4.6.11
-  resolution: "redis@npm:4.6.11"
+"redis@npm:^4.6.12":
+  version: 4.6.12
+  resolution: "redis@npm:4.6.12"
   dependencies:
     "@redis/bloom": 1.2.0
-    "@redis/client": 1.5.12
+    "@redis/client": 1.5.13
     "@redis/graph": 1.1.1
     "@redis/json": 1.0.6
     "@redis/search": 1.1.6
     "@redis/time-series": 1.0.5
-  checksum: 90c35cf30ff5b3318804a59e9692acf8145e783357ffb66bb4128d2f8e9a8fa08b485d27a651acfae833fb59a5ed7ba24bc435892ef5fdf128f2ea9dfdce33d6
+  checksum: ae8e0a2c8f2f3a20bcaaee22eaaecab5a993ecf8121429d250da29a24e676f5727a94f59828e64babc2de4c326679664d3eaffc762c32761cf83e4248fa635c2
   languageName: node
   linkType: hard
 
