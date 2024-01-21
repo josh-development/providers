@@ -28,9 +28,9 @@
   },
   "dependencies": {
     "@joshdb/provider": "2.0.0-next.a699598.0",
-    "@sapphire/async-queue": "^1.5.1",
-    "@sapphire/snowflake": "^3.5.2",
-    "@sapphire/utilities": "^3.15.2",
+    "@sapphire/async-queue": "^1.5.2",
+    "@sapphire/snowflake": "^3.5.3",
+    "@sapphire/utilities": "^3.15.3",
     "better-serialize": "^1.0.0",
     "property-helpers": "^2.0.0"
   },
