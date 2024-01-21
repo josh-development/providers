@@ -787,9 +787,9 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/async-queue": ^1.5.1
-    "@sapphire/snowflake": ^3.5.2
-    "@sapphire/utilities": ^3.15.2
+    "@sapphire/async-queue": ^1.5.2
+    "@sapphire/snowflake": ^3.5.3
+    "@sapphire/utilities": ^3.15.3
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
     property-helpers: ^2.0.0
@@ -805,7 +805,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.15.2
+    "@sapphire/utilities": ^3.15.3
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
     property-helpers: ^2.0.0
@@ -821,7 +821,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/snowflake": ^3.5.2
+    "@sapphire/snowflake": ^3.5.3
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
     mariadb: ^3.2.3
@@ -837,7 +837,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.15.2
+    "@sapphire/utilities": ^3.15.3
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
     mongodb: ^6.3.0
@@ -854,8 +854,8 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/snowflake": ^3.5.2
-    "@sapphire/utilities": ^3.15.2
+    "@sapphire/snowflake": ^3.5.3
+    "@sapphire/utilities": ^3.15.3
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
     postgres: ^3.4.3
@@ -908,7 +908,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.15.2
+    "@sapphire/utilities": ^3.15.3
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
     better-sqlite3: ^8.7.0
@@ -1195,10 +1195,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/async-queue@npm:^1.5.1":
-  version: 1.5.1
-  resolution: "@sapphire/async-queue@npm:1.5.1"
-  checksum: 1f64ab355b9f8cb861a779754d5fd01b51ada71bd2150f7b705ad3d3eee3b3d2655bc6df946dac47b7a756c406e3364178231eeab3c3cc5238b257707db781c5
+"@sapphire/async-queue@npm:^1.5.2":
+  version: 1.5.2
+  resolution: "@sapphire/async-queue@npm:1.5.2"
+  checksum: 6252e72254f33c91da4887e324f17b59708b12c603216cc45f001460fd33265844301de47ab67c8caf8383ee280b39c8427ede242bd3b50b6ccdf13a386a5f1b
   languageName: node
   linkType: hard
 
@@ -1240,10 +1240,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/snowflake@npm:^3.5.2":
-  version: 3.5.2
-  resolution: "@sapphire/snowflake@npm:3.5.2"
-  checksum: f88ee6b167abd83868092b71d68ad36599e922948d1b77ba694c1e13afafc46d4b07914d86ad5af6841cb4b95ceaffd940affe56576362a1c7a5d28a4344f3e4
+"@sapphire/snowflake@npm:^3.5.3":
+  version: 3.5.3
+  resolution: "@sapphire/snowflake@npm:3.5.3"
+  checksum: 821add76877e2786ddb1b5cd3ee5de130610b82014972d91a99b4b7ce5475839b9a26f94de322f48a66f9ba2e2c578ffe46a60d06cbb9a36fd8fb96ef78be248
   languageName: node
   linkType: hard
 
@@ -1264,10 +1264,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/utilities@npm:^3.15.2":
-  version: 3.15.2
-  resolution: "@sapphire/utilities@npm:3.15.2"
-  checksum: c0570d9b6a20fefbf096c4ec0572274cfd160903a00d08b553ac10c7bb0b291a1fbc0d8c27fe21e357870c5402d25728ec3c611869aac56d90f77e831637cfac
+"@sapphire/utilities@npm:^3.15.3":
+  version: 3.15.3
+  resolution: "@sapphire/utilities@npm:3.15.3"
+  checksum: 2868bfcf7bf4f829e0fe9cf0dcb7969c349a1823714a805736dbded38653ed5c6042cca1e68f20193094de29688f71a0451588dc081d26f9651368d23a62f705
   languageName: node
   linkType: hard
 
@@ -2022,7 +2022,7 @@ __metadata:
   resolution: "benchmarks@workspace:benchmarks"
   dependencies:
     "@joshdb/provider": 2.0.0-next.a699598.0
-    "@sapphire/utilities": ^3.15.2
+    "@sapphire/utilities": ^3.15.3
     "@vitest/coverage-v8": ^0.34.6
     property-helpers: ^2.0.0
   languageName: unknown

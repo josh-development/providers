@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@joshdb/provider": "2.0.0-next.a699598.0",
-    "@sapphire/utilities": "^3.15.2",
+    "@sapphire/utilities": "^3.15.3",
     "better-serialize": "^1.0.0",
     "better-sqlite3": "^8.7.0",
     "property-helpers": "^2.0.0"
