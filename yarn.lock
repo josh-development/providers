@@ -919,14 +919,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/ts-config@npm:1.1.0-next.8eae637.0":
-  version: 1.1.0-next.8eae637.0
-  resolution: "@joshdb/ts-config@npm:1.1.0-next.8eae637.0"
+"@joshdb/ts-config@npm:1.1.0-next.9fd3b9d.0":
+  version: 1.1.0-next.9fd3b9d.0
+  resolution: "@joshdb/ts-config@npm:1.1.0-next.9fd3b9d.0"
   dependencies:
     "@sapphire/ts-config": ^5.0.0
     tslib: ^2.6.2
-    typescript: ^5.2.2
-  checksum: 7de3d2638923299aad0b1bada5c0497c61a1e2fb6b37824d0750244fab10231fcf33a52f7734b188fa2bd0007997052433d3f5f12fe9c93de45c7bae8b70e730
+    typescript: ^5.3.3
+  checksum: a901fbe7b56791c3d51f7280310ee8372c6f0e8cfa4e6b9d2af996458956b933c2affd6f4bef1d5c19c0feaafce3f03ccee139bb867837d39a1d848e022cfc17
   languageName: node
   linkType: hard
 
@@ -5828,7 +5828,7 @@ __metadata:
     "@favware/npm-deprecate": ^1.0.7
     "@joshdb/eslint-config": 1.1.0-next.e036bff.0
     "@joshdb/prettier-config": 1.1.0-next.e036bff.0
-    "@joshdb/ts-config": 1.1.0-next.8eae637.0
+    "@joshdb/ts-config": 1.1.0-next.9fd3b9d.0
     "@types/better-sqlite3": ^7.6.8
     "@types/node": ^20.10.6
     "@types/prompts": ^2.4.9
