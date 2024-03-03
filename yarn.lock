@@ -840,7 +840,7 @@ __metadata:
     "@sapphire/utilities": ^3.15.3
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
-    mongodb: ^6.3.0
+    mongodb: ^6.4.0
     property-helpers: ^2.0.0
     typedoc: ^0.25.6
     typedoc-json-parser: ^9.0.1
@@ -2117,10 +2117,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bson@npm:^6.2.0":
-  version: 6.2.0
-  resolution: "bson@npm:6.2.0"
-  checksum: 950fccd2abd0ff5a1bd3637f4697631298f1538314994ab8c9e13f1c9851d0fd042b54fe8340e00151c2acee43917ea40e64b800ceeea811b00f2de3e900c77e
+"bson@npm:^6.4.0":
+  version: 6.4.0
+  resolution: "bson@npm:6.4.0"
+  checksum: 2f82d0d8ef2b33a6e7b5147e3110724dc92f286a00130be08908ed39ea8afe7313724850145b29427fa368ffc4238fc9e924e50345cc9537c55c578f7a5604d6
   languageName: node
   linkType: hard
 
@@ -4885,12 +4885,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:^6.3.0":
-  version: 6.3.0
-  resolution: "mongodb@npm:6.3.0"
+"mongodb@npm:^6.4.0":
+  version: 6.4.0
+  resolution: "mongodb@npm:6.4.0"
   dependencies:
     "@mongodb-js/saslprep": ^1.1.0
-    bson: ^6.2.0
+    bson: ^6.4.0
     mongodb-connection-string-url: ^3.0.0
   peerDependencies:
     "@aws-sdk/credential-providers": ^3.188.0
@@ -4915,7 +4915,7 @@ __metadata:
       optional: true
     socks:
       optional: true
-  checksum: ebc5d9dbd1299321b6873e86eb4ea635316f97450644811db24ce2b01432b1c641def864facf2eab6f0c0c5c360c318108ea5555142f55177ca4c33991c6d7c4
+  checksum: 06f600fefeea1ad70c971d6e6b4677ab14432b1d69a2973f43e263dde3856a67036ab46b8c6bbdcbe7c7951e90685233c8a2e4e53cb76fdeafc369856d09480d
   languageName: node
   linkType: hard
 
