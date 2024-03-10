@@ -786,7 +786,7 @@ __metadata:
   resolution: "@joshdb/json@workspace:packages/json"
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.de91349.0
     "@sapphire/async-queue": ^1.5.2
     "@sapphire/snowflake": ^3.5.3
     "@sapphire/utilities": ^3.15.3
@@ -804,7 +804,7 @@ __metadata:
   resolution: "@joshdb/map@workspace:packages/map"
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.de91349.0
     "@sapphire/utilities": ^3.15.3
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
@@ -820,7 +820,7 @@ __metadata:
   resolution: "@joshdb/maria@workspace:packages/maria"
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.de91349.0
     "@sapphire/snowflake": ^3.5.3
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
@@ -836,7 +836,7 @@ __metadata:
   resolution: "@joshdb/mongo@workspace:packages/mongo"
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.de91349.0
     "@sapphire/utilities": ^3.15.3
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
@@ -853,7 +853,7 @@ __metadata:
   resolution: "@joshdb/postgresql@workspace:packages/postgresql"
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.de91349.0
     "@sapphire/snowflake": ^3.5.3
     "@sapphire/utilities": ^3.15.3
     "@vitest/coverage-v8": ^0.34.6
@@ -875,13 +875,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@joshdb/provider@npm:2.0.0-next.a699598.0":
-  version: 2.0.0-next.a699598.0
-  resolution: "@joshdb/provider@npm:2.0.0-next.a699598.0"
+"@joshdb/provider@npm:2.0.0-next.de91349.0":
+  version: 2.0.0-next.de91349.0
+  resolution: "@joshdb/provider@npm:2.0.0-next.de91349.0"
   dependencies:
-    "@sapphire/utilities": ^3.11.2
-    reflect-metadata: ^0.1.13
-  checksum: 38585c16f83a7fe433102c0cbfcccfe1c5d42c8fbad2fd1d9d41d84ba08624637ef150a26cd434b4b5f6acaf710ee0c6418da7c4717f773f3a5dc5f3fb0f60c2
+    "@sapphire/utilities": ^3.15.3
+    reflect-metadata: ^0.2.1
+  checksum: dc7fc1357cace117a6ffe669fb4ce2f115fdcd6dea960caeee4193a8281dcd0061b5283b1238c19a62edb887a9c05b962dd6dfd7f2f488daaa20190ff9f2ff6f
   languageName: node
   linkType: hard
 
@@ -890,7 +890,7 @@ __metadata:
   resolution: "@joshdb/redis@workspace:packages/redis"
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.de91349.0
     "@types/uuid": ^9.0.7
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
@@ -907,7 +907,7 @@ __metadata:
   resolution: "@joshdb/sqlite@workspace:packages/sqlite"
   dependencies:
     "@favware/cliff-jumper": ^2.2.3
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.de91349.0
     "@sapphire/utilities": ^3.15.3
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
@@ -919,14 +919,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/ts-config@npm:1.1.0-next.9fd3b9d.0":
-  version: 1.1.0-next.9fd3b9d.0
-  resolution: "@joshdb/ts-config@npm:1.1.0-next.9fd3b9d.0"
+"@joshdb/ts-config@npm:1.1.0-next.de91349.0":
+  version: 1.1.0-next.de91349.0
+  resolution: "@joshdb/ts-config@npm:1.1.0-next.de91349.0"
   dependencies:
     "@sapphire/ts-config": ^5.0.0
     tslib: ^2.6.2
     typescript: ^5.3.3
-  checksum: a901fbe7b56791c3d51f7280310ee8372c6f0e8cfa4e6b9d2af996458956b933c2affd6f4bef1d5c19c0feaafce3f03ccee139bb867837d39a1d848e022cfc17
+  checksum: f5d3a9705c4326a2b6f18d548da834c2c4864fd61520cdf1ae76fa053938f4d0594bdfbcc6d41777e9f9b5c9ffd49eba8ceb6a6a6922e21fb27226f32829456d
   languageName: node
   linkType: hard
 
@@ -1257,7 +1257,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/utilities@npm:3.13.0, @sapphire/utilities@npm:^3.11.0, @sapphire/utilities@npm:^3.11.2":
+"@sapphire/utilities@npm:3.13.0, @sapphire/utilities@npm:^3.11.0":
   version: 3.13.0
   resolution: "@sapphire/utilities@npm:3.13.0"
   checksum: c2f901c104459e01a24af71871294b700ff188925cf050558880486de6564792df2b7549796dd9fd6f309c12af7d4e2b2d2f4069ec9d4c27d9c3998eca3ac9a9
@@ -2021,7 +2021,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "benchmarks@workspace:benchmarks"
   dependencies:
-    "@joshdb/provider": 2.0.0-next.a699598.0
+    "@joshdb/provider": 2.0.0-next.de91349.0
     "@sapphire/utilities": ^3.15.3
     "@vitest/coverage-v8": ^0.34.6
     property-helpers: ^2.0.0
@@ -5629,10 +5629,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reflect-metadata@npm:^0.1.13":
-  version: 0.1.13
-  resolution: "reflect-metadata@npm:0.1.13"
-  checksum: 798d379a7b6f6455501145419505c97dd11cbc23857a386add2b9ef15963ccf15a48d9d15507afe01d4cd74116df8a213247200bac00320bd7c11ddeaa5e8fb4
+"reflect-metadata@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "reflect-metadata@npm:0.2.1"
+  checksum: 772f552a544e04b999c1bf2c868225fef10032274e9d9e315bc3e7a687a504b8b115fa71966665b9619acfd323123a941f892b593250140da809330d41564181
   languageName: node
   linkType: hard
 
@@ -5828,7 +5828,7 @@ __metadata:
     "@favware/npm-deprecate": ^1.0.7
     "@joshdb/eslint-config": 1.1.0-next.e036bff.0
     "@joshdb/prettier-config": 1.1.0-next.e036bff.0
-    "@joshdb/ts-config": 1.1.0-next.9fd3b9d.0
+    "@joshdb/ts-config": 1.1.0-next.de91349.0
     "@types/better-sqlite3": ^7.6.8
     "@types/node": ^20.10.6
     "@types/prompts": ^2.4.9

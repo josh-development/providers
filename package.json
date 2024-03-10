@@ -26,7 +26,7 @@
     "@favware/npm-deprecate": "^1.0.7",
     "@joshdb/eslint-config": "1.1.0-next.e036bff.0",
     "@joshdb/prettier-config": "1.1.0-next.e036bff.0",
-    "@joshdb/ts-config": "1.1.0-next.9fd3b9d.0",
+    "@joshdb/ts-config": "1.1.0-next.de91349.0",
     "@types/better-sqlite3": "^7.6.8",
     "@types/node": "^20.10.6",
     "@types/prompts": "^2.4.9",
