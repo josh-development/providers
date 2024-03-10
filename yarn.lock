@@ -911,7 +911,7 @@ __metadata:
     "@sapphire/utilities": ^3.15.3
     "@vitest/coverage-v8": ^0.34.6
     better-serialize: ^1.0.0
-    better-sqlite3: ^8.7.0
+    better-sqlite3: ^9.4.3
     property-helpers: ^2.0.0
     typedoc: ^0.25.6
     typedoc-json-parser: ^9.0.1
@@ -2035,14 +2035,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"better-sqlite3@npm:^8.7.0":
-  version: 8.7.0
-  resolution: "better-sqlite3@npm:8.7.0"
+"better-sqlite3@npm:^9.4.3":
+  version: 9.4.3
+  resolution: "better-sqlite3@npm:9.4.3"
   dependencies:
     bindings: ^1.5.0
     node-gyp: latest
     prebuild-install: ^7.1.1
-  checksum: f1fa38a9a0e4fcd59ececb67c60371b9638d29c19ce9af034421e8a56c9a77e799bb1411b1c3cb08bb9678e15dfb8985553a9ef4098cf5558e7207a3e019f211
+  checksum: 09e8d52e52e42f7175fd71fb8856873e9e39714a31b7739e0c6c2017b020bfa3f1cdd255ad1fe4d68140b0c74a5d043eca4d1ed8be9a080e172557bbea0deaf5
   languageName: node
   linkType: hard
 
