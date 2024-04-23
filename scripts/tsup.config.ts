@@ -11,7 +11,7 @@ export const createTsupConfig = (options: Options = {}) =>
     minify: false,
     skipNodeModulesBundle: true,
     sourcemap: true,
-    target: 'es2021',
+    target: 'es2022',
     tsconfig: relative(__dirname, resolve(process.cwd(), 'src', 'tsconfig.json')),
     keepNames: true,
     esbuildPlugins: [esbuildPluginVersionInjector(), ...(options.esbuildPlugins ?? [])],
