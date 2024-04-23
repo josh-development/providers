@@ -1,3 +1,6 @@
 {
-  "extends": ["@joshdb/ts-config", "@joshdb/ts-config/extra-strict", "@joshdb/ts-config/bundler", "@joshdb/ts-config/verbatim"]
+  "extends": ["@joshdb/ts-config", "@joshdb/ts-config/extra-strict", "@joshdb/ts-config/bundler", "@joshdb/ts-config/verbatim"],
+  "compilerOptions": {
+    "target": "ES2022"
+  }
 }
