@@ -22,8 +22,9 @@ jobs:
       - name: Store Code Coverage Report
         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4
         with:
-          name: coverage
+          name: coverage-json
           path: coverage/
+
   map:
     name: MapProvider
     runs-on: ubuntu-latest
@@ -39,8 +40,9 @@ jobs:
       - name: Store Code Coverage Report
         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4
         with:
-          name: coverage
+          name: coverage-map
           path: coverage/
+
   maria:
     name: MariaProvider
     runs-on: ubuntu-latest
@@ -66,8 +68,9 @@ jobs:
       - name: Store Code Coverage Report
         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4
         with:
-          name: coverage
+          name: coverage-maria
           path: coverage/
+
   mongo:
     name: MongoProvider
     runs-on: ubuntu-latest
@@ -78,8 +81,6 @@ jobs:
         uses: josh-development/.github/setup-node@main
         with:
           turbo: true
-          cache: yarn
-          registry-url: https://registry.yarnpkg.com/
       - name: Start Mongo Database
         uses: supercharge/mongodb-github-action@b0a1493307c4e9b82ed61f3858d606c5ff190c64 # v1.10.0
         with:
@@ -91,8 +92,9 @@ jobs:
       - name: Store Code Coverage Report
         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4
         with:
-          name: coverage
+          name: coverage-mongo
           path: coverage/
+
   postgresql:
     name: PostgreSQLProvider
     runs-on: ubuntu-latest
@@ -108,7 +110,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     steps:
       - name: Checkout Project
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
@@ -121,8 +122,9 @@ jobs:
       - name: Store Code Coverage Report
         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4
         with:
-          name: coverage
+          name: coverage-postgresql
           path: coverage/
+
   redis:
     name: RedisProvider
     runs-on: ubuntu-latest
@@ -144,8 +146,9 @@ jobs:
       - name: Store Code Coverage Report
         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4
         with:
-          name: coverage
+          name: coverage-redis
           path: coverage/
+
   sqlite:
     name: SQLiteProvider
     runs-on: ubuntu-latest
@@ -163,7 +166,7 @@ jobs:
       - name: Store Code Coverage Report
         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4
         with:
-          name: coverage
+          name: coverage-sqlite
           path: coverage/
 
   upload-coverage-report:
@@ -178,8 +181,9 @@ jobs:
       - name: Download Coverage Report
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
-          name: coverage
           path: coverage/
+          pattern: coverage-*
+          merge-multiple: true
       - name: Codecov Upload
         uses: codecov/codecov-action@54bcd8715eee62d40e33596ef5e8f0f48dbbccab # v4
         with:
