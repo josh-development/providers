@@ -1,4 +1,4 @@
-import { runProviderTest } from '@joshdb/provider/tests';
+import { runProviderTest } from 'tests';
 import { MapProvider } from '../../src';
 
 runProviderTest<typeof MapProvider>({

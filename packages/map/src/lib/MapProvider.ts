@@ -535,9 +535,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
       return { ...payload, data: [] };
     }
 
-    const { count, duplicates } = payload;
+    const { count, unique } = payload;
 
-    if (this.cache.size < count) {
+    if (this.cache.size < count && unique) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }));
 
       return payload;
@@ -547,13 +547,7 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
 
     const keys = Array.from(this.cache.keys());
 
-    if (duplicates) {
-      while (payload.data.length < count) {
-        const key = keys[Math.floor(Math.random() * keys.length)];
-
-        payload.data.push(this.cache.get(key)!);
-      }
-    } else {
+    if (unique) {
       const randomKeys = new Set<string>();
 
       while (randomKeys.size < count) {
@@ -561,6 +555,12 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
       }
 
       for (const key of randomKeys) {
+        payload.data.push(this.cache.get(key)!);
+      }
+    } else {
+      while (payload.data.length < count) {
+        const key = keys[Math.floor(Math.random() * keys.length)];
+
         payload.data.push(this.cache.get(key)!);
       }
     }
@@ -573,9 +573,9 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
       return { ...payload, data: [] };
     }
 
-    const { count, duplicates } = payload;
+    const { count, unique } = payload;
 
-    if (this.cache.size < count) {
+    if (this.cache.size < count && unique) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }));
 
       return payload;
@@ -585,11 +585,7 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
 
     const keys = Array.from(this.cache.keys());
 
-    if (duplicates) {
-      while (payload.data.length < count) {
-        payload.data.push(keys[Math.floor(Math.random() * keys.length)]);
-      }
-    } else {
+    if (unique) {
       const randomKeys = new Set<string>();
 
       while (randomKeys.size < count) {
@@ -598,6 +594,10 @@ export class MapProvider<StoredValue = unknown> extends JoshProvider<StoredValue
 
       for (const key of randomKeys) {
         payload.data.push(key);
+      }
+    } else {
+      while (payload.data.length < count) {
+        payload.data.push(keys[Math.floor(Math.random() * keys.length)]);
       }
     }
 

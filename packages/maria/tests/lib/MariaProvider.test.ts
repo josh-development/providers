@@ -1,4 +1,4 @@
-import { runProviderTest } from '@joshdb/provider/tests';
+import { runProviderTest } from 'tests';
 import { MariaProvider } from '../../src';
 
 runProviderTest<typeof MariaProvider, MariaProvider.Options, MariaProvider>({

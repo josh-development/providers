@@ -61,9 +61,9 @@ export class QueryHandler<StoredValue = unknown> {
       }
 
       this.database
-        .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>>(
-          `UPDATE 'internal_metadata' SET serializedKeys = @serializedKeys WHERE name = @name`
-        )
+        .prepare<
+          Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>
+        >(`UPDATE 'internal_metadata' SET serializedKeys = @serializedKeys WHERE name = @name`)
         .run({
           name: tableName,
           serializedKeys: JSON.stringify([])
@@ -76,9 +76,9 @@ export class QueryHandler<StoredValue = unknown> {
       }
 
       this.database
-        .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>>(
-          `UPDATE 'internal_metadata' SET serializedKeys = @serializedKeys WHERE name = @name`
-        )
+        .prepare<
+          Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>
+        >(`UPDATE 'internal_metadata' SET serializedKeys = @serializedKeys WHERE name = @name`)
         .run({
           name: tableName,
           serializedKeys: JSON.stringify(entries.map(([key]) => key))
@@ -142,9 +142,9 @@ export class QueryHandler<StoredValue = unknown> {
     autoKeyCount++;
 
     this.database
-      .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'autoKeyCount'>>(
-        `UPDATE 'internal_metadata' SET autoKeyCount = @autoKeyCount WHERE name = @name`
-      )
+      .prepare<
+        Pick<QueryHandler.MetadataRow, 'name' | 'autoKeyCount'>
+      >(`UPDATE 'internal_metadata' SET autoKeyCount = @autoKeyCount WHERE name = @name`)
       .run({ name: tableName, autoKeyCount });
 
     return autoKeyCount.toString();
@@ -251,9 +251,9 @@ export class QueryHandler<StoredValue = unknown> {
       serializedKeys.push(key);
 
       this.database
-        .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>>(
-          `UPDATE 'internal_metadata' SET serializedKeys = @serializedKeys WHERE name = @name`
-        )
+        .prepare<
+          Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>
+        >(`UPDATE 'internal_metadata' SET serializedKeys = @serializedKeys WHERE name = @name`)
         .run({ name: tableName, serializedKeys: JSON.stringify(serializedKeys) });
     }
   }
@@ -290,9 +290,9 @@ export class QueryHandler<StoredValue = unknown> {
 
     if (serializedKeys.length !== length) {
       this.database
-        .prepare<Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>>(
-          `UPDATE 'internal_metadata' SET serializedKeys = @serializedKeys WHERE name = @name`
-        )
+        .prepare<
+          Pick<QueryHandler.MetadataRow, 'name' | 'serializedKeys'>
+        >(`UPDATE 'internal_metadata' SET serializedKeys = @serializedKeys WHERE name = @name`)
         .run({
           name: tableName,
           serializedKeys: JSON.stringify(row.serializedKeys)

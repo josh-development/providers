@@ -19,6 +19,10 @@
     "docs": {
       "dependsOn": [],
       "outputs": ["docs/**"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
     }
   }
 }

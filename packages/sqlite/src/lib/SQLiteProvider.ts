@@ -606,14 +606,14 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
   }
 
   public [Method.Random](payload: Payload.Random<StoredValue>): Payload.Random<StoredValue> {
-    const { count, duplicates } = payload;
+    const { count, unique } = payload;
     const size = this.handler.size();
 
     if (size === 0) {
       return { ...payload, data: [] };
     }
 
-    if (size < count) {
+    if (size < count && unique) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { size }));
 
       return payload;
@@ -623,13 +623,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 
     const keys = this.handler.keys();
 
-    if (duplicates) {
-      while (payload.data.length < count) {
-        const key = keys[Math.floor(Math.random() * size)];
-
-        payload.data.push(this.handler.get(key)!);
-      }
-    } else {
+    if (unique) {
       const randomKeys = new Set<string>();
 
       while (randomKeys.size < count) {
@@ -639,20 +633,26 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
       for (const key of randomKeys) {
         payload.data.push(this.handler.get(key)!);
       }
+    } else {
+      while (payload.data.length < count) {
+        const key = keys[Math.floor(Math.random() * size)];
+
+        payload.data.push(this.handler.get(key)!);
+      }
     }
 
     return payload;
   }
 
   public [Method.RandomKey](payload: Payload.RandomKey): Payload.RandomKey {
-    const { count, duplicates } = payload;
+    const { count, unique } = payload;
     const size = this.handler.size();
 
     if (size === 0) {
       return { ...payload, data: [] };
     }
 
-    if (size < count) {
+    if (size < count && unique) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }, { size }));
 
       return payload;
@@ -662,11 +662,7 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 
     const keys = this.handler.keys();
 
-    if (duplicates) {
-      while (payload.data.length < count) {
-        payload.data.push(keys[Math.floor(Math.random() * size)]);
-      }
-    } else {
+    if (unique) {
       const randomKeys = new Set<string>();
 
       while (randomKeys.size < count) {
@@ -675,6 +671,10 @@ export class SQLiteProvider<StoredValue = unknown> extends JoshProvider<StoredVa
 
       for (const key of randomKeys) {
         payload.data.push(key);
+      }
+    } else {
+      while (payload.data.length < count) {
+        payload.data.push(keys[Math.floor(Math.random() * size)]);
       }
     }
 
