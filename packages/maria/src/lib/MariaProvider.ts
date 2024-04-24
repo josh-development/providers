@@ -553,7 +553,7 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     }
 
     if (size < count && unique) {
-      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }));
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { size }));
 
       return payload;
     }
