@@ -576,54 +576,78 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   public async [Method.Random](payload: Payload.Random<StoredValue>): Promise<Payload.Random<StoredValue>> {
-    const docCount = (await this[Method.Size]({ method: Method.Size, errors: [] })).data || 0;
+    const { count, unique } = payload;
+    const size = (await this[Method.Size]({ method: Method.Size, errors: [] })).data || 0;
 
-    if (docCount === 0) {
+    if (size === 0) {
       return { ...payload, data: [] };
     }
 
-    if (docCount < payload.count) {
-      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { count: payload.count, docCount }));
+    if (size < payload.count && unique) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { size }));
 
       return payload;
     }
 
-    const keys = await this[Method.Keys]({ method: Method.Keys, errors: [] });
+    const keysData = await this[Method.Keys]({ method: Method.Keys, errors: [] });
+    const keys = keysData.data || [];
 
-    keys.data = keys.data || [];
     payload.data = [];
 
-    for (let i = 0; i < payload.count; i++) {
-      const key = keys.data[Math.floor(Math.random() * keys.data.length)];
-      const getPayload = await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] });
+    if (unique) {
+      const randomKeys = new Set<string>();
 
-      payload.data.push(getPayload.data as StoredValue);
+      while (randomKeys.size < count) {
+        randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
+      }
+
+      for (const key of randomKeys) {
+        payload.data.push((await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] })).data!);
+      }
+    } else {
+      while (payload.data.length < count) {
+        const key = keys[Math.floor(Math.random() * size)];
+
+        payload.data.push((await this[Method.Get]({ method: Method.Get, errors: [], key, path: [] })).data!);
+      }
     }
 
     return payload;
   }
 
   public async [Method.RandomKey](payload: Payload.RandomKey): Promise<Payload.RandomKey> {
-    const docCount = (await this[Method.Size]({ method: Method.Size, errors: [] })).data || 0;
+    const { count, unique } = payload;
+    const size = (await this[Method.Size]({ method: Method.Size, errors: [] })).data || 0;
 
-    if (docCount === 0) {
+    if (size === 0) {
       return { ...payload, data: [] };
     }
 
-    if (docCount < payload.count) {
-      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }, { count: payload.count, docCount }));
+    if (size < payload.count) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }, { size }));
 
       return payload;
     }
 
-    const keys = await this[Method.Keys]({ method: Method.Keys, errors: [] });
+    const keysData = await this[Method.Keys]({ method: Method.Keys, errors: [] });
+    const keys = keysData.data || [];
 
-    keys.data = keys.data || [];
     payload.data = [];
-    for (let i = 0; i < payload.count; i++) {
-      const key = keys.data[Math.floor(Math.random() * keys.data.length)];
 
-      payload.data.push(key);
+    if (unique) {
+      const randomKeys = new Set<string>();
+
+      while (randomKeys.size < count) {
+        randomKeys.add(keys[Math.floor(Math.random() * keys.length)]);
+      }
+
+      for (const key of randomKeys) {
+        payload.data.push(key);
+      }
+    } else {
+      while (payload.data.length < count) {
+        payload.data.push(keys[Math.floor(Math.random() * size)]);
+      }
     }
 
     return payload;
