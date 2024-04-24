@@ -20,7 +20,12 @@ jobs:
       - name: Install Dependencies
         run: yarn --immutable
       - name: Build Tests
-        run: yarn build
+        run: yarn build -F tests
+      - name: Store Built Tests
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4
+        with:
+          name: tests-dist
+          path: tests/dist
 
   json:
     name: JSONProvider
@@ -33,6 +38,11 @@ jobs:
         uses: josh-development/.github/setup-node@main
         with:
           turbo: true
+      - name: Download Tests
+        uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
+        with:
+          path: tests/dist
+          pattern: tests-dist
       - name: Run Tests
         run: yarn workspace @joshdb/json run test
       - name: Store Code Coverage Report
@@ -52,6 +62,11 @@ jobs:
         uses: josh-development/.github/setup-node@main
         with:
           turbo: true
+      - name: Download Tests
+        uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
+        with:
+          path: tests/dist
+          pattern: tests-dist
       - name: Run Tests
         run: yarn workspace @joshdb/map run test
       - name: Store Code Coverage Report
@@ -79,8 +94,11 @@ jobs:
           mysql database: 'josh'
           mysql user: 'josh'
           mysql password: 'josh'
-      - name: Install Dependencies
-        run: yarn --immutable
+      - name: Download Tests
+        uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
+        with:
+          path: tests/dist
+          pattern: tests-dist
       - name: Run Tests
         run: yarn workspace @joshdb/maria run test
       - name: Store Code Coverage Report
@@ -104,8 +122,11 @@ jobs:
         uses: supercharge/mongodb-github-action@b0a1493307c4e9b82ed61f3858d606c5ff190c64 # v1.10.0
         with:
           mongodb-version: 5.0
-      - name: Install Dependencies
-        run: yarn --immutable
+      - name: Download Tests
+        uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
+        with:
+          path: tests/dist
+          pattern: tests-dist
       - name: Run Tests
         run: yarn workspace @joshdb/mongo run test
       - name: Store Code Coverage Report
@@ -137,6 +158,11 @@ jobs:
         uses: josh-development/.github/setup-node@main
         with:
           turbo: true
+      - name: Download Tests
+        uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
+        with:
+          path: tests/dist
+          pattern: tests-dist
       - name: Run Tests
         run: yarn workspace @joshdb/postgresql run test --coverage
       - name: Store Code Coverage Report
@@ -160,8 +186,11 @@ jobs:
         uses: supercharge/redis-github-action@ea9b21c6ecece47bd99595c532e481390ea0f044 # 1.8.0
         with:
           redis-version: 6
-      - name: Install Dependencies
-        run: yarn --immutable
+      - name: Download Tests
+        uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
+        with:
+          path: tests/dist
+          pattern: tests-dist
       - name: Run Tests
         run: yarn workspace @joshdb/redis run test --coverage
       - name: Store Code Coverage Report
@@ -181,8 +210,11 @@ jobs:
         uses: josh-development/.github/setup-node@main
         with:
           turbo: true
-      - name: Install Dependencies
-        run: yarn --immutable
+      - name: Download Tests
+        uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
+        with:
+          path: tests/dist
+          pattern: tests-dist
       - name: Run Tests
         run: yarn workspace @joshdb/sqlite run test --coverage
       - name: Store Code Coverage Report
