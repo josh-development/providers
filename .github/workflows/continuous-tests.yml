@@ -41,8 +41,8 @@ jobs:
       - name: Download Tests
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
+          name: tests-dist
           path: tests/dist
-          pattern: tests-dist
       - name: Run Tests
         run: yarn workspace @joshdb/json run test
       - name: Store Code Coverage Report
@@ -65,8 +65,8 @@ jobs:
       - name: Download Tests
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
+          name: tests-dist
           path: tests/dist
-          pattern: tests-dist
       - name: Run Tests
         run: yarn workspace @joshdb/map run test
       - name: Store Code Coverage Report
@@ -97,8 +97,8 @@ jobs:
       - name: Download Tests
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
+          name: tests-dist
           path: tests/dist
-          pattern: tests-dist
       - name: Run Tests
         run: yarn workspace @joshdb/maria run test
       - name: Store Code Coverage Report
@@ -125,8 +125,8 @@ jobs:
       - name: Download Tests
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
+          name: tests-dist
           path: tests/dist
-          pattern: tests-dist
       - name: Run Tests
         run: yarn workspace @joshdb/mongo run test
       - name: Store Code Coverage Report
@@ -161,8 +161,8 @@ jobs:
       - name: Download Tests
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
+          name: tests-dist
           path: tests/dist
-          pattern: tests-dist
       - name: Run Tests
         run: yarn workspace @joshdb/postgresql run test --coverage
       - name: Store Code Coverage Report
@@ -189,8 +189,8 @@ jobs:
       - name: Download Tests
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
+          name: tests-dist
           path: tests/dist
-          pattern: tests-dist
       - name: Run Tests
         run: yarn workspace @joshdb/redis run test --coverage
       - name: Store Code Coverage Report
@@ -213,8 +213,8 @@ jobs:
       - name: Download Tests
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
+          name: tests-dist
           path: tests/dist
-          pattern: tests-dist
       - name: Run Tests
         run: yarn workspace @joshdb/sqlite run test --coverage
       - name: Store Code Coverage Report
