@@ -623,7 +623,7 @@ export class RedisProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       return { ...payload, data: [] };
     }
 
-    if (size < payload.count) {
+    if (size < payload.count && unique) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }, { size }));
 
       return payload;
