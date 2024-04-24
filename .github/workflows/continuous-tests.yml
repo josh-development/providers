@@ -88,12 +88,16 @@ jobs:
           turbo: true
       - name: Shutdown MySQL
         run: sudo service mysql stop
-      - name: Start MariaDB Instance
-        uses: getong/mariadb-action@acf7bc08e06a9c26e2a534d54284cb9a62697e7d # tag=v1.1
+      - name: Setup MariaDB
+        id: mysql
+        uses: shogo82148/actions-setup-mysql@v1
         with:
-          mysql database: 'josh'
-          mysql user: 'josh'
-          mysql password: 'josh'
+          distribution: "mariadb"
+          database: 'josh'
+          user: 'josh'
+          password: 'josh'
+      - name: Create database
+        run: mysql -ujosh -pjosh --socket ${{ steps.mysql.outputs.base-dir }}/tmp/mysql.sock -e 'CREATE DATABASE IF NOT EXISTS josh;'
       - name: Download Tests
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
