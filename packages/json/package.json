@@ -41,6 +41,7 @@
     "tsup": "^8.0.2",
     "typedoc": "^0.25.13",
     "typedoc-json-parser": "^9.0.1",
+    "typescript": "^5.4.5",
     "vitest": "^1.5.2"
   },
   "repository": {

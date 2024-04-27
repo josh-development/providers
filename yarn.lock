@@ -785,6 +785,7 @@ __metadata:
     tsup: "npm:^8.0.2"
     typedoc: "npm:^0.25.13"
     typedoc-json-parser: "npm:^9.0.1"
+    typescript: "npm:^5.4.5"
     vitest: "npm:^1.5.2"
   languageName: unknown
   linkType: soft
@@ -803,6 +804,7 @@ __metadata:
     tsup: "npm:^8.0.2"
     typedoc: "npm:^0.25.13"
     typedoc-json-parser: "npm:^9.0.1"
+    typescript: "npm:^5.4.5"
     vitest: "npm:^1.5.2"
   languageName: unknown
   linkType: soft
@@ -821,6 +823,7 @@ __metadata:
     tsup: "npm:^8.0.2"
     typedoc: "npm:^0.25.13"
     typedoc-json-parser: "npm:^9.0.1"
+    typescript: "npm:^5.4.5"
     vitest: "npm:^1.5.2"
   languageName: unknown
   linkType: soft
@@ -840,6 +843,7 @@ __metadata:
     tsup: "npm:^8.0.2"
     typedoc: "npm:^0.25.13"
     typedoc-json-parser: "npm:^9.0.1"
+    typescript: "npm:^5.4.5"
     vitest: "npm:^1.5.2"
   languageName: unknown
   linkType: soft
@@ -860,6 +864,7 @@ __metadata:
     tsup: "npm:^8.0.2"
     typedoc: "npm:^0.25.13"
     typedoc-json-parser: "npm:^9.0.1"
+    typescript: "npm:^5.4.5"
     vitest: "npm:^1.5.2"
   languageName: unknown
   linkType: soft
@@ -897,6 +902,7 @@ __metadata:
     tsup: "npm:^8.0.2"
     typedoc: "npm:^0.25.13"
     typedoc-json-parser: "npm:^9.0.1"
+    typescript: "npm:^5.4.5"
     uuid: "npm:^9.0.1"
     vitest: "npm:^1.5.2"
   languageName: unknown
@@ -917,6 +923,7 @@ __metadata:
     tsup: "npm:^8.0.2"
     typedoc: "npm:^0.25.13"
     typedoc-json-parser: "npm:^9.0.1"
+    typescript: "npm:^5.4.5"
     vitest: "npm:^1.5.2"
   languageName: unknown
   linkType: soft
@@ -1909,6 +1916,7 @@ __metadata:
     "@vitest/coverage-v8": "npm:^1.5.2"
     property-helpers: "npm:^2.0.0"
     typescript: "npm:^5.4.5"
+    vitest: "npm:^1.5.2"
   languageName: unknown
   linkType: soft
 
@@ -2677,7 +2685,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:^0.20.1":
+"esbuild@npm:^0.20.1, esbuild@npm:^0.20.2":
   version: 0.20.2
   resolution: "esbuild@npm:0.20.2"
   dependencies:
@@ -5235,6 +5243,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:^7.7.1"
     "@vitest/coverage-v8": "npm:^1.5.2"
     colorette: "npm:^2.0.20"
+    esbuild: "npm:^0.20.2"
     esbuild-plugin-polyfill-node: "npm:^0.3.0"
     esbuild-plugin-version-injector: "npm:^1.2.1"
     eslint: "npm:^8.57.0"
