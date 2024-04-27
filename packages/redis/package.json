@@ -34,6 +34,7 @@
     "@types/uuid": "^9.0.8",
     "@vitest/coverage-v8": "^1.5.2",
     "tests": "workspace:*",
+    "tsup": "^8.0.2",
     "typedoc": "^0.25.13",
     "typedoc-json-parser": "^9.0.1",
     "vitest": "^1.5.2"
