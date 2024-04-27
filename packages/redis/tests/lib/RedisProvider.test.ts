@@ -1,4 +1,4 @@
-import { runProviderTest } from '@joshdb/provider/tests';
+import { runProviderTest } from 'tests';
 import { RedisProvider } from '../../src';
 
 runProviderTest<typeof RedisProvider, RedisProvider.Options, RedisProvider>({

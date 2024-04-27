@@ -545,15 +545,15 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   public async [Method.Random](payload: Payload.Random<StoredValue>): Promise<Payload.Random<StoredValue>> {
-    const { count, duplicates } = payload;
+    const { count, unique } = payload;
     const size = await this.handler.size();
 
     if (size === 0) {
       return { ...payload, data: [] };
     }
 
-    if (size < count) {
-      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }));
+    if (size < count && unique) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { size }));
 
       return payload;
     }
@@ -562,13 +562,7 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     const keys = await this.handler.keys();
 
-    if (duplicates) {
-      while (payload.data.length < count) {
-        const key = keys[Math.floor(Math.random() * size)];
-
-        payload.data.push((await this.handler.get(key))!);
-      }
-    } else {
+    if (unique) {
       const randomKeys = new Set<string>();
 
       while (randomKeys.size < count) {
@@ -578,20 +572,26 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
       for (const key of randomKeys) {
         payload.data.push((await this.handler.get(key))!);
       }
+    } else {
+      while (payload.data.length < count) {
+        const key = keys[Math.floor(Math.random() * size)];
+
+        payload.data.push((await this.handler.get(key))!);
+      }
     }
 
     return payload;
   }
 
   public async [Method.RandomKey](payload: Payload.RandomKey): Promise<Payload.RandomKey> {
-    const { count, duplicates } = payload;
+    const { count, unique } = payload;
     const size = await this.handler.size();
 
     if (size === 0) {
       return { ...payload, data: [] };
     }
 
-    if (size < count) {
+    if (size < count && unique) {
       payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }));
 
       return payload;
@@ -601,11 +601,7 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
     const keys = await this.handler.keys();
 
-    if (duplicates) {
-      while (payload.data.length < count) {
-        payload.data.push(keys[Math.floor(Math.random() * size)]);
-      }
-    } else {
+    if (unique) {
       const randomKeys = new Set<string>();
 
       while (randomKeys.size < count) {
@@ -614,6 +610,10 @@ export class MariaProvider<StoredValue = unknown> extends JoshProvider<StoredVal
 
       for (const key of randomKeys) {
         payload.data.push(key);
+      }
+    } else {
+      while (payload.data.length < count) {
+        payload.data.push(keys[Math.floor(Math.random() * size)]);
       }
     }
 

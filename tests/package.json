@@ -1,12 +1,12 @@
 {
-  "name": "@joshdb/json",
-  "version": "2.0.0",
-  "description": "A provider for @joshdb/core which uses JSON",
+  "name": "tests",
+  "version": "1.0.0",
+  "description": "Required tests for providers.",
   "author": "Évelyne Lachance <eslachance@gmail.com> (https://evie.codes/)",
   "contributors": [
-    "Hezekiah Hendry <hezekiah.hendry@gmail.com>",
-    "DanCodes <dan@dancodes.online> (https://dancodes.online/)"
+    "Hezekiah Hendry <hezekiah.hendry@gmail.com>"
   ],
+  "private": true,
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -18,29 +18,14 @@
   },
   "sideEffects": false,
   "scripts": {
-    "test": "vitest run",
-    "docs": "typedoc-json-parser",
-    "lint": "eslint src tests --ext ts --fix -c ../../.eslintrc",
     "build": "tsup",
-    "prepack": "yarn build",
-    "bump": "cliff-jumper",
-    "check-update": "cliff-jumper --dry-run"
+    "prepack": "yarn build"
   },
   "dependencies": {
     "@joshdb/provider": "2.0.0-next.fdc1285.0",
-    "@sapphire/async-queue": "^1.5.2",
-    "@sapphire/snowflake": "^3.5.3",
     "@sapphire/utilities": "^3.15.3",
-    "better-serialize": "^1.0.0",
-    "property-helpers": "^2.0.0"
-  },
-  "devDependencies": {
-    "@favware/cliff-jumper": "^2.2.3",
-    "@vitest/coverage-v8": "^0.34.6",
-    "tests": "workspace:*",
-    "typedoc": "^0.25.6",
-    "typedoc-json-parser": "^9.0.1",
-    "vitest": "^0.34.6"
+    "@vitest/coverage-v8": "^1.5.0",
+    "vitest": "^1.5.0"
   },
   "repository": {
     "type": "git",
@@ -59,7 +44,7 @@
     "url": "https://github.com/josh-development/providers/issues"
   },
   "homepage": "https://josh.evie.dev",
-  "publishConfig": {
-    "access": "public"
+  "devDependencies": {
+    "typescript": "^5.4.5"
   }
 }

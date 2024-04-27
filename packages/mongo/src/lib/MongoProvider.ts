@@ -631,22 +631,32 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
     return payload;
   }
 
-  // Due to the use of $sample, the output will never have duplicates
   public async [Method.Random](payload: Payload.Random<StoredValue>): Promise<Payload.Random<StoredValue>> {
-    const docCount = await this.collection.countDocuments({});
+    const { count, unique } = payload;
+    const size = await this.collection.countDocuments({});
 
-    if (docCount === 0) {
+    if (size === 0) {
       return { ...payload, data: [] };
     }
 
-    if (docCount < payload.count) {
-      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }));
+    if (size < count && unique) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.Random }, { size }));
 
       return payload;
     }
 
     const aggr: Document[] = [{ $sample: { size: payload.count } }];
-    const docs = (await this.collection.aggregate(aggr).toArray()) || [];
+    let docs: Document[] = [];
+
+    if (unique) {
+      docs = docs.concat(...(await this.collection.aggregate(aggr).toArray()));
+    } else {
+      while (docs.length !== count) {
+        const foundDocs = await this.collection.aggregate(aggr).toArray();
+
+        docs = docs.concat(foundDocs.slice(0, count - docs.length));
+      }
+    }
 
     if (docs.length > 0) {
       payload.data = docs.map((doc) => this.deserialize(doc.value));
@@ -656,20 +666,31 @@ export class MongoProvider<StoredValue = unknown> extends JoshProvider<StoredVal
   }
 
   public async [Method.RandomKey](payload: Payload.RandomKey): Promise<Payload.RandomKey> {
-    const docCount = await this.collection.countDocuments({});
+    const { count, unique } = payload;
+    const size = await this.collection.countDocuments({});
 
-    if (docCount === 0) {
+    if (size === 0) {
       return { ...payload, data: [] };
     }
 
-    if (docCount < payload.count) {
-      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }));
+    if (size < payload.count && unique) {
+      payload.errors.push(this.error({ identifier: CommonIdentifiers.InvalidCount, method: Method.RandomKey }, { size }));
 
       return payload;
     }
 
     const aggr: Document[] = [{ $sample: { size: payload.count } }];
-    const docs = (await this.collection.aggregate(aggr).toArray()) || [];
+    let docs: Document[] = [];
+
+    if (unique) {
+      docs = docs.concat(...(await this.collection.aggregate(aggr).toArray()));
+    } else {
+      while (docs.length !== count) {
+        const foundDocs = await this.collection.aggregate(aggr).toArray();
+
+        docs = docs.concat(foundDocs.slice(0, count - docs.length));
+      }
+    }
 
     if (docs.length > 0) {
       payload.data = docs.map((doc) => doc.key);

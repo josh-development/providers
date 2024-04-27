@@ -1,6 +1,6 @@
 import { Method } from '@joshdb/provider';
-import { runProviderTest } from '@joshdb/provider/tests';
 import { Db, MongoClient } from 'mongodb';
+import { runProviderTest } from 'tests';
 import { MongoProvider } from '../../src';
 
 describe('Additional tests', () => {

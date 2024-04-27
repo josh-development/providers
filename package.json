@@ -2,8 +2,9 @@
   "name": "root",
   "private": true,
   "workspaces": [
+    "benchmarks",
     "packages/*",
-    "benchmarks"
+    "tests"
   ],
   "scripts": {
     "clean": "rimraf .bench \"packages/**/.tests\"  \"packages/**/dist\" \"packages/**/build\" \"packages/**/.turbo\" \"packages/**/node_modules/.cache\" node_modules/.cache",
@@ -11,7 +12,7 @@
     "docs": "turbo run docs",
     "lint": "eslint packages scripts --ext mjs,js,ts --fix",
     "format": "prettier --write \"packages/**/{src,tests}/**/*.{mjs,js,ts}\"",
-    "test": "vitest run",
+    "test": "turbo run test",
     "build": "turbo run build",
     "update": "yarn upgrade-interactive",
     "check-update": "turbo run check-update",
@@ -24,9 +25,9 @@
     "@favware/cliff-jumper": "^2.2.3",
     "@favware/colorette-spinner": "^1.0.1",
     "@favware/npm-deprecate": "^1.0.7",
-    "@joshdb/eslint-config": "1.1.0-next.e036bff.0",
-    "@joshdb/prettier-config": "1.1.0-next.e036bff.0",
-    "@joshdb/ts-config": "1.1.0-next.9fd3b9d.0",
+    "@joshdb/eslint-config": "2.0.0-next.fdc1285.0",
+    "@joshdb/prettier-config": "2.0.0-next.fdc1285.0",
+    "@joshdb/ts-config": "2.0.0-next.fdc1285.0",
     "@types/better-sqlite3": "^7.6.8",
     "@types/node": "^20.10.6",
     "@types/prompts": "^2.4.9",
@@ -47,7 +48,7 @@
     "tslib": "^2.6.2",
     "tsup": "^7.3.0",
     "turbo": "^1.11.3",
-    "typescript": "^5.3.3",
+    "typescript": "^5.4.5",
     "vitest": "^0.34.6"
   },
   "repository": {
