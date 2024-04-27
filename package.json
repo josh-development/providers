@@ -22,7 +22,7 @@
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
     "@faker-js/faker": "^8.4.1",
-    "@favware/cliff-jumper": "^2.2.3",
+    "@favware/cliff-jumper": "^3.0.3",
     "@favware/colorette-spinner": "^1.0.1",
     "@favware/npm-deprecate": "^1.0.7",
     "@joshdb/eslint-config": "2.0.0-next.fdc1285.0",
