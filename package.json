@@ -16,7 +16,7 @@
     "build": "turbo run build",
     "update": "yarn upgrade-interactive",
     "check-update": "turbo run check-update",
-    "postinstall": "husky install"
+    "postinstall": "husky"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",
