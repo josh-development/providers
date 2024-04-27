@@ -24,7 +24,7 @@ jobs:
       - name: Store Built Tests
         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4
         with:
-          name: tests-dist
+          name: dist-tests
           path: tests/dist
 
   json:
@@ -41,7 +41,7 @@ jobs:
       - name: Download Tests
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
-          name: tests-dist
+          name: dist-tests
           path: tests/dist
       - name: Run Tests
         run: yarn workspace @joshdb/json run test
@@ -65,7 +65,7 @@ jobs:
       - name: Download Tests
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
-          name: tests-dist
+          name: dist-tests
           path: tests/dist
       - name: Run Tests
         run: yarn workspace @joshdb/map run test
@@ -92,7 +92,7 @@ jobs:
         id: mysql
         uses: shogo82148/actions-setup-mysql@v1
         with:
-          distribution: "mariadb"
+          distribution: 'mariadb'
           database: 'josh'
           user: 'josh'
           password: 'josh'
@@ -101,7 +101,7 @@ jobs:
       - name: Download Tests
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
-          name: tests-dist
+          name: dist-tests
           path: tests/dist
       - name: Run Tests
         run: yarn workspace @joshdb/maria run test
@@ -129,7 +129,7 @@ jobs:
       - name: Download Tests
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
-          name: tests-dist
+          name: dist-tests
           path: tests/dist
       - name: Run Tests
         run: yarn workspace @joshdb/mongo run test
@@ -165,7 +165,7 @@ jobs:
       - name: Download Tests
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
-          name: tests-dist
+          name: dist-tests
           path: tests/dist
       - name: Run Tests
         run: yarn workspace @joshdb/postgresql run test --coverage
@@ -193,7 +193,7 @@ jobs:
       - name: Download Tests
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
-          name: tests-dist
+          name: dist-tests
           path: tests/dist
       - name: Run Tests
         run: yarn workspace @joshdb/redis run test --coverage
@@ -217,7 +217,7 @@ jobs:
       - name: Download Tests
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4
         with:
-          name: tests-dist
+          name: dist-tests
           path: tests/dist
       - name: Run Tests
         run: yarn workspace @joshdb/sqlite run test --coverage
