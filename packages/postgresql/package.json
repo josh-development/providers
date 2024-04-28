@@ -32,7 +32,7 @@
     "@sapphire/snowflake": "^3.5.3",
     "@sapphire/utilities": "^3.15.3",
     "better-serialize": "^1.0.0",
-    "postgres": "^3.4.3",
+    "postgres": "^3.4.4",
     "property-helpers": "^2.0.0"
   },
   "devDependencies": {

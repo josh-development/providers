@@ -29,7 +29,7 @@
     "@joshdb/provider": "2.0.0-next.a089b2d.0",
     "@sapphire/snowflake": "^3.5.3",
     "better-serialize": "^1.0.0",
-    "mariadb": "^3.2.3"
+    "mariadb": "^3.3.0"
   },
   "devDependencies": {
     "@favware/cliff-jumper": "^3.0.3",
