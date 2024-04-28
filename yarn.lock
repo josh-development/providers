@@ -779,7 +779,7 @@ __metadata:
     "@sapphire/snowflake": "npm:^3.5.3"
     "@sapphire/utilities": "npm:^3.15.3"
     "@vitest/coverage-v8": "npm:^1.5.2"
-    better-serialize: "npm:^1.0.0"
+    better-serialize: "npm:^2.0.0"
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.0.2"
@@ -798,7 +798,7 @@ __metadata:
     "@joshdb/provider": "npm:2.0.0-next.c7aa6bf.0"
     "@sapphire/utilities": "npm:^3.15.3"
     "@vitest/coverage-v8": "npm:^1.5.2"
-    better-serialize: "npm:^1.0.0"
+    better-serialize: "npm:^2.0.0"
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.0.2"
@@ -817,7 +817,7 @@ __metadata:
     "@joshdb/provider": "npm:2.0.0-next.c7aa6bf.0"
     "@sapphire/snowflake": "npm:^3.5.3"
     "@vitest/coverage-v8": "npm:^1.5.2"
-    better-serialize: "npm:^1.0.0"
+    better-serialize: "npm:^2.0.0"
     mariadb: "npm:^3.3.0"
     tests: "workspace:*"
     tsup: "npm:^8.0.2"
@@ -836,7 +836,7 @@ __metadata:
     "@joshdb/provider": "npm:2.0.0-next.c7aa6bf.0"
     "@sapphire/utilities": "npm:^3.15.3"
     "@vitest/coverage-v8": "npm:^1.5.2"
-    better-serialize: "npm:^1.0.0"
+    better-serialize: "npm:^2.0.0"
     mongodb: "npm:^6.5.0"
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
@@ -857,7 +857,7 @@ __metadata:
     "@sapphire/snowflake": "npm:^3.5.3"
     "@sapphire/utilities": "npm:^3.15.3"
     "@vitest/coverage-v8": "npm:^1.5.2"
-    better-serialize: "npm:^1.0.0"
+    better-serialize: "npm:^2.0.0"
     postgres: "npm:^3.4.4"
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
@@ -916,7 +916,7 @@ __metadata:
     "@joshdb/provider": "npm:2.0.0-next.c7aa6bf.0"
     "@types/uuid": "npm:^9.0.8"
     "@vitest/coverage-v8": "npm:^1.5.2"
-    better-serialize: "npm:^1.0.0"
+    better-serialize: "npm:^2.0.0"
     redis: "npm:^4.6.13"
     tests: "workspace:*"
     tsup: "npm:^8.0.2"
@@ -936,7 +936,7 @@ __metadata:
     "@joshdb/provider": "npm:2.0.0-next.c7aa6bf.0"
     "@sapphire/utilities": "npm:^3.15.3"
     "@vitest/coverage-v8": "npm:^1.5.2"
-    better-serialize: "npm:^1.0.0"
+    better-serialize: "npm:^2.0.0"
     better-sqlite3: "npm:^9.6.0"
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
@@ -1940,10 +1940,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"better-serialize@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "better-serialize@npm:1.0.0"
-  checksum: 10c0/dd604375208996f87749d9a389712340e03fad5e26c0cb8ae861a61b5c888cef15197f054472653c114441133ca28eaeb1500a1d08bdf52ad24bdb89e8595b6d
+"better-serialize@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "better-serialize@npm:2.0.0"
+  checksum: 10c0/828a30f3303c8924272cb7cba83e350c75731b3bb7090364c60eb453ee82bd7a6f2645bccc087801fec3266b0b0bc401e355c5a7850297b20d52175e7ee45bf7
   languageName: node
   linkType: hard
 
