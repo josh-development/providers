@@ -26,7 +26,7 @@
     "check-update": "cliff-jumper --dry-run"
   },
   "dependencies": {
-    "@joshdb/provider": "2.0.0-next.a089b2d.0",
+    "@joshdb/provider": "2.0.0-next.c7aa6bf.0",
     "@sapphire/snowflake": "^3.5.3",
     "better-serialize": "^1.0.0",
     "mariadb": "^3.3.0"
