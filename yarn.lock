@@ -784,7 +784,7 @@ __metadata:
     tests: "workspace:*"
     tsup: "npm:^8.0.2"
     typedoc: "npm:^0.25.13"
-    typedoc-json-parser: "npm:^9.0.1"
+    typedoc-json-parser: "npm:^10.0.0"
     typescript: "npm:^5.4.5"
     vitest: "npm:^1.5.2"
   languageName: unknown
@@ -803,7 +803,7 @@ __metadata:
     tests: "workspace:*"
     tsup: "npm:^8.0.2"
     typedoc: "npm:^0.25.13"
-    typedoc-json-parser: "npm:^9.0.1"
+    typedoc-json-parser: "npm:^10.0.0"
     typescript: "npm:^5.4.5"
     vitest: "npm:^1.5.2"
   languageName: unknown
@@ -822,7 +822,7 @@ __metadata:
     tests: "workspace:*"
     tsup: "npm:^8.0.2"
     typedoc: "npm:^0.25.13"
-    typedoc-json-parser: "npm:^9.0.1"
+    typedoc-json-parser: "npm:^10.0.0"
     typescript: "npm:^5.4.5"
     vitest: "npm:^1.5.2"
   languageName: unknown
@@ -842,7 +842,7 @@ __metadata:
     tests: "workspace:*"
     tsup: "npm:^8.0.2"
     typedoc: "npm:^0.25.13"
-    typedoc-json-parser: "npm:^9.0.1"
+    typedoc-json-parser: "npm:^10.0.0"
     typescript: "npm:^5.4.5"
     vitest: "npm:^1.5.2"
   languageName: unknown
@@ -863,7 +863,7 @@ __metadata:
     tests: "workspace:*"
     tsup: "npm:^8.0.2"
     typedoc: "npm:^0.25.13"
-    typedoc-json-parser: "npm:^9.0.1"
+    typedoc-json-parser: "npm:^10.0.0"
     typescript: "npm:^5.4.5"
     vitest: "npm:^1.5.2"
   languageName: unknown
@@ -921,7 +921,7 @@ __metadata:
     tests: "workspace:*"
     tsup: "npm:^8.0.2"
     typedoc: "npm:^0.25.13"
-    typedoc-json-parser: "npm:^9.0.1"
+    typedoc-json-parser: "npm:^10.0.0"
     typescript: "npm:^5.4.5"
     uuid: "npm:^9.0.1"
     vitest: "npm:^1.5.2"
@@ -942,7 +942,7 @@ __metadata:
     tests: "workspace:*"
     tsup: "npm:^8.0.2"
     typedoc: "npm:^0.25.13"
-    typedoc-json-parser: "npm:^9.0.1"
+    typedoc-json-parser: "npm:^10.0.0"
     typescript: "npm:^5.4.5"
     vitest: "npm:^1.5.2"
   languageName: unknown
@@ -1279,7 +1279,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/node-utilities@npm:^1.0.0":
+"@sapphire/node-utilities@npm:^1.0.2":
   version: 1.0.2
   resolution: "@sapphire/node-utilities@npm:1.0.2"
   checksum: 10c0/65ec33badf849fb7d23ba6387567c5d2bea488463e5af0e46f9a348efb08346c5559d32a953f279cf4b1669994d774a25471398c26e415ec202e7da62c04c981
@@ -2272,7 +2272,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:11.1.0, commander@npm:^11.0.0":
+"commander@npm:11.1.0":
   version: 11.1.0
   resolution: "commander@npm:11.1.0"
   checksum: 10c0/13cc6ac875e48780250f723fb81c1c1178d35c5decb1abb1b628b3177af08a8554e76b2c0f29de72d69eef7c864d12613272a71fabef8047922bc622ab75a179
@@ -6005,25 +6005,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typedoc-json-parser@npm:^9.0.1":
-  version: 9.0.1
-  resolution: "typedoc-json-parser@npm:9.0.1"
+"typedoc-json-parser@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "typedoc-json-parser@npm:10.0.0"
   dependencies:
     "@favware/colorette-spinner": "npm:^1.0.1"
-    "@sapphire/node-utilities": "npm:^1.0.0"
+    "@sapphire/node-utilities": "npm:^1.0.2"
     colorette: "npm:^2.0.20"
-    commander: "npm:^11.0.0"
+    commander: "npm:^12.0.0"
     js-yaml: "npm:^4.1.0"
     tslib: "npm:^2.6.2"
-    typedoc: "npm:^0.25.1"
-    typescript: "npm:^5.2.2"
+    typedoc: "npm:^0.25.13"
+    typescript: "npm:^5.4.5"
   bin:
     typedoc-json-parser: ./dist/bin/index.js
-  checksum: 10c0/2a4ea07c2ae4cec3d463ef24c08b3637f03bd364ea4263a0dfb95eab1c93c66705d8f6bf32aee3e3cc707c37fbe9282ee08b5e9b4194586e23701fb6f92e88eb
+  checksum: 10c0/cdff182dd08670ebc84bb9ad38889a1796d40ddfe19f62a2a1344020d8464a384d9709829be450b257e8759d3ef82da8db3b854e3d95740893c25c51d3c2de89
   languageName: node
   linkType: hard
 
-"typedoc@npm:^0.25.1, typedoc@npm:^0.25.13":
+"typedoc@npm:^0.25.13":
   version: 0.25.13
   resolution: "typedoc@npm:0.25.13"
   dependencies:
@@ -6039,7 +6039,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.2.2, typescript@npm:^5.4.2, typescript@npm:^5.4.5":
+"typescript@npm:^5.4.2, typescript@npm:^5.4.5":
   version: 5.4.5
   resolution: "typescript@npm:5.4.5"
   bin:
@@ -6049,7 +6049,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.2.2#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.4.2#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.4.5#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A^5.4.2#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.4.5#optional!builtin<compat/typescript>":
   version: 5.4.5
   resolution: "typescript@patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=5adc0c"
   bin:
