@@ -837,7 +837,7 @@ __metadata:
     "@sapphire/utilities": "npm:^3.15.3"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
-    mongodb: "npm:^6.5.0"
+    mongodb: "npm:^6.6.0"
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.0.2"
@@ -2142,10 +2142,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bson@npm:^6.4.0":
-  version: 6.6.0
-  resolution: "bson@npm:6.6.0"
-  checksum: 10c0/cb1690c6a72fbda88bc6af97540d5152d8f5c7ce3f004012b3dc8bfc3420a30af8aaf4eee47c731432ab7e470e288d078b0a339bdfe9cab1ebfc7c3bb3dcebc4
+"bson@npm:^6.7.0":
+  version: 6.7.0
+  resolution: "bson@npm:6.7.0"
+  checksum: 10c0/6cc5c66bafaa2b7127409abda094af7e6f76771123ffc9526b167de23860d62560ba5db9b59a1f51bad3e51d320adf372e8ae0b2e0d156b0781683b094f3a325
   languageName: node
   linkType: hard
 
@@ -4589,12 +4589,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:^6.5.0":
-  version: 6.5.0
-  resolution: "mongodb@npm:6.5.0"
+"mongodb@npm:^6.6.0":
+  version: 6.6.0
+  resolution: "mongodb@npm:6.6.0"
   dependencies:
     "@mongodb-js/saslprep": "npm:^1.1.5"
-    bson: "npm:^6.4.0"
+    bson: "npm:^6.7.0"
     mongodb-connection-string-url: "npm:^3.0.0"
   peerDependencies:
     "@aws-sdk/credential-providers": ^3.188.0
@@ -4619,7 +4619,7 @@ __metadata:
       optional: true
     socks:
       optional: true
-  checksum: 10c0/d51f8673b76f073ef5d0101d96b1adc3ebacd63890771cb72ae245081415887a2e0b5a9451b18e370f930d63173f2af68fac98371487995ae921140756fe510b
+  checksum: 10c0/05f77be97f1d6d2e4b5949d23c6da1d0749adbce58f7608bc9432692335f00c849ee4eb81d0137c3329f205ff490181dae7b82b2b40537e943b7527fa6a09bde
   languageName: node
   linkType: hard
 
