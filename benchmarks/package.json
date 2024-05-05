@@ -10,8 +10,8 @@
     "property-helpers": "^2.0.0"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^1.5.2",
+    "@vitest/coverage-v8": "^1.6.0",
     "typescript": "^5.4.5",
-    "vitest": "^1.5.2"
+    "vitest": "^1.6.0"
   }
 }
