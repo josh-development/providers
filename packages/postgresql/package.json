@@ -30,7 +30,7 @@
   "dependencies": {
     "@joshdb/provider": "2.0.0-next.b88aca0.0",
     "@sapphire/snowflake": "^3.5.3",
-    "@sapphire/utilities": "^3.15.3",
+    "@sapphire/utilities": "^3.16.2",
     "better-serialize": "^2.0.0",
     "postgres": "^3.4.4",
     "property-helpers": "^2.0.0"
