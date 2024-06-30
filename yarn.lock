@@ -998,7 +998,7 @@ __metadata:
     "@sapphire/utilities": "npm:^3.16.2"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
-    mongodb: "npm:^6.7.0"
+    mongodb: "npm:^6.8.0"
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.1.0"
@@ -1098,7 +1098,7 @@ __metadata:
     "@sapphire/utilities": "npm:^3.16.2"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
-    better-sqlite3: "npm:^11.0.0"
+    better-sqlite3: "npm:^11.1.1"
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.1.0"
@@ -2223,14 +2223,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"better-sqlite3@npm:^11.0.0":
-  version: 11.0.0
-  resolution: "better-sqlite3@npm:11.0.0"
+"better-sqlite3@npm:^11.1.1":
+  version: 11.1.1
+  resolution: "better-sqlite3@npm:11.1.1"
   dependencies:
     bindings: "npm:^1.5.0"
     node-gyp: "npm:latest"
     prebuild-install: "npm:^7.1.1"
-  checksum: 10c0/5a55f8c171055d0fd589b88da58b9e8d9de60ae701ca189270d98a0c25cdabae01abcc27bef26cc2f0b6a8f119d86373089b0a89199df5ac06382d0193651598
+  checksum: 10c0/60b67d89f22d78afb810cb18dd446e397d35b9f95895793a3934da17f257193ac0d112798f115af3fea5ea1f2318e98051abd632a443d530ff20760a08be7d57
   languageName: node
   linkType: hard
 
@@ -4869,9 +4869,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:^6.7.0":
-  version: 6.7.0
-  resolution: "mongodb@npm:6.7.0"
+"mongodb@npm:^6.8.0":
+  version: 6.8.0
+  resolution: "mongodb@npm:6.8.0"
   dependencies:
     "@mongodb-js/saslprep": "npm:^1.1.5"
     bson: "npm:^6.7.0"
@@ -4899,7 +4899,7 @@ __metadata:
       optional: true
     socks:
       optional: true
-  checksum: 10c0/4a8a3781b6c4851dc211df559ac2b82b62f6c1bcc0dcd14c86264891221c081436d03254cb257d0da696efbba9f426919c0e6a9e14398faac4a93db3c1c8d335
+  checksum: 10c0/5ea1b78d3d7915b7d8e1047f15247e7d831ff79c537c51656b34b5a223f917ab686b96cdf5eca7495a1f0125f7cc4b1355881645138c995a50c42b8b0665e518
   languageName: node
   linkType: hard
 
