@@ -32,7 +32,7 @@
     "mariadb": "^3.3.1"
   },
   "devDependencies": {
-    "@favware/cliff-jumper": "^3.0.3",
+    "@favware/cliff-jumper": "^4.0.2",
     "@vitest/coverage-v8": "^1.6.0",
     "tests": "workspace:*",
     "tsup": "^8.1.0",
