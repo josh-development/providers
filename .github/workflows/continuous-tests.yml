@@ -22,7 +22,7 @@ jobs:
       - name: Build Tests
         run: yarn build -F tests
       - name: Store Built Tests
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4
         with:
           name: dist-tests
           path: tests/dist
@@ -39,14 +39,14 @@ jobs:
         with:
           turbo: true
       - name: Download Tests
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           name: dist-tests
           path: tests/dist
       - name: Run Tests
         run: yarn workspace @joshdb/json run test
       - name: Store Code Coverage Report
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4
         with:
           name: coverage-json
           path: coverage/
@@ -63,14 +63,14 @@ jobs:
         with:
           turbo: true
       - name: Download Tests
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           name: dist-tests
           path: tests/dist
       - name: Run Tests
         run: yarn workspace @joshdb/map run test
       - name: Store Code Coverage Report
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4
         with:
           name: coverage-map
           path: coverage/
@@ -99,14 +99,14 @@ jobs:
       - name: Create database
         run: mysql -ujosh -pjosh --socket ${{ steps.mysql.outputs.base-dir }}/tmp/mysql.sock -e 'CREATE DATABASE IF NOT EXISTS josh;'
       - name: Download Tests
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           name: dist-tests
           path: tests/dist
       - name: Run Tests
         run: yarn workspace @joshdb/maria run test
       - name: Store Code Coverage Report
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4
         with:
           name: coverage-maria
           path: coverage/
@@ -127,14 +127,14 @@ jobs:
         with:
           mongodb-version: 5.0
       - name: Download Tests
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           name: dist-tests
           path: tests/dist
       - name: Run Tests
         run: yarn workspace @joshdb/mongo run test
       - name: Store Code Coverage Report
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4
         with:
           name: coverage-mongo
           path: coverage/
@@ -163,14 +163,14 @@ jobs:
         with:
           turbo: true
       - name: Download Tests
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           name: dist-tests
           path: tests/dist
       - name: Run Tests
         run: yarn workspace @joshdb/postgresql run test --coverage
       - name: Store Code Coverage Report
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4
         with:
           name: coverage-postgresql
           path: coverage/
@@ -191,14 +191,14 @@ jobs:
         with:
           redis-version: 6
       - name: Download Tests
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           name: dist-tests
           path: tests/dist
       - name: Run Tests
         run: yarn workspace @joshdb/redis run test --coverage
       - name: Store Code Coverage Report
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4
         with:
           name: coverage-redis
           path: coverage/
@@ -215,14 +215,14 @@ jobs:
         with:
           turbo: true
       - name: Download Tests
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           name: dist-tests
           path: tests/dist
       - name: Run Tests
         run: yarn workspace @joshdb/sqlite run test --coverage
       - name: Store Code Coverage Report
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4
+        uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4
         with:
           name: coverage-sqlite
           path: coverage/
@@ -237,7 +237,7 @@ jobs:
         with:
           fetch-depth: 2
       - name: Download Coverage Report
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4
         with:
           path: coverage/
           pattern: coverage-*
