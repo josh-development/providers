@@ -39,10 +39,10 @@
     "@favware/cliff-jumper": "^3.0.3",
     "@vitest/coverage-v8": "^1.6.0",
     "tests": "workspace:*",
-    "tsup": "^8.2.1",
-    "typedoc": "^0.26.4",
+    "tsup": "^8.2.3",
+    "typedoc": "^0.26.5",
     "typedoc-json-parser": "^10.1.5",
-    "typescript": "^5.5.3",
+    "typescript": "^5.5.4",
     "vitest": "^1.6.0"
   },
   "repository": {
