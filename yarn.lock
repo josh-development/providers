@@ -958,7 +958,7 @@ __metadata:
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.2.4"
-    typedoc: "npm:^0.26.5"
+    typedoc: "npm:^0.26.6"
     typedoc-json-parser: "npm:^10.1.5"
     typescript: "npm:^5.5.4"
     vitest: "npm:^1.6.0"
@@ -977,7 +977,7 @@ __metadata:
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.2.4"
-    typedoc: "npm:^0.26.5"
+    typedoc: "npm:^0.26.6"
     typedoc-json-parser: "npm:^10.1.5"
     typescript: "npm:^5.5.4"
     vitest: "npm:^1.6.0"
@@ -996,7 +996,7 @@ __metadata:
     mariadb: "npm:^3.3.1"
     tests: "workspace:*"
     tsup: "npm:^8.2.4"
-    typedoc: "npm:^0.26.5"
+    typedoc: "npm:^0.26.6"
     typedoc-json-parser: "npm:^10.1.5"
     typescript: "npm:^5.5.4"
     vitest: "npm:^1.6.0"
@@ -1016,7 +1016,7 @@ __metadata:
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.2.4"
-    typedoc: "npm:^0.26.5"
+    typedoc: "npm:^0.26.6"
     typedoc-json-parser: "npm:^10.1.5"
     typescript: "npm:^5.5.4"
     vitest: "npm:^1.6.0"
@@ -1037,7 +1037,7 @@ __metadata:
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.2.4"
-    typedoc: "npm:^0.26.5"
+    typedoc: "npm:^0.26.6"
     typedoc-json-parser: "npm:^10.1.5"
     typescript: "npm:^5.5.4"
     vitest: "npm:^1.6.0"
@@ -1095,7 +1095,7 @@ __metadata:
     redis: "npm:^4.7.0"
     tests: "workspace:*"
     tsup: "npm:^8.2.4"
-    typedoc: "npm:^0.26.5"
+    typedoc: "npm:^0.26.6"
     typedoc-json-parser: "npm:^10.1.5"
     typescript: "npm:^5.5.4"
     uuid: "npm:^9.0.1"
@@ -1116,7 +1116,7 @@ __metadata:
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.2.4"
-    typedoc: "npm:^0.26.5"
+    typedoc: "npm:^0.26.6"
     typedoc-json-parser: "npm:^10.1.5"
     typescript: "npm:^5.5.4"
     vitest: "npm:^1.6.0"
@@ -1673,12 +1673,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.16.0":
-  version: 20.16.0
-  resolution: "@types/node@npm:20.16.0"
+"@types/node@npm:^20.16.1":
+  version: 20.16.1
+  resolution: "@types/node@npm:20.16.1"
   dependencies:
     undici-types: "npm:~6.19.2"
-  checksum: 10c0/ad8e11e654af99b3556397c87a495cf3cf5d3e8e8bfa1f60e14d255763e9cde7e703d7309fb7c39e89c1191281f2759cb8314f36dee2ae0bf8779123fc85d90c
+  checksum: 10c0/cac13c0f42467df3254805a671ca9e74a6eb7c41568de972e26b10dcc448a45743aaf00e9e5fce4a9214da5bc8444fe902918e105dac5a224e24e83fd9989a97
   languageName: node
   linkType: hard
 
@@ -4097,12 +4097,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^9.1.4":
-  version: 9.1.4
-  resolution: "husky@npm:9.1.4"
+"husky@npm:^9.1.5":
+  version: 9.1.5
+  resolution: "husky@npm:9.1.5"
   bin:
     husky: bin.js
-  checksum: 10c0/f5185003bef9ad9ec3f40e821963e4c12409b993fdcab89e3d660bed7d8c9d8bfd399f05222e27e0ead6589601fb1bb08d1a589c51751a4ab0547ead3429b8de
+  checksum: 10c0/f42efb95a026303eb880898760f802d88409780dd72f17781d2dfc302177d4f80b641cf1f1694f53f6d97c536c7397684133d8c8fe4a4426f7460186a7d1c6b8
   languageName: node
   linkType: hard
 
@@ -5965,7 +5965,7 @@ __metadata:
     "@joshdb/prettier-config": "npm:2.0.0-next.d52de95.0"
     "@joshdb/ts-config": "npm:2.0.0-next.d52de95.0"
     "@types/better-sqlite3": "npm:^7.6.11"
-    "@types/node": "npm:^20.16.0"
+    "@types/node": "npm:^20.16.1"
     "@types/prompts": "npm:^2.4.9"
     "@typescript-eslint/eslint-plugin": "npm:^7.18.0"
     "@typescript-eslint/parser": "npm:^7.18.0"
@@ -5977,12 +5977,12 @@ __metadata:
     eslint: "npm:^8.57.0"
     eslint-config-prettier: "npm:^9.1.0"
     eslint-plugin-prettier: "npm:^5.2.1"
-    husky: "npm:^9.1.4"
+    husky: "npm:^9.1.5"
     lint-staged: "npm:^15.2.9"
     prettier: "npm:^3.3.3"
     prompts: "npm:^2.4.2"
     rimraf: "npm:^5.0.10"
-    tslib: "npm:^2.6.3"
+    tslib: "npm:^2.7.0"
     tsup: "npm:^8.2.4"
     turbo: "npm:^1.13.4"
     typescript: "npm:^5.5.4"
@@ -6585,6 +6585,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "tslib@npm:2.7.0"
+  checksum: 10c0/469e1d5bf1af585742128827000711efa61010b699cb040ab1800bcd3ccdd37f63ec30642c9e07c4439c1db6e46345582614275daca3e0f4abae29b0083f04a6
+  languageName: node
+  linkType: hard
+
 "tsup@npm:^8.2.4":
   version: 8.2.4
   resolution: "tsup@npm:8.2.4"
@@ -6764,9 +6771,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typedoc@npm:^0.26.5":
-  version: 0.26.5
-  resolution: "typedoc@npm:0.26.5"
+"typedoc@npm:^0.26.6":
+  version: 0.26.6
+  resolution: "typedoc@npm:0.26.6"
   dependencies:
     lunr: "npm:^2.3.9"
     markdown-it: "npm:^14.1.0"
@@ -6777,7 +6784,7 @@ __metadata:
     typescript: 4.6.x || 4.7.x || 4.8.x || 4.9.x || 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x
   bin:
     typedoc: bin/typedoc
-  checksum: 10c0/c3ca06e7496276d6c14af6c9ed7afe48477117093fa4723b30c73b902adba5821fd58bb19139be9322980de0f279ec688600ac4d6da31792c1654675068f1352
+  checksum: 10c0/95e7aefd500d057e0b73afbe4e76d9ddb2617516f890fbe5ce690bddfccc2f73a6279eb7d6e510347ca8347078d7cbbbdf416b9432b156708eaf1a1f34f7a4f0
   languageName: node
   linkType: hard
 
