@@ -927,9 +927,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@joshdb/eslint-config@npm:2.0.0-next.d52de95.0":
-  version: 2.0.0-next.d52de95.0
-  resolution: "@joshdb/eslint-config@npm:2.0.0-next.d52de95.0"
+"@joshdb/eslint-config@npm:2.0.0-next.d94b386.0":
+  version: 2.0.0-next.d94b386.0
+  resolution: "@joshdb/eslint-config@npm:2.0.0-next.d94b386.0"
   dependencies:
     "@sapphire/eslint-config": "npm:^5.0.5"
     "@typescript-eslint/eslint-plugin": "npm:^7.18.0"
@@ -938,8 +938,8 @@ __metadata:
     eslint-config-prettier: "npm:^9.1.0"
     eslint-plugin-prettier: "npm:^5.2.1"
     prettier: "npm:^3.3.3"
-    typescript: "npm:^5.5.4"
-  checksum: 10c0/b3b9229ae0b3009c4bfa31fa8e3d153ede12ee9627660f7ff3a4f819de29961cb2a3d780a13fee37eb1d5871167c13c9b015ec04a051f0c24f3a2aea6dbcc8dd
+    typescript: "npm:^5.6.2"
+  checksum: 10c0/e6602e97707dd46930b1123a8c40fe71261641b114b2772f550f7d32e44370704ba15dd3457eb7eb717751bc0bd12733060eb5baa4bc973b9e08112a90fad22c
   languageName: node
   linkType: hard
 
@@ -948,7 +948,7 @@ __metadata:
   resolution: "@joshdb/json@workspace:packages/json"
   dependencies:
     "@favware/cliff-jumper": "npm:^3.0.3"
-    "@joshdb/provider": "npm:2.0.0-next.d52de95.0"
+    "@joshdb/provider": "npm:2.0.0-next.d94b386.0"
     "@sapphire/async-queue": "npm:^1.5.3"
     "@sapphire/snowflake": "npm:^3.5.3"
     "@sapphire/utilities": "npm:^3.17.0"
@@ -969,7 +969,7 @@ __metadata:
   resolution: "@joshdb/map@workspace:packages/map"
   dependencies:
     "@favware/cliff-jumper": "npm:^3.0.3"
-    "@joshdb/provider": "npm:2.0.0-next.d52de95.0"
+    "@joshdb/provider": "npm:2.0.0-next.d94b386.0"
     "@sapphire/utilities": "npm:^3.17.0"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
@@ -988,7 +988,7 @@ __metadata:
   resolution: "@joshdb/maria@workspace:packages/maria"
   dependencies:
     "@favware/cliff-jumper": "npm:^3.0.3"
-    "@joshdb/provider": "npm:2.0.0-next.d52de95.0"
+    "@joshdb/provider": "npm:2.0.0-next.d94b386.0"
     "@sapphire/snowflake": "npm:^3.5.3"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
@@ -1007,7 +1007,7 @@ __metadata:
   resolution: "@joshdb/mongo@workspace:packages/mongo"
   dependencies:
     "@favware/cliff-jumper": "npm:^3.0.3"
-    "@joshdb/provider": "npm:2.0.0-next.d52de95.0"
+    "@joshdb/provider": "npm:2.0.0-next.d94b386.0"
     "@sapphire/utilities": "npm:^3.17.0"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
@@ -1027,7 +1027,7 @@ __metadata:
   resolution: "@joshdb/postgresql@workspace:packages/postgresql"
   dependencies:
     "@favware/cliff-jumper": "npm:^3.0.3"
-    "@joshdb/provider": "npm:2.0.0-next.d52de95.0"
+    "@joshdb/provider": "npm:2.0.0-next.d94b386.0"
     "@sapphire/snowflake": "npm:^3.5.3"
     "@sapphire/utilities": "npm:^3.17.0"
     "@vitest/coverage-v8": "npm:^1.6.0"
@@ -1043,12 +1043,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/prettier-config@npm:2.0.0-next.d52de95.0":
-  version: 2.0.0-next.d52de95.0
-  resolution: "@joshdb/prettier-config@npm:2.0.0-next.d52de95.0"
+"@joshdb/prettier-config@npm:2.0.0-next.d94b386.0":
+  version: 2.0.0-next.d94b386.0
+  resolution: "@joshdb/prettier-config@npm:2.0.0-next.d94b386.0"
   dependencies:
     prettier: "npm:^3.3.3"
-  checksum: 10c0/07b93d47d36d0e33f1d9c8e1300b98b85ff58864f3d6bdbccdd90085133e857fd189e5be1183585736250c472392ce170d0478e848be367b7cac007781c43892
+  checksum: 10c0/ebe32b17bceb306576064df862d2883a4fd3df6dbd39b832571a263598773c5fccfa0cfae9f84cefefeec54f484d55949421697a81c3fbbbd5a245a04394b846
   languageName: node
   linkType: hard
 
@@ -1062,13 +1062,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@joshdb/provider@npm:2.0.0-next.d52de95.0":
-  version: 2.0.0-next.d52de95.0
-  resolution: "@joshdb/provider@npm:2.0.0-next.d52de95.0"
+"@joshdb/provider@npm:2.0.0-next.d94b386.0":
+  version: 2.0.0-next.d94b386.0
+  resolution: "@joshdb/provider@npm:2.0.0-next.d94b386.0"
   dependencies:
     "@sapphire/utilities": "npm:^3.17.0"
     reflect-metadata: "npm:^0.2.1"
-  checksum: 10c0/833c943680cc1ca00e1a491221a4884d9683fb7529a8c87542776305189c7cfa7366d4d946efdc97c57b5447df246b66076d5616a3dd9f2d2f6d8b7c241f6753
+  checksum: 10c0/2bfa5f88f6dc3a7af626c4569ea19975f924f4ec12970b7bcf80813bb3df48e67c96c3ae7ed1ad246e8f230a2408200de2f2a491692666d3dbee22b54616b9c8
   languageName: node
   linkType: hard
 
@@ -1087,7 +1087,7 @@ __metadata:
   resolution: "@joshdb/redis@workspace:packages/redis"
   dependencies:
     "@favware/cliff-jumper": "npm:^3.0.3"
-    "@joshdb/provider": "npm:2.0.0-next.d52de95.0"
+    "@joshdb/provider": "npm:2.0.0-next.d94b386.0"
     "@types/uuid": "npm:^9.0.8"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
@@ -1107,7 +1107,7 @@ __metadata:
   resolution: "@joshdb/sqlite@workspace:packages/sqlite"
   dependencies:
     "@favware/cliff-jumper": "npm:^3.0.3"
-    "@joshdb/provider": "npm:2.0.0-next.d52de95.0"
+    "@joshdb/provider": "npm:2.0.0-next.d94b386.0"
     "@sapphire/utilities": "npm:^3.17.0"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
@@ -1122,14 +1122,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@joshdb/ts-config@npm:2.0.0-next.d52de95.0":
-  version: 2.0.0-next.d52de95.0
-  resolution: "@joshdb/ts-config@npm:2.0.0-next.d52de95.0"
+"@joshdb/ts-config@npm:2.0.0-next.d94b386.0":
+  version: 2.0.0-next.d94b386.0
+  resolution: "@joshdb/ts-config@npm:2.0.0-next.d94b386.0"
   dependencies:
     "@sapphire/ts-config": "npm:^5.0.1"
-    tslib: "npm:^2.6.3"
-    typescript: "npm:^5.5.4"
-  checksum: 10c0/620ec9ab240baa5acc5d062b458233e3a215d1d61186aed1bdd3c405048ce1eb68abba314b19ed73da62215b847782b2de67e1b55fb6f29e8c1913151cfae880
+    tslib: "npm:^2.7.0"
+    typescript: "npm:^5.6.2"
+  checksum: 10c0/ec3a6fa587650c3c24153e1c97bafe2c9f88856306129a95747e55c32811dc2bdc7a9dce234a7dcfa245a2efa0867f866b2da20b60c918ad8c7aa20a2bfc92ea
   languageName: node
   linkType: hard
 
@@ -6197,9 +6197,9 @@ __metadata:
     "@favware/cliff-jumper": "npm:^3.0.3"
     "@favware/colorette-spinner": "npm:^1.0.1"
     "@favware/npm-deprecate": "npm:^1.0.7"
-    "@joshdb/eslint-config": "npm:2.0.0-next.d52de95.0"
-    "@joshdb/prettier-config": "npm:2.0.0-next.d52de95.0"
-    "@joshdb/ts-config": "npm:2.0.0-next.d52de95.0"
+    "@joshdb/eslint-config": "npm:2.0.0-next.d94b386.0"
+    "@joshdb/prettier-config": "npm:2.0.0-next.d94b386.0"
+    "@joshdb/ts-config": "npm:2.0.0-next.d94b386.0"
     "@types/better-sqlite3": "npm:^7.6.11"
     "@types/node": "npm:^20.16.5"
     "@types/prompts": "npm:^2.4.9"
@@ -7089,16 +7089,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.5.4":
-  version: 5.5.4
-  resolution: "typescript@npm:5.5.4"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 10c0/422be60f89e661eab29ac488c974b6cc0a660fb2228003b297c3d10c32c90f3bcffc1009b43876a082515a3c376b1eefcce823d6e78982e6878408b9a923199c
-  languageName: node
-  linkType: hard
-
 "typescript@npm:^5.6.2":
   version: 5.6.2
   resolution: "typescript@npm:5.6.2"
@@ -7126,16 +7116,6 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 10c0/911c7811d61f57f07df79c4a35f56a0f426a65426a020e5fcd792f66559f399017205f5f10255329ab5a3d8c2d1f1d19530aeceffda70758a521fae1d469432e
-  languageName: node
-  linkType: hard
-
-"typescript@patch:typescript@npm%3A^5.5.4#optional!builtin<compat/typescript>":
-  version: 5.5.4
-  resolution: "typescript@patch:typescript@npm%3A5.5.4#optional!builtin<compat/typescript>::version=5.5.4&hash=379a07"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 10c0/73409d7b9196a5a1217b3aaad929bf76294d3ce7d6e9766dd880ece296ee91cf7d7db6b16c6c6c630ee5096eccde726c0ef17c7dfa52b01a243e57ae1f09ef07
   languageName: node
   linkType: hard
 
