@@ -992,7 +992,7 @@ __metadata:
     "@sapphire/snowflake": "npm:^3.5.3"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
-    mariadb: "npm:^3.3.1"
+    mariadb: "npm:^3.3.2"
     tests: "workspace:*"
     tsup: "npm:^8.2.4"
     typedoc: "npm:^0.26.7"
@@ -1732,7 +1732,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^20.11.17":
+"@types/node@npm:*":
   version: 20.12.7
   resolution: "@types/node@npm:20.12.7"
   dependencies:
@@ -1747,6 +1747,15 @@ __metadata:
   dependencies:
     undici-types: "npm:~6.19.2"
   checksum: 10c0/6af7994129815010bcbc4cf8221865559c8116ff43e74a6549525c2108267596fc2d18aff5d5ecfe089fb60a119f975631343e2c65c52bfa0955ed9dc56733d6
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^22.5.4":
+  version: 22.5.5
+  resolution: "@types/node@npm:22.5.5"
+  dependencies:
+    undici-types: "npm:~6.19.2"
+  checksum: 10c0/ead9495cfc6b1da5e7025856dcce2591e9bae635357410c0d2dd619fce797d2a1d402887580ca4b336cb78168b195224869967de370a23f61663cf1e4836121c
   languageName: node
   linkType: hard
 
@@ -4841,6 +4850,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lru-cache@npm:^10.3.0":
+  version: 10.4.3
+  resolution: "lru-cache@npm:10.4.3"
+  checksum: 10c0/ebd04fbca961e6c1d6c0af3799adcc966a1babe798f685bb84e6599266599cd95d94630b10262f5424539bc4640107e8a33aa28585374abf561d30d16f4b39fb
+  languageName: node
+  linkType: hard
+
 "lru-cache@npm:^6.0.0":
   version: 6.0.0
   resolution: "lru-cache@npm:6.0.0"
@@ -4935,16 +4951,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mariadb@npm:^3.3.1":
-  version: 3.3.1
-  resolution: "mariadb@npm:3.3.1"
+"mariadb@npm:^3.3.2":
+  version: 3.3.2
+  resolution: "mariadb@npm:3.3.2"
   dependencies:
     "@types/geojson": "npm:^7946.0.14"
-    "@types/node": "npm:^20.11.17"
+    "@types/node": "npm:^22.5.4"
     denque: "npm:^2.1.0"
     iconv-lite: "npm:^0.6.3"
-    lru-cache: "npm:^10.2.0"
-  checksum: 10c0/980358fd69be905b1f8e69a685c70bc8c7accedac3ab6aff8742e3f3dec649b7cedb060d7c834a460fc6c48f56eca2125b0fcb9e64198cbb54c69a85c3fdc9ee
+    lru-cache: "npm:^10.3.0"
+  checksum: 10c0/ea4b410bedeae5d768b5e34c608edc67e02ad18b60ff44d066db8efd8431da0403637cbe231928d66ad3d443dc611ea4b48c8d66eaa912e0935a3672adbacdf3
   languageName: node
   linkType: hard
 
