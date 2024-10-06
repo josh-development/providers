@@ -975,8 +975,8 @@ __metadata:
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.3.0"
-    typedoc: "npm:^0.26.7"
-    typedoc-json-parser: "npm:^10.1.5"
+    typedoc: "npm:^0.26.8"
+    typedoc-json-parser: "npm:^10.1.6"
     typescript: "npm:^5.6.2"
     vitest: "npm:^1.6.0"
   languageName: unknown
@@ -994,8 +994,8 @@ __metadata:
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.3.0"
-    typedoc: "npm:^0.26.7"
-    typedoc-json-parser: "npm:^10.1.5"
+    typedoc: "npm:^0.26.8"
+    typedoc-json-parser: "npm:^10.1.6"
     typescript: "npm:^5.6.2"
     vitest: "npm:^1.6.0"
   languageName: unknown
@@ -1013,8 +1013,8 @@ __metadata:
     mariadb: "npm:^3.3.2"
     tests: "workspace:*"
     tsup: "npm:^8.3.0"
-    typedoc: "npm:^0.26.7"
-    typedoc-json-parser: "npm:^10.1.5"
+    typedoc: "npm:^0.26.8"
+    typedoc-json-parser: "npm:^10.1.6"
     typescript: "npm:^5.6.2"
     vitest: "npm:^1.6.0"
   languageName: unknown
@@ -1033,8 +1033,8 @@ __metadata:
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.3.0"
-    typedoc: "npm:^0.26.7"
-    typedoc-json-parser: "npm:^10.1.5"
+    typedoc: "npm:^0.26.8"
+    typedoc-json-parser: "npm:^10.1.6"
     typescript: "npm:^5.6.2"
     vitest: "npm:^1.6.0"
   languageName: unknown
@@ -1054,8 +1054,8 @@ __metadata:
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.3.0"
-    typedoc: "npm:^0.26.7"
-    typedoc-json-parser: "npm:^10.1.5"
+    typedoc: "npm:^0.26.8"
+    typedoc-json-parser: "npm:^10.1.6"
     typescript: "npm:^5.6.2"
     vitest: "npm:^1.6.0"
   languageName: unknown
@@ -1112,8 +1112,8 @@ __metadata:
     redis: "npm:^4.7.0"
     tests: "workspace:*"
     tsup: "npm:^8.3.0"
-    typedoc: "npm:^0.26.7"
-    typedoc-json-parser: "npm:^10.1.5"
+    typedoc: "npm:^0.26.8"
+    typedoc-json-parser: "npm:^10.1.6"
     typescript: "npm:^5.6.2"
     uuid: "npm:^9.0.1"
     vitest: "npm:^1.6.0"
@@ -1133,8 +1133,8 @@ __metadata:
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.3.0"
-    typedoc: "npm:^0.26.7"
-    typedoc-json-parser: "npm:^10.1.5"
+    typedoc: "npm:^0.26.8"
+    typedoc-json-parser: "npm:^10.1.6"
     typescript: "npm:^5.6.2"
     vitest: "npm:^1.6.0"
   languageName: unknown
@@ -1639,13 +1639,6 @@ __metadata:
     "@types/hast": "npm:^3.0.4"
     hast-util-to-html: "npm:^9.0.2"
   checksum: 10c0/36b5eb1c70710ff08bc54915ebf55f00fdff939a51a59271b2fcd24d0d513c4426f46260f1aa35fb4f3bb3f83c3de25184aed5203ffb156ea9fcdcceb5f8b9f5
-  languageName: node
-  linkType: hard
-
-"@shikijs/core@npm:1.9.1":
-  version: 1.9.1
-  resolution: "@shikijs/core@npm:1.9.1"
-  checksum: 10c0/70523a0fc2e8d32da6f35e640c854cb3ae3cb7202bcab2f08c92b8925ea4b2c19ec6df55c5cfd50d586bc3a3a5156945db720962ed66a3e624c2ef241aebe6ce
   languageName: node
   linkType: hard
 
@@ -6391,15 +6384,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"shiki@npm:^1.9.1":
-  version: 1.9.1
-  resolution: "shiki@npm:1.9.1"
-  dependencies:
-    "@shikijs/core": "npm:1.9.1"
-  checksum: 10c0/a9d58279a015f6ab9c2a849d90c23545062f15d6e18d4402f463c41fc7d51992d1d478f9d43b33bf1c1310d56cc0caee90d25a42e4453d4e522166b41409956e
-  languageName: node
-  linkType: hard
-
 "siginfo@npm:^2.0.0":
   version: 2.0.0
   resolution: "siginfo@npm:2.0.0"
@@ -7128,9 +7112,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typedoc-json-parser@npm:^10.1.5":
-  version: 10.1.5
-  resolution: "typedoc-json-parser@npm:10.1.5"
+"typedoc-json-parser@npm:^10.1.6":
+  version: 10.1.6
+  resolution: "typedoc-json-parser@npm:10.1.6"
   dependencies:
     "@favware/colorette-spinner": "npm:^1.0.1"
     "@sapphire/node-utilities": "npm:^1.0.2"
@@ -7138,34 +7122,17 @@ __metadata:
     commander: "npm:^12.1.0"
     js-yaml: "npm:^4.1.0"
     tslib: "npm:^2.6.3"
-    typedoc: "npm:^0.26.3"
+    typedoc: "npm:^0.26.4"
     typescript: "npm:^5.5.3"
   bin:
     typedoc-json-parser: ./dist/bin/index.js
-  checksum: 10c0/371d2abdec149c952e9c4c0b87a26e6aaf89bca1ad57753776978cbafea0efb6f5e125df7914925376a677b2a7b75ee2d17ec5ed554412a231837ad7c8da84b4
+  checksum: 10c0/4ddd1f5ca90a75722c29fe1e5f4ee9eb6b2a444d42b6d6d3abda4180cdc42db600717c86a06b1a1ed0f326732e04e8835b8d11f3b3b5a28f33bc72d9dcaa11a3
   languageName: node
   linkType: hard
 
-"typedoc@npm:^0.26.3":
-  version: 0.26.3
-  resolution: "typedoc@npm:0.26.3"
-  dependencies:
-    lunr: "npm:^2.3.9"
-    markdown-it: "npm:^14.1.0"
-    minimatch: "npm:^9.0.5"
-    shiki: "npm:^1.9.1"
-    yaml: "npm:^2.4.5"
-  peerDependencies:
-    typescript: 4.6.x || 4.7.x || 4.8.x || 4.9.x || 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x
-  bin:
-    typedoc: bin/typedoc
-  checksum: 10c0/d6d0a19d4b90cb547dcefb282c35ea4bef0b76dcb3d0c7afdae2bb9b0af092a7389b40fb02aae8fba7bf8ee7da371ab200690d9c9d4a38b156275a3674c3f2ce
-  languageName: node
-  linkType: hard
-
-"typedoc@npm:^0.26.7":
-  version: 0.26.7
-  resolution: "typedoc@npm:0.26.7"
+"typedoc@npm:^0.26.4, typedoc@npm:^0.26.8":
+  version: 0.26.8
+  resolution: "typedoc@npm:0.26.8"
   dependencies:
     lunr: "npm:^2.3.9"
     markdown-it: "npm:^14.1.0"
@@ -7176,7 +7143,7 @@ __metadata:
     typescript: 4.6.x || 4.7.x || 4.8.x || 4.9.x || 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x
   bin:
     typedoc: bin/typedoc
-  checksum: 10c0/36a73dc08670478d34e9232f4f95b928ca51010e5926dbe22bd5582e9ead914ec7628e73f02488811f79b685abca8f1211c6cf879313cf1122a5ea7eb1bbaf5a
+  checksum: 10c0/8381e50139ca8df9e9dfcaff35d6a5d1a226b32969ed2dcbc65aafacd1aaef2ecc4712f229229e8bb3850971b530af2e79312fcd2e18febe950c03710c504eec
   languageName: node
   linkType: hard
 
@@ -7702,15 +7669,6 @@ __metadata:
   version: 4.0.0
   resolution: "yallist@npm:4.0.0"
   checksum: 10c0/2286b5e8dbfe22204ab66e2ef5cc9bbb1e55dfc873bbe0d568aa943eb255d131890dfd5bf243637273d31119b870f49c18fcde2c6ffbb7a7a092b870dc90625a
-  languageName: node
-  linkType: hard
-
-"yaml@npm:^2.4.5":
-  version: 2.4.5
-  resolution: "yaml@npm:2.4.5"
-  bin:
-    yaml: bin.mjs
-  checksum: 10c0/e1ee78b381e5c710f715cc4082fd10fc82f7f5c92bd6f075771d20559e175616f56abf1c411f545ea0e9e16e4f84a83a50b42764af5f16ec006328ba9476bb31
   languageName: node
   linkType: hard
 
