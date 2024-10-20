@@ -40,7 +40,7 @@
     "@vitest/coverage-v8": "^1.6.0",
     "tests": "workspace:*",
     "tsup": "^8.3.0",
-    "typedoc": "^0.26.9",
+    "typedoc": "^0.26.10",
     "typedoc-json-parser": "^10.1.6",
     "typescript": "^5.6.3",
     "vitest": "^1.6.0"
