@@ -842,7 +842,7 @@ __metadata:
     "@sapphire/snowflake": "npm:^3.5.3"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
-    mariadb: "npm:^3.3.2"
+    mariadb: "npm:^3.4.0"
     tests: "workspace:*"
     tsup: "npm:^8.3.5"
     typedoc: "npm:^0.26.10"
@@ -861,7 +861,7 @@ __metadata:
     "@sapphire/utilities": "npm:^3.17.0"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
-    mongodb: "npm:^6.9.0"
+    mongodb: "npm:^6.10.0"
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.3.5"
@@ -882,7 +882,7 @@ __metadata:
     "@sapphire/utilities": "npm:^3.17.0"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
-    postgres: "npm:^3.4.4"
+    postgres: "npm:^3.4.5"
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.3.5"
@@ -961,7 +961,7 @@ __metadata:
     "@sapphire/utilities": "npm:^3.17.0"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
-    better-sqlite3: "npm:^11.4.0"
+    better-sqlite3: "npm:^11.5.0"
     property-helpers: "npm:^2.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.3.5"
@@ -2275,14 +2275,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"better-sqlite3@npm:^11.4.0":
-  version: 11.4.0
-  resolution: "better-sqlite3@npm:11.4.0"
+"better-sqlite3@npm:^11.5.0":
+  version: 11.5.0
+  resolution: "better-sqlite3@npm:11.5.0"
   dependencies:
     bindings: "npm:^1.5.0"
     node-gyp: "npm:latest"
     prebuild-install: "npm:^7.1.1"
-  checksum: 10c0/3dac7284edda55ae650cb3d274da15812c558370907eb33293743867c614977c81cacda5ca66caf49bd9d33af5afd91251c54f13448d9a48fd36a8af5c5394a1
+  checksum: 10c0/c24200972e11f6f99c4e6538122bd7ec8b31b92b2fa095f4b595cc39fedf924cb0a93fd326f0900415eccdf634367f7bba2ba4eaa4d164edd7352f4cfaaaec51
   languageName: node
   linkType: hard
 
@@ -4704,16 +4704,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mariadb@npm:^3.3.2":
-  version: 3.3.2
-  resolution: "mariadb@npm:3.3.2"
+"mariadb@npm:^3.4.0":
+  version: 3.4.0
+  resolution: "mariadb@npm:3.4.0"
   dependencies:
     "@types/geojson": "npm:^7946.0.14"
     "@types/node": "npm:^22.5.4"
     denque: "npm:^2.1.0"
     iconv-lite: "npm:^0.6.3"
     lru-cache: "npm:^10.3.0"
-  checksum: 10c0/ea4b410bedeae5d768b5e34c608edc67e02ad18b60ff44d066db8efd8431da0403637cbe231928d66ad3d443dc611ea4b48c8d66eaa912e0935a3672adbacdf3
+  checksum: 10c0/8984061760f5610a754f9ff8fb6b299f7da2a74b4250298c5f9f97deb02a27f2cf64265ce954e57d96ab5b943cbd8893aa2456e42eb3e5bbea7636f9144d1baf
   languageName: node
   linkType: hard
 
@@ -5043,9 +5043,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:^6.9.0":
-  version: 6.9.0
-  resolution: "mongodb@npm:6.9.0"
+"mongodb@npm:^6.10.0":
+  version: 6.10.0
+  resolution: "mongodb@npm:6.10.0"
   dependencies:
     "@mongodb-js/saslprep": "npm:^1.1.5"
     bson: "npm:^6.7.0"
@@ -5073,7 +5073,7 @@ __metadata:
       optional: true
     socks:
       optional: true
-  checksum: 10c0/2b6c241a3361d014464a2c446fc9a71bae7270a9d8f777ffb8d69f0decfc6047f7dd6315c76caaa301fd61476948c3570b4b54a0866af5968e89b3cf5afa218e
+  checksum: 10c0/8a92b1a5f0a30b88b80d09a0718ecfb18a4a7f7e77c4b2a7047b57babfec6a29ece09dd375a4f528f0712f1282b39e27f194e75d89a3039fbfda4b1c4f7d3095
   languageName: node
   linkType: hard
 
@@ -5509,10 +5509,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postgres@npm:^3.4.4":
-  version: 3.4.4
-  resolution: "postgres@npm:3.4.4"
-  checksum: 10c0/5c01a1501a1cb8851d981b1949bffd0a0a82ac5fd8453c410fdf4d6c0f91d01e69a42b30da2d08a77a00d6ddac0ea6ce58a1aa0dd6bd3f76e9220b1176bdfe60
+"postgres@npm:^3.4.5":
+  version: 3.4.5
+  resolution: "postgres@npm:3.4.5"
+  checksum: 10c0/53415acea77e97bdc1eeb861048f34964e2236e4d4d42f408fc9b901e62bfcf7443a487ebfdad18b57b468c6e297bf8d22097106a200f62eb1262eb5a71355df
   languageName: node
   linkType: hard
 
