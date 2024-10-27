@@ -29,7 +29,7 @@
     "@joshdb/prettier-config": "2.0.0-next.df53d54.0",
     "@joshdb/ts-config": "2.0.0-next.df53d54.0",
     "@types/better-sqlite3": "^7.6.11",
-    "@types/node": "^20.16.13",
+    "@types/node": "^20.17.1",
     "@types/prompts": "^2.4.9",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
@@ -47,7 +47,7 @@
     "prompts": "^2.4.2",
     "rimraf": "^5.0.10",
     "tslib": "^2.8.0",
-    "tsup": "^8.3.0",
+    "tsup": "^8.3.5",
     "turbo": "^1.13.4",
     "typescript": "^5.6.3",
     "vitest": "^1.6.0"
