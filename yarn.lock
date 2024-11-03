@@ -799,9 +799,9 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": "npm:^3.0.3"
     "@joshdb/provider": "npm:2.0.0-next.df53d54.0"
-    "@sapphire/async-queue": "npm:^1.5.3"
-    "@sapphire/snowflake": "npm:^3.5.3"
-    "@sapphire/utilities": "npm:^3.17.0"
+    "@sapphire/async-queue": "npm:^1.5.4"
+    "@sapphire/snowflake": "npm:^3.5.4"
+    "@sapphire/utilities": "npm:^3.18.0"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
     property-helpers: "npm:^2.0.0"
@@ -820,7 +820,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": "npm:^3.0.3"
     "@joshdb/provider": "npm:2.0.0-next.df53d54.0"
-    "@sapphire/utilities": "npm:^3.17.0"
+    "@sapphire/utilities": "npm:^3.18.0"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
     property-helpers: "npm:^2.0.0"
@@ -839,7 +839,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": "npm:^3.0.3"
     "@joshdb/provider": "npm:2.0.0-next.df53d54.0"
-    "@sapphire/snowflake": "npm:^3.5.3"
+    "@sapphire/snowflake": "npm:^3.5.4"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
     mariadb: "npm:^3.4.0"
@@ -858,7 +858,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": "npm:^3.0.3"
     "@joshdb/provider": "npm:2.0.0-next.df53d54.0"
-    "@sapphire/utilities": "npm:^3.17.0"
+    "@sapphire/utilities": "npm:^3.18.0"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
     mongodb: "npm:^6.10.0"
@@ -878,8 +878,8 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": "npm:^3.0.3"
     "@joshdb/provider": "npm:2.0.0-next.df53d54.0"
-    "@sapphire/snowflake": "npm:^3.5.3"
-    "@sapphire/utilities": "npm:^3.17.0"
+    "@sapphire/snowflake": "npm:^3.5.4"
+    "@sapphire/utilities": "npm:^3.18.0"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
     postgres: "npm:^3.4.5"
@@ -958,7 +958,7 @@ __metadata:
   dependencies:
     "@favware/cliff-jumper": "npm:^3.0.3"
     "@joshdb/provider": "npm:2.0.0-next.df53d54.0"
-    "@sapphire/utilities": "npm:^3.17.0"
+    "@sapphire/utilities": "npm:^3.18.0"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
     better-sqlite3: "npm:^11.5.0"
@@ -1384,10 +1384,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/async-queue@npm:^1.5.3":
-  version: 1.5.3
-  resolution: "@sapphire/async-queue@npm:1.5.3"
-  checksum: 10c0/fcf860cdde9bfbc1625dab5e11924caa871c9e741a8fb836193a519267179a4a1979604f88f8a40855c6b931bc82d489dcd11d034fea38bb8a4d9816ab821ed1
+"@sapphire/async-queue@npm:^1.5.4":
+  version: 1.5.4
+  resolution: "@sapphire/async-queue@npm:1.5.4"
+  checksum: 10c0/f63b9ed41a7209b927de707ae2a4ab66efdb938fdc1983f79c8b2deb7d65ef4d4be271fb695a33920a092236e2c19982af78e030697fc2b54bf3b110b43d76e7
   languageName: node
   linkType: hard
 
@@ -1429,10 +1429,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/snowflake@npm:^3.5.3":
-  version: 3.5.3
-  resolution: "@sapphire/snowflake@npm:3.5.3"
-  checksum: 10c0/361b6a3e16eea4eb48b2608005ce397d4163065ccd84077059a0f609b97fb9cc52a173d7a64bbfce6f5d1e77be0f9704fd72ef64683a3dc7e455e9b4a1c90db1
+"@sapphire/snowflake@npm:^3.5.4":
+  version: 3.5.4
+  resolution: "@sapphire/snowflake@npm:3.5.4"
+  checksum: 10c0/1ca5d8036b5e3e441510d1645a3147b7114232c9c25072a8347e83ec937a0cab4e167a066503e31c37fdb19e6cf90e48be5e92aa327653f4c8c39c32876cfa9a
   languageName: node
   linkType: hard
 
@@ -1457,6 +1457,13 @@ __metadata:
   version: 3.17.0
   resolution: "@sapphire/utilities@npm:3.17.0"
   checksum: 10c0/f3bedac4a5bfb2f0cf67e87554fab23bd9789761419c771f4b1b5515075e73f3f1add5c5b2c309d80596d6e6a17ae8d78c06ac6ef4525fcf3a2580cffab99d5a
+  languageName: node
+  linkType: hard
+
+"@sapphire/utilities@npm:^3.18.0":
+  version: 3.18.0
+  resolution: "@sapphire/utilities@npm:3.18.0"
+  checksum: 10c0/be94b340d0ee399e3dce0e3566481382a6562cf2f49bd428b91e1797e7a6b18eee282116cc15ce1e590fe39e78478599f94ed40b937f26c79dd52f8b82c7232f
   languageName: node
   linkType: hard
 
@@ -2260,7 +2267,7 @@ __metadata:
   resolution: "benchmarks@workspace:benchmarks"
   dependencies:
     "@joshdb/provider": "npm:2.0.0-next.fdc1285.0"
-    "@sapphire/utilities": "npm:^3.17.0"
+    "@sapphire/utilities": "npm:^3.18.0"
     "@vitest/coverage-v8": "npm:^1.6.0"
     property-helpers: "npm:^2.0.0"
     typescript: "npm:^5.6.3"
