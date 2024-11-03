@@ -36,7 +36,7 @@
     "property-helpers": "^2.0.0"
   },
   "devDependencies": {
-    "@favware/cliff-jumper": "^3.0.3",
+    "@favware/cliff-jumper": "^5.0.0",
     "@vitest/coverage-v8": "^1.6.0",
     "tests": "workspace:*",
     "tsup": "^8.3.5",
