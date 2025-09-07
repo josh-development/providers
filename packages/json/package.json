@@ -30,7 +30,7 @@
     "@joshdb/provider": "2.0.0-next.df53d54.0",
     "@sapphire/async-queue": "^1.5.5",
     "@sapphire/snowflake": "^3.5.5",
-    "@sapphire/utilities": "^3.18.1",
+    "@sapphire/utilities": "^3.18.2",
     "better-serialize": "^2.0.0",
     "property-helpers": "^2.0.0"
   },

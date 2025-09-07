@@ -26,7 +26,7 @@
   "dependencies": {
     "@joshdb/provider": "2.0.0-next.df53d54.0",
     "better-serialize": "^2.0.0",
-    "redis": "^4.7.0",
+    "redis": "^4.7.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
