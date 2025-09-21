@@ -31,7 +31,7 @@
     "@sapphire/utilities": "^3.18.2",
     "better-serialize": "^2.0.0",
     "mongodb": "^6.20.0",
-    "property-helpers": "^2.0.0"
+    "property-helpers": "^3.0.0"
   },
   "devDependencies": {
     "@favware/cliff-jumper": "^3.0.3",
