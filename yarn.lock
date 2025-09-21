@@ -804,7 +804,7 @@ __metadata:
     "@sapphire/utilities": "npm:^3.18.2"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
-    property-helpers: "npm:^2.0.0"
+    property-helpers: "npm:^3.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.3.5"
     typedoc: "npm:^0.26.11"
@@ -823,7 +823,7 @@ __metadata:
     "@sapphire/utilities": "npm:^3.18.2"
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
-    property-helpers: "npm:^2.0.0"
+    property-helpers: "npm:^3.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.3.5"
     typedoc: "npm:^0.26.11"
@@ -862,7 +862,7 @@ __metadata:
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
     mongodb: "npm:^6.20.0"
-    property-helpers: "npm:^2.0.0"
+    property-helpers: "npm:^3.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.3.5"
     typedoc: "npm:^0.26.11"
@@ -883,7 +883,7 @@ __metadata:
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
     postgres: "npm:^3.4.7"
-    property-helpers: "npm:^2.0.0"
+    property-helpers: "npm:^3.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.3.5"
     typedoc: "npm:^0.26.11"
@@ -962,7 +962,7 @@ __metadata:
     "@vitest/coverage-v8": "npm:^1.6.0"
     better-serialize: "npm:^2.0.0"
     better-sqlite3: "npm:^11.10.0"
-    property-helpers: "npm:^2.0.0"
+    property-helpers: "npm:^3.0.0"
     tests: "workspace:*"
     tsup: "npm:^8.3.5"
     typedoc: "npm:^0.26.11"
@@ -2269,7 +2269,7 @@ __metadata:
     "@joshdb/provider": "npm:2.0.0-next.fdc1285.0"
     "@sapphire/utilities": "npm:^3.18.2"
     "@vitest/coverage-v8": "npm:^1.6.0"
-    property-helpers: "npm:^2.0.0"
+    property-helpers: "npm:^3.0.0"
     typescript: "npm:^5.6.3"
     vitest: "npm:^1.6.0"
   languageName: unknown
@@ -5617,10 +5617,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"property-helpers@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "property-helpers@npm:2.0.0"
-  checksum: 10c0/abbec0dd9a46fbaf28079196cfc1be83a0ebf4da483c27a227fb11e0eb5cc25ee056e8b1e809b8455bf8b10f0ebaeea534281cd34029313593c93cc8f7dfe795
+"property-helpers@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "property-helpers@npm:3.0.0"
+  checksum: 10c0/1817653daa8ead5109d460db7178e2b76b8c472b09be2b7161e0e493bd0c59fc408b3c8b66133390a1aa1c1d64c6dc2e38c5acb395f3077cfb1a500ad41d63b4
   languageName: node
   linkType: hard
 
