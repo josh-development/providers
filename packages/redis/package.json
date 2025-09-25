@@ -30,7 +30,7 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@favware/cliff-jumper": "^3.0.3",
+    "@favware/cliff-jumper": "^6.0.0",
     "@types/uuid": "^9.0.8",
     "@vitest/coverage-v8": "^1.6.0",
     "tests": "workspace:*",
