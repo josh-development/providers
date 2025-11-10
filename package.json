@@ -19,8 +19,8 @@
     "postinstall": "husky"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.5.0",
-    "@commitlint/config-conventional": "^19.5.0",
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
     "@faker-js/faker": "^8.4.1",
     "@favware/cliff-jumper": "^3.0.3",
     "@favware/colorette-spinner": "^1.0.1",
