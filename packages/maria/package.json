@@ -33,13 +33,13 @@
   },
   "devDependencies": {
     "@favware/cliff-jumper": "^3.0.3",
-    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/coverage-v8": "^1.6.1",
     "tests": "workspace:*",
-    "tsup": "^8.3.5",
-    "typedoc": "^0.26.11",
+    "tsup": "^8.5.1",
+    "typedoc": "^0.28.14",
     "typedoc-json-parser": "^10.2.0",
-    "typescript": "^5.6.3",
-    "vitest": "^1.6.0"
+    "typescript": "^5.9.3",
+    "vitest": "^1.6.1"
   },
   "repository": {
     "type": "git",
